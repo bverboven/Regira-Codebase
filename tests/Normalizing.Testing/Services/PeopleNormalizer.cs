@@ -1,0 +1,37 @@
+﻿using Regira.Normalizing;
+using Regira.Normalizing.Abstractions;
+using Regira.Normalizing.Models;
+using Regira.Utilities;
+using Testing.Library.Contoso;
+
+namespace Normalizing.Testing.Services;
+
+public class PeopleNormalizer : IObjectNormalizer
+{
+    public INormalizer DefaultNormalizer { get; }
+    public PeopleNormalizer() : this(null) { }
+    public PeopleNormalizer(INormalizer? normalizer)
+    {
+        DefaultNormalizer = normalizer
+                            ?? new DefaultNormalizer(new NormalizeOptions
+                            {
+                                RemoveDiacritics = true,
+                                Transform = TextTransform.ToUpperCase
+                            });
+    }
+
+    public void HandleNormalize(object? instance, bool recursive = true)
+    {
+        if (instance is Person item)
+        {
+            item.NormalizedLastName = DefaultNormalizer.Normalize(item.LastName);
+            item.NormalizedGivenName = DefaultNormalizer.Normalize(item.GivenName);
+            item.Email = item.Email?.ToLowerInvariant();
+            item.NormalizedPhone = !string.IsNullOrWhiteSpace(item.Phone)
+                ? RegexUtility.ExtractPhoneNumbers(item.Phone).FirstOrDefault()
+                : null;
+
+            HandleNormalize(item.Supervisor);
+        }
+    }
+}

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <Authors>B.Verboven</Authors>
+        <UserSecretsId>a148955e-1052-48e7-a8da-4534748de1c4</UserSecretsId>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.10" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.10" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.10" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Entities.DependencyInjection\Entities.DependencyInjection.csproj" />
+        <ProjectReference Include="..\..\src\IO.Storage.Azure\IO.Storage.Azure.csproj" />
+        <ProjectReference Include="..\..\src\Serializing.Newtonsoft\Serializing.Newtonsoft.csproj" />
+        <ProjectReference Include="..\Testing.Library\_Testing.Library.csproj" />
+    </ItemGroup>
+</Project>

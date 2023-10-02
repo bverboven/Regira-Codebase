@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.TreeList</RootNamespace>
+    <PackageId>Regira.TreeList</PackageId>
+    <AssemblyName>Regira.TreeList</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>3.0.0</Version>
+  </PropertyGroup>
+</Project>

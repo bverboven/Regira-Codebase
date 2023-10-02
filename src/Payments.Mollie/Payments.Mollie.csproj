@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.Payments.Mollie</RootNamespace>
+    <PackageId>Regira.Payments.Mollie</PackageId>
+    <AssemblyName>Regira.Payments.Mollie</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>3.2.7</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Abstractions\**" />
+    <Compile Remove="Models\**" />
+    <Compile Remove="Response\**" />
+    <EmbeddedResource Remove="Abstractions\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="Response\**" />
+    <None Remove="Abstractions\**" />
+    <None Remove="Models\**" />
+    <None Remove="Response\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Payments\Common.Payments.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
+    <PackageReference Include="System.Text.Json" Version="7.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Mollie.Api" Version="2.3.0.2" />
+  </ItemGroup>
+</Project>

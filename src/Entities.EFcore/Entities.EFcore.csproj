@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.Entities.EFcore</RootNamespace>
+    <PackageId>Regira.Entities.EFcore</PackageId>
+    <AssemblyName>Regira.Entities.EFcore</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>3.7.3</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Entities\Common.Entities.csproj" />
+    <ProjectReference Include="..\DAL.EFcore\DAL.EFcore.csproj" />
+  </ItemGroup>
+</Project>

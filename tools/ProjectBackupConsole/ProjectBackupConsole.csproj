@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.ProjectBackupConsole</RootNamespace>
+    <PackageId>Regira.ProjectBackupConsole</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Common.IO.Storage\Common.IO.Storage.csproj" />
+  </ItemGroup>
+</Project>

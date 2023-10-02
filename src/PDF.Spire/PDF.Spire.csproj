@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.Office.PDF.Spire</RootNamespace>
+    <PackageId>Regira.Office.PDF.Spire</PackageId>
+    <AssemblyName>Regira.Office.PDF.Spire</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>3.3.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
+    <ProjectReference Include="..\Drawing.GDI\Drawing.GDI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FreeSpire.PDF" Version="8.6.0" />
+  </ItemGroup>
+</Project>

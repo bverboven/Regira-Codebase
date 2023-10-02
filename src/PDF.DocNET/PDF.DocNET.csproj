@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.Office.PDF.DocNET</RootNamespace>
+    <PackageId>Regira.Office.PDF.DocNET</PackageId>
+    <AssemblyName>Regira.Office.PDF.DocNET</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>3.3.1</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
+    <ProjectReference Include="..\Drawing.GDI\Drawing.GDI.csproj" />
+    <!--<ProjectReference Include="..\Drawing.SkiaSharp\Drawing.SkiaSharp.csproj" />-->
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Docnet.Core" Version="2.3.1" />
+  </ItemGroup>
+</Project>

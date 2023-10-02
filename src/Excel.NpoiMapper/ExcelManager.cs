@@ -1,0 +1,139 @@
+﻿using Npoi.Mapper;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+using Regira.IO.Abstractions;
+using Regira.IO.Extensions;
+using Regira.Office.Excel.Abstractions;
+using Regira.Utilities;
+
+namespace Regira.Office.Excel.NpoiMapper;
+
+public class ExcelManager : IExcelManager
+{
+    public class Options
+    {
+        public string DateFormat { get; set; } = "yyyy-MM-dd hh:mm:ss";
+    }
+
+    private readonly string _dateFormat;
+    public ExcelManager(Options? options = null)
+    {
+        options ??= new Options();
+        _dateFormat = options.DateFormat;
+    }
+
+
+    public IEnumerable<ExcelSheet> Read(IBinaryFile input, string[]? headers = null)
+    {
+        using var ms = input.GetStream();
+        var mapper = new Mapper(ms);
+        var sheetCount = mapper.Workbook.NumberOfSheets;
+        var sheets = new List<ExcelSheet>();
+        for (var i = 0; i < sheetCount; i++)
+        {
+            var sheetName = mapper.Workbook.GetSheetName(i);
+            sheets.Add(new ExcelSheet
+            {
+                Name = sheetName,
+                Data = mapper.Take<object>(i).Select(r => r.Value).ToList()
+            });
+        }
+
+        return sheets;
+    }
+
+    public IMemoryFile Create(ExcelSheet sheet)
+    {
+        return Create(new[] { sheet });
+    }
+    public IMemoryFile Create(IEnumerable<ExcelSheet> sheets)
+    {
+        var workbook = new XSSFWorkbook();
+        var mapper = new Mapper(workbook);
+        var sheetIndex = 0;
+        foreach (var sheet in sheets)
+        {
+            var sheetName = sheet.Name ?? $"Sheet-{++sheetIndex}";
+            if (sheet.Data?.FirstOrDefault() is IDictionary<string, object>)
+            {
+                var xlsSheet = workbook.CreateSheet(sheetName);
+                var dicData = sheet.Data.Select(d => DictionaryUtility.ToDictionary(d)).ToList();
+                FillSheet(xlsSheet, dicData);
+            }
+            else
+            {
+                mapper.Put(sheet.Data, sheetName);
+            }
+        }
+
+        var ms = new MemoryStream();
+        workbook.Write(ms, true);
+        return ms.ToMemoryFile();
+    }
+
+    protected void FillSheet(ISheet sheet, IList<IDictionary<string, object?>> data)
+    {
+        if (!data.Any())
+        {
+            return;
+        }
+
+        var keys = data.SelectMany(dic => dic.Keys).Distinct().ToArray();
+        var keysWithType = keys.ToDictionary(key => key, key =>
+        {
+            var firstValidItem = data.FirstOrDefault(d => d.ContainsKey(key) && d[key] != null);
+            return firstValidItem?[key]?.GetType();
+        });
+
+        ICellStyle? dateCellStyle = null;
+
+        var headers = sheet.CreateRow(0);
+        for (var r = 0; r < data.Count; r++)
+        {
+            var row = sheet.CreateRow(r + 1);
+            for (var c = 0; c < keys.Length; c++)
+            {
+                var key = keys[c];
+                if (r == 0)
+                {
+                    // headers
+                    var cell = headers.CreateCell(c);
+                    cell.SetCellValue(key);
+                }
+                if (data[r].ContainsKey(key))
+                {
+                    var cell = row.CreateCell(c);
+                    var value = data[r][key];
+
+                    if (value != null)
+                    {
+                        var propertyType = keysWithType[key];
+                        var simplePropertyType = TypeUtility.GetSimpleType(propertyType!);
+                        if (simplePropertyType == typeof(DateTime))
+                        {
+                            if (dateCellStyle == null)
+                            {
+                                dateCellStyle = sheet.Workbook.CreateCellStyle();
+                                dateCellStyle.DataFormat = sheet.Workbook.CreateDataFormat().GetFormat(_dateFormat);
+                            }
+                            cell.CellStyle = dateCellStyle;
+                            cell.SetCellValue((DateTime)value);
+                        }
+                        else if (simplePropertyType.IsNumeric())
+                        {
+                            cell.SetCellValue(Convert.ToDouble(value));
+                        }
+                        else if (new[] { typeof(bool) }.Contains(simplePropertyType))
+                        {
+                            cell.SetCellValue((bool)value);
+                        }
+                        else //if (new[] { typeof(string), typeof(char) }.Contains(simplePropertyType))
+                        {
+                            cell.SetCellValue(value.ToString());
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.Web.HTML.RazorLight</RootNamespace>
+    <PackageId>Regira.Web.HTML.RazorLight</PackageId>
+    <AssemblyName>Regira.Web.HTML.RazorLight</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>3.2.7</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Web\Common.Web.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="RazorLight" Version="2.3.1" />
+  </ItemGroup>
+</Project>

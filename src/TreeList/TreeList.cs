@@ -1,0 +1,161 @@
+﻿using Regira.TreeList.Abstractions;
+
+namespace Regira.TreeList;
+
+public class TreeList<T> : List<TreeNode<T>>
+{
+    public class Options
+    {
+        public bool EnableAutoCheck { get; set; } = true;
+        public bool ThrowOnError { get; set; } = true;
+    }
+
+    public bool EnableAutoCheck { get; set; }
+    public bool ThrowOnError { get; set; }
+    public TreeNode<T>[] Roots { get; private set; } = Array.Empty<TreeNode<T>>();
+
+
+    public TreeList(Options? options = null)
+    {
+        options ??= new Options();
+        EnableAutoCheck = options.EnableAutoCheck;
+        ThrowOnError = options.ThrowOnError;
+    }
+    public TreeList(int capacity, Options? options = null)
+        : base(capacity)
+    {
+        options ??= new Options();
+        EnableAutoCheck = options.EnableAutoCheck;
+        ThrowOnError = options.ThrowOnError;
+    }
+    public TreeList(IEnumerable<T> collection, Options? options = null)
+    {
+        options ??= new Options();
+        EnableAutoCheck = options.EnableAutoCheck;
+        ThrowOnError = options.ThrowOnError;
+
+        AddValues(collection);
+    }
+    public TreeList(IEnumerable<TreeNode<T>> collection, Options? options = null)
+        : base(collection)
+    {
+        options ??= new Options();
+        EnableAutoCheck = options.EnableAutoCheck;
+        ThrowOnError = options.ThrowOnError;
+
+        Roots = this.Where(node => node.Parent == null).ToArray();
+    }
+
+
+    public TreeNode<T>? AddValue(T value, TreeNode<T>? parent = null)
+    {
+        return AddValues(new[] { value }, parent).FirstOrDefault();
+    }
+    public IEnumerable<TreeNode<T>> AddValues(IEnumerable<T> values, TreeNode<T>? parent = null)
+    {
+        if (parent == null)
+        {
+            var roots = values.Select(x => new TreeNode<T>(x, this)).ToArray();
+            AddRange(roots);
+            Roots = Roots.Concat(roots).ToArray();
+            return roots;
+        }
+
+        return parent.AddChildren(values);
+    }
+
+    public void Fill(IEnumerable<T> values, Func<T, T> getParent)
+    {
+        Fill(values, value => new[] { getParent(value) }.Where(parent => parent != null));
+    }
+    /// <summary>
+    /// Fill TreeList by defining each node's parents.
+    /// Lesser performance.
+    /// </summary>
+    /// <param name="values">Complete collection of items</param>
+    /// <param name="getParents">Selector of all parents for each item</param>
+    public void Fill(IEnumerable<T> values, Func<T, IEnumerable<T>> getParents)
+    {
+        var list = values as IList<T> ?? values.ToList();
+        var roots = list.Where(x => !getParents(x).Any());
+        Fill(roots, node => list.Where(listValue => getParents(listValue).Contains(node.Value)));
+    }
+    /// <summary>
+    /// Fill TreeList by defining each node's children.
+    /// Best performance!
+    /// </summary>
+    /// <param name="rootValues">Only the root items</param>
+    /// <param name="getChildren">Selector of all children for each node</param>
+    public void Fill(IEnumerable<T> rootValues, Func<ITreeNode<T>, IEnumerable<T>> getChildren)
+    {
+        Clear();
+        var rootList = rootValues as IList<T> ?? rootValues.ToList();
+        foreach (var root in rootList)
+        {
+            var rootNode = AddValue(root);
+            if (rootNode != null)
+            {
+                AddChildren(rootNode, getChildren);
+            }
+        }
+    }
+    private void AddChildren(TreeNode<T> node, Func<ITreeNode<T>, IEnumerable<T>> getChildren)
+    {
+        var children = getChildren(node);
+        foreach (var child in children)
+        {
+            var childNode = node.AddChild(child);
+            AddChildren(childNode, getChildren);
+        }
+    }
+
+    public new void RemoveAt(int index)
+    {
+        if (index > Count || index < 0)
+        {
+            throw new Exception("Invalid index");
+        }
+
+        var item = this[index];
+
+        base.RemoveAt(index);
+
+        item.Parent?.RemoveChild(item);
+
+        foreach (var child in item.Children)
+        {
+            Remove(child);
+        }
+    }
+    public new bool Remove(TreeNode<T> item)
+    {
+        int index = IndexOf(item);
+        if (index >= 0)
+        {
+            RemoveAt(index);
+        }
+
+        return index >= 0;
+    }
+    public int Remove(T value)
+    {
+        var items = FindAll(i => i.Value?.Equals(value) == true);
+        return RemoveAll(items);
+    }
+    public int RemoveAll(IEnumerable<TreeNode<T>> items)
+    {
+        return items.Count(Remove);
+    }
+    public int RemoveAll(Func<TreeNode<T>, bool> predicate)
+    {
+        var items = this.Where(predicate);
+        return items.Count(Remove);
+    }
+
+
+    public bool IsValidChild(TreeNode<T> parent, T child)
+    {
+        var ancestors = parent.GetAncestors();
+        return ancestors.All(a => a.Value?.Equals(child) != true);
+    }
+}

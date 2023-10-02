@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.Entities.Web</RootNamespace>
+    <PackageId>Regira.Entities.Web</PackageId>
+    <AssemblyName>Regira.Entities.Web</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>3.6.7</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Entities\Common.Entities.csproj" />
+    <ProjectReference Include="..\Common.Web\Common.Web.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="AutoMapper">
+      <Version>10.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection">
+      <Version>8.1.1</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="AutoMapper">
+      <Version>12.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection">
+      <Version>12.0.1</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+    <PackageReference Include="AutoMapper">
+      <Version>12.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection">
+      <Version>12.0.1</Version>
+    </PackageReference>
+  </ItemGroup>
+</Project>

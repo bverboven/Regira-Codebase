@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.Office.OCR.Tesseract</RootNamespace>
+    <PackageId>Regira.Office.OCR.Tesseract</PackageId>
+    <AssemblyName>Regira.Office.OCR.Tesseract</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>3.1.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="tessdata\readme.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="tessdata\readme.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Tesseract" Version="5.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
+  </ItemGroup>
+</Project>

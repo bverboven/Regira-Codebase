@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.Office.PDF.SelectPdf</RootNamespace>
+    <PackageId>Regira.Office.PDF.SelectPdf</PackageId>
+    <AssemblyName>Regira.Office.PDF.SelectPdf</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>3.3.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Select.HtmlToPdf.NetCore" Version="23.1.0" />
+  </ItemGroup>
+</Project>

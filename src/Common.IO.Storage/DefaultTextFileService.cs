@@ -1,0 +1,58 @@
+using Regira.IO.Storage.Abstractions;
+using Regira.IO.Utilities;
+using System.Text;
+
+namespace Regira.IO.Storage;
+
+public class DefaultTextFileService : ITextFileService
+{
+
+    private readonly IFileService _binaryFileService;
+    private readonly Encoding? _encoding;
+    public DefaultTextFileService(IFileService binaryFileService, Encoding? encoding = null)
+    {
+        _binaryFileService = binaryFileService;
+        _encoding = encoding ?? Encoding.Default;
+    }
+
+
+    public string RootFolder => _binaryFileService.RootFolder;
+
+
+    public async Task<string?> GetContents(string identifier)
+    {
+        using var stream = await GetStream(identifier);
+        return FileUtility.GetString(stream);
+    }
+    public Task<string> Save(string identifier, string contents, string? contentType = null)
+    {
+        using var stream = FileUtility.GetStreamFromString(contents, _encoding);
+        return Save(identifier, stream, contentType);
+    }
+
+
+    public Task<bool> Exists(string identifier)
+        => _binaryFileService.Exists(identifier);
+    public Task<byte[]?> GetBytes(string identifier)
+        => _binaryFileService.GetBytes(identifier);
+    public Task<Stream?> GetStream(string identifier)
+        => _binaryFileService.GetStream(identifier);
+    public Task<IEnumerable<string>> List(FileSearchObject? so = null)
+        => _binaryFileService.List(so);
+
+    public Task Move(string sourceIdentifier, string targetIdentifier)
+        => _binaryFileService.Move(sourceIdentifier, targetIdentifier);
+    public Task<string> Save(string identifier, byte[] bytes, string? contentType = null)
+        => _binaryFileService.Save(identifier, bytes, contentType);
+    public Task<string> Save(string identifier, Stream stream, string? contentType = null)
+        => _binaryFileService.Save(identifier, stream, contentType);
+    public Task Delete(string identifier)
+        => _binaryFileService.Delete(identifier);
+
+    public string GetAbsoluteUri(string identifier)
+        => _binaryFileService.GetAbsoluteUri(identifier);
+    public string GetIdentifier(string uri)
+        => _binaryFileService.GetIdentifier(uri);
+    public string? GetRelativeFolder(string identifier)
+        => _binaryFileService.GetRelativeFolder(identifier);
+}

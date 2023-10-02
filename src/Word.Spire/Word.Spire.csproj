@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.Office.Word.Spire</RootNamespace>
+    <PackageId>Regira.Office.Word.Spire</PackageId>
+    <AssemblyName>Regira.Office.Word.Spire</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>3.3.0</Version>
+  </PropertyGroup>
+  <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
+    <PackageReference Include="FreeSpire.Doc" Version="9.9.7" />
+    <ProjectReference Include="..\Drawing.SkiaSharp\Drawing.SkiaSharp.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="$(TargetFramework) == 'net6.0' or $(TargetFramework) == 'net7.0'">
+    <PackageReference Include="FreeSpire.Doc" Version="11.6.0" />
+    <ProjectReference Include="..\Drawing.GDI\Drawing.GDI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="7.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
+    <ProjectReference Include="..\TreeList\TreeList.csproj" />
+  </ItemGroup>
+</Project>

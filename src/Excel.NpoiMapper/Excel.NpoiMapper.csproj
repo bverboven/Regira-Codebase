@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.Office.Excel.NpoiMapper</RootNamespace>
+    <PackageId>Regira.Office.Excel.NpoiMapper</PackageId>
+    <AssemblyName>Regira.Office.Excel.NpoiMapper</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>3.3.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
+    <PackageReference Include="Npoi.Mapper" Version="4.1.0" />
+  </ItemGroup>
+  <ItemGroup Condition="$(TargetFramework) == 'net6.0' or $(TargetFramework) == 'net7.0'">
+    <PackageReference Include="Npoi.Mapper" Version="6.0.0" />
+  </ItemGroup>
+</Project>
