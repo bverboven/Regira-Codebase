@@ -11,7 +11,7 @@
     <AssemblyName>Regira.IO.Storage.SSH</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>3.2.7</Version>
+    <Version>3.2.8</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.IO.Storage\Common.IO.Storage.csproj" />

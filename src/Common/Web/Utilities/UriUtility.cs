@@ -1,6 +1,7 @@
 using Regira.IO.Utilities;
 using Regira.Utilities;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace Regira.Web.Utilities;
 
@@ -45,5 +46,23 @@ public static class UriUtility
     public static string ToBase64ImageUrl(byte[] bytes, string contentType = "image/png")
     {
         return $"data:{contentType};base64,{FileUtility.GetBase64String(bytes)}";
+    }
+
+    /// <summary>
+    /// Converts a querystring into a lookup
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public static ILookup<string, string> ToQueryDictionary(string query)
+    {
+        return query
+            .TrimStart('?')
+            .Split('&')
+            .Select(x =>
+            {
+                var segments = x.Split('=');
+                return new { Key = segments.FirstOrDefault(), Value = segments.LastOrDefault() };
+            })
+            .ToLookup(x => HttpUtility.UrlDecode(x.Key)!, x => HttpUtility.UrlDecode(x.Value)!);
     }
 }

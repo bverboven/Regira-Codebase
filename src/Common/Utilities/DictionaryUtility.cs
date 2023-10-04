@@ -93,7 +93,7 @@ public static class DictionaryUtility
                 }
                 Add(queue);
             }
-        };
+        }
         Add(new Queue<string>(args));
 
         return dic;
@@ -362,9 +362,9 @@ public static class DictionaryUtility
             {
                 var header = keys[i];
                 var dic = dicList[row - startRow];
-                if (dic.ContainsKey(header))
+                if (dic.TryGetValue(header, out var value))
                 {
-                    table[row, i] = dic[header];
+                    table[row, i] = value;
                 }
             }
         }
@@ -495,9 +495,8 @@ public static class DictionaryUtility
             .Where(prop => prop.GetIndexParameters().Length == 0 && prop.SetMethod != null);
         foreach (var property in targetProperties)
         {
-            if (caseInsensitiveInput.ContainsKey(property.Name))
+            if (caseInsensitiveInput.TryGetValue(property.Name, out var value))
             {
-                var value = caseInsensitiveInput[property.Name];
                 property.SetValue(target!, value, null);
             }
         }
@@ -507,4 +506,27 @@ public static class DictionaryUtility
     public static T ToObject<T>(this IDictionary<string, object?> input)
         where T : new()
         => ToObject(input, new T());
+
+    /// <summary>
+    /// Returns the first value for the given key
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="values"></param>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool TryGetValue<TKey, TValue>(this ILookup<TKey, TValue> values, TKey key, out TValue? value)
+    {
+        var items = values.FirstOrDefault(x => x.Key!.Equals(key));
+        if (items?.Any() != true)
+        {
+            value = default;
+            return false;
+        }
+
+        value = items.FirstOrDefault();
+
+        return true;
+    }
 }
