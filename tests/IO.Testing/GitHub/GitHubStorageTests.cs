@@ -76,21 +76,28 @@ namespace IO.Testing.GitHub
             var so = new FileSearchObject
             {
                 Recursive = true,
-                Extensions = new[] { ".png", ".txt" }
+                Extensions = new[] { ".png", ".txt", ".sql" }
             };
             var fileService = GetFileService();
             var files = (await fileService.List(so)).AsList();
             CollectionAssert.IsNotEmpty(files);
             foreach (var file in files)
             {
-                Assert.IsTrue(so.Extensions.Any(e => file.EndsWith(e, StringComparison.CurrentCultureIgnoreCase)));
+                var pathWithoutQuery = file.Split('?').First();
+                Assert.IsTrue(so.Extensions.Any(e => pathWithoutQuery.EndsWith(e, StringComparison.CurrentCultureIgnoreCase)));
             }
         }
         [Test]
         public virtual async Task GetBytes()
         {
             var fileService = GetFileService();
-            var files = (await fileService.List(new FileSearchObject { Type = FileEntryTypes.Files, Recursive = true })).AsList();
+            var fso = new FileSearchObject
+            {
+                Type = FileEntryTypes.Files,
+                FolderUri = "img",
+                Recursive = true
+            };
+            var files = (await fileService.List(fso)).AsList();
             CollectionAssert.IsNotEmpty(files);
             foreach (var file in files.Take(3))
             {

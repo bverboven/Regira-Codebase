@@ -1,6 +1,7 @@
 ﻿using Regira.IO.Storage.Abstractions;
 using Regira.IO.Utilities;
 using Regira.Serializing.Abstractions;
+using System.Net.Http.Headers;
 using System.Reflection;
 
 namespace Regira.IO.Storage.GitHub;
@@ -19,7 +20,7 @@ public class GitHubService : IFileService
         _options = options;
         _serializer = serializer;
         // Remove trailing slash when using api trees (https://docs.github.com/en/rest/git/trees)
-        RootFolder = _options.Uri.TrimEnd('/') + '/';
+        RootFolder = _options.Uri.TrimEnd('/') + "/contents/";
     }
 
     public async Task<bool> Exists(string identifier)
@@ -41,20 +42,17 @@ public class GitHubService : IFileService
     public async Task<Stream?> GetStream(string identifier)
     {
         using var httpClient = GetClient();
-        var uri = GetIdentifier(identifier);
-        var response = await httpClient.GetAsync(uri);
+        var gitUri = GetAbsoluteUri(identifier);
+        var folder = GetRelativeFolder(identifier);
+        var downloadUri = gitUri.ToDownloadUri(folder);
+        var response = await httpClient.GetAsync(downloadUri);
         return await response.Content.ReadAsStreamAsync();
     }
     public async Task<IEnumerable<string>> List(FileSearchObject? so = null)
     {
         using var httpClient = GetClient();
 
-        var listUri = $"contents/{so?.FolderUri?.TrimStart(@"\/".ToCharArray())}";
-        //if (_options.PageSize > 0)
-        //{
-        //    // not supported?
-        //    listUri = $"{listUri}?per_page={_options.PageSize}";
-        //}
+        var listUri = $"{so?.FolderUri?.TrimStart(@"\/".ToCharArray())}";
         var response = await httpClient.GetAsync(listUri);
         response.EnsureSuccessStatusCode();
         var content = await response.Content.ReadAsStringAsync();
@@ -63,11 +61,6 @@ public class GitHubService : IFileService
         var files = new List<string>();
         foreach (var item in items)
         {
-            if (_options.PageSize != 0 && files.Count >= _options.PageSize)
-            {
-                break;
-            }
-
             if (item.Type == GitHubItemType.Dir)
             {
                 if (so == null || so.Type == FileEntryTypes.All || so.Type == FileEntryTypes.Directories)
@@ -83,7 +76,7 @@ public class GitHubService : IFileService
                         files.Add(folder);
                     }
                 }
-                if (so?.Recursive == true && (_options.PageSize == 0 || files.Count < _options.PageSize))
+                if (so?.Recursive == true)
                 {
                     var dirSo = new FileSearchObject
                     {
@@ -103,15 +96,12 @@ public class GitHubService : IFileService
                 {
                     if (so == null || (so.Extensions?.Any() ?? false) == false || so.Extensions?.Any(e => item.Name.EndsWith(e, StringComparison.InvariantCultureIgnoreCase)) == true)
                     {
-                        files.Add(item.Download_Url!);
+                        var uri = item.ToTokenUri();
+                        var identifier = GetIdentifier(uri);
+                        files.Add(identifier);
                     }
                 }
             }
-        }
-
-        if (_options.PageSize > 0)
-        {
-            return files.Take(_options.PageSize);
         }
 
         return files;
@@ -130,6 +120,7 @@ public class GitHubService : IFileService
         return FileNameUtility.GetRelativeFolder(identifier, RootFolder);
     }
 
+
     protected HttpClient GetClient()
     {
         var httpClient = new HttpClient
@@ -140,7 +131,7 @@ public class GitHubService : IFileService
         httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(_options.UserAgent ?? Assembly.GetExecutingAssembly().GetName().Name);
         if (!string.IsNullOrEmpty(_options.Key))
         {
-            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _options.Key);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.Key);
         }
 
         return httpClient;
