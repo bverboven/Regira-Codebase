@@ -130,6 +130,9 @@ public class BarcodeService : IBarcodeService
                 return ZXingFormat.UPC_A;
             case BarcodeFormat.Upce:
                 return ZXingFormat.UPC_E;
+            case BarcodeFormat.Any:
+            case BarcodeFormat.UnKnown:
+                return ZXingFormat.All_1D;
             default:
                 throw new NotSupportedException($"Format {format} is not supported");
 
