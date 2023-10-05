@@ -11,10 +11,10 @@
     <AssemblyName>Regira.Normalizing.LibPhoneNumber</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>3.2.8</Version>
+    <Version>3.2.9</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="libphonenumber-csharp" Version="8.13.19" />
+    <PackageReference Include="libphonenumber-csharp" Version="8.13.22" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />

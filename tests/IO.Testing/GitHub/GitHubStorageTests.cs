@@ -99,7 +99,8 @@ namespace IO.Testing.GitHub
             };
             var files = (await fileService.List(fso)).AsList();
             CollectionAssert.IsNotEmpty(files);
-            foreach (var file in files.Take(3))
+            // Getting file contents is sometimes very slow (penalty for testing too much?)
+            foreach (var file in files.Take(1))
             {
                 var bytes = await fileService.GetBytes(file);
                 Assert.IsNotNull(bytes);

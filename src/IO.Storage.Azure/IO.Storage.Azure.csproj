@@ -11,12 +11,12 @@
     <AssemblyName>Regira.IO.Storage.Azure</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>3.2.9</Version>
+    <Version>3.2.10</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.IO.Storage\Common.IO.Storage.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.17.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.18.0" />
   </ItemGroup>
 </Project>
