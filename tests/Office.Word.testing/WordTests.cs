@@ -617,6 +617,36 @@ public class WordTests
         var hasTitleParameter = HasContent(outputFile, "{{ title }}");
         Assert.IsFalse(hasTitleParameter);
     }
+
+    class WordDocumentModel
+    {
+        public byte[] TemplateBytes { get; set; }
+        public IDictionary<string, object> GlobalParameters { get; set; }
+
+    }
+    [Test]
+    public async Task From_JsonFile()
+    {
+        var srcPath = Path.Combine(_assetsDir, "Input", "json-input.json");
+        var outputPath = Path.Combine(_assetsDir, "Output", "from-json-file.docx");
+
+        var json = await File.ReadAllTextAsync(srcPath);
+        var model = JsonSerializer.Deserialize<WordDocumentModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+        var input = new WordTemplateInput
+        {
+            Template = model.TemplateBytes.ToBinaryFile(),
+            GlobalParameters = model.GlobalParameters
+        };
+
+        var mgr = new WordManager();
+        using var outputFile = mgr.Create(input)
+            .ToBinaryFile();
+
+        var file = await outputFile.SaveAs(outputPath);
+        Assert.IsTrue(file.Exists);
+        Assert.Greater(file.Length, 0);
+    }
+
     [Test]
     public async Task Factuur()
     {

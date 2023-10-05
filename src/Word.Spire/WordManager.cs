@@ -93,7 +93,9 @@ namespace Regira.Office.Word.Spire
                 yield return skBitmap.ToImageFile(SKEncodedImageFormat.Jpeg);
 #else
                 var img = doc.SaveToImages(i, ImageType.Bitmap);
+#pragma warning disable CA1416
                 yield return img.ToImageFile(ImageFormat.Jpeg);
+#pragma warning restore CA1416
 #endif
             }
         }
@@ -143,34 +145,34 @@ namespace Regira.Office.Word.Spire
                 doc.LoadFromStream(templateStream, SpireFileFormat.Auto, XHTMLValidationType.None);
             }
 
-            if (input.DocumentParameters.Any())
+            if (input.DocumentParameters?.Any() == true)
             {
                 InsertDocuments(doc, input.DocumentParameters);
             }
             // collection parameters first so the globalParameters don't interfere
-            if (input.CollectionParameters.Any())
+            if (input.CollectionParameters?.Any() == true)
             {
                 ReplaceCollections(doc, input.CollectionParameters);
             }
 
-            if (input.Images.Any())
+            if (input.Images?.Any() == true)
             {
                 ReplaceImages(doc, input.Images);
             }
 
-            if (input.GlobalParameters.Any())
+            if (input.GlobalParameters?.Any() == true)
             {
                 ReplaceGlobalParameters(doc, input.GlobalParameters);
             }
 
-            if (input.Headers.Any())
+            if (input.Headers?.Any() == true)
             {
                 foreach (var inputHeader in input.Headers)
                 {
                     AddHeader(doc, CreateDocument(inputHeader.Template, reference), inputHeader.Type);
                 }
             }
-            if (input.Footers.Any())
+            if (input.Footers?.Any() == true)
             {
                 foreach (var inputFooter in input.Footers)
                 {
@@ -410,7 +412,7 @@ namespace Regira.Office.Word.Spire
                         var matches = ParamRegex.Matches(content);
                         foreach (Match match in matches)
                         {
-                            object? value = null;
+                            object? value;
                             var key = match.Value.Trim("{ }".ToCharArray());
                             switch (key)
                             {
@@ -418,10 +420,7 @@ namespace Regira.Office.Word.Spire
                                     value = r + 1;
                                     break;
                                 default:
-                                    if (itemDic.ContainsKey(key))
-                                    {
-                                        value = itemDic[key];
-                                    }
+                                    itemDic.TryGetValue(key, out value);
                                     break;
                             }
                             newRow.Cells[i].FirstParagraph.Replace(new Regex($"{{{{ *{key} *}}}}"), value?.ToString());
