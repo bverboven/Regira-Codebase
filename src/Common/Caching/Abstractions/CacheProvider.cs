@@ -13,11 +13,7 @@ public abstract class CacheProvider : ICacheProvider
     }
 
     public abstract T? Get<T>(string key);
-    public virtual void Set<T>(string key, T? value)
-    {
-        Set(key, value, 0);
-    }
-    public abstract void Set<T>(string key, T? value, int duration);
+    public abstract void Set<T>(string key, T? value, int? duration = null);
 
     public abstract void Remove(string key);
     public abstract void RemoveAll();
@@ -65,9 +61,5 @@ public abstract class CacheProvider : ICacheProvider
     public IDictionaryEnumerator GetEnumerator()
     {
         return new CacheEnumerator(Keys, Get<object>);
-    }
-
-    public virtual void Dispose()
-    {
     }
 }

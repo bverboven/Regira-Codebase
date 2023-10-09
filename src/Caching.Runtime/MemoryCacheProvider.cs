@@ -8,20 +8,22 @@ public class MemoryCacheProvider : CacheProvider
     public class Options
     {
         public string? Prefix { get; set; }
+        /// <summary>
+        /// Default caching duration in seconds
+        /// </summary>
+        public int DefaultDuration { get; set; } = 60 * 60;
     }
 
     private readonly string? _prefix;
+    private readonly int _defaultDuration;
     protected readonly MemoryCache Cache = MemoryCache.Default;
     public override IList<string> Keys { get; }
     public MemoryCacheProvider(Options? options = null)
     {
-        _prefix = options?.Prefix;
+        options ??= new Options();
+        _prefix = options.Prefix;
+        _defaultDuration = options.DefaultDuration;
         Keys = new List<string>();
-    }
-    // compatibility
-    public MemoryCacheProvider(string prefix)
-        : this(new Options { Prefix = prefix })
-    {
     }
 
 
@@ -32,11 +34,11 @@ public class MemoryCacheProvider : CacheProvider
         var cachedItem = Cache.GetCacheItem(fullKey);
         return (T?)cachedItem.Value;
     }
-    public override void Set<T>(string key, T? value, int duration)
+    public override void Set<T>(string key, T? value, int? duration = null)
         where T : default
     {
         var fullKey = GetKey(key);
-        Cache.Set(fullKey, value!, new CacheItemPolicy { AbsoluteExpiration = DateTime.Now.AddSeconds(duration) });
+        Cache.Set(fullKey, value!, new CacheItemPolicy { AbsoluteExpiration = DateTime.Now.AddSeconds(duration ?? _defaultDuration) });
     }
     public override void Remove(string key)
     {

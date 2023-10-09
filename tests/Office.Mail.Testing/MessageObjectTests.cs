@@ -25,7 +25,7 @@ public class MessageObjectTests
     [TestCase("")]
     [TestCase("bad_email")]
     [TestCase("test@bad_email")]
-    public void Error_Invalid_Email(string email)
+    public void Error_Invalid_Email(string? email)
     {
         // ReSharper disable once ObjectCreationAsStatement
         Assert.Throws<EmailFormatException>(() => new MailAddress { Email = email });

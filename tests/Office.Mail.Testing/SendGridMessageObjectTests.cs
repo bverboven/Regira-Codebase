@@ -26,7 +26,7 @@ public class SendGridMessageObjectTests
         var input = _serializer.Deserialize<MailInput>(serializedInput)!;
         var msg = input.ToMessageObject();
         // added [assembly: InternalsVisibleTo("Mail.Testing")] to internal Sendgrid extensions
-        var sgMsg = MessageObjectExtensions.ToMailMessage(msg);
+        var sgMsg = msg.ToMailMessage();
 
         Assert.AreEqual(msg.From?.Email, sgMsg.From?.Email);
         Assert.AreEqual(msg.From?.DisplayName, sgMsg.From?.Name);

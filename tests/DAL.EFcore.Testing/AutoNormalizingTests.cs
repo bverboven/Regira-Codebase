@@ -46,6 +46,7 @@ internal class AutoNormalizingTests
     public void TearDown()
     {
         _connection.Close();
+        _dbContext.Dispose();
     }
 
     [Test]

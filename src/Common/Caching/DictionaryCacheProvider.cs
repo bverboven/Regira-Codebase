@@ -29,7 +29,7 @@ public class DictionaryCacheProvider : CacheProvider
 
         return default;
     }
-    public override void Set<T>(string key, T? value, int duration)
+    public override void Set<T>(string key, T? value, int? duration = null)
         where T : default
     {
         key = GetKey(key);

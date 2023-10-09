@@ -37,7 +37,7 @@ Vivamus tempus enim lacinia nisi molestie vulputate. Praesent 1:2:3:4:5:6:7:8 tu
     [TestCase("xxx", false)]
     [TestCase("", false)]
     [TestCase(null, false)]
-    public void TestValidEmail(string input, bool expected)
+    public void TestValidEmail(string? input, bool expected)
     {
         var isValid = RegexUtility.IsValidEmail(input);
         Assert.AreEqual(expected, isValid);

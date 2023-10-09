@@ -3,6 +3,7 @@
 public class ProjectOptions
 {
     public string Prefix { get; set; } = "Regira";
-    public string SourceDirectory { get; set; } = null!;
+    public string? ApiKey { get; set; }
     public string PackagesUri { get; set; } = null!;
+    public string? SourceDirectory { get; set; }
 }

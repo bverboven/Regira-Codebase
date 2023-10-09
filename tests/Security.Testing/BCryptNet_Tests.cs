@@ -14,7 +14,7 @@ public class BCryptNet_Hash_Tests
     [TestCase("0123ABCdef", null)]
     [TestCase(null, "secret")]
     [TestCase(null, null)]
-    public void Verify_Hasher_Success(string plaintext, string secret)
+    public void Verify_Hasher_Success(string? plaintext, string? secret)
     {
         var hasher = new Hasher(new CryptoOptions { Secret = secret });
         var hashed = hasher.Hash(plaintext);

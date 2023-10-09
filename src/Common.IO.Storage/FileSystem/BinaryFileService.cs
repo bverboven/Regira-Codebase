@@ -6,9 +6,10 @@ public class BinaryFileService : IFileService
 {
     public class FileServiceOptions
     {
-        public string RootFolder { get; set; } = null!;
+        public string RootFolder { get; set; } = string.Empty;
     }
     public string RootFolder { get; }
+    [Obsolete("Deprecated, use constructor with FileServiceOptions instead", false)]
     public BinaryFileService(string rootFolder)
         : this(new FileServiceOptions { RootFolder = rootFolder })
     {
@@ -140,7 +141,8 @@ public class BinaryFileService : IFileService
     public string GetAbsoluteUri(string identifier)
         => FileNameUtility.GetAbsoluteUri(identifier, RootFolder);
     public string GetIdentifier(string uri)
-        => FileNameUtility.GetRelativeUri(uri, RootFolder);
+        // use forward slashes to keep identifier uniform with other IFileService implementations (e.g. Azure)
+        => FileNameUtility.GetRelativeUri(uri, RootFolder).Replace('\\', '/');
     public string? GetRelativeFolder(string identifier)
         => FileNameUtility.GetRelativeFolder(identifier, RootFolder);
 

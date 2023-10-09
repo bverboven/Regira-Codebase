@@ -22,6 +22,7 @@ public class AutoTruncateTests
     public void TearDown()
     {
         _connection.Close();
+        _dbContext.Dispose();
     }
 
     [Test]

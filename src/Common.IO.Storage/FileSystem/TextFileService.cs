@@ -2,8 +2,8 @@
 
 public class TextFileService : BinaryFileService, Abstractions.ITextFileService
 {
-    public TextFileService(string rootFolder)
-        : base(rootFolder)
+    public TextFileService(FileServiceOptions options)
+        : base(options)
     {
     }
 

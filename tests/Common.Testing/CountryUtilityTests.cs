@@ -47,7 +47,7 @@ public class CountryUtilityTests
     [TestCase("fr-CD", "Congo (République démocratique du)")]
     //[TestCase("de-BE", "Belgien")] // not possible to convert CultureInfo to RegionInfo
     [TestCase("xx-BE", null)]
-    public void Test_Get_Country_Name(string cultureName, string expectedCountryName)
+    public void Test_Get_Country_Name(string cultureName, string? expectedCountryName)
     {
         var countryCode = cultureName.Split('-').Last();
         var country = CountryUtility.GetCountry(countryCode);

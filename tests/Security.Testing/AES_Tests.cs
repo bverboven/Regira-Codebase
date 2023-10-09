@@ -14,7 +14,7 @@ public class AES_Tests
     [TestCase("123456", "secret")]
     [TestCase("abc0123DEF", "")]
     [TestCase("0123ABCdef", null)]
-    public void Decrypt_Encrypted_Success(string plaintext, string secret)
+    public void Decrypt_Encrypted_Success(string plaintext, string? secret)
     {
         var encrypter = new AesEncrypter(new CryptoOptions { Secret = secret });
         var encrypted = encrypter.Encrypt(plaintext);
