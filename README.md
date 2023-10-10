@@ -10,7 +10,7 @@ Services to read, write or delete files from different storage types in a unifor
 - SSH (FTP)
 - GitHub (fetching only)
 
-[Unit Tests](https://github.com/bverboven/Regira-Codebase/tree/master/tests/IO.Testing)
+<img src="https://nunit.org/img/nunit.svg" height="16" /> [Unit Tests](https://github.com/bverboven/Regira-Codebase/tree/master/tests/IO.Testing)
 
 Sample
 ```c#
@@ -44,38 +44,42 @@ services.AddTransient<IFileService>(_ => {
 
 ### Office
 
-- Csv
-  - CsvHelper
-- Excel
-  - EPPlus (deprecated)
-  - NpoiMapper
-- Mail 
-  - Mailgun
-  - SendGrid
-- OCR
-  - PaddleOCR
-  - Tesseract
-- PDF
-  - DocNET
-  - SelectPDF
-  - (Free)Spire.PDF
-- vCards
-    - FolkerKinzel
-- Word
-  - (Free)Spire.Doc
+- Csv - [Tests](https://github.com/bverboven/Regira-Codebase/blob/master/tests/Office.Csv.Testing)
+  - [CsvHelper](https://github.com/bverboven/Regira-Codebase/tree/master/src/Csv.CsvHelper)
+- Excel - [Tests](https://github.com/bverboven/Regira-Codebase/blob/master/tests/Office.Excel.Testing)
+  - [EPPlus](https://github.com/bverboven/Regira-Codebase/tree/master/src/Excel.EPPlus)
+  - [NpoiMapper](https://github.com/bverboven/Regira-Codebase/tree/master/src/Excel.NpoiMapper)
+- Mail - [Tests](https://github.com/bverboven/Regira-Codebase/tree/master/tests/Office.Mail.Testing)
+  - [Mailgun](https://github.com/bverboven/Regira-Codebase/tree/master/src/Mail.MailGun)
+  - [SendGrid](https://github.com/bverboven/Regira-Codebase/tree/master/src/Mail.SendGrid)
+- OCR - [Tests](https://github.com/bverboven/Regira-Codebase/tree/master/tests/Office.OCR.Testing)
+  - [PaddleOCR](https://github.com/bverboven/Regira-Codebase/tree/master/src/OCR.PaddleOCR)
+  - [Tesseract](https://github.com/bverboven/Regira-Codebase/tree/master/src/OCR.Tesseract)
+- PDF - [Tests](https://github.com/bverboven/Regira-Codebase/tree/master/tests/Office.PDF.Testing)
+  - [DocNET](https://github.com/bverboven/Regira-Codebase/tree/master/src/PDF.DocNET)
+  - [SelectPDF](https://github.com/bverboven/Regira-Codebase/tree/master/src/PDF.SelectPdf)
+  - [(Free)Spire.PDF](https://github.com/bverboven/Regira-Codebase/tree/master/src/PDF.Spire)
+- vCards - [Tests](https://github.com/bverboven/Regira-Codebase/tree/master/tests/Office.VCards.Testing)
+    - [FolkerKinzel](https://github.com/bverboven/Regira-Codebase/tree/master/src/VCards.FolkerKinzel)
+- Word - [Tests](https://github.com/bverboven/Regira-Codebase/tree/master/tests/Office.Word.testing)
+  - [(Free)Spire.Doc](https://github.com/bverboven/Regira-Codebase/tree/master/src/Word.Spire)
 
 ### Drawing
 
 Functions for cropping, resizing, rotating, flipping
 
-- GDI (System.Drawing.Common)
-- SkiaSharp
+- [GDI](https://github.com/bverboven/Regira-Codebase/tree/master/src/Drawing.GDI) (System.Drawing.Common)
+- [SkiaSharp](https://github.com/bverboven/Regira-Codebase/tree/master/src/Drawing.SkiaSharp)
+
+<img src="https://nunit.org/img/nunit.svg" height="16" /> [Unit Tests](https://github.com/bverboven/Regira-Codebase/tree/master/tests/Drawing.Testing)
 
 #### Barcodes
 
-- QRCoder (create only)
-- (Free)Spire.Barcode: create & write (limited types) of barcodes (including QR codes)
-- ZXing: create & write multiple types of barcodes (including QR Codes)
+- [QRCoder](https://github.com/bverboven/Regira-Codebase/tree/master/src/Drawing.Barcodes.QRCoder) (create only)
+- [(Free)Spire.Barcode](https://github.com/bverboven/Regira-Codebase/tree/master/src/Drawing.Barcodes.Spire): create & write (limited types) of barcodes (including QR codes)
+- [ZXing](https://github.com/bverboven/Regira-Codebase/tree/master/src/Drawing.Barcodes.ZXing): create & write multiple types of barcodes (including QR Codes)
+
+<img src="https://nunit.org/img/nunit.svg" height="16" /> [Unit Tests](https://github.com/bverboven/Regira-Codebase/tree/master/tests/Drawing.Barcodes.Testing)
 
 ## Tools
 
@@ -89,4 +93,4 @@ A console application to synchronize versions of project (*.cproj) files and pus
 
 ## Tests
 
-Before synchronizing modified projects, better run the [unit tests](https://github.com/bverboven/Regira-Codebase/tree/master/tests) first.
+Before synchronizing modified projects, better run the <img src="https://nunit.org/img/nunit.svg" height="16" /> [Unit Tests](https://github.com/bverboven/Regira-Codebase/tree/master/tests) first.
