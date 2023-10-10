@@ -7,9 +7,9 @@
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
     <RootNamespace>Regira.ProjectFilesProcessor</RootNamespace>
+    <PackageId>Regira.ProjectFilesProcessor</PackageId>
     <Authors>B.Verboven</Authors>
     <UserSecretsId>a148955e-1052-48e7-a8da-4534748de1c4</UserSecretsId>
-    <PackageId>Regira.ProjectFilesProcessor</PackageId>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="appsettings.json" />

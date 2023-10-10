@@ -1,5 +1,4 @@
-﻿using AzureBackupConsole;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.WindowsServices;
@@ -7,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Regira.System.Hosting.WindowsService;
 using Serilog;
 using System.Reflection;
+using Regira.AzureBackupService;
 
 // basic logger (configuration and services not loaded yet)
 Log.Logger = new LoggerConfiguration()

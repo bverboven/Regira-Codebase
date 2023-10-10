@@ -1,4 +1,4 @@
-﻿namespace AzureBackupConsole;
+﻿namespace Regira.AzureBackupService;
 
 public class BackupOptions
 {

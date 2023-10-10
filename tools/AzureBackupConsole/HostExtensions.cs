@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Regira.IO.Storage.Azure;
 using Serilog;
 using Serilog.Events;
-using System.Reflection;
 
-namespace AzureBackupConsole;
+namespace Regira.AzureBackupService;
 
 public static class HostExtensions
 {

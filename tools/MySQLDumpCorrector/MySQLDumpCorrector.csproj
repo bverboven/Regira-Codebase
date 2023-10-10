@@ -5,6 +5,9 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RootNamespace>Regira.MySQLDumpCorrector</RootNamespace>
+        <PackageId>Regira.MySQLDumpCorrector</PackageId>
+        <Authors>B.Verboven</Authors>
         <UserSecretsId>a148955e-1052-48e7-a8da-4534748de1c4</UserSecretsId>
     </PropertyGroup>
 

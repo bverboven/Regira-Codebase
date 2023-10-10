@@ -2,7 +2,7 @@
 using Regira.IO.Extensions;
 using Regira.IO.Storage.Abstractions;
 
-namespace AzureBackupConsole;
+namespace Regira.AzureBackupService;
 
 public class BackupManager
 {

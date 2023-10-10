@@ -1,6 +1,6 @@
 ﻿using Regira.IO.Storage.FileSystem;
 
-namespace AzureBackupConsole;
+namespace Regira.AzureBackupService;
 
 public class FileWatcher : IDisposable
 {

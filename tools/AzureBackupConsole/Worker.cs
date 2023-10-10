@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Regira.IO.Models;
 
-namespace AzureBackupConsole;
+namespace Regira.AzureBackupService;
 
 public class Worker : BackgroundService
 {
