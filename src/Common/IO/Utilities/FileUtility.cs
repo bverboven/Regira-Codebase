@@ -20,7 +20,7 @@ public static class FileUtility
     /// </summary>
     /// <param name="bytes"></param>
     /// <returns>Encoding (ASCII when not match is found)</returns>
-    public static Encoding GetEncoding(byte[] bytes)
+    public static Encoding GetEncoding(this byte[] bytes)
     {
         // Read the BOM
         var bom = bytes.Take(4).ToArray();
@@ -36,7 +36,7 @@ public static class FileUtility
         return Encoding.ASCII;
     }
 
-    public static byte[]? GetBytes(Stream? stream)
+    public static byte[]? GetBytes(this Stream? stream)
     {
         if (stream == null)
         {
@@ -66,7 +66,19 @@ public static class FileUtility
         var cleanBase64String = CleanBase64String(base64String);
         return Convert.FromBase64String(cleanBase64String);
     }
-    public static Stream? GetStream(byte[]? bytes)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="contents"></param>
+    /// <param name="encoding">Using Encoding.Default when null</param>
+    /// <returns></returns>
+    public static byte[] GetBytesFromString(this string contents, Encoding? encoding = null)
+    {
+        encoding ??= Encoding.Default;
+        return encoding.GetBytes(contents);
+    }
+
+    public static Stream? GetStream(this byte[]? bytes)
     {
         if (bytes == null)
         {
@@ -79,28 +91,57 @@ public static class FileUtility
     {
         return GetStream(GetBytes(base64String));
     }
-    public static Stream GetStreamFromString(string contents, Encoding? encoding = null)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="contents"></param>
+    /// <param name="encoding">Using Encoding.Default when null</param>
+    /// <returns></returns>
+    public static Stream GetStreamFromString(this string contents, Encoding? encoding = null)
     {
         encoding ??= Encoding.Default;
         return new MemoryStream(encoding.GetBytes(contents));
     }
-    public static string? GetString(Stream? stream)
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
+    public static string? GetString(this Stream? stream)
     {
-        var bytes = GetBytes(stream);
-        return GetString(bytes);
+        if (stream == null)
+        {
+            return null;
+        }
+
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
     }
-    public static string? GetString(byte[]? bytes)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="bytes"></param>
+    /// <param name="encoding">Will try to retrieve from BOM, using ASCII as last resort</param>
+    /// <returns></returns>
+    public static string? GetString(this byte[]? bytes, Encoding? encoding = null)
     {
         if (bytes == null)
         {
             return null;
         }
 
-        var encoding = GetEncoding(bytes);
+        encoding ??= GetEncoding(bytes);
         return encoding.GetString(bytes);
     }
 
-    public static string GetBase64String(byte[] bytes, bool clean = true)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="bytes"></param>
+    /// <param name="clean">Removes content-type, spaces and newlines when true</param>
+    /// <returns></returns>
+    public static string GetBase64String(this byte[] bytes, bool clean = true)
     {
         var base64 = Convert.ToBase64String(bytes);
         return clean ? CleanBase64String(base64) : base64;
@@ -112,9 +153,9 @@ public static class FileUtility
             .Replace(" ", string.Empty);
         var cleanedBase64 = sb.ToString();
         var firstChars = StringUtility.Truncate(cleanedBase64, 64);
-        if (firstChars.Contains(','))
+        if (firstChars?.Contains(',') == true)
         {
-            cleanedBase64 = cleanedBase64.Substring(cleanedBase64.IndexOf(',') + 1);
+            return cleanedBase64.Substring(cleanedBase64.IndexOf(',') + 1);
         }
 
         return cleanedBase64;
