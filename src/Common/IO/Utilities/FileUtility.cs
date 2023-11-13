@@ -22,18 +22,31 @@ public static class FileUtility
     /// <returns>Encoding (ASCII when not match is found)</returns>
     public static Encoding GetEncoding(this byte[] bytes)
     {
-        // Read the BOM
-        var bom = bytes.Take(4).ToArray();
+        if (bytes.Length >= 2)
+        {
+            // Read the BOM
+            var bom = bytes.Take(4).ToArray();
 
-        // Analyze the BOM
+            if (bytes.Length >= 3)
+            {
+                // Analyze the BOM
 #pragma warning disable SYSLIB0001
-        if (bom[0] == 0x2b && bom[1] == 0x2f && bom[2] == 0x76) return Encoding.UTF7;
+                if (bom[0] == 0x2b && bom[1] == 0x2f && bom[2] == 0x76) return Encoding.UTF7;
 #pragma warning restore SYSLIB0001
-        if (bom[0] == 0xef && bom[1] == 0xbb && bom[2] == 0xbf) return Encoding.UTF8;
-        if (bom[0] == 0xff && bom[1] == 0xfe) return Encoding.Unicode; //UTF-16LE
-        if (bom[0] == 0xfe && bom[1] == 0xff) return Encoding.BigEndianUnicode; //UTF-16BE
-        if (bom[0] == 0 && bom[1] == 0 && bom[2] == 0xfe && bom[3] == 0xff) return Encoding.UTF32;
-        return Encoding.ASCII;
+                if (bom[0] == 0xef && bom[1] == 0xbb && bom[2] == 0xbf) return Encoding.UTF8;
+            }
+
+            if (bom[0] == 0xff && bom[1] == 0xfe) return Encoding.Unicode; //UTF-16LE
+            if (bom[0] == 0xfe && bom[1] == 0xff) return Encoding.BigEndianUnicode; //UTF-16BE
+
+
+            if (bytes.Length >= 4)
+            {
+                if (bom[0] == 0 && bom[1] == 0 && bom[2] == 0xfe && bom[3] == 0xff) return Encoding.UTF32;
+            }
+        }
+
+        return Encoding.Default;
     }
 
     public static byte[]? GetBytes(this Stream? stream)
@@ -87,10 +100,9 @@ public static class FileUtility
 
         return new MemoryStream(bytes);
     }
-    public static Stream? GetStream(string base64String)
-    {
-        return GetStream(GetBytes(base64String));
-    }
+    public static Stream? GetStream(string base64String) 
+        => GetStream(GetBytes(base64String));
+
     /// <summary>
     /// 
     /// </summary>
@@ -107,15 +119,18 @@ public static class FileUtility
     /// 
     /// </summary>
     /// <param name="stream"></param>
+    /// <param name="encoding">When null, try to detect encoding</param>
     /// <returns></returns>
-    public static string? GetString(this Stream? stream)
+    public static string? GetString(this Stream? stream, Encoding? encoding = null)
     {
         if (stream == null)
         {
             return null;
         }
 
-        using var reader = new StreamReader(stream);
+        using var reader = encoding == null
+            ? new StreamReader(stream, true)
+            : new StreamReader(stream, encoding);
         return reader.ReadToEnd();
     }
     /// <summary>
