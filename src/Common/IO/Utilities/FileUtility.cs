@@ -100,7 +100,7 @@ public static class FileUtility
 
         return new MemoryStream(bytes);
     }
-    public static Stream? GetStream(string base64String) 
+    public static Stream? GetStream(string base64String)
         => GetStream(GetBytes(base64String));
 
     /// <summary>
@@ -128,8 +128,13 @@ public static class FileUtility
             return null;
         }
 
+        if (stream.CanSeek && stream.Position != 0)
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+        }
+
         using var reader = encoding == null
-            ? new StreamReader(stream, true)
+            ? new StreamReader(stream)
             : new StreamReader(stream, encoding);
         return reader.ReadToEnd();
     }
