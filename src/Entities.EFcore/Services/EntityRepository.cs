@@ -26,7 +26,7 @@ public abstract class EntityRepository<TContext, TEntity, TKey> : EntityReposito
     {
     }
 }
-public class EntityRepository<TContext, TEntity, TKey, TSearchObject> : IEntityService<TEntity, TKey>
+public class EntityRepository<TContext, TEntity, TKey, TSearchObject> : IEntityService<TEntity, TKey, TSearchObject>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
@@ -115,10 +115,10 @@ public class EntityRepository<TContext, TEntity, TKey, TSearchObject> : IEntityS
     {
     }
 
-    protected virtual TSearchObject? Convert(object? so)
+    public virtual TSearchObject? Convert(object? so)
         => so != default
             ? so as TSearchObject ?? ObjectUtility.Create<TSearchObject>(so)
             : default;
-    protected bool IsNew(TEntity item)
+    public bool IsNew(TEntity item)
         => default(TKey)?.Equals(item.Id) == true;
 }

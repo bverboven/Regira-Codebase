@@ -88,7 +88,7 @@ public abstract class EntityControllerBase<TEntity, TKey, TSearchObject, TDto, T
 /// <typeparam name="TInputDto"></typeparam>
 public abstract class EntityControllerBase<TEntity, TSo, TSortBy, TIncludes, TDto, TInputDto> : EntityControllerBase<TEntity, int, TSo, TSortBy, TIncludes, TDto, TInputDto>
     where TEntity : class, IEntity<int>
-    where TSo : ISearchObject<int>, new()
+    where TSo : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
@@ -105,7 +105,7 @@ public abstract class EntityControllerBase<TEntity, TSo, TSortBy, TIncludes, TDt
 /// <typeparam name="TInputDto"></typeparam>
 public abstract class EntityControllerBase<TEntity, TKey, TSo, TSortBy, TIncludes, TDto, TInputDto> : ControllerBase
     where TEntity : class, IEntity<TKey>
-    where TSo : ISearchObject<TKey>, new()
+    where TSo : class, ISearchObject<TKey>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {

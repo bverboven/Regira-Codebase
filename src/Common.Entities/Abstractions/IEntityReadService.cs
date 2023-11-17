@@ -12,16 +12,21 @@ public interface IEntityReadService<TEntity, in TKey>
     Task<IList<TEntity>> List(object? so = default, PagingInfo? pagingInfo = null);
     Task<int> Count(object? so);
 }
+public interface IEntityReadService<TEntity, in TKey, in TSearchObject> : IEntityReadService<TEntity, TKey>
+where TSearchObject : class, ISearchObject<TKey>, new()
+{
+    Task<IList<TEntity>> List(TSearchObject? so = default, PagingInfo? pagingInfo = null);
+}
 public interface IEntityReadService<TEntity, TSearchObject, TSortBy, TIncludes> : IEntityReadService<TEntity, int, TSearchObject, TSortBy, TIncludes>, IEntityReadService<TEntity>
     where TEntity : class, IEntity<int>
-    where TSearchObject : ISearchObject<int>, new()
+    where TSearchObject : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
 }
 public interface IEntityReadService<TEntity, in TKey, TSearchObject, TSortBy, TIncludes> : IEntityReadService<TEntity, TKey>
     where TEntity : class, IEntity<TKey>
-    where TSearchObject : ISearchObject<TKey>, new()
+    where TSearchObject : class, ISearchObject<TKey>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {

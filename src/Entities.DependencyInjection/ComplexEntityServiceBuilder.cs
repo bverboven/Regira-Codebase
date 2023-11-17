@@ -8,7 +8,7 @@ namespace Regira.Entities.DependencyInjection;
 public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> : ComplexEntityServiceBuilder<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>
     where TContext : DbContext
     where TEntity : class, IEntity<int>
-    where TSearchObject : ISearchObject<int>, new()
+    where TSearchObject : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
@@ -47,7 +47,7 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
 public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> : EntityServiceBuilder<TContext, TEntity, TKey>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
-    where TSearchObject : ISearchObject<TKey>, new()
+    where TSearchObject : class, ISearchObject<TKey>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {

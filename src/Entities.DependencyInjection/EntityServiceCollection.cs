@@ -178,7 +178,7 @@ public class EntityServiceCollection<TContext> : ServiceCollectionWrapper
         Action<ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>? configure = null)
         where TService : class, IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>, IEntityService<TEntity>
         where TEntity : class, IEntity<int>
-        where TSearchObject : ISearchObject, new()
+        where TSearchObject : class, ISearchObject, new()
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
     {
@@ -201,7 +201,7 @@ public class EntityServiceCollection<TContext> : ServiceCollectionWrapper
     public EntityServiceCollection<TContext> For<TEntity, TKey, TService, TSearchObject, TSortBy, TIncludes>(Action<ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>>? configure = null)
         where TService : class, IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, IEntityService<TEntity, TKey>
         where TEntity : class, IEntity<TKey>
-        where TSearchObject : ISearchObject<TKey>, new()
+        where TSearchObject : class, ISearchObject<TKey>, new()
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
     {

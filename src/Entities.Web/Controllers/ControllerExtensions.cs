@@ -63,7 +63,7 @@ public static class ControllerExtensions
     public static async Task<ActionResult<ListResult<TDto>>> List<TEntity, TKey, TSo, TSortBy, TIncludes, TDto>(this ControllerBase ctrl,
         TSo[] so, PagingInfo pagingInfo, TIncludes[] includes, TSortBy[] sortBy)
         where TEntity : class, IEntity<TKey>
-        where TSo : ISearchObject<TKey>, new()
+        where TSo : class, ISearchObject<TKey>, new()
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
     {
@@ -110,7 +110,7 @@ public static class ControllerExtensions
     public static async Task<ActionResult<SearchResult<TDto>>> Search<TEntity, TKey, TSo, TSortBy, TIncludes, TDto>(this ControllerBase ctrl,
         TSo[] so, PagingInfo pagingInfo, TIncludes[] includes, TSortBy[] sortBy)
         where TEntity : class, IEntity<TKey>
-        where TSo : ISearchObject<TKey>, new()
+        where TSo : class, ISearchObject<TKey>, new()
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
     {

@@ -59,7 +59,7 @@ public class EntityServiceBuilder<TContext, TEntity> : EntityServiceBuilder<TCon
 
     public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddComplexService<TService, TSearchObject, TSortBy, TIncludes>()
         where TService : class, IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>, IEntityService<TEntity>
-        where TSearchObject : ISearchObject, new()
+        where TSearchObject : class, ISearchObject, new()
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
     {
@@ -221,7 +221,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey> : EntityServiceCollec
     /// <returns></returns>
     public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddComplexService<TService, TSearchObject, TSortBy, TIncludes>()
         where TService : class, IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, IEntityService<TEntity, TKey>
-        where TSearchObject : ISearchObject<TKey>, new()
+        where TSearchObject : class, ISearchObject<TKey>, new()
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
     {

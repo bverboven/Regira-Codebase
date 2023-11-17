@@ -11,7 +11,7 @@ public abstract class EntityRepositoryBase<TContext, TEntity, TSearchObject, TSo
     : EntityRepositoryBase<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>, IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>
     where TContext : DbContext
     where TEntity : class, IEntity<int>
-    where TSearchObject : ISearchObject<int>, new()
+    where TSearchObject : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
@@ -23,7 +23,7 @@ public abstract class EntityRepositoryBase<TContext, TEntity, TSearchObject, TSo
 public abstract class EntityRepositoryBase<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> : IEntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
-    where TSearchObject : ISearchObject<TKey>, new()
+    where TSearchObject : class, ISearchObject<TKey>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
