@@ -50,6 +50,17 @@ public class EntityServiceCollection<TContext> : ServiceCollectionWrapper
 
         return this;
     }
+    public EntityServiceCollection<TContext> For<TEntity, TKey, TSearchObject, TService>(Action<EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>>? configure = null)
+        where TEntity : class, IEntity<TKey>
+        where TSearchObject : class, ISearchObject<TKey>, new()
+        where TService : class, IEntityService<TEntity, TKey, TSearchObject>
+    {
+        var builder = new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(this)
+            .AddService<TService>();
+        configure?.Invoke(builder);
+
+        return this;
+    }
 
     // Default service
     public EntityServiceCollection<TContext> For<TEntity>(Action<EntityServiceBuilder<TContext, TEntity, int>>? configure = null)
@@ -77,6 +88,16 @@ public class EntityServiceCollection<TContext> : ServiceCollectionWrapper
 
         return this;
     }
+    public EntityServiceCollection<TContext> For<TEntity, TKey, TSearchObject>(Action<EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>>? configure = null)
+        where TEntity : class, IEntity<TKey>
+        where TSearchObject : class, ISearchObject<TKey>, new()
+    {
+        var builder = new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(this)
+            .AddDefaultService();
+        configure?.Invoke(builder);
+
+        return this;
+    }
 
 
     // Service with attachments
@@ -93,7 +114,7 @@ public class EntityServiceCollection<TContext> : ServiceCollectionWrapper
     //        .AddDefaultAttachmentService()
     //        .WithDefaultMapping();
     //    configureAttachments?.Invoke(builder);
-        
+
     //    return For<TEntity, TService>(configure);
     //}
     ///// <summary>
@@ -215,7 +236,7 @@ public class EntityServiceCollection<TContext> : ServiceCollectionWrapper
     // Complex service with attachments
     public EntityServiceCollection<TContext> ConfigureAttachmentService(Func<IServiceProvider, IFileService> factory)
     {
-        Services.AddTransient<IAttachmentService>(p 
+        Services.AddTransient<IAttachmentService>(p
             => new AttachmentRepository<TContext>(p.GetRequiredService<TContext>(), factory(p)));
         return ConfigureAttachmentService<int>(factory);
     }
@@ -229,7 +250,7 @@ public class EntityServiceCollection<TContext> : ServiceCollectionWrapper
     public EntityServiceCollection<TContext> ConfigureAttachmentService<TKey>(Func<IServiceProvider, IFileService> factory)
     {
         Services
-            .AddTransient<IAttachmentService<TKey>>(p 
+            .AddTransient<IAttachmentService<TKey>>(p
                 => new AttachmentRepository<TContext, TKey>(p.GetRequiredService<TContext>(), factory(p)))
             .AddAutoMapper(cfg =>
             {

@@ -103,7 +103,7 @@ public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject, TS
     public virtual Task<int> SaveChanges(CancellationToken token = default)
         => _service.SaveChanges(token);
 
-    protected virtual TSearchObject? Convert(object? so)
+    public virtual TSearchObject? Convert(object? so)
         => so != default
             ? so as TSearchObject ?? ObjectUtility.Create<TSearchObject>(so)
             : default;

@@ -95,7 +95,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey> : EntityServiceCollec
     /// <typeparam name="TDto"></typeparam>
     /// <typeparam name="TInputDto"></typeparam>
     /// <returns></returns>
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddMapping<TDto, TInputDto>()
+    public virtual EntityServiceBuilder<TContext, TEntity, TKey> AddMapping<TDto, TInputDto>()
         where TDto : class
         where TInputDto : class
     {
@@ -106,7 +106,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey> : EntityServiceCollec
         });
         return this;
     }
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddMappingProfile<TProfile>() where TProfile : Profile, new()
+    public virtual EntityServiceBuilder<TContext, TEntity, TKey> AddMappingProfile<TProfile>() where TProfile : Profile, new()
     {
         Services.AddAutoMapper(cfg => cfg.AddProfile<TProfile>());
         return this;
@@ -122,7 +122,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey> : EntityServiceCollec
     /// </summary>
     /// <typeparam name="TService"></typeparam>
     /// <returns></returns>
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddService<TService>()
+    public virtual EntityServiceBuilder<TContext, TEntity, TKey> AddService<TService>()
         where TService : class, IEntityService<TEntity, TKey>
     {
         Services.AddTransient<IEntityService<TEntity, TKey>, TService>();
@@ -138,7 +138,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey> : EntityServiceCollec
     /// </list>
     /// </summary>
     /// <returns></returns>
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddDefaultService()
+    public virtual EntityServiceBuilder<TContext, TEntity, TKey> AddDefaultService()
         => AddService<EntityRepository<TContext, TEntity, TKey>>();
 
     // Entity Repository
@@ -219,7 +219,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey> : EntityServiceCollec
     /// <typeparam name="TSortBy"></typeparam>
     /// <typeparam name="TIncludes"></typeparam>
     /// <returns></returns>
-    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddComplexService<TService, TSearchObject, TSortBy, TIncludes>()
+    public virtual ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddComplexService<TService, TSearchObject, TSortBy, TIncludes>()
         where TService : class, IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, IEntityService<TEntity, TKey>
         where TSearchObject : class, ISearchObject<TKey>, new()
         where TSortBy : struct, Enum
@@ -227,6 +227,70 @@ public class EntityServiceBuilder<TContext, TEntity, TKey> : EntityServiceCollec
     {
         // Remove
         Services.RemoveAll<IEntityService<TEntity, TKey>>();
+        // Add
+        Services.AddTransient<IEntityService<TEntity, TKey>, TService>();
+        Services.AddTransient<IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, TService>();
+        return new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(this);
+    }
+}
+
+public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> : EntityServiceBuilder<TContext, TEntity, TKey>
+    where TContext : DbContext
+    where TEntity : class, IEntity<TKey>
+    where TSearchObject : class, ISearchObject<TKey>, new()
+{
+    public EntityServiceBuilder(IServiceCollection services)
+        : base(services)
+    {
+    }
+
+    public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddService<TService>()
+        where TService : class, IEntityService<TEntity, TKey, TSearchObject>
+    {
+        base.AddService<TService>();
+        Services.AddTransient<IEntityService<TEntity, TKey, TSearchObject>, TService>();
+        return this;
+    }
+    public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddDefaultService()
+        => AddService<EntityRepository<TContext, TEntity, TKey, TSearchObject>>();
+
+    public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasRepository<TService>()
+        where TService : class, IEntityRepository<TEntity, TKey, TSearchObject>
+    {
+        base.HasRepository<TService>();
+        Services.AddTransient<IEntityRepository<TEntity, TKey, TSearchObject>, TService>();
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasRepository(Func<IServiceProvider, IEntityRepository<TEntity, TKey, TSearchObject>> factory)
+    {
+        base.HasRepository(factory);
+        Services.AddTransient(factory);
+        return this;
+    }
+
+    public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasManager<TService>()
+        where TService : class, IEntityManager<TEntity, TKey, TSearchObject>
+    {
+        base.HasManager<TService>();
+        Services.AddTransient<IEntityManager<TEntity, TKey, TSearchObject>, TService>();
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasManager(Func<IServiceProvider, IEntityManager<TEntity, TKey, TSearchObject>> factory)
+    {
+        base.HasManager(factory);
+        Services.AddTransient(factory);
+        return this;
+    }
+
+
+    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddComplexService<TService, TSortBy, TIncludes>()
+        where TService : class, IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, IEntityService<TEntity, TKey, TSearchObject>
+        where TSortBy : struct, Enum
+        where TIncludes : struct, Enum
+    {
+        base.AddComplexService<TService, TSearchObject, TSortBy, TIncludes>();
+        // Remove
+        Services.RemoveAll<IEntityService<TEntity, TKey, TSearchObject>>();
         // Add
         Services.AddTransient<IEntityService<TEntity, TKey>, TService>();
         Services.AddTransient<IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, TService>();
