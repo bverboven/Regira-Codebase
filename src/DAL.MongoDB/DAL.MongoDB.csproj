@@ -11,7 +11,7 @@
     <AssemblyName>Regira.DAL.MongoDB</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>3.2.10</Version>
+    <Version>3.3.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.21.0" />
