@@ -12,7 +12,7 @@ public class JwtStartup
         services
             .AddJwtAuthentication(o =>
             {
-                o.Secret = "0E4D39DB-407A-45D5-A3D9-7DCF03F43931";
+                o.Secret = string.Join(":", Enumerable.Range(0, 3).Select(_ => Guid.NewGuid().ToString("N")));
                 o.LifeSpan = 2;
             });
 

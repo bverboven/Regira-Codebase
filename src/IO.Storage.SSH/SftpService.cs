@@ -47,9 +47,9 @@ public class SftpService : IFileService
         return files.Select(f => FileNameUtility.GetRelativeUri(f.FullName, RootFolder));
     }
 
-    protected IList<SftpFile> List(SftpClient client, string path, bool recursive = false)
+    protected IList<ISftpFile> List(SftpClient client, string path, bool recursive = false)
     {
-        var list = new List<SftpFile>();
+        var list = new List<ISftpFile>();
         var files = client.ListDirectory(path)
             .Where(f => !string.IsNullOrWhiteSpace(f.Name.Trim('.')));
         foreach (var sftpFile in files)
@@ -113,9 +113,9 @@ public class SftpService : IFileService
     protected async Task CreateDirectory(string identifier)
     {
         var dir = FileNameUtility.GetRelativeFolder(identifier, RootFolder);
-        if (!string.IsNullOrWhiteSpace(dir) && !await Exists(dir!))
+        if (!string.IsNullOrWhiteSpace(dir) && !await Exists(dir))
         {
-            var dirUri = FileNameUtility.GetUri(dir!, RootFolder);
+            var dirUri = FileNameUtility.GetUri(dir, RootFolder);
             await CreateDirectory(dirUri);
 
             var client = await _communicator.Open();

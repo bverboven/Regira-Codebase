@@ -19,14 +19,14 @@ internal static class Converter
             Prefix = fkName?.Prefix.FirstOrDefault(),
             Suffix = fkName?.Suffix.FirstOrDefault()
         };
-        var tels = item.PhoneNumbers
+        var tels = item.Phones
             ?.Select(phone =>
             {
                 VCardTel tel = phone?.Value;
-                if (phone?.Parameters.TelephoneType.HasValue ?? false)
+                if (phone?.Parameters.PhoneType.HasValue ?? false)
                 {
                     var types = ConvertUtility
-                        .ConvertBitFields<TelTypes, VCardTelType>(phone.Parameters.TelephoneType.Value)
+                        .ConvertBitFields<PhoneTypes, VCardTelType>(phone.Parameters.PhoneType.Value)
                         .ToArray();
                     if (types.Any())
                     {
@@ -51,7 +51,7 @@ internal static class Converter
                 return tel;
             })
             .ToList();
-        var emails = item.EmailAddresses
+        var emails = item.EMails
             ?.Select(e =>
             {
                 var email = new VCardEmail { Text = e?.Value };
@@ -134,11 +134,11 @@ internal static class Converter
                 if (tel.Type.HasValue)
                 {
                     var telTypes = ConvertUtility
-                        .ConvertBitFields<VCardTelType, TelTypes>(tel.Type.Value)
+                        .ConvertBitFields<VCardTelType, PhoneTypes>(tel.Type.Value)
                         .ToArray();
                     if (telTypes.Any())
                     {
-                        phone.Parameters.TelephoneType = telTypes.Aggregate((r, v) => r | v);
+                        phone.Parameters.PhoneType = telTypes.Aggregate((r, v) => r | v);
                     }
 
                     var propTypes = ConvertUtility
@@ -175,13 +175,21 @@ internal static class Converter
                     var address = new AddressProperty(
                         x.StreetAndNumber,
                         x.Locality,
-                        x.PostalCode,
                         null,
-                        x.Country,
-                        x.PostBox,
-                        x.Extension
-                    );
-                    address.Parameters.Label = x.Label;
+                        x.PostalCode,
+                        x.Country
+                    )
+                    {
+                        Parameters =
+                        {
+                            Label = x.Label
+                        },
+                        //Value =
+                        //{
+                        //    PostOfficeBox = { x.PostBox },
+                        //    ExtendedAddress = { x.Extension }
+                        //}
+                    };
                     if (x.Type.HasValue)
                     {
                         var types = ConvertUtility
@@ -204,8 +212,8 @@ internal static class Converter
                 new (item.FormattedName)
             },
             NameViews = name,
-            PhoneNumbers = phoneNumbers,
-            EmailAddresses = emailAddresses,
+            Phones = phoneNumbers,
+            EMails = emailAddresses,
             Addresses = addresses,
             Organizations = orgs
         };

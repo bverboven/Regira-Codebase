@@ -6,7 +6,7 @@ public class Project
     public string ProjectFile { get; set; } = null!;
     public string? RootNamespace { get; set; }
     public string? AssemblyName { get; set; }
-    public ICollection<string> TargetFrameworks { get; set; } = new HashSet<string> { "net7.0" };
+    public ICollection<string> TargetFrameworks { get; set; } = new HashSet<string> { "net8.0" };
     public ICollection<string> Authors { get; set; } = new HashSet<string>() { "B. Verboven" };
     public Version Version { get; set; } = new("1.0.0");
     public Version? PublishedVersion { get; set; }
