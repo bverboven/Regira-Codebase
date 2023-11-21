@@ -14,7 +14,6 @@ using System.Text.Json;
 namespace Office.Word.testing;
 
 [TestFixture]
-[Parallelizable(ParallelScope.Children)]
 public class WordTests
 {
     private readonly string _assetsDir;
