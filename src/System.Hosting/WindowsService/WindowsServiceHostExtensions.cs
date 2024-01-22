@@ -28,15 +28,15 @@ public static class WindowsServiceHostExtensions
             return host;
         }
 
-        var installTemplate = $@"sc create {serviceName} binPath= %~dp0{assemblyName}.exe
-sc failure {serviceName} actions= restart/60000/restart/60000/""/60000 reset= 86400
-sc start {serviceName}
-sc config {serviceName} start=auto";
+        var installTemplate = $@"sc create ""{serviceName}"" binPath= %~dp0{assemblyName}.exe
+sc failure ""{serviceName}"" actions= restart/60000/restart/60000/""/60000 reset= 86400
+sc start ""{serviceName}""
+sc config ""{serviceName}"" start=auto";
         File.WriteAllText(installPath, installTemplate);
 
-        var uninstallTemplate = $@"sc stop {serviceName}
+        var uninstallTemplate = $@"sc stop ""{serviceName}""
 timeout /t 5 /nobreak > NUL
-sc delete {serviceName}";
+sc delete ""{serviceName}""";
         File.WriteAllText(uninstallPath, uninstallTemplate);
 
         return host;
