@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Abstractions;
-using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Extensions;

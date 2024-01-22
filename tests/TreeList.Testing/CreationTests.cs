@@ -1,5 +1,7 @@
-﻿using Regira.TreeList;
+﻿using NUnit.Framework.Legacy;
+using Regira.TreeList;
 using System.Diagnostics;
+
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 
 namespace TreeList.Testing;
@@ -34,7 +36,7 @@ public class CreationTests
         var directories = data.Values;
         var roots = data.Roots;
 
-        Assert.AreEqual(directories.Length, tree.Count);
+        ClassicAssert.AreEqual(directories.Length, tree.Count);
         CollectionAssert.AreEquivalent(roots, tree.Roots.Select(n => n.Value));
         foreach (var node in tree)
         {
@@ -44,7 +46,7 @@ public class CreationTests
             }
             else
             {
-                Assert.AreEqual(node.Parent.Value, Path.GetDirectoryName(node.Value));
+                ClassicAssert.AreEqual(node.Parent.Value, Path.GetDirectoryName(node.Value));
             }
 
             var subDirectories = Directory.GetDirectories(node.Value).ToArray();
@@ -79,7 +81,7 @@ public class CreationTests
             .OrderByDescending(d => d.Split('\\').Length)
             .ThenBy(d => d)
             .First();
-        Assert.AreEqual(highestSegmentCountDirectory, lowestLevelChild.Value);
+        ClassicAssert.AreEqual(highestSegmentCountDirectory, lowestLevelChild.Value);
 
         var ancestors = lowestLevelChild.GetAncestors()
             .Select(a => a.Value)
@@ -104,7 +106,7 @@ public class CreationTests
         var roots = data.Roots;
         var items = data.Values;
 
-        Assert.AreEqual(items.Length, tree.Count);
+        ClassicAssert.AreEqual(items.Length, tree.Count);
         foreach (var node in tree)
         {
             if (node.Parent == null)
@@ -113,7 +115,7 @@ public class CreationTests
             }
             else
             {
-                Assert.AreEqual(node.Parent!.Value.Path, node.Value.ParentDirectory);
+                ClassicAssert.AreEqual(node.Parent!.Value.Path, node.Value.ParentDirectory);
             }
 
             // only directories can have children

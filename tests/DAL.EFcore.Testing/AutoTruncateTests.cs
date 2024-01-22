@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using NUnit.Framework.Legacy;
 using Regira.DAL.EFcore.Extensions;
 using Testing.Library.Contoso;
 
@@ -38,8 +39,8 @@ public class AutoTruncateTests
 
         _dbContext.Persons.Add(item);
 
-        Assert.IsTrue(item.GivenName.Length > 32);
-        Assert.IsTrue(item.LastName.Length > 64);
+        ClassicAssert.IsTrue(item.GivenName.Length > 32);
+        ClassicAssert.IsTrue(item.LastName.Length > 64);
         Assert.That(item.Description, Is.EqualTo(description));
 
         _dbContext.AutoTruncateStringsToMaxLengthForEntries();

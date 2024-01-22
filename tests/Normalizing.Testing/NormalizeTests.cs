@@ -1,4 +1,5 @@
-﻿using Regira.Normalizing;
+﻿using NUnit.Framework.Legacy;
+using Regira.Normalizing;
 using Regira.Normalizing.Abstractions;
 
 namespace Normalizing.Testing;
@@ -36,7 +37,7 @@ public class NormalizeTests
     public void Test_SourceProp_And_DefaultNormalizer()
     {
         var obj = new NormalizableObject2 { SourceProp = "Testing the normalized-attribute" };
-        Assert.IsNull(obj.NormalizedProp);
+        ClassicAssert.IsNull(obj.NormalizedProp);
         _objectNormalizer.HandleNormalize(obj);
         Assert.That(obj.NormalizedProp, Is.Not.EqualTo(obj.SourceProp));
         Assert.That(obj.NormalizedProp, Is.EqualTo(_normalizer.Normalize(obj.SourceProp)));
@@ -45,7 +46,7 @@ public class NormalizeTests
     public void Test_SourceProp_And_CustomNormalizer()
     {
         var obj = new NormalizableObject3 { SourceProp = "Testing the normalized attribute" };
-        Assert.IsNull(obj.NormalizedProp);
+        ClassicAssert.IsNull(obj.NormalizedProp);
         _objectNormalizer.HandleNormalize(obj);
         Assert.That(obj.NormalizedProp, Is.Not.EqualTo(obj.SourceProp));
         var normalizer = new TestNormalizer();
@@ -60,8 +61,8 @@ public class NormalizeTests
             SourceProp2 = "Testing the normalized attribute",
             NormalizedProp3 = "Testing the normalized attribute"
         };
-        Assert.IsNull(obj.NormalizedProp1);
-        Assert.IsNull(obj.NormalizedProp2);
+        ClassicAssert.IsNull(obj.NormalizedProp1);
+        ClassicAssert.IsNull(obj.NormalizedProp2);
         var sourceProp3 = obj.NormalizedProp3;
         _objectNormalizer.HandleNormalize(obj);
         Assert.That(obj.NormalizedProp1, Is.Not.EqualTo(obj.SourceProp1));

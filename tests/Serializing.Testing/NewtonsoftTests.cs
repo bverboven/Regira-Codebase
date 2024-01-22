@@ -1,3 +1,4 @@
+using NUnit.Framework.Legacy;
 using JsonSerializer = Regira.Serializing.Newtonsoft.Json.JsonSerializer;
 
 namespace Serializing.Testing;
@@ -97,7 +98,7 @@ public class NewtonsoftTests
 
         var expected = $@"{{""status"":""{TestStatus.Hard}"",""isArchived"":0}}";
         Assert.That(json, Is.EqualTo(expected));
-        Assert.IsTrue(json.Contains(TestStatus.Hard.ToString()));
+        ClassicAssert.IsTrue(json.Contains(TestStatus.Hard.ToString()));
         Assert.That(output.Status, Is.EqualTo(input.Status));
     }
 }

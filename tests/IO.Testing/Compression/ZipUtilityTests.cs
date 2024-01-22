@@ -1,3 +1,4 @@
+using NUnit.Framework.Legacy;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
 using Regira.IO.Storage.Compression;
@@ -69,7 +70,7 @@ public class ZipUtilityTests
 
         var unzippedFiles = Directory.GetFiles(targetDir, "*", SearchOption.AllDirectories);
         CollectionAssert.IsNotEmpty(unzippedFiles);
-        Assert.AreEqual(files.Length, unzippedFiles.Length);
+        ClassicAssert.AreEqual(files.Length, unzippedFiles.Length);
         var expectedFiles = files.Select(f => f.Substring(_assetsDir.Length)).ToArray();
         var actualFiles = unzippedFiles.Select(f => f.Substring(targetDir.Length)).ToArray();
         CollectionAssert.AreEquivalent(expectedFiles, actualFiles);
@@ -92,7 +93,7 @@ public class ZipUtilityTests
 
         // test
         CollectionAssert.IsNotEmpty(unzippedFiles);
-        Assert.AreEqual(files.Length, unzippedFiles.Length);
+        ClassicAssert.AreEqual(files.Length, unzippedFiles.Length);
         var expectedFiles = files.Select(f => f.Substring(_assetsDir.Length)).ToArray();
         var actualFiles = unzippedFiles.Select(f => f.Substring(targetDir.Length)).ToArray();
         CollectionAssert.AreEquivalent(expectedFiles, actualFiles);
@@ -127,7 +128,7 @@ public class ZipUtilityTests
 
         // test
         CollectionAssert.IsNotEmpty(unzippedFiles);
-        Assert.AreEqual(dir1Files.Length + dir2Files.Length, unzippedFiles.Length);
+        ClassicAssert.AreEqual(dir1Files.Length + dir2Files.Length, unzippedFiles.Length);
         var expectedFiles = dir1Files.Concat(dir2Files.Select(f2 => f2.Path)).Select(f => f?.Substring(_assetsDir.Length)).ToArray();
         var actualFiles = unzippedFiles.Select(f => f.Substring(targetDir.Length)).ToArray();
         CollectionAssert.AreEquivalent(expectedFiles, actualFiles);
@@ -154,7 +155,7 @@ public class ZipUtilityTests
 
         // test
         CollectionAssert.IsNotEmpty(unzippedFiles);
-        Assert.AreEqual(files.Length - dir2Files.Length, unzippedFiles.Length);
+        ClassicAssert.AreEqual(files.Length - dir2Files.Length, unzippedFiles.Length);
 
         var expectedFiles = files.Where(f => dir2Files.All(f2 => f2.Path != f)).Select(f => f.Substring(_assetsDir.Length)).ToArray();
         var actualFiles = unzippedFiles.Select(f => f.Substring(targetDir.Length)).ToArray();

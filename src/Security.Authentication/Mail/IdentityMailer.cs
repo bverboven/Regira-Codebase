@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
+﻿#if NET8_0_OR_GREATER
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Regira.Office.Mail.Abstractions;
 using Regira.Office.Mail.Models;
 
@@ -23,3 +24,4 @@ public class IdentityMailer : IEmailSender
         return _mailer.Send(msg);
     }
 }
+#endif

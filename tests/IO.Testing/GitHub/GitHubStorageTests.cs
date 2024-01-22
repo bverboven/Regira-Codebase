@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using NUnit.Framework.Legacy;
 using Regira.IO.Storage;
 using Regira.IO.Storage.Abstractions;
 using Regira.IO.Storage.GitHub;
@@ -84,7 +85,7 @@ namespace IO.Testing.GitHub
             foreach (var file in files)
             {
                 var pathWithoutQuery = file.Split('?').First();
-                Assert.IsTrue(so.Extensions.Any(e => pathWithoutQuery.EndsWith(e, StringComparison.CurrentCultureIgnoreCase)));
+                ClassicAssert.IsTrue(so.Extensions.Any(e => pathWithoutQuery.EndsWith(e, StringComparison.CurrentCultureIgnoreCase)));
             }
         }
         [Test]
@@ -103,8 +104,8 @@ namespace IO.Testing.GitHub
             foreach (var file in files.Take(1))
             {
                 var bytes = await fileService.GetBytes(file);
-                Assert.IsNotNull(bytes);
-                Assert.IsTrue(bytes!.Length > 0);
+                ClassicAssert.IsNotNull(bytes);
+                ClassicAssert.IsTrue(bytes!.Length > 0);
             }
         }
 

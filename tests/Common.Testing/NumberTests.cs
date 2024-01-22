@@ -16,9 +16,10 @@ public class NumberTests
     [TestCase(449, "CDXLIX")]
     [TestCase(999, "CMXCIX")]
     [TestCase(1556, "mdlvi")]
-    public void FromRoman(int expected, string roman) {
+    public void FromRoman(int expected, string roman)
+    {
         var result = NumberUtility.FromRomanNumeral(roman);
-        Assert.AreEqual(expected, result);
+        Assert.That(expected, Is.EqualTo(result));
     }
 
     [TestCase(1, "I")]
@@ -31,8 +32,9 @@ public class NumberTests
     [TestCase(449, "CDXLIX")]
     [TestCase(999, "CMXCIX")]
     [TestCase(1556, "MDLVI")]
-    public void ToRoman(int number, string expected) {
+    public void ToRoman(int number, string expected)
+    {
         var result = NumberUtility.ToRomanNumeral(number);
-        Assert.AreEqual(expected, result);
+        Assert.That(expected, Is.EqualTo(result));
     }
 }

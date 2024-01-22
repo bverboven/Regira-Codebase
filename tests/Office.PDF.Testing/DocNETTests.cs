@@ -1,4 +1,5 @@
-﻿using Office.PDF.Testing.Abstractions;
+﻿using NUnit.Framework.Legacy;
+using Office.PDF.Testing.Abstractions;
 using Regira.Collections;
 using Regira.Drawing.SkiaSharp.Services;
 using Regira.IO.Extensions;
@@ -50,7 +51,7 @@ Simple PDF File 2
  Boring. More, a little more text. The end, and just as well.";
         await using var pdfStream = File.OpenRead(Path.Combine(_inputDir, "sample.pdf"));
         var pdfText = _pdfService.GetText(pdfStream.ToBinaryFile());
-        Assert.AreEqual(expectedText, pdfText);
+        ClassicAssert.AreEqual(expectedText, pdfText);
     }
 
     [Test]
@@ -65,7 +66,7 @@ Simple PDF File 2
         var inputPageCount = inputDocs.Select(doc => _pdfService.GetPageCount(File.ReadAllBytes(doc).ToBinaryFile())).Sum();
         var mergedPageCount = _pdfService.GetPageCount(merged.ToBinaryFile());
 
-        Assert.AreEqual(inputPageCount, mergedPageCount);
+        ClassicAssert.AreEqual(inputPageCount, mergedPageCount);
 
         var outputPath = Path.Combine(_outputDir, "merged-by-path.pdf");
         await File.WriteAllBytesAsync(outputPath, merged.GetBytes()!);
@@ -82,7 +83,7 @@ Simple PDF File 2
         var inputPageCount = inputStreams.Select(doc => _pdfService.GetPageCount(doc)).Sum();
         var mergedPageCount = _pdfService.GetPageCount(merged.ToBinaryFile());
 
-        Assert.AreEqual(inputPageCount, mergedPageCount);
+        ClassicAssert.AreEqual(inputPageCount, mergedPageCount);
 
         var outputPath = Path.Combine(_outputDir, "merged-by-stream.pdf");
         await File.WriteAllBytesAsync(outputPath, merged.GetBytes()!);
@@ -106,9 +107,9 @@ Simple PDF File 2
         var textsWithEmptyPages = _pdfService.GetTextPerPage(bf);
         using var resultPdf = _pdfService.RemoveEmptyPages(bf);
         var texts = _pdfService.GetTextPerPage(resultPdf!.ToBinaryFile());
-        Assert.IsNotEmpty(texts);
-        Assert.IsNotEmpty(textsWithEmptyPages.Where(string.IsNullOrWhiteSpace));
-        Assert.IsEmpty(texts.Where(string.IsNullOrWhiteSpace));
+        ClassicAssert.IsNotEmpty(texts);
+        ClassicAssert.IsNotEmpty(textsWithEmptyPages.Where(string.IsNullOrWhiteSpace));
+        ClassicAssert.IsEmpty(texts.Where(string.IsNullOrWhiteSpace));
     }
 
 

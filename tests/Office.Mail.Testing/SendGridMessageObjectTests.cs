@@ -1,3 +1,4 @@
+using NUnit.Framework.Legacy;
 using Regira.Office.Mail.SendGrid.Extensions;
 using Regira.Office.Mail.Web;
 using Regira.Serializing.Abstractions;
@@ -28,24 +29,24 @@ public class SendGridMessageObjectTests
         // added [assembly: InternalsVisibleTo("Mail.Testing")] to internal Sendgrid extensions
         var sgMsg = msg.ToMailMessage();
 
-        Assert.AreEqual(msg.From?.Email, sgMsg.From?.Email);
-        Assert.AreEqual(msg.From?.DisplayName, sgMsg.From?.Name);
+        ClassicAssert.AreEqual(msg.From?.Email, sgMsg.From?.Email);
+        ClassicAssert.AreEqual(msg.From?.DisplayName, sgMsg.From?.Name);
 
-        Assert.AreEqual(msg.ReplyTo?.Email, sgMsg.ReplyTo?.Email);
-        Assert.AreEqual(msg.ReplyTo?.DisplayName, sgMsg.ReplyTo?.Name);
+        ClassicAssert.AreEqual(msg.ReplyTo?.Email, sgMsg.ReplyTo?.Email);
+        ClassicAssert.AreEqual(msg.ReplyTo?.DisplayName, sgMsg.ReplyTo?.Name);
 
         // Cannot test recipients -> no such getter on SendGrid's MailMessage object
 
-        Assert.AreEqual(msg.Subject, sgMsg.Subject);
+        ClassicAssert.AreEqual(msg.Subject, sgMsg.Subject);
         if (msg.IsHtml)
         {
-            Assert.AreEqual(msg.Body, sgMsg.HtmlContent);
-            Assert.IsNull(sgMsg.PlainTextContent);
+            ClassicAssert.AreEqual(msg.Body, sgMsg.HtmlContent);
+            ClassicAssert.IsNull(sgMsg.PlainTextContent);
         }
         else
         {
-            Assert.AreEqual(msg.Body, sgMsg.PlainTextContent);
-            Assert.IsNull(sgMsg.HtmlContent);
+            ClassicAssert.AreEqual(msg.Body, sgMsg.PlainTextContent);
+            ClassicAssert.IsNull(sgMsg.HtmlContent);
         }
     }
 }

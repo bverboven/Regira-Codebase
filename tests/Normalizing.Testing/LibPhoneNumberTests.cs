@@ -1,4 +1,5 @@
-﻿using Regira.Globalization.LibPhoneNumber;
+﻿using NUnit.Framework.Legacy;
+using Regira.Globalization.LibPhoneNumber;
 using System.Globalization;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
@@ -27,7 +28,7 @@ public class LibPhoneNumberTests
     {
         var output = _formatter.Normalize(input);
 
-        Assert.AreEqual(expected, output);
+        ClassicAssert.AreEqual(expected, output);
     }
 
     [TestCase("+32 486 99 99 99", "+32 486 99 99 99")]
@@ -40,6 +41,6 @@ public class LibPhoneNumberTests
     {
         var output = _formatter.Format(input);
 
-        Assert.AreEqual(expected, output);
+        ClassicAssert.AreEqual(expected, output);
     }
 }

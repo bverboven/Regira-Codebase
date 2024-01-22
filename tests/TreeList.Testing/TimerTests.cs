@@ -1,4 +1,5 @@
 ﻿using Bogus;
+using NUnit.Framework.Legacy;
 using Regira.TreeList;
 using Regira.Utilities;
 using TreeList.Testing.Infrastructure;
@@ -50,7 +51,7 @@ public class TimerTests
         {
             var listParents = persons.Where(p => p.Children.Contains(node.Value)).ToArray();
             var treeParent = node.Parent?.Value;
-            Assert.IsTrue(!listParents.Any() && treeParent == null || listParents.Contains(treeParent));
+            ClassicAssert.IsTrue(!listParents.Any() && treeParent == null || listParents.Contains(treeParent));
             var listChildren = persons.Where(p => p.Parent == node.Value).ToArray();
             var treeChildren = node.Children.Select(c => c.Value).ToArray();
             CollectionAssert.AreEquivalent(listChildren, treeChildren);
@@ -73,7 +74,7 @@ public class TimerTests
         TreeNode<SimplePerson> prevNode = null!;
         foreach (var sortedNode in sortedNodes)
         {
-            Assert.IsTrue(sortedNode.Parent == null || sortedNode.Parent == prevNode || sortedNode.Parent == prevNode?.Parent
+            ClassicAssert.IsTrue(sortedNode.Parent == null || sortedNode.Parent == prevNode || sortedNode.Parent == prevNode?.Parent
                           || sortedNode.GetAncestors().Intersect(prevNode!.GetAncestors()).Any());
             prevNode = sortedNode;
         }
@@ -87,7 +88,7 @@ public class TimerTests
         {
             var listParents = persons.Where(p => p.Contacts.Any(c => c.Contact == node.Value)).ToArray();
             var treeParent = node.Parent?.Value;
-            Assert.IsTrue(!listParents.Any() && treeParent == null || listParents.Contains(treeParent));
+            ClassicAssert.IsTrue(!listParents.Any() && treeParent == null || listParents.Contains(treeParent));
         }
     }
 
@@ -101,7 +102,7 @@ public class TimerTests
                 //var tree = persons.ToTreeList(x => x.Parent);
                 var personList = persons.AsList();
                 var tree = personList.ToTreeList(personList.FindAll(p => p.Parent == null), node => personList.Where(p => p.Parent == node.Value));
-                Assert.IsNotEmpty(tree);
+                ClassicAssert.IsNotEmpty(tree);
                 return new { duration = (DateTime.Now - start).TotalMilliseconds, tree };
             })
             .ToList();
@@ -121,7 +122,7 @@ public class TimerTests
                 var start = DateTime.Now;
                 var tree = new TreeList<SimplePerson>();
                 tree.Fill(persons, x => new[] { x.Parent }.Where(p => p != null)!);
-                Assert.IsNotEmpty(tree);
+                ClassicAssert.IsNotEmpty(tree);
                 return new { duration = (DateTime.Now - start).TotalMilliseconds, tree };
             })
             .ToList();
@@ -167,7 +168,7 @@ public class TimerTests
                         }
                     }
 
-                    Assert.IsNotEmpty(tree);
+                    ClassicAssert.IsNotEmpty(tree);
                 }
 
                 return new
@@ -219,7 +220,7 @@ public class TimerTests
                     }
                 }
 
-                Assert.IsNotEmpty(tree);
+                ClassicAssert.IsNotEmpty(tree);
                 return new
                 {
                     duration = (DateTime.Now - start).TotalMilliseconds,

@@ -1,4 +1,5 @@
 using MongoDB.Driver;
+using NUnit.Framework.Legacy;
 using Regira.DAL.MongoDB;
 using Regira.Serializing.Newtonsoft.Json;
 using Regira.Utilities;
@@ -32,7 +33,7 @@ public class RepositoryTests : IDisposable
         await _personRepo.Save(person);
 
         var collections = await _mongoCommunicator.ListCollectionNames().ToListAsync();
-        Assert.IsNotEmpty(collections);
+        ClassicAssert.IsNotEmpty(collections);
 
         _personRepo.Delete(person).Wait();
     }
@@ -43,8 +44,8 @@ public class RepositoryTests : IDisposable
     {
         var person = new Person { Title = "B.Verboven", BirthDate = new DateTime(1980, 5, 6) };
         var affected = await _personRepo.Save(person);
-        Assert.AreEqual(1, affected);
-        Assert.IsNotNull(person.Id);
+        ClassicAssert.AreEqual(1, affected);
+        ClassicAssert.IsNotNull(person.Id);
 
         await _personRepo.Delete(person);
     }
@@ -53,8 +54,8 @@ public class RepositoryTests : IDisposable
     {
         var person = new Person { Id = Guid.NewGuid().ToString(), Title = "B.Verboven", BirthDate = new DateTime(1980, 5, 6) };
         var affected = await _personRepo.Save(person);
-        Assert.AreEqual(1, affected);
-        Assert.IsNotNull(person.Id);
+        ClassicAssert.AreEqual(1, affected);
+        ClassicAssert.IsNotNull(person.Id);
 
         await _personRepo.Delete(person);
     }
@@ -64,7 +65,7 @@ public class RepositoryTests : IDisposable
     {
         var item = new Config { ConfigId = "123456", Key = "MyKey", Value = "Testing" };
         var affected = await _configRepo.Save(item);
-        Assert.AreEqual(1, affected);
+        ClassicAssert.AreEqual(1, affected);
 
         await _configRepo.Delete(item);
     }
@@ -76,8 +77,8 @@ public class RepositoryTests : IDisposable
         await _personRepo.Save(person);
 
         var persons = (await _personRepo.List(new { person.Id })).AsList();
-        Assert.IsNotEmpty(persons);
-        Assert.AreEqual(1, persons.Count);
+        ClassicAssert.IsNotEmpty(persons);
+        ClassicAssert.AreEqual(1, persons.Count);
 
         await _personRepo.Delete(person);
     }
@@ -89,7 +90,7 @@ public class RepositoryTests : IDisposable
         await _personRepo.Save(person);
 
         var fetchedPerson = await _personRepo.Details(personId);
-        Assert.IsNotNull(fetchedPerson);
+        ClassicAssert.IsNotNull(fetchedPerson);
 
         await _personRepo.Delete(fetchedPerson!);
     }
@@ -100,13 +101,13 @@ public class RepositoryTests : IDisposable
         var person = new Person { Title = "B.Verboven", BirthDate = new DateTime(1980, 5, 6) };
         await _personRepo.Save(person);
 
-        Assert.AreEqual(new DateTime(1980, 5, 6), person.BirthDate);
+        ClassicAssert.AreEqual(new DateTime(1980, 5, 6), person.BirthDate);
         // ReSharper disable once PossibleInvalidOperationException
         person.BirthDate = person.BirthDate.Value.AddYears(-1);
         var affected = await _personRepo.Save(person);
-        Assert.AreEqual(1, affected);
+        ClassicAssert.AreEqual(1, affected);
         var person2 = (await _personRepo.List(new { person.Id })).First();
-        Assert.AreEqual(new DateTime(1979, 5, 6), person2.BirthDate);
+        ClassicAssert.AreEqual(new DateTime(1979, 5, 6), person2.BirthDate);
 
         await _personRepo.Delete(person);
     }
@@ -118,13 +119,13 @@ public class RepositoryTests : IDisposable
         var person = new Person { Id = personId, Title = "B.Verboven", BirthDate = new DateTime(1980, 5, 6) };
         await _personRepo.Save(person);
 
-        Assert.AreEqual(new DateTime(1980, 5, 6), person.BirthDate);
+        ClassicAssert.AreEqual(new DateTime(1980, 5, 6), person.BirthDate);
         // ReSharper disable once PossibleInvalidOperationException
         person.BirthDate = person.BirthDate.Value.AddYears(-1);
         var affected = await _personRepo.Save(person);
-        Assert.AreEqual(1, affected);
+        ClassicAssert.AreEqual(1, affected);
         var person2 = await _personRepo.Details(personId);
-        Assert.AreEqual(new DateTime(1979, 5, 6), person2!.BirthDate);
+        ClassicAssert.AreEqual(new DateTime(1979, 5, 6), person2!.BirthDate);
 
         await _personRepo.Delete(person);
     }
@@ -136,9 +137,9 @@ public class RepositoryTests : IDisposable
         await _personRepo.Save(person);
 
         var affected = await _personRepo.Delete(person);
-        Assert.AreEqual(1, affected);
+        ClassicAssert.AreEqual(1, affected);
         var persons = await _personRepo.List(new { person.Id });
-        Assert.IsEmpty(persons);
+        ClassicAssert.IsEmpty(persons);
     }
     [Test]
     public async Task DeletePersonWithGivenId()
@@ -147,9 +148,9 @@ public class RepositoryTests : IDisposable
         await _personRepo.Save(person);
 
         var affected = await _personRepo.Delete(person);
-        Assert.AreEqual(1, affected);
+        ClassicAssert.AreEqual(1, affected);
         var persons = await _personRepo.List(new { person.Id });
-        Assert.IsEmpty(persons);
+        ClassicAssert.IsEmpty(persons);
     }
 
 

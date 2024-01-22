@@ -1,3 +1,4 @@
+using NUnit.Framework.Legacy;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
@@ -55,11 +56,11 @@ public abstract class ExcelTestsBase
         }
 
         using var excelFile = CreateExcel(TestData);
-        Assert.IsNotNull(excelFile.GetBytes());
-        Assert.IsTrue(excelFile.GetLength() > 0);
+        ClassicAssert.IsNotNull(excelFile.GetBytes());
+        ClassicAssert.IsTrue(excelFile.GetLength() > 0);
         var file = await excelFile.SaveAs(outputFile);
 
-        Assert.IsTrue(file.Exists);
+        ClassicAssert.IsTrue(file.Exists);
     }
     [Test]
     public virtual void Compare_DictionaryCollection_Input_With_Output()
@@ -76,7 +77,7 @@ public abstract class ExcelTestsBase
             Assert.That(excelItem["Title"], Is.EqualTo(sourceItem.Title));
             Assert.That(excelItem["Value"], Is.EqualTo(sourceItem.Value));
             var excelDate = (DateTime)excelItem["Created"]!;
-            Assert.IsTrue((sourceItem.Created - excelDate) < TimeSpan.FromMilliseconds(1));
+            ClassicAssert.IsTrue((sourceItem.Created - excelDate) < TimeSpan.FromMilliseconds(1));
         }
     }
     [Test]
@@ -93,7 +94,7 @@ public abstract class ExcelTestsBase
             Assert.That(excelItem["Title"], Is.EqualTo(sourceItem.Title));
             Assert.That(excelItem["Value"], Is.EqualTo(sourceItem.Value));
             var excelDate = (DateTime)excelItem["Created"]!;
-            Assert.IsTrue((sourceItem.Created - excelDate) < TimeSpan.FromMilliseconds(1));
+            ClassicAssert.IsTrue((sourceItem.Created - excelDate) < TimeSpan.FromMilliseconds(1));
         }
     }
     [Test]
@@ -110,9 +111,9 @@ public abstract class ExcelTestsBase
             var sourceItem = TestData[i];
             var excelItem = excelItems[i];
             Assert.That(excelItem.Title, Is.EqualTo(sourceItem.Title));
-            Assert.IsTrue(Math.Abs(sourceItem.Value - excelItem.Value) < .000000001m);
+            ClassicAssert.IsTrue(Math.Abs(sourceItem.Value - excelItem.Value) < .000000001m);
             var excelDate = excelItem.Created;
-            Assert.IsTrue((sourceItem.Created - excelDate) < TimeSpan.FromMilliseconds(1));
+            ClassicAssert.IsTrue((sourceItem.Created - excelDate) < TimeSpan.FromMilliseconds(1));
         }
     }
     [Test]
@@ -137,11 +138,11 @@ public abstract class ExcelTestsBase
         var countriesJSON = File.ReadAllText(Path.Combine(AssetsDir, "Input", "countries.json"));
         var countries = JsonSerializer.Deserialize<IList<Dictionary<string, object>>>(countriesJSON)!;
         using var excelFile = CreateExcel(countries);
-        Assert.IsNotNull(excelFile.GetBytes());
-        Assert.IsTrue(excelFile.GetLength() > 0);
+        ClassicAssert.IsNotNull(excelFile.GetBytes());
+        ClassicAssert.IsTrue(excelFile.GetLength() > 0);
 
         var file = await excelFile.SaveAs(outputPath);
-        Assert.IsTrue(file.Exists);
+        ClassicAssert.IsTrue(file.Exists);
     }
     [Test]
     public virtual async Task Export_Countries_As_Sheet()
@@ -160,11 +161,11 @@ public abstract class ExcelTestsBase
             Data = countries.Cast<object>().ToList()
         };
         using var excelFile = ExcelManager.Create(new[] { sheet });
-        Assert.IsNotNull(excelFile.GetBytes());
-        Assert.IsTrue(excelFile.GetLength() > 0);
+        ClassicAssert.IsNotNull(excelFile.GetBytes());
+        ClassicAssert.IsTrue(excelFile.GetLength() > 0);
 
         var file = await excelFile.SaveAs(outputFile);
-        Assert.IsTrue(file.Exists);
+        ClassicAssert.IsTrue(file.Exists);
     }
 
     [Test]
@@ -180,11 +181,11 @@ public abstract class ExcelTestsBase
         {
             new () {Name = "Countries", Data = data}
         });
-        Assert.IsNotNull(excelFile.GetBytes());
-        Assert.IsTrue(excelFile.GetLength() > 0);
+        ClassicAssert.IsNotNull(excelFile.GetBytes());
+        ClassicAssert.IsTrue(excelFile.GetLength() > 0);
 
         var file = await excelFile.SaveAs(outputFile);
-        Assert.IsTrue(file.Exists);
+        ClassicAssert.IsTrue(file.Exists);
     }
 
     public IMemoryFile CreateExcel<T>(IEnumerable<T> input)

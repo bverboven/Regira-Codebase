@@ -39,7 +39,7 @@ public class SpireBarcodeTests : BarcodeTestsBase
     //[Test]
     //public override void TooLong_Expect_InputException()
     //{
-    //    Assert.Ignore("Spire just generates an invalid barcode...");
+    //     Assert.Ignore("Spire just generates an invalid barcode...");
     //}
 
     [TestCase("Code39.png", "123456")]

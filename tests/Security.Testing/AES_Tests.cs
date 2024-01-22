@@ -1,3 +1,4 @@
+using NUnit.Framework.Legacy;
 using Regira.Security.Core;
 using Regira.Security.Encryption;
 
@@ -20,7 +21,7 @@ public class AES_Tests
         var encrypted = encrypter.Encrypt(plaintext);
         var decrypter = new AesEncrypter(new CryptoOptions { Secret = secret });
         var decrypted = decrypter.Decrypt(encrypted);
-        Assert.AreEqual(plaintext, decrypted);
+        ClassicAssert.AreEqual(plaintext, decrypted);
     }
     [Test]
     public void Decrypt_Encrypted_Failure()
@@ -31,7 +32,7 @@ public class AES_Tests
         var encrypted = encrypter.Encrypt("wrong_password");
         var decrypter = new AesEncrypter(new CryptoOptions { Secret = secret });
         var decrypted = decrypter.Decrypt(encrypted);
-        Assert.AreNotEqual(plaintext, decrypted);
+        ClassicAssert.AreNotEqual(plaintext, decrypted);
     }
     [Test]
     public void Encrypt_Without_Secret()
@@ -41,6 +42,6 @@ public class AES_Tests
         var encrypted = encrypter.Encrypt(plaintext);
         var decrypter = new AesEncrypter();
         var decrypted = decrypter.Decrypt(encrypted);
-        Assert.AreEqual(plaintext, decrypted);
+        ClassicAssert.AreEqual(plaintext, decrypted);
     }
 }

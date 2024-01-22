@@ -1,3 +1,4 @@
+using NUnit.Framework.Legacy;
 using Regira.Utilities;
 using Regira.Web.HTML.Abstractions;
 using Regira.Web.HTML.RazorLight;
@@ -36,9 +37,9 @@ public class RazerTemplateTests
         var model = "test";
         var parsedHtml = _parser.Parse(inputHtml, model).Result;
 
-        Assert.IsNotNull(parsedHtml);
-        Assert.AreNotEqual(inputHtml, parsedHtml);
-        Assert.IsTrue(parsedHtml.Contains($"<p>Hello {model}!</p>"));
+        ClassicAssert.IsNotNull(parsedHtml);
+        ClassicAssert.AreNotEqual(inputHtml, parsedHtml);
+        ClassicAssert.IsTrue(parsedHtml.Contains($"<p>Hello {model}!</p>"));
 
         File.WriteAllText(Path.Combine(_assetsDir, "Output", "simple-razor.html"), parsedHtml);
     }
@@ -63,12 +64,12 @@ public class RazerTemplateTests
         };
         var parsedHtml = _parser.Parse(inputHtml, model).Result;
 
-        Assert.IsNotNull(parsedHtml);
-        Assert.AreNotEqual(inputHtml, parsedHtml);
-        Assert.IsTrue(parsedHtml.Contains($"<p>Order: {model.Title}</p>"));
+        ClassicAssert.IsNotNull(parsedHtml);
+        ClassicAssert.AreNotEqual(inputHtml, parsedHtml);
+        ClassicAssert.IsTrue(parsedHtml.Contains($"<p>Order: {model.Title}</p>"));
         foreach (var orderline in model.OrderLines)
         {
-            Assert.IsTrue(parsedHtml.Contains($"<li>{orderline.Title}: {orderline.Amount} x {orderline.Price}</li>"));
+            ClassicAssert.IsTrue(parsedHtml.Contains($"<li>{orderline.Title}: {orderline.Amount} x {orderline.Price}</li>"));
         }
 
         File.WriteAllText(Path.Combine(_assetsDir, "Output", "razor-order.html"), parsedHtml);

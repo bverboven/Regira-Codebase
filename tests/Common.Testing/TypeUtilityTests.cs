@@ -1,4 +1,5 @@
-﻿using Regira.Utilities;
+﻿using NUnit.Framework.Legacy;
+using Regira.Utilities;
 using System.Collections;
 
 namespace Common.Testing;
@@ -58,35 +59,35 @@ public class TypeUtilityTests
     [Test]
     public void Test_IsSimpleType()
     {
-        Assert.IsTrue(TypeUtility.IsSimpleType(typeof(int)));
-        Assert.IsTrue(TypeUtility.IsSimpleType(typeof(string)));
-        Assert.IsTrue(TypeUtility.IsSimpleType(typeof(DateTime)));
-        Assert.IsTrue(TypeUtility.IsSimpleType(typeof(TestEnum)));
+        ClassicAssert.IsTrue(TypeUtility.IsSimpleType(typeof(int)));
+        ClassicAssert.IsTrue(TypeUtility.IsSimpleType(typeof(string)));
+        ClassicAssert.IsTrue(TypeUtility.IsSimpleType(typeof(DateTime)));
+        ClassicAssert.IsTrue(TypeUtility.IsSimpleType(typeof(TestEnum)));
 
-        Assert.IsTrue(TypeUtility.IsSimpleType(typeof(int?)));
-        Assert.IsTrue(TypeUtility.IsSimpleType(typeof(string)));
-        Assert.IsTrue(TypeUtility.IsSimpleType(typeof(DateTime?)));
-        Assert.IsTrue(TypeUtility.IsSimpleType(typeof(TestEnum?)));
+        ClassicAssert.IsTrue(TypeUtility.IsSimpleType(typeof(int?)));
+        ClassicAssert.IsTrue(TypeUtility.IsSimpleType(typeof(string)));
+        ClassicAssert.IsTrue(TypeUtility.IsSimpleType(typeof(DateTime?)));
+        ClassicAssert.IsTrue(TypeUtility.IsSimpleType(typeof(TestEnum?)));
 
-        Assert.IsFalse(TypeUtility.IsSimpleType(typeof(TestStruct)));
-        Assert.IsFalse(TypeUtility.IsSimpleType(typeof(TestStruct?)));
-        Assert.IsFalse(TypeUtility.IsSimpleType(typeof(ITestCore<>)));
+        ClassicAssert.IsFalse(TypeUtility.IsSimpleType(typeof(TestStruct)));
+        ClassicAssert.IsFalse(TypeUtility.IsSimpleType(typeof(TestStruct?)));
+        ClassicAssert.IsFalse(TypeUtility.IsSimpleType(typeof(ITestCore<>)));
     }
     [Test]
     public void Test_IsNullableType()
     {
-        Assert.IsFalse(TypeUtility.IsNullableType(typeof(int)));
-        Assert.IsFalse(TypeUtility.IsNullableType(typeof(string)));
-        Assert.IsFalse(TypeUtility.IsNullableType(typeof(DateTime)));
-        Assert.IsFalse(TypeUtility.IsNullableType(typeof(TestEnum)));
-        Assert.IsFalse(TypeUtility.IsNullableType(typeof(TestStruct)));
+        ClassicAssert.IsFalse(TypeUtility.IsNullableType(typeof(int)));
+        ClassicAssert.IsFalse(TypeUtility.IsNullableType(typeof(string)));
+        ClassicAssert.IsFalse(TypeUtility.IsNullableType(typeof(DateTime)));
+        ClassicAssert.IsFalse(TypeUtility.IsNullableType(typeof(TestEnum)));
+        ClassicAssert.IsFalse(TypeUtility.IsNullableType(typeof(TestStruct)));
 
-        Assert.IsTrue(TypeUtility.IsNullableType(typeof(int?)));
-        Assert.IsTrue(TypeUtility.IsNullableType(typeof(DateTime?)));
-        Assert.IsTrue(TypeUtility.IsNullableType(typeof(TestEnum?)));
-        Assert.IsTrue(TypeUtility.IsNullableType(typeof(TestStruct?)));
+        ClassicAssert.IsTrue(TypeUtility.IsNullableType(typeof(int?)));
+        ClassicAssert.IsTrue(TypeUtility.IsNullableType(typeof(DateTime?)));
+        ClassicAssert.IsTrue(TypeUtility.IsNullableType(typeof(TestEnum?)));
+        ClassicAssert.IsTrue(TypeUtility.IsNullableType(typeof(TestStruct?)));
 
-        Assert.IsFalse(TypeUtility.IsNullableType(typeof(ITestCore<>)));
+        ClassicAssert.IsFalse(TypeUtility.IsNullableType(typeof(ITestCore<>)));
     }
 
     [Test]
@@ -96,27 +97,27 @@ public class TypeUtilityTests
         var aIntCollection = new[] { 1, 2, 3, 4, 5 };
         var test1Class = new Test1Class { Structs = new TestStruct[] { new(), new() } };
 
-        Assert.IsTrue(TypeUtility.IsTypeEnumerable(aStringCollection.GetType()));
-        Assert.IsTrue(TypeUtility.IsTypeEnumerable<string>(aStringCollection.GetType()));
-        Assert.IsTrue(TypeUtility.IsTypeEnumerable(aStringCollection.GetType(), typeof(IEnumerable<char>)));
-        Assert.IsFalse(TypeUtility.IsTypeEnumerable<IList>(aStringCollection.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeEnumerable(aStringCollection.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeEnumerable<string>(aStringCollection.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeEnumerable(aStringCollection.GetType(), typeof(IEnumerable<char>)));
+        ClassicAssert.IsFalse(TypeUtility.IsTypeEnumerable<IList>(aStringCollection.GetType()));
 
-        Assert.IsTrue(TypeUtility.IsTypeEnumerable(aIntCollection.GetType()));
-        Assert.IsTrue(TypeUtility.IsTypeEnumerable(aIntCollection.GetType(), typeof(int[])));
-        Assert.IsTrue(TypeUtility.IsTypeEnumerable(aIntCollection.GetType(), typeof(IList<int>)));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeEnumerable(aIntCollection.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeEnumerable(aIntCollection.GetType(), typeof(int[])));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeEnumerable(aIntCollection.GetType(), typeof(IList<int>)));
 
-        Assert.IsFalse(TypeUtility.IsTypeEnumerable(typeof(int)));
-        Assert.IsFalse(TypeUtility.IsTypeEnumerable(typeof(Test1Class)));
-        Assert.IsFalse(TypeUtility.IsTypeEnumerable(typeof(TestStruct)));
-        Assert.IsTrue(TypeUtility.IsTypeEnumerable(typeof(ArrayList)));
+        ClassicAssert.IsFalse(TypeUtility.IsTypeEnumerable(typeof(int)));
+        ClassicAssert.IsFalse(TypeUtility.IsTypeEnumerable(typeof(Test1Class)));
+        ClassicAssert.IsFalse(TypeUtility.IsTypeEnumerable(typeof(TestStruct)));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeEnumerable(typeof(ArrayList)));
 
-        Assert.IsTrue(TypeUtility.IsTypeEnumerable(test1Class.Structs.GetType()));
-        Assert.IsTrue(TypeUtility.IsTypeEnumerable<IList>(test1Class.Structs.GetType()));
-        Assert.IsTrue(TypeUtility.IsTypeEnumerable<TestStruct[]>(test1Class.Structs.GetType()));
-        Assert.IsTrue(TypeUtility.IsTypeEnumerable<IList<TestStruct>>(test1Class.Structs.GetType()));
-        Assert.IsTrue(TypeUtility.IsTypeEnumerable<ICollection<TestStruct>>(test1Class.Structs.GetType()));
-        Assert.IsFalse(TypeUtility.IsTypeEnumerable<List<TestStruct>>(test1Class.Structs.GetType()));
-        Assert.IsFalse(TypeUtility.IsTypeEnumerable<IList<Test1Class>>(test1Class.Structs.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeEnumerable(test1Class.Structs.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeEnumerable<IList>(test1Class.Structs.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeEnumerable<TestStruct[]>(test1Class.Structs.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeEnumerable<IList<TestStruct>>(test1Class.Structs.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeEnumerable<ICollection<TestStruct>>(test1Class.Structs.GetType()));
+        ClassicAssert.IsFalse(TypeUtility.IsTypeEnumerable<List<TestStruct>>(test1Class.Structs.GetType()));
+        ClassicAssert.IsFalse(TypeUtility.IsTypeEnumerable<IList<Test1Class>>(test1Class.Structs.GetType()));
     }
 
     [Test]
@@ -126,26 +127,26 @@ public class TypeUtilityTests
         var aIntCollection = new[] { 1, 2, 3, 4, 5 };
         var test1Class = new Test1Class { Structs = new TestStruct[] { new(), new() } };
 
-        Assert.IsTrue(TypeUtility.IsTypeACollection(aStringCollection.GetType()));
-        Assert.IsFalse(TypeUtility.IsTypeACollection(aStringCollection.GetType(), typeof(IList<char>)));
-        Assert.IsFalse(TypeUtility.IsTypeACollection<IList>(aStringCollection.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeACollection(aStringCollection.GetType()));
+        ClassicAssert.IsFalse(TypeUtility.IsTypeACollection(aStringCollection.GetType(), typeof(IList<char>)));
+        ClassicAssert.IsFalse(TypeUtility.IsTypeACollection<IList>(aStringCollection.GetType()));
 
-        Assert.IsTrue(TypeUtility.IsTypeACollection(aIntCollection.GetType()));
-        Assert.IsTrue(TypeUtility.IsTypeACollection(aIntCollection.GetType(), typeof(int[])));
-        Assert.IsTrue(TypeUtility.IsTypeACollection(aIntCollection.GetType(), typeof(IList<int>)));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeACollection(aIntCollection.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeACollection(aIntCollection.GetType(), typeof(int[])));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeACollection(aIntCollection.GetType(), typeof(IList<int>)));
 
-        Assert.IsFalse(TypeUtility.IsTypeACollection(typeof(int)));
-        Assert.IsFalse(TypeUtility.IsTypeACollection(typeof(Test1Class)));
-        Assert.IsFalse(TypeUtility.IsTypeACollection(typeof(TestStruct)));
-        Assert.IsTrue(TypeUtility.IsTypeACollection(typeof(ArrayList)));
+        ClassicAssert.IsFalse(TypeUtility.IsTypeACollection(typeof(int)));
+        ClassicAssert.IsFalse(TypeUtility.IsTypeACollection(typeof(Test1Class)));
+        ClassicAssert.IsFalse(TypeUtility.IsTypeACollection(typeof(TestStruct)));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeACollection(typeof(ArrayList)));
 
-        Assert.IsTrue(TypeUtility.IsTypeACollection(test1Class.Structs.GetType()));
-        Assert.IsTrue(TypeUtility.IsTypeACollection<IList>(test1Class.Structs.GetType()));
-        Assert.IsTrue(TypeUtility.IsTypeACollection<TestStruct[]>(test1Class.Structs.GetType()));
-        Assert.IsTrue(TypeUtility.IsTypeACollection<IList<TestStruct>>(test1Class.Structs.GetType()));
-        Assert.IsTrue(TypeUtility.IsTypeACollection<ICollection<TestStruct>>(test1Class.Structs.GetType()));
-        Assert.IsFalse(TypeUtility.IsTypeACollection<List<TestStruct>>(test1Class.Structs.GetType()));
-        Assert.IsFalse(TypeUtility.IsTypeACollection<IList<Test1Class>>(test1Class.Structs.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeACollection(test1Class.Structs.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeACollection<IList>(test1Class.Structs.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeACollection<TestStruct[]>(test1Class.Structs.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeACollection<IList<TestStruct>>(test1Class.Structs.GetType()));
+        ClassicAssert.IsTrue(TypeUtility.IsTypeACollection<ICollection<TestStruct>>(test1Class.Structs.GetType()));
+        ClassicAssert.IsFalse(TypeUtility.IsTypeACollection<List<TestStruct>>(test1Class.Structs.GetType()));
+        ClassicAssert.IsFalse(TypeUtility.IsTypeACollection<IList<Test1Class>>(test1Class.Structs.GetType()));
     }
 
     [Test]

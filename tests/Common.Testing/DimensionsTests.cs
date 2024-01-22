@@ -1,6 +1,7 @@
 ﻿using Regira.Dimensions;
 using Regira.Utilities;
 using System.Text.Json;
+using NUnit.Framework.Legacy;
 
 namespace Common.Testing;
 
@@ -44,9 +45,9 @@ public class DimensionsTests
     {
         var size = _references[format];
         var expected = ((Size2D)size.Inches).Round(2);
-        Assert.AreEqual(expected, DimensionsUtility.MmToIn(size.Mm).Round(2));
-        Assert.AreEqual(expected, DimensionsUtility.PtToIn(size.Pt72, 72).Round(2));
-        Assert.AreEqual(expected, DimensionsUtility.PtToIn(size.Pt300, 300).Round(2));
+        ClassicAssert.AreEqual(expected, DimensionsUtility.MmToIn(size.Mm).Round(2));
+        ClassicAssert.AreEqual(expected, DimensionsUtility.PtToIn(size.Pt72, 72).Round(2));
+        ClassicAssert.AreEqual(expected, DimensionsUtility.PtToIn(size.Pt300, 300).Round(2));
     }
 
     [TestCase("a0")]
@@ -57,8 +58,8 @@ public class DimensionsTests
     {
         var size = _references[format];
         var expected = ((Size2D)size.Pt72).Round();
-        Assert.AreEqual(expected, DimensionsUtility.MmToPt(size.Mm, 72).Round());
-        Assert.AreEqual(expected, DimensionsUtility.InToPt(size.Inches, 72).Round());
+        ClassicAssert.AreEqual(expected, DimensionsUtility.MmToPt(size.Mm, 72).Round());
+        ClassicAssert.AreEqual(expected, DimensionsUtility.InToPt(size.Inches, 72).Round());
     }
 
     [TestCase("a0")]
@@ -69,8 +70,8 @@ public class DimensionsTests
     {
         var size = _references[format];
         var expected = ((Size2D)size.Pt300).Round();
-        Assert.AreEqual(expected, DimensionsUtility.MmToPt(size.Mm, 300).Round());
-        Assert.AreEqual(expected, DimensionsUtility.InToPt(size.Inches, 300).Round());
+        ClassicAssert.AreEqual(expected, DimensionsUtility.MmToPt(size.Mm, 300).Round());
+        ClassicAssert.AreEqual(expected, DimensionsUtility.InToPt(size.Inches, 300).Round());
     }
 
     [TestCase("a0")]
@@ -81,9 +82,9 @@ public class DimensionsTests
     {
         var size = _references[format];
         var expected = ((Size2D)size.Mm).Round(2);
-        Assert.AreEqual(expected, DimensionsUtility.InToMm(size.Inches).Round(2));
-        Assert.AreEqual(expected, DimensionsUtility.PtToMm(size.Pt72, 72).Round(2));
-        Assert.AreEqual(expected, DimensionsUtility.PtToMm(size.Pt300, 300).Round(2));
+        ClassicAssert.AreEqual(expected, DimensionsUtility.InToMm(size.Inches).Round(2));
+        ClassicAssert.AreEqual(expected, DimensionsUtility.PtToMm(size.Pt72, 72).Round(2));
+        ClassicAssert.AreEqual(expected, DimensionsUtility.PtToMm(size.Pt300, 300).Round(2));
     }
 
     [TestCase("a0")]
@@ -94,7 +95,7 @@ public class DimensionsTests
     {
         var size = _references[format];
         var expected = ((Size2D)size.Pt72).Round();
-        Assert.AreEqual(expected, DimensionsUtility.ModifyDPI(size.Pt300, 300, 72).Round());
+        ClassicAssert.AreEqual(expected, DimensionsUtility.ModifyDPI(size.Pt300, 300, 72).Round());
     }
 
     [TestCase("a0")]
@@ -105,6 +106,6 @@ public class DimensionsTests
     {
         var size = _references[format];
         var expected = ((Size2D)size.Pt300).Round();
-        Assert.AreEqual(expected, DimensionsUtility.ModifyDPI(size.Pt72, 72, 300).Round());
+        ClassicAssert.AreEqual(expected, DimensionsUtility.ModifyDPI(size.Pt72, 72, 300).Round());
     }
 }

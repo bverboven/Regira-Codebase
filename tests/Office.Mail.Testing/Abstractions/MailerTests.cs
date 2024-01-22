@@ -1,4 +1,5 @@
-﻿using Regira.IO.Abstractions;
+﻿using NUnit.Framework.Legacy;
+using Regira.IO.Abstractions;
 using Regira.IO.Models;
 using Regira.Office.Mail.Abstractions;
 using Regira.Office.Mail.Models;
@@ -29,7 +30,7 @@ public abstract class MailerTestsBase
         };
         var response = await Mailer.Send(msg);
 
-        Assert.IsTrue(response.Success);
+        ClassicAssert.IsTrue(response.Success);
     }
 
     [Test]
@@ -50,6 +51,6 @@ public abstract class MailerTestsBase
         };
         var response = await Mailer.Send(msg);
 
-        Assert.IsTrue(response.Success);
+        ClassicAssert.IsTrue(response.Success);
     }
 }

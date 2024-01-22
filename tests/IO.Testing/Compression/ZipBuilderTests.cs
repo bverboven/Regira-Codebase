@@ -1,3 +1,4 @@
+using NUnit.Framework.Legacy;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
 using Regira.IO.Storage.Compression;
@@ -36,8 +37,8 @@ public class ZipBuilderTests
         using var zipFile = await zipBuilder
             .For(_sourceFiles)
             .Build();
-        Assert.IsNotEmpty(zipFile.GetBytes()!);
-        Assert.IsTrue(zipFile.GetLength() > 0);
+        ClassicAssert.IsNotEmpty(zipFile.GetBytes()!);
+        ClassicAssert.IsTrue(zipFile.GetLength() > 0);
     }
     [Test]
     public async Task Can_Add_Files_To_Existing_Zip()
@@ -48,15 +49,15 @@ public class ZipBuilderTests
         using var zipFile = await zipBuilder1
             .For(files1)
             .Build();
-        Assert.AreEqual(files1.Length, ZipUtility.Unzip(zipFile.ToBinaryFile()).Count);
+        ClassicAssert.AreEqual(files1.Length, ZipUtility.Unzip(zipFile.ToBinaryFile()).Count);
         var zipStream1Length = zipFile.Stream?.Length;
         var zipBuilder2 = new ZipBuilder();
         await zipBuilder2
             .For(zipFile.Stream)
             .For(files2)
             .Build();
-        Assert.IsTrue(zipFile.Stream?.Length > zipStream1Length);
-        Assert.AreEqual(_sourceFiles.Length, ZipUtility.Unzip(zipFile.ToBinaryFile()).Count);
+        ClassicAssert.IsTrue(zipFile.Stream?.Length > zipStream1Length);
+        ClassicAssert.AreEqual(_sourceFiles.Length, ZipUtility.Unzip(zipFile.ToBinaryFile()).Count);
     }
 
     [Test]
@@ -69,7 +70,7 @@ public class ZipBuilderTests
         //FileSystemUtility.SaveStream("zipped.zip", zipStream);
         var unzippedFiles = ZipUtility.Unzip(zipFile.ToBinaryFile());
         // compare count
-        Assert.AreEqual(_sourceFiles.Length, unzippedFiles.Count);
+        ClassicAssert.AreEqual(_sourceFiles.Length, unzippedFiles.Count);
         // compare bytes
         CollectionAssert.AreEqual(_sourceFiles.Select(f => f.Bytes), unzippedFiles.Select(f => FileUtility.GetBytes(f.Stream)));
         unzippedFiles.Dispose();

@@ -1,3 +1,4 @@
+using NUnit.Framework.Legacy;
 using Regira.IO.Models;
 using Regira.Office.OCR.Tesseract;
 
@@ -26,7 +27,7 @@ public class TesseractTests
         };
         var mgr = new OcrManager(new OcrManager.Options { Language = "eng" });
         var content = (await mgr.Read(img))?.ReplaceLineEndings();
-        Assert.IsNotNull(content);
+        ClassicAssert.IsNotNull(content);
 
         var contentLines = content?.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         var expected = @"MOTHER'S DAY POEM
@@ -40,7 +41,7 @@ Your strength and love has guided me
 and gave me wings to fly.".Split(Environment.NewLine);
 
         CollectionAssert.IsNotEmpty(contentLines);
-        Assert.AreEqual(string.Join(Environment.NewLine, expected), string.Join(Environment.NewLine, contentLines!));
+        ClassicAssert.AreEqual(string.Join(Environment.NewLine, expected), string.Join(Environment.NewLine, contentLines!));
     }
 
     [Test]
@@ -53,7 +54,7 @@ and gave me wings to fly.".Split(Environment.NewLine);
         };
         var mgr = new OcrManager(new OcrManager.Options { Language = "nld" });
         var content = (await mgr.Read(img))?.ReplaceLineEndings();
-        Assert.IsNotNull(content);
+        ClassicAssert.IsNotNull(content);
 
         var contentLines = content?.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         var expected = @"je gaf mij het leven
@@ -66,6 +67,6 @@ op deze mooie dag
 little universe".Split(Environment.NewLine);
 
         CollectionAssert.IsNotEmpty(contentLines);
-        Assert.AreEqual(string.Join(Environment.NewLine, expected), string.Join(Environment.NewLine, contentLines!));
+        ClassicAssert.AreEqual(string.Join(Environment.NewLine, expected), string.Join(Environment.NewLine, contentLines!));
     }
 }

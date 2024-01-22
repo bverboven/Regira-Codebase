@@ -1,3 +1,4 @@
+using NUnit.Framework.Legacy;
 using Regira.IO.Extensions;
 using Regira.IO.Utilities;
 using Regira.Office.PDF.Models;
@@ -47,8 +48,8 @@ public class SelectPdfTests
         };
         using var pdf = pdfPrinter.Create(template);
         using var stream = pdf.GetStream()!;
-        Assert.IsNotNull(stream);
-        Assert.IsTrue(stream.Length > 0);
+        ClassicAssert.IsNotNull(stream);
+        ClassicAssert.IsTrue(stream.Length > 0);
         var outputPath = Path.Combine(_outputDir, "pdf-table.pdf");
         File.WriteAllBytes(outputPath, FileUtility.GetBytes(stream)!);
     }
@@ -76,8 +77,8 @@ public class SelectPdfTests
         var pdfPrinter = new PdfManager();
         using var pdf = pdfPrinter.Create(template);
         using var stream = pdf.GetStream()!;
-        Assert.IsNotNull(stream);
-        Assert.IsTrue(stream.Length > 0);
+        ClassicAssert.IsNotNull(stream);
+        ClassicAssert.IsTrue(stream.Length > 0);
         var outputPath = Path.Combine(_outputDir, "pdf-with-parameters.pdf");
         File.WriteAllBytes(outputPath, FileUtility.GetBytes(stream)!);
     }
@@ -108,8 +109,8 @@ public class SelectPdfTests
         var pdfPrinter = new PdfManager();
         using var pdf = pdfPrinter.Create(template);
         using var stream = pdf.GetStream()!;
-        Assert.IsNotNull(stream);
-        Assert.IsTrue(stream.Length > 0);
+        ClassicAssert.IsNotNull(stream);
+        ClassicAssert.IsTrue(stream.Length > 0);
         var outputPath = Path.Combine(_outputDir, "pdf-with-header.pdf");
         File.WriteAllBytes(outputPath, FileUtility.GetBytes(stream)!);
     }

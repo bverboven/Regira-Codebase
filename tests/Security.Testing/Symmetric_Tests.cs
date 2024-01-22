@@ -1,3 +1,4 @@
+using NUnit.Framework.Legacy;
 using Regira.Security.Core;
 using Regira.Security.Encryption;
 
@@ -18,7 +19,7 @@ public class Symmetric_Tests
     {
         var encrypter = new SymmetricEncrypter(new CryptoOptions { Secret = secret });
         var encrypted = encrypter.Encrypt(plaintext);
-        Assert.AreEqual(expected, encrypted);
+        ClassicAssert.AreEqual(expected, encrypted);
     }
 
     [TestCase("32087901-04E0-47EB-959E-A3A7EBB36DCD", null, "RHpJu+UBzo7ZiE7QEEJZYh4anOdJPjw/IP7JhDD80eXrdq49zx7Pg0Q7CUiTitZ9")]
@@ -32,7 +33,7 @@ public class Symmetric_Tests
     {
         var decrypter = new SymmetricEncrypter(new CryptoOptions { Secret = secret });
         var decrypted = decrypter.Decrypt(encrypted);
-        Assert.AreEqual(plaintext, decrypted);
+        ClassicAssert.AreEqual(plaintext, decrypted);
     }
 
     [Test]
@@ -44,7 +45,7 @@ public class Symmetric_Tests
         var encrypted = encrypter.Encrypt("wrong_password");
         var decrypter = new SymmetricEncrypter(new CryptoOptions { Secret = secret });
         var decrypted = decrypter.Decrypt(encrypted);
-        Assert.AreNotEqual(plaintext, decrypted);
+        ClassicAssert.AreNotEqual(plaintext, decrypted);
     }
 
     [Test]
@@ -55,6 +56,6 @@ public class Symmetric_Tests
         var encrypted = encrypter.Encrypt(plaintext);
         var decrypter = new SymmetricEncrypter();
         var decrypted = decrypter.Decrypt(encrypted);
-        Assert.AreEqual(plaintext, decrypted);
+        ClassicAssert.AreEqual(plaintext, decrypted);
     }
 }

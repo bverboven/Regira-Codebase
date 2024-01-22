@@ -1,6 +1,4 @@
-﻿using Regira.Entities.Web.Attachments.Models;
-
-namespace Regira.Entities.Web.Attachments.Abstractions
+﻿namespace Regira.Entities.Web.Attachments.Abstractions
 {
     public interface IEntityAttachmentInput : IEntityAttachmentInput<int, int, int>
     {

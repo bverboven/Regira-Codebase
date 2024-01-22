@@ -1,4 +1,5 @@
-﻿using Regira.TreeList;
+﻿using NUnit.Framework.Legacy;
+using Regira.TreeList;
 using TreeList.Testing.Infrastructure;
 using Person = TreeList.Testing.Infrastructure.Person;
 
@@ -54,6 +55,6 @@ public class ExpectingFailureTests
         var node2 = tree.AddValue(person2, node1);
         var invalidNode = tree.AddValue(person0, node2);
 
-        Assert.IsNull(invalidNode);
+        ClassicAssert.IsNull(invalidNode);
     }
 }

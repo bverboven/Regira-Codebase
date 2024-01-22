@@ -1,4 +1,5 @@
-﻿using Regira.IO.Extensions;
+﻿using NUnit.Framework.Legacy;
+using Regira.IO.Extensions;
 using Regira.IO.Models;
 using Regira.IO.Storage.FileSystem;
 using Regira.Office.Word.Models;
@@ -67,10 +68,10 @@ public class DocumentBuilderTests
             .Build();
 
         var file = await FileSystemUtility.SaveStream(outputPath, stream);
-        Assert.IsTrue(file.Exists);
-        Assert.IsTrue(file.Length > 0);
+        ClassicAssert.IsTrue(file.Exists);
+        ClassicAssert.IsTrue(file.Length > 0);
 
         var content = manager.GetText(new WordTemplateInput { Template = stream.ToBinaryFile() });
-        Assert.IsTrue(content.Contains(headingParagraph.Text));
+        ClassicAssert.IsTrue(content.Contains(headingParagraph.Text));
     }
 }

@@ -1,4 +1,5 @@
 using Bogus;
+using NUnit.Framework.Legacy;
 using Office.Csv.Testing.Infrastructure;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
@@ -36,8 +37,8 @@ public class CsvTests
         var csvMgr = new CsvManager<dynamic>(new CsvManager<dynamic>.Options { Culture = CultureInfo.CurrentCulture });
         var records = await csvMgr.Read(input);
         CollectionAssert.IsNotEmpty(records);
-        Assert.AreEqual("1", records.First().Id);
-        Assert.AreEqual("one", records.First().Name);
+        ClassicAssert.AreEqual("1", records.First().Id);
+        ClassicAssert.AreEqual("one", records.First().Name);
     }
     [Test]
     public async Task Read_Cities()
@@ -54,9 +55,9 @@ public class CsvTests
 
         CollectionAssert.IsNotEmpty(cities);
         var firstCity = cities.First();
-        Assert.AreEqual("Youngstown", firstCity.City);
+        ClassicAssert.AreEqual("Youngstown", firstCity.City);
         var lastCity = cities.Last();
-        Assert.AreEqual("Ravenna", lastCity.City);
+        ClassicAssert.AreEqual("Ravenna", lastCity.City);
     }
     [Test]
     public async Task Write_Products()
@@ -74,7 +75,7 @@ public class CsvTests
         var csvMgr = new CsvManager<CsvProduct>();
 
         var csvString = await csvMgr.Write(products);
-        Assert.IsNotEmpty(csvString);
+        ClassicAssert.IsNotEmpty(csvString);
 
         using var csvFile = await csvMgr.WriteFile(products);
         await csvFile.SaveAs(outputPath);
@@ -103,7 +104,7 @@ public class CsvTests
         var csvMgr = new CsvManager(new CsvManager<IDictionary<string, object>>.Options { Culture = CultureInfo.CurrentCulture });
 
         var csvString = await csvMgr.Write(products!);
-        Assert.IsNotEmpty(csvString);
+        ClassicAssert.IsNotEmpty(csvString);
 
         using var csvFile = await csvMgr.WriteFile(products!);
         await csvFile.SaveAs(outputPath);
@@ -132,7 +133,7 @@ public class CsvTests
             var p2 = writtenProducts[i];
             foreach (var key in p1.Keys)
             {
-                Assert.AreEqual(p1[key]?.ToString() ?? string.Empty, p2[key]);
+                ClassicAssert.AreEqual(p1[key]?.ToString() ?? string.Empty, p2[key]);
             }
         }
     }

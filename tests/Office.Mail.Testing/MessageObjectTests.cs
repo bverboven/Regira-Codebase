@@ -5,6 +5,7 @@ using Regira.Office.Mail.Web;
 using Regira.Serializing.Abstractions;
 using Regira.Serializing.Newtonsoft.Json;
 using System.Dynamic;
+using NUnit.Framework.Legacy;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 
@@ -39,11 +40,11 @@ public class MessageObjectTests
 
         var msg = mailInput.ToMessageObject();
         TestMailAddress((MailAddress)msg.From!.Email, input.from);
-        Assert.IsNull(msg.ReplyTo);
+        ClassicAssert.IsNull(msg.ReplyTo);
         TestMailAddress((MailAddress)msg.To.First().Email, input.to[0]);
-        Assert.AreEqual(msg.Subject, input.subject);
-        Assert.AreEqual(msg.Body, input.body);
-        Assert.IsTrue(msg.IsHtml);
+        ClassicAssert.AreEqual(msg.Subject, input.subject);
+        ClassicAssert.AreEqual(msg.Body, input.body);
+        ClassicAssert.IsTrue(msg.IsHtml);
     }
 
     [TestCase(MailConstants.INPUT_REPLYTO)]
@@ -53,7 +54,7 @@ public class MessageObjectTests
         var mailInput = _serializer.Deserialize<MailInput>(serializedInput)!;
 
         var msg = mailInput.ToMessageObject();
-        Assert.IsNotNull(msg.ReplyTo);
+        ClassicAssert.IsNotNull(msg.ReplyTo);
         TestMailAddress(msg.ReplyTo, input.replyTo);
     }
 
@@ -64,8 +65,8 @@ public class MessageObjectTests
         var mailInput = _serializer.Deserialize<MailInput>(serializedInput)!;
 
         var msg = mailInput.ToMessageObject();
-        Assert.IsNull(msg.From);
-        Assert.IsFalse(((IDictionary<string, object?>)input).ContainsKey("from"));
+        ClassicAssert.IsNull(msg.From);
+        ClassicAssert.IsFalse(((IDictionary<string, object?>)input).ContainsKey("from"));
         TestMailAddress(msg.From!, null);
     }
 
@@ -77,7 +78,7 @@ public class MessageObjectTests
 
         var msg = mailInput.ToMessageObject();
         CollectionAssert.IsEmpty(msg.To);
-        Assert.IsFalse(((IDictionary<string, object?>)input).ContainsKey("to"));
+        ClassicAssert.IsFalse(((IDictionary<string, object?>)input).ContainsKey("to"));
         TestMailAddress(msg.To.FirstOrDefault(), null);
     }
 
@@ -87,7 +88,7 @@ public class MessageObjectTests
         var mailInput = _serializer.Deserialize<MailInput>(serializedInput)!;
 
         var msg = mailInput.ToMessageObject();
-        Assert.IsFalse(msg.IsHtml);
+        ClassicAssert.IsFalse(msg.IsHtml);
     }
 
     [TestCase(MailConstants.EXTENDED_INPUT)]
@@ -135,18 +136,18 @@ public class MessageObjectTests
         }
 
         inputDic.TryGetValue("subject", out object? subject);
-        Assert.AreEqual(msg.Subject, subject);
+        ClassicAssert.AreEqual(msg.Subject, subject);
 
         inputDic.TryGetValue("body", out object? body);
-        Assert.AreEqual(msg.Body, body);
+        ClassicAssert.AreEqual(msg.Body, body);
 
         if (inputDic.ContainsKey("isHtml"))
         {
-            Assert.AreEqual(msg.IsHtml, input.isHtml);
+            ClassicAssert.AreEqual(msg.IsHtml, input.isHtml);
         }
         else
         {
-            Assert.IsTrue(msg.IsHtml);
+            ClassicAssert.IsTrue(msg.IsHtml);
         }
     }
 
@@ -156,25 +157,25 @@ public class MessageObjectTests
         var inputDic = input as IDictionary<string, object?>;
         if (input == null)
         {
-            Assert.IsNull(address);
+            ClassicAssert.IsNull(address);
             return;
         }
 
         if (inputDic?.ContainsKey("displayName") ?? false)
         {
-            Assert.AreEqual(address!.DisplayName, inputDic["displayName"]);
+            ClassicAssert.AreEqual(address!.DisplayName, inputDic["displayName"]);
         }
         else
         {
-            Assert.IsNull(address!.DisplayName);
+            ClassicAssert.IsNull(address!.DisplayName);
         }
         if (inputDic?.ContainsKey("email") ?? false)
         {
-            Assert.AreEqual(address.Email, inputDic["email"]);
+            ClassicAssert.AreEqual(address.Email, inputDic["email"]);
         }
         else
         {
-            Assert.AreEqual(address.Email, input);
+            ClassicAssert.AreEqual(address.Email, input);
         }
     }
 }

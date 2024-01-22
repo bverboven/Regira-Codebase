@@ -1,3 +1,4 @@
+using NUnit.Framework.Legacy;
 using Regira.IO.Models;
 using Regira.IO.Storage;
 using Regira.IO.Storage.Abstractions;

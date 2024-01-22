@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using NUnit.Framework.Legacy;
 using Regira.Payments.Models;
 using Regira.Payments.Mollie.Config;
 using Regira.Payments.Mollie.Services;
@@ -36,7 +37,7 @@ public class MollieTests
     //public void Test_Parse_MollieAmount(decimal value, string expected)
     //{
     //    var amount = value;
-    //    Assert.AreEqual(amount, expected);
+    //    ClassicAssert.AreEqual(amount, expected);
     //}
 
     [Test]
@@ -49,7 +50,7 @@ public class MollieTests
             Description = "Test payment"
         };
         await _repo.Save(payment);
-        Assert.IsNotNull(payment.Id);
+        ClassicAssert.IsNotNull(payment.Id);
     }
     [Test]
     public async Task GetPayment()
@@ -57,7 +58,7 @@ public class MollieTests
         var items = (await _repo.List()).AsList();
         CollectionAssert.IsNotEmpty(items);
         var details = await _repo.Details(items.Last().Id!);
-        Assert.IsNotNull(details);
+        ClassicAssert.IsNotNull(details);
     }
 
     [Test]
@@ -68,7 +69,7 @@ public class MollieTests
         CollectionAssert.IsNotEmpty(items);
         foreach (var payment in items)
         {
-            Assert.IsTrue(payment.Amount > 5);
+            ClassicAssert.IsTrue(payment.Amount > 5);
         }
     }
 
@@ -89,6 +90,6 @@ public class MollieTests
             })
         };
         await _repo.Save(payment);
-        Assert.IsNotNull(payment.Id);
+        ClassicAssert.IsNotNull(payment.Id);
     }
 }

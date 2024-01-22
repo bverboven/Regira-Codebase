@@ -1,4 +1,5 @@
-﻿using Regira.Drawing.Barcodes.Abstractions;
+﻿using NUnit.Framework.Legacy;
+using Regira.Drawing.Barcodes.Abstractions;
 using Regira.Drawing.Barcodes.Exceptions;
 using Regira.Drawing.Barcodes.Models;
 using Regira.Drawing.Core;
@@ -38,7 +39,7 @@ public class BarcodeTestsBase
     {
         if (Writer == null)
         {
-            Assert.Ignore("Writing not supported");
+             Assert.Ignore("Writing not supported");
             return;
         }
 
@@ -50,14 +51,14 @@ public class BarcodeTestsBase
 
         using var barCodeImg = Writer.Create(input);
         await barCodeImg.SaveAs(Path.Combine(OutputDir, $"{outputName}-{input.Format.ToString().ToLowerInvariant()}.jpg"));
-        Assert.IsNotNull(barCodeImg.GetBytes());
-        Assert.IsTrue(barCodeImg.GetLength() > 0);
+        ClassicAssert.IsNotNull(barCodeImg.GetBytes());
+        ClassicAssert.IsTrue(barCodeImg.GetLength() > 0);
     }
     public virtual async Task Check_Dimensions(string content, BarcodeFormat format, int[] size)
     {
         if (Writer == null)
         {
-            Assert.Ignore("Writing not supported");
+             Assert.Ignore("Writing not supported");
             return;
         }
 
@@ -69,16 +70,16 @@ public class BarcodeTestsBase
         };
         using var barCodeImg = Writer.Create(input);
         await barCodeImg.SaveAs(Path.Combine(OutputDir, $"barcode-{input.Format}-{input.Size.Width}x{input.Size.Height}.jpg"));
-        Assert.IsNotNull(barCodeImg.GetBytes());
-        Assert.IsTrue(barCodeImg.GetLength() > 0);
-        Assert.AreEqual(input.Size.Width, barCodeImg.Size?.Width);
-        Assert.AreEqual(input.Size.Height, barCodeImg.Size?.Height);
+        ClassicAssert.IsNotNull(barCodeImg.GetBytes());
+        ClassicAssert.IsTrue(barCodeImg.GetLength() > 0);
+        ClassicAssert.AreEqual(input.Size.Width, barCodeImg.Size?.Width);
+        ClassicAssert.AreEqual(input.Size.Height, barCodeImg.Size?.Height);
     }
     public virtual void TooLong_Expect_InputException()
     {
         if (Writer == null)
         {
-            Assert.Ignore("Writing not supported");
+             Assert.Ignore("Writing not supported");
             return;
         }
 
@@ -93,21 +94,21 @@ public class BarcodeTestsBase
     {
         if (Reader == null)
         {
-            Assert.Ignore("Reading not supported");
+             Assert.Ignore("Reading not supported");
             return;
         }
 
         var input = new ImageFile().Load(Path.Combine(InputDir, inputImg));
 
         var content = string.Join(Environment.NewLine, Reader.Read(input)?.Contents!);
-        Assert.AreEqual(expectedContent, content);
+        ClassicAssert.AreEqual(expectedContent, content);
     }
 
     public virtual Task Create_And_Read_Barcode()
     {
         if (Reader == null)
         {
-            Assert.Ignore("Reading not supported");
+             Assert.Ignore("Reading not supported");
             return Task.CompletedTask;
         }
 
@@ -118,7 +119,7 @@ public class BarcodeTestsBase
         };
         var inputBytes = Writer?.Create(input)!;
         var result = Reader.Read(inputBytes);
-        Assert.AreEqual(input.Content, result?.Contents?.FirstOrDefault());
+        ClassicAssert.AreEqual(input.Content, result?.Contents?.FirstOrDefault());
         return Task.CompletedTask;
     }
 }

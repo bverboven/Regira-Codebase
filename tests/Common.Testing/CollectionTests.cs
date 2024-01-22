@@ -1,4 +1,5 @@
 ﻿using Common.Testing.Models;
+using NUnit.Framework.Legacy;
 using Regira.Utilities;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
@@ -177,13 +178,13 @@ public class CollectionTests
             };
         });
 
-        Assert.AreEqual(testItems.Count, indexDic.Count);
+        ClassicAssert.AreEqual(testItems.Count, indexDic.Count);
 
         var fileLines = await File.ReadAllLinesAsync(tempFile);
         foreach (var kvp in indexDic)
         {
             var expected = Array.IndexOf(fileLines, kvp.value);
-            Assert.AreEqual(expected, kvp.index);
+            ClassicAssert.AreEqual(expected, kvp.index);
         }
         File.Delete(tempFile);
     }

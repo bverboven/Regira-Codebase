@@ -1,3 +1,4 @@
+using NUnit.Framework.Legacy;
 using Regira.Utilities;
 using System.Text.Json;
 
@@ -87,31 +88,31 @@ public class DictionaryUtilityTests
     [Test]
     public void Plain_Object_To_Dictionary()
     {
-        dynamic obj = _plainObj;
+        dynamic? obj = _plainObj;
         var dic = DictionaryUtility.ToDictionary(obj);
-        Assert.IsNotEmpty(dic);
-        Assert.AreEqual(obj.Id, dic["Id"]);
-        Assert.AreEqual(obj.Title, dic["Title"]);
-        Assert.AreEqual(obj.Created, dic["Created"]);
+        CollectionAssert.IsNotEmpty(dic);
+        Assert.That(obj?.Id, Is.EqualTo(dic["Id"]));
+        Assert.That(obj?.Title, Is.EqualTo(dic["Title"]));
+        Assert.That(obj?.Created, Is.EqualTo(dic["Created"]));
     }
     [Test]
     public void Plain_Object_To_Dictionary_With_CaseInsensitive()
     {
-        dynamic obj = _plainObj;
+        dynamic? obj = _plainObj;
         var dic = DictionaryUtility.ToDictionary(obj);
         var keys = ((ICollection<string>)dic.Keys).ToArray(); // use ToArray to remove case insensitivity on key collection
-        Assert.IsTrue(keys.Contains("Id"));
-        Assert.IsFalse(keys.Contains("id"));
-        Assert.AreEqual(obj.Id, dic["id"]);
-        Assert.AreEqual(obj.Title, dic["title"]);
-        Assert.AreEqual(obj.Created, dic["created"]);
+        CollectionAssert.Contains(keys, "Id");
+        CollectionAssert.DoesNotContain(keys, "id");
+        Assert.That(obj?.Id, Is.EqualTo(dic["id"]));
+        Assert.That(obj?.Title, Is.EqualTo(dic["title"]));
+        Assert.That(obj?.Created, Is.EqualTo(dic["created"]));
     }
     [Test]
     public void Object_With_Array_To_Dictionary()
     {
-        dynamic obj = _objWithArray;
+        dynamic? obj = _objWithArray;
         var dic = DictionaryUtility.ToDictionary(obj);
-        Assert.IsNotEmpty(dic["Values"]);
+        CollectionAssert.IsNotEmpty(dic["Values"]);
         var src = (int[])obj.Values;
         var result = (IList<object>)dic["Values"];
         CollectionAssert.AreEqual(src, result);
@@ -119,14 +120,14 @@ public class DictionaryUtilityTests
     [Test]
     public void Nested_Object()
     {
-        dynamic obj = _nestedObj;
+        dynamic obj = _nestedObj!;
         IDictionary<string, object?> dic = DictionaryUtility.ToDictionary(obj);
-        IDictionary<string, object?> parent = (IDictionary<string, object?>)dic["Parent"];
-        Assert.IsInstanceOf<IDictionary<string, object?>>(parent);
-        Assert.AreEqual(obj.Parent.Id, parent["Id"]);
-        Assert.AreEqual(obj.Parent.Title, parent["Title"]);
-        IDictionary<string, object?> root = (IDictionary<string, object?>)parent["Parent"];
-        Assert.AreEqual(obj.Parent.Parent.Id, root["Id"]);
+        IDictionary<string, object?> parent = (IDictionary<string, object?>)dic["Parent"]!;
+        ClassicAssert.IsInstanceOf<IDictionary<string, object?>>(parent);
+        Assert.That(obj.Parent.Id, Is.EqualTo(parent["Id"]));
+        Assert.That(obj.Parent.Title, Is.EqualTo(parent["Title"]));
+        IDictionary<string, object?> root = (IDictionary<string, object?>)parent["Parent"]!;
+        Assert.That(obj.Parent.Id, Is.EqualTo(root["Id"]));
     }
     #endregion
 
@@ -139,9 +140,9 @@ public class DictionaryUtilityTests
             .ToList();
         var table = DictionaryUtility.ToTableArray(countries);
         // test headers
-        Assert.AreEqual("Code", table[0, 0]);
-        Assert.AreEqual("Title", table[0, 1]);
-        Assert.AreEqual("Created", table[0, 2]);
+        Assert.That(table[0, 0], Is.EqualTo("Code"));
+        Assert.That(table[0, 1], Is.EqualTo("Title"));
+        Assert.That(table[0, 2], Is.EqualTo("Created"));
 
         // test values
         var keys = countries[0].Keys.ToArray();
@@ -150,7 +151,7 @@ public class DictionaryUtilityTests
             for (var j = 0; j < keys.Length; j++)
             {
                 var key = keys[j];
-                Assert.AreEqual(countries[i][key], table[i + 1, j]);
+                Assert.That(countries[i][key], Is.EqualTo(table[i + 1, j]));
             }
         }
     }
@@ -167,15 +168,15 @@ public class DictionaryUtilityTests
 
         // test values
         var keys = countries[0].Keys.ToArray();
-        Assert.AreEqual("Code", keys[0]);
-        Assert.AreEqual("Title", keys[1]);
-        Assert.AreEqual("Created", keys[2]);
+        Assert.That(keys[0], Is.EqualTo("Code"));
+        Assert.That(keys[1], Is.EqualTo("Title"));
+        Assert.That(keys[2], Is.EqualTo("Created"));
         for (var i = 0; i < countries.Count(); i++)
         {
             for (var j = 0; j < keys.Length; j++)
             {
                 var key = keys[j];
-                Assert.AreEqual(table[i + 1, j], dicList[i][key]);
+                Assert.That(table[i + 1, j], Is.EqualTo(dicList[i][key]));
             }
         }
     }
@@ -187,8 +188,8 @@ public class DictionaryUtilityTests
     {
         var source = new Dictionary<string, object?>();
         var target = DictionaryUtility.Flatten(source);
-        Assert.IsNotNull(target);
-        Assert.IsInstanceOf<IDictionary<string, object?>>(target);
+        Assert.That(target, Is.Not.Null);
+        Assert.That(target, Is.InstanceOf<IDictionary<string, object?>>());
     }
     [Test]
     public void Flatten_Simple_Values()
@@ -198,8 +199,8 @@ public class DictionaryUtilityTests
             { "factuurDatum", "2019-11-19" }
         };
         var target = DictionaryUtility.Flatten(source);
-        Assert.AreEqual(source["factuurNummer"], target["factuurNummer"]);
-        Assert.AreEqual(source["factuurDatum"], target["factuurDatum"]);
+        Assert.That(source["factuurNummer"], Is.EqualTo(target["factuurNummer"]));
+        Assert.That(source["factuurDatum"], Is.EqualTo(target["factuurDatum"]));
     }
     [Test]
     public void Flatten_CollectionValues()
@@ -217,10 +218,10 @@ public class DictionaryUtilityTests
             } }
         };
         var target = DictionaryUtility.Flatten(source);
-        Assert.IsFalse(target.ContainsKey("factuurLijnen"));
-        Assert.IsTrue(target.ContainsKey("factuurLijnen.0.omschrijving"));
-        var sourceFactuurLijnen = (IDictionary<string, object?>[])source["factuurLijnen"];
-        Assert.AreEqual(sourceFactuurLijnen[0]["omschrijving"], target["factuurLijnen.0.omschrijving"]);
+        Assert.That(target.ContainsKey("factuurLijnen"), Is.False);
+        Assert.That(target.ContainsKey("factuurLijnen.0.omschrijving"), Is.True);
+        var sourceFactuurLijnen = (IDictionary<string, object?>[])source["factuurLijnen"]!;
+        Assert.That(sourceFactuurLijnen[0]["omschrijving"], Is.EqualTo(target["factuurLijnen.0.omschrijving"]));
     }
     [Test]
     public void Flatten_Ignore_CollectionValues()
@@ -238,8 +239,8 @@ public class DictionaryUtilityTests
             } }
         };
         var target = DictionaryUtility.Flatten(source, new FlattenOptions { IgnoreCollections = true });
-        Assert.IsTrue(target.ContainsKey("factuurLijnen"));
-        Assert.IsNotEmpty((IList<IDictionary<string, object?>>)target["factuurLijnen"]);
+        Assert.That(target.ContainsKey("factuurLijnen"), Is.True);
+        CollectionAssert.IsNotEmpty((IList<IDictionary<string, object?>>)target["factuurLijnen"]!);
     }
     [Test]
     public void Flatten_Nested_CollectionValues()
@@ -258,7 +259,7 @@ public class DictionaryUtilityTests
         var sourceFactuurLijnen = (IDictionary<string, object?>[])source["factuurLijnen"];
         var sourceLijn = sourceFactuurLijnen.First();
         var sourceFirstNested = (IDictionary<string, object?>)sourceLijn["nested"];
-        Assert.AreEqual(sourceFirstNested["first"], target["factuurLijnen.0.nested.first"]);
+        Assert.That(sourceFirstNested["first"], Is.EqualTo(target["factuurLijnen.0.nested.first"]));
     }
     [Test]
     public void Flatten_Nested_Ignore_Collections()
@@ -278,7 +279,7 @@ public class DictionaryUtilityTests
         var sourceLijn = sourceFactuurLijnen.First();
         var sourceFirstNested = (IDictionary<string, object?>)sourceLijn["nested"];
         var targetFactuurLijnen = (IList<IDictionary<string, object?>>)target["factuurLijnen"];
-        Assert.AreEqual(sourceFirstNested["first"], targetFactuurLijnen[0]["nested.first"]);
+        Assert.That(sourceFirstNested["first"], Is.EqualTo(targetFactuurLijnen[0]["nested.first"]));
     }
     [Test]
     public void Flatten_Removes_Hierarchy()
@@ -294,9 +295,9 @@ public class DictionaryUtilityTests
         //var json = _serializer.Serialize(source);
         //source = _serializer.Deserialize<Dictionary<string, object>>(json);
         var target = DictionaryUtility.Flatten(source);
-        Assert.IsFalse(target.ContainsKey("leverancier"));
-        var sourceLeverancier = (IDictionary<string, object?>)source["leverancier"];
-        Assert.AreEqual(sourceLeverancier["naam"], target["leverancier.naam"]);
+        Assert.That(target.ContainsKey("leverancier"), Is.False);
+        var sourceLeverancier = (IDictionary<string, object?>)source["leverancier"]!;
+        Assert.That(sourceLeverancier["naam"], Is.EqualTo(target["leverancier.naam"]));
     }
     [Test]
     public void Flatten_Removes_Nested_Hierarchy()
@@ -311,11 +312,11 @@ public class DictionaryUtilityTests
             } }
         };
         var target = DictionaryUtility.Flatten(source);
-        var sourceLeverancier = (IDictionary<string, object?>)source["leverancier"];
-        Assert.IsTrue(sourceLeverancier.ContainsKey("adres"));
-        Assert.IsInstanceOf<IDictionary<string, object?>>(sourceLeverancier["adres"]);
-        var sourceLeverancierAdres = (IDictionary<string, object?>)sourceLeverancier["adres"];
-        Assert.AreEqual(sourceLeverancierAdres["straat"], target["leverancier.adres.straat"]);
+        var sourceLeverancier = (IDictionary<string, object?>)source["leverancier"]!;
+        Assert.That(sourceLeverancier.ContainsKey("adres"), Is.True);
+        Assert.That(sourceLeverancier["adres"], Is.InstanceOf<IDictionary<string, object?>>());
+        var sourceLeverancierAdres = (IDictionary<string, object?>)sourceLeverancier["adres"]!;
+        Assert.That(sourceLeverancierAdres["straat"], Is.EqualTo(target["leverancier.adres.straat"]));
     }
     [Test]
     public void Flatten_Nested_Collections_In_Collections()
@@ -344,11 +345,11 @@ public class DictionaryUtilityTests
         var target = DictionaryUtility.Flatten(source);
         var sourceFactuurLijnen = ((IEnumerable<IDictionary<string, object?>>)source["factuurLijnen"]).ToArray();
         var sourceLijn2 = sourceFactuurLijnen[1];
-        var sourceNestedProp = (IDictionary<string, object?>)sourceLijn2["nested"];
-        Assert.AreEqual(sourceNestedProp["first"], target["factuurLijnen.1.nested.first"]);
+        var sourceNestedProp = (IDictionary<string, object?>)sourceLijn2["nested"]!;
+        Assert.That(sourceNestedProp["first"], Is.EqualTo(target["factuurLijnen.1.nested.first"]));
         var sourceNestedSecond = ((IEnumerable<IDictionary<string, object?>>)sourceNestedProp["second"]).ToList();
-        var sourceNestedSecondFoo = (IDictionary<string, object?>)sourceNestedSecond[0]["foo"];
-        Assert.AreEqual(sourceNestedSecondFoo["value"], target["factuurLijnen.1.nested.second.0.foo.value"]);
+        var sourceNestedSecondFoo = (IDictionary<string, object?>)sourceNestedSecond[0]["foo"]!;
+        Assert.That(sourceNestedSecondFoo["value"], Is.EqualTo(target["factuurLijnen.1.nested.second.0.foo.value"]));
     }
     [Test]
     public void Flatten_Full_Unflattened_Sample()
@@ -392,26 +393,26 @@ public class DictionaryUtilityTests
         source = DictionaryUtility.Unflatten(source);
         var target = DictionaryUtility.Flatten(source);
 
-        Assert.AreEqual(source["factuurNummer"], target["factuurNummer"]);
-        Assert.AreEqual(source["factuurDatum"], target["factuurDatum"]);
+        Assert.That(source["factuurNummer"], Is.EqualTo(target["factuurNummer"]));
+        Assert.That(source["factuurDatum"], Is.EqualTo(target["factuurDatum"]));
 
         var sourceFactuurLijnen = (IList<IDictionary<string, object?>>)source["factuurLijnen"];
         var sourceLijn = sourceFactuurLijnen.First();
         var sourceFirstNested = (IDictionary<string, object?>)sourceLijn["nested"];
-        Assert.AreEqual(sourceFirstNested["first"], target["factuurLijnen.0.nested.first"]);
+        Assert.That(sourceFirstNested["first"], Is.EqualTo(target["factuurLijnen.0.nested.first"]));
 
         var sourceLeverancier = (IDictionary<string, object?>)source["leverancier"];
-        Assert.IsTrue(sourceLeverancier.ContainsKey("adres"));
-        Assert.IsInstanceOf<IDictionary<string, object?>>(sourceLeverancier["adres"]);
-        var sourceLeverancierAdres = (IDictionary<string, object?>)sourceLeverancier["adres"];
-        Assert.AreEqual(sourceLeverancierAdres["straat"], target["leverancier.adres.straat"]);
+        Assert.That(sourceLeverancier.ContainsKey("adres"), Is.True);
+        Assert.That(sourceLeverancier["adres"], Is.InstanceOf<IDictionary<string, object?>>());
+        var sourceLeverancierAdres = (IDictionary<string, object?>)sourceLeverancier["adres"]!;
+        Assert.That(sourceLeverancierAdres["straat"], Is.EqualTo(target["leverancier.adres.straat"]));
 
         var sourceLijn2 = sourceFactuurLijnen[1];
         var sourceNestedProp = (IDictionary<string, object?>)sourceLijn2["nested"];
-        Assert.AreEqual(sourceNestedProp["first"], target["factuurLijnen.1.nested.first"]);
+        Assert.That(sourceNestedProp["first"], Is.EqualTo(target["factuurLijnen.1.nested.first"]));
         var sourceNestedSecond = ((IEnumerable<IDictionary<string, object?>>)sourceNestedProp["second"]).ToList();
         var sourceNestedSecondFoo = (IDictionary<string, object?>)sourceNestedSecond[0]["foo"];
-        Assert.AreEqual(sourceNestedSecondFoo["value"], target["factuurLijnen.1.nested.second.0.foo.value"]);
+        Assert.That(sourceNestedSecondFoo["value"], Is.EqualTo(target["factuurLijnen.1.nested.second.0.foo.value"]));
     }
     //        [Test]
     //        public void Flatten_Json_Sample()
@@ -446,14 +447,14 @@ public class DictionaryUtilityTests
     //            var source = JsonSerializer.Deserialize<IDictionary<string, object?>>(json)!;
     //            var target = DictionaryUtility.Flatten(source);
     //            //var flatJson = JsonSerializer.Serialize(target);
-    //            Assert.AreEqual(source["factuurNummer"], target["factuurNummer"]);
+    //            ClassicAssert.AreEqual(source["factuurNummer"], target["factuurNummer"]);
     //            var leverancier = (IDictionary<string, object?>)source["leverancier"];
     //            var adres = (IDictionary<string, object?>)leverancier["adres"];
-    //            Assert.AreEqual(adres["straat"], target["leverancier.adres.straat"]);
+    //            ClassicAssert.AreEqual(adres["straat"], target["leverancier.adres.straat"]);
     //            var factuurLijnen = (IList<IDictionary<string, object?>>)source["factuurLijnen"];
-    //            Assert.AreEqual(factuurLijnen[0]["volgnummer"], target["factuurLijnen.0.volgnummer"]);
+    //            ClassicAssert.AreEqual(factuurLijnen[0]["volgnummer"], target["factuurLijnen.0.volgnummer"]);
     //            var firstBtw = (IDictionary<string, object?>)factuurLijnen.First()["btw"];
-    //            Assert.AreEqual(firstBtw["tarief"], target["factuurLijnen.0.btw.tarief"]);
+    //            ClassicAssert.AreEqual(firstBtw["tarief"], target["factuurLijnen.0.btw.tarief"]);
     //        }
     #endregion
 
@@ -463,8 +464,8 @@ public class DictionaryUtilityTests
     {
         var source = new Dictionary<string, object?>();
         var target = DictionaryUtility.Unflatten(source);
-        Assert.IsNotNull(target);
-        Assert.IsInstanceOf<IDictionary<string, object?>>(target);
+        Assert.That(target, Is.Not.Null);
+        Assert.That(target, Is.InstanceOf<IDictionary<string, object?>>());
     }
     [Test]
     public void Unflatten_Simple_Values()
@@ -474,8 +475,8 @@ public class DictionaryUtilityTests
             {"factuurDatum", "2019-11-19"}
         };
         var target = DictionaryUtility.Unflatten(source);
-        Assert.AreEqual(source["factuurNummer"], target["factuurNummer"]);
-        Assert.AreEqual(source["factuurDatum"], target["factuurDatum"]);
+        Assert.That(source["factuurNummer"], Is.EqualTo(target["factuurNummer"]));
+        Assert.That(source["factuurDatum"], Is.EqualTo(target["factuurDatum"]));
     }
     [Test]
     public void Unflatten_CollectionValues()
@@ -496,12 +497,12 @@ public class DictionaryUtilityTests
         };
         var target = DictionaryUtility.Unflatten(source);
         var targetFactuurLijnen = target["factuurLijnen"] as IEnumerable<IDictionary<string, object?>>;
-        Assert.IsInstanceOf<IEnumerable<IDictionary<string, object?>>>(targetFactuurLijnen);
+        Assert.That(targetFactuurLijnen, Is.InstanceOf<IEnumerable<IDictionary<string, object?>>>());
         // ReSharper disable once AssignNullToNotNullAttribute
         var factuurlijnen = targetFactuurLijnen!.ToList();
         var lijn1 = factuurlijnen[0];
         var sourceFactuurLijnen = (IDictionary<string, object?>[])source["factuurLijnen"];
-        Assert.AreEqual(sourceFactuurLijnen[0]["omschrijving"], lijn1["omschrijving"]);
+        Assert.That(sourceFactuurLijnen[0]["omschrijving"], Is.EqualTo(lijn1["omschrijving"]));
     }
     [Test]
     public void Unflatten_Flat_CollectionValues()
@@ -514,11 +515,11 @@ public class DictionaryUtilityTests
         };
         var target = DictionaryUtility.Unflatten(source);
         var targetFactuurLijnen = target["factuurLijnen"] as IEnumerable<IDictionary<string, object?>>;
-        Assert.IsInstanceOf<IEnumerable<IDictionary<string, object?>>>(targetFactuurLijnen);
+        Assert.That(targetFactuurLijnen, Is.InstanceOf<IEnumerable<IDictionary<string, object?>>>());
         // ReSharper disable once AssignNullToNotNullAttribute
         var factuurlijnen = targetFactuurLijnen.ToList();
         var lijn1 = factuurlijnen[0];
-        Assert.AreEqual(source["factuurLijnen.0.omschrijving"], lijn1["omschrijving"]);
+        Assert.That(source["factuurLijnen.0.omschrijving"], Is.EqualTo(lijn1["omschrijving"]));
     }
     [Test]
     public void Unflatten_Nested_CollectionValues()
@@ -547,8 +548,8 @@ public class DictionaryUtilityTests
             { "leverancier.telefoon", "003239999999" },
         };
         var target = DictionaryUtility.Unflatten(source);
-        Assert.IsTrue(target.ContainsKey("leverancier"));
-        Assert.IsInstanceOf<IDictionary<string, object?>>(target["leverancier"]);
+        Assert.That(target.ContainsKey("leverancier"), Is.True);
+        Assert.That(target["leverancier"], Is.InstanceOf<IDictionary<string, object?>>());
         var targetLeverancier = (IDictionary<string, object?>)target["leverancier"]!;
         Assert.That(targetLeverancier["naam"], Is.EqualTo(source["leverancier.naam"]));
     }
@@ -562,10 +563,10 @@ public class DictionaryUtilityTests
         };
         var target = DictionaryUtility.Unflatten(source);
         var targetLeverancier = (IDictionary<string, object?>)target["leverancier"]!;
-        Assert.IsTrue(targetLeverancier.ContainsKey("adres"));
-        Assert.IsInstanceOf<IDictionary<string, object?>>(targetLeverancier["adres"]);
+        Assert.That(targetLeverancier.ContainsKey("adres"), Is.True);
+        Assert.That(targetLeverancier["adres"], Is.InstanceOf<IDictionary<string, object?>>());
         var targetLeverancierAdres = (IDictionary<string, object?>)targetLeverancier["adres"]!;
-        Assert.AreEqual(source["leverancier.adres.straat"], targetLeverancierAdres["straat"]);
+        Assert.That(source["leverancier.adres.straat"], Is.EqualTo(targetLeverancierAdres["straat"]));
     }
     [Test]
     public void Collections_Remain_Collections()
@@ -584,12 +585,12 @@ public class DictionaryUtilityTests
         };
         var target = DictionaryUtility.Unflatten(source);
         var targetFactuurLijnen = target["factuurLijnen"] as IEnumerable<IDictionary<string, object?>>;
-        Assert.IsInstanceOf<IEnumerable<IDictionary<string, object?>>>(targetFactuurLijnen);
+        Assert.That(targetFactuurLijnen, Is.InstanceOf<IEnumerable<IDictionary<string, object?>>>());
         // ReSharper disable once AssignNullToNotNullAttribute
         var factuurlijnen = targetFactuurLijnen.ToList();
         var lijn1 = factuurlijnen[0];
-        var sourceFactuurLijnen = (IDictionary<string, object?>[])source["factuurLijnen"];
-        Assert.AreEqual(sourceFactuurLijnen[0]["omschrijving"], lijn1["omschrijving"]);
+        var sourceFactuurLijnen = (IDictionary<string, object?>[])source["factuurLijnen"]!;
+        Assert.That(sourceFactuurLijnen[0]["omschrijving"], Is.EqualTo(lijn1["omschrijving"]));
     }
     [Test]
     public void Unflatten_Nested_Collections_In_Collections()
@@ -616,13 +617,13 @@ public class DictionaryUtilityTests
         var sourceFactuurLijnen = (IDictionary<string, object?>[])source["factuurLijnen"];
         var targetLijn2 = targetFactuurLijnen[1];
         var sourceLijn2 = sourceFactuurLijnen[1];
-        Assert.IsNotNull(targetLijn2["nested"] as IDictionary<string, object?>);
+        Assert.That(targetLijn2["nested"] as IDictionary<string, object?>, Is.Not.Null);
         var targetNestedProp = (IDictionary<string, object?>)targetLijn2["nested"];
-        Assert.AreEqual(sourceLijn2["nested.first"], targetNestedProp["first"]);
+        Assert.That(sourceLijn2["nested.first"], Is.EqualTo(targetNestedProp["first"]));
         var targetNestedSecond = ((IEnumerable<IDictionary<string, object?>>)targetNestedProp["second"]).ToList();
         var sourceNestedSecond = ((IEnumerable<IDictionary<string, object?>>)sourceLijn2["nested.second"]).ToList();
         var targetNestedSecondFoo = (IDictionary<string, object?>)targetNestedSecond[0]["foo"];
-        Assert.AreEqual(sourceNestedSecond[0]["foo.value"], targetNestedSecondFoo["value"]);
+        Assert.That(sourceNestedSecond[0]["foo.value"], Is.EqualTo(targetNestedSecondFoo["value"]));
     }
     [Test]
     public void Unflatten_Full_Sample_With_Custom_Separator()
@@ -655,19 +656,19 @@ public class DictionaryUtilityTests
         var target = DictionaryUtility.Unflatten(source, new FlattenOptions { Separator = ":" });
 
         var targetLeverancier = (IDictionary<string, object?>)target["leverancier"];
-        Assert.IsTrue(targetLeverancier.ContainsKey("adres"));
-        Assert.IsInstanceOf<IDictionary<string, object?>>(targetLeverancier["adres"]);
+        Assert.That(targetLeverancier.ContainsKey("adres"), Is.True);
+        Assert.That(targetLeverancier["adres"], Is.InstanceOf<IDictionary<string, object?>>());
         var targetLeverancierAdres = (IDictionary<string, object?>)targetLeverancier["adres"];
-        Assert.AreEqual(source["leverancier:adres:straat"], targetLeverancierAdres["straat"]);
+        Assert.That(source["leverancier:adres:straat"], Is.EqualTo(targetLeverancierAdres["straat"]));
 
         var targetFactuurLijnen = ((IEnumerable<IDictionary<string, object?>>)target["factuurLijnen"]).ToArray();
         var targetLijn2 = targetFactuurLijnen[1];
-        Assert.IsNotNull(targetLijn2["nested"] as IDictionary<string, object?>);
+        Assert.That(targetLijn2["nested"] as IDictionary<string, object?>, Is.Not.Null);
         var targetNestedProp = (IDictionary<string, object?>)targetLijn2["nested"];
-        Assert.AreEqual(source["factuurLijnen:0:nested:first"], targetNestedProp["first"]);
+        Assert.That(source["factuurLijnen:0:nested:first"], Is.EqualTo(targetNestedProp["first"]));
         var targetNestedSecond = ((IEnumerable<IDictionary<string, object?>>)targetNestedProp["second"]).ToList();
         var targetNestedSecondFoo = (IDictionary<string, object?>)targetNestedSecond[0]["foo"];
-        Assert.AreEqual(source["factuurLijnen:1:nested:second:0:foo:value"], targetNestedSecondFoo["value"]);
+        Assert.That(source["factuurLijnen:1:nested:second:0:foo:value"], Is.EqualTo(targetNestedSecondFoo["value"]));
     }
     #endregion
 }

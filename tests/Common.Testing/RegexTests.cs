@@ -1,4 +1,5 @@
-﻿using Regira.Utilities;
+﻿using NUnit.Framework.Legacy;
+using Regira.Utilities;
 
 namespace Common.Testing;
 
@@ -40,7 +41,7 @@ Vivamus tempus enim lacinia nisi molestie vulputate. Praesent 1:2:3:4:5:6:7:8 tu
     public void TestValidEmail(string? input, bool expected)
     {
         var isValid = RegexUtility.IsValidEmail(input);
-        Assert.AreEqual(expected, isValid);
+        ClassicAssert.AreEqual(expected, isValid);
     }
 
     [TestCase("http://regira.com", true)]
@@ -130,8 +131,8 @@ Vivamus tempus enim lacinia nisi molestie vulputate. Praesent 1:2:3:4:5:6:7:8 tu
     public void TestExtractEmails()
     {
         var matches = RegexUtility.ExtractEmails(TestInput);
-        Assert.IsNotEmpty(matches);
-        Assert.IsTrue(matches.Length == 2);
+        ClassicAssert.IsNotEmpty(matches);
+        ClassicAssert.IsTrue(matches.Length == 2);
         CollectionAssert.Contains(matches, "info@regira.com");
         CollectionAssert.Contains(matches, "bbv.info@regira.com");
     }
@@ -139,7 +140,7 @@ Vivamus tempus enim lacinia nisi molestie vulputate. Praesent 1:2:3:4:5:6:7:8 tu
     public void TestExtractUrls()
     {
         var matches = RegexUtility.ExtractUrls(TestInput);
-        Assert.IsNotEmpty(matches);
+        ClassicAssert.IsNotEmpty(matches);
         //Assert.IsTrue(matches.Length == 2);//ToDo: pattern is also extracting parts of email-addresses for now
         CollectionAssert.Contains(matches, "regira.com");
         CollectionAssert.Contains(matches, "https://www.regira.com");
@@ -148,7 +149,7 @@ Vivamus tempus enim lacinia nisi molestie vulputate. Praesent 1:2:3:4:5:6:7:8 tu
     public void TestExtractPhoneNumbers()
     {
         var matches = RegexUtility.ExtractPhoneNumbers(TestInput);
-        Assert.IsNotEmpty(matches);
+        ClassicAssert.IsNotEmpty(matches);
         //Assert.IsTrue(matches.Length == 3); // also extracting IP 192.168.0.1
         CollectionAssert.Contains(matches, "+32 3 384 30");
         CollectionAssert.Contains(matches, "0032 (0)3 384 30 44");
@@ -158,8 +159,8 @@ Vivamus tempus enim lacinia nisi molestie vulputate. Praesent 1:2:3:4:5:6:7:8 tu
     public void TestExtractIPs()
     {
         var matches = RegexUtility.ExtractIPAddresses(TestInput);
-        Assert.IsNotEmpty(matches);
-        Assert.IsTrue(matches.Length == 2);
+        ClassicAssert.IsNotEmpty(matches);
+        ClassicAssert.IsTrue(matches.Length == 2);
         CollectionAssert.Contains(matches, "192.168.0.1");
         CollectionAssert.Contains(matches, "1:2:3:4:5:6:7:8");
     }

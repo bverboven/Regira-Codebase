@@ -34,7 +34,7 @@ public class SpireQRCodeTests : QRCodeTestsBase
     [Test]
     public override void TooLong_Expect_InputException()
     {
-        Assert.Ignore("Not supported");
+         Assert.Ignore("Not supported");
         //base.TooLong_Expect_InputException();
     }
 
@@ -45,14 +45,14 @@ public class SpireQRCodeTests : QRCodeTestsBase
     [TestCase("collection-picture.jpg", "http://itunes.apple.com/us/app/encyclopaedia-britannica/id447919187?mt=8\r\nhttp://en.m.wikipedia.org\r\nhttps://www.cyberciti.biz/")]
     public override void Read_QRCode(string inputImg, string expectedContent)
     {
-        Assert.Ignore("Not supported in free version");
+         Assert.Ignore("Not supported in free version");
         base.Read_QRCode(inputImg, expectedContent);
     }
 
     [Test]
     public override Task Create_And_Read_QRCode()
     {
-        Assert.Ignore("Not supported in free version");
+         Assert.Ignore("Not supported in free version");
         //base.Create_And_Read_QRCode();
         return Task.CompletedTask;
     }

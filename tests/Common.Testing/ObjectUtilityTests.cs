@@ -1,4 +1,5 @@
-﻿using Regira.Utilities;
+﻿using NUnit.Framework.Legacy;
+using Regira.Utilities;
 
 namespace Common.Testing;
 

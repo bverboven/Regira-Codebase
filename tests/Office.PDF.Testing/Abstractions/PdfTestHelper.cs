@@ -1,4 +1,5 @@
-﻿using Regira.Collections;
+﻿using NUnit.Framework.Legacy;
+using Regira.Collections;
 using Regira.Dimensions;
 using Regira.IO.Extensions;
 using Regira.IO.Storage.FileSystem;
@@ -31,12 +32,12 @@ public static class PdfTestHelper
             new() { Start = (int)Math.Ceiling(pageCount / 2d) + 1, End = pageCount - 1 }
         };
         var splidPdfs = pdfSplitter.Split(pdfStream.ToBinaryFile(), ranges).ToArray();
-        Assert.AreEqual(ranges.Length, splidPdfs.Length);
+        ClassicAssert.AreEqual(ranges.Length, splidPdfs.Length);
         for (var i = 0; i < splidPdfs.Length; i++)
         {
             var splitPdf = splidPdfs[i];
             var splitPageCount = pdfSplitter.GetPageCount(splitPdf.ToBinaryFile());
-            Assert.AreEqual(ranges[i].End - ranges[i].Start + 1, splitPageCount);
+            ClassicAssert.AreEqual(ranges[i].End - ranges[i].Start + 1, splitPageCount);
             await FileSystemUtility.SaveStream(Path.Combine(outputDir, $"split-{i + 1}.pdf"), splitPdf.GetStream());
         }
         // clean up
@@ -74,7 +75,7 @@ public static class PdfTestHelper
         var mergedPageCount = pdfSplitter.GetPageCount(merged.ToBinaryFile());
 
         await FileSystemUtility.SaveStream(Path.Combine(outputDir, "split-merged.pdf"), merged.GetStream());
-        Assert.AreEqual(expectedPageCount, mergedPageCount);
+        ClassicAssert.AreEqual(expectedPageCount, mergedPageCount);
         // clean up
         splidPdfs.Dispose();
     }
@@ -93,7 +94,7 @@ public static class PdfTestHelper
         var count = 0;
         foreach (var image in images)
         {
-            Assert.IsNotNull(image);
+            ClassicAssert.IsNotNull(image);
             var imgPath = Path.Combine(outputDir, $"pdf-img-{count + 1}.jpg");
             await File.WriteAllBytesAsync(imgPath, image.Bytes);
             //Assert.IsTrue(size.Width >= image.Size.Width);
@@ -101,6 +102,6 @@ public static class PdfTestHelper
             count++;
         }
 
-        Assert.AreEqual(2, count);
+        ClassicAssert.AreEqual(2, count);
     }
 }

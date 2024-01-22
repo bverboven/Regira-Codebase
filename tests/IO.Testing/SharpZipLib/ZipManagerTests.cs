@@ -1,3 +1,4 @@
+using NUnit.Framework.Legacy;
 using Regira.IO.Compression.SharpZipLib;
 using Regira.IO.Storage.FileSystem;
 using Regira.IO.Storage.Utilities;
@@ -30,7 +31,7 @@ public class ZipManagerTests
     [Test]
     public async Task Create_Zip()
     {
-        Assert.Ignore("ToDo");
+         Assert.Ignore("ToDo");
         var targetDir = new DirectoryInfo(Path.Combine(_assetsDir, "..\\unzipped")).FullName;
         var files = Directory.GetFiles(_assetsDir, "*", SearchOption.AllDirectories);
 
@@ -51,7 +52,7 @@ public class ZipManagerTests
 
         // test
         CollectionAssert.IsNotEmpty(unzippedFiles);
-        Assert.AreEqual(files.Length, unzippedFiles.Length);
+        ClassicAssert.AreEqual(files.Length, unzippedFiles.Length);
         var expectedFiles = files.Select(f => f.Substring(_assetsDir.Length)).ToArray();
         var actualFiles = unzippedFiles.Select(f => f?.Substring(targetDir.Length)).ToArray();
         CollectionAssert.AreEquivalent(expectedFiles, actualFiles);
@@ -59,11 +60,11 @@ public class ZipManagerTests
     [Test]
     public void Update_Zip_Add_Files()
     {
-        Assert.Ignore("ToDo");
+         Assert.Ignore("ToDo");
     }
     [Test]
     public void Update_Zip_Remove_Files()
     {
-        Assert.Ignore("ToDo");
+         Assert.Ignore("ToDo");
     }
 }

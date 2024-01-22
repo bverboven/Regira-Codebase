@@ -1,4 +1,5 @@
-﻿using Regira.Drawing.Barcodes.Abstractions;
+﻿using NUnit.Framework.Legacy;
+using Regira.Drawing.Barcodes.Abstractions;
 using Regira.Drawing.Barcodes.Exceptions;
 using Regira.Drawing.Barcodes.Models;
 using Regira.Drawing.Core;
@@ -38,20 +39,20 @@ public abstract class QRCodeTestsBase
     {
         if (QRWriter == null)
         {
-            Assert.Ignore("Writing not supported");
+             Assert.Ignore("Writing not supported");
             return;
         }
 
         using var barCodeImg = QRWriter.Create(input);
         await barCodeImg.SaveAs(Path.Combine(OutputDir, $"{outputName}.jpg"));
-        Assert.IsNotNull(barCodeImg.GetBytes());
-        Assert.IsTrue(barCodeImg.GetLength() > 0);
+        ClassicAssert.IsNotNull(barCodeImg.GetBytes());
+        ClassicAssert.IsTrue(barCodeImg.GetLength() > 0);
     }
     public virtual async Task Check_Dimensions(string content, int size)
     {
         if (QRWriter == null)
         {
-            Assert.Ignore("Writing not supported");
+             Assert.Ignore("Writing not supported");
             return;
         }
 
@@ -62,15 +63,15 @@ public abstract class QRCodeTestsBase
         };
         using var barCodeImg = QRWriter.Create(input);
         await barCodeImg.SaveAs(Path.Combine(OutputDir, $"barcode-{input.Size.Width}x{input.Size.Height}-zxing.jpg"));
-        Assert.IsNotNull(barCodeImg.GetBytes());
-        Assert.IsTrue(barCodeImg.GetLength() > 0);
-        Assert.AreEqual(input.Size.Width, barCodeImg.Size?.Width);
+        ClassicAssert.IsNotNull(barCodeImg.GetBytes());
+        ClassicAssert.IsTrue(barCodeImg.GetLength() > 0);
+        ClassicAssert.AreEqual(input.Size.Width, barCodeImg.Size?.Width);
     }
     public virtual void TooLong_Expect_InputException()
     {
         if (QRWriter == null)
         {
-            Assert.Ignore("Writing not supported");
+             Assert.Ignore("Writing not supported");
             return;
         }
 
@@ -85,7 +86,7 @@ public abstract class QRCodeTestsBase
     {
         if (QRReader == null)
         {
-            Assert.Ignore("Reading not supported");
+             Assert.Ignore("Reading not supported");
             return;
         }
 
@@ -93,21 +94,21 @@ public abstract class QRCodeTestsBase
 
         var result = QRReader.Read(inputImg);
         var content = string.Join(Environment.NewLine, result?.Contents!);
-        Assert.AreEqual(expectedContent, content);
+        ClassicAssert.AreEqual(expectedContent, content);
     }
 
     public virtual Task Create_And_Read_QRCode()
     {
         if (QRReader == null)
         {
-            Assert.Ignore("Reading not supported");
+             Assert.Ignore("Reading not supported");
             return Task.CompletedTask;
         }
 
         var input = "This is a test";
         var inputBytes = QRWriter?.Create(input);
         var content = QRReader.Read(inputBytes!)?.Contents?.FirstOrDefault();
-        Assert.AreEqual(input, content);
+        ClassicAssert.AreEqual(input, content);
         return Task.CompletedTask;
     }
 }

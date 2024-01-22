@@ -1,3 +1,4 @@
+using NUnit.Framework.Legacy;
 using Regira.IO.Models;
 using Regira.IO.Storage;
 using Regira.IO.Storage.Abstractions;
@@ -31,29 +32,29 @@ public abstract class FileServiceTestsBase
     public virtual void Create_Files()
     {
         var savedFiles = SaveTestFiles(TestFolder);
-        Assert.AreEqual(Testfiles.Length, savedFiles.Length);
+        ClassicAssert.AreEqual(Testfiles.Length, savedFiles.Length);
         var files = GetStorageFiles(TestFolder);
-        Assert.AreEqual(Testfiles.Length, files.Count());
+        ClassicAssert.AreEqual(Testfiles.Length, files.Count());
         foreach (var file in Testfiles)
         {
             var identifier = GetFullIdentifier(TestFolder, file.Identifier!);
-            Assert.IsTrue(FileService.Exists(identifier).Result);
+            ClassicAssert.IsTrue(FileService.Exists(identifier).Result);
         }
     }
     [Test]
     public virtual void Update_Files()
     {
         var createdFiles = SaveTestFiles(TestFolder);
-        Assert.AreEqual(Testfiles.Length, createdFiles.Length);
+        ClassicAssert.AreEqual(Testfiles.Length, createdFiles.Length);
         // save again (update)
         var updatedFiles = SaveTestFiles(TestFolder);
-        Assert.AreEqual(createdFiles.Length, updatedFiles.Length);
+        ClassicAssert.AreEqual(createdFiles.Length, updatedFiles.Length);
         var files = GetStorageFiles(TestFolder);
-        Assert.AreEqual(Testfiles.Length, files.Count());
+        ClassicAssert.AreEqual(Testfiles.Length, files.Count());
         foreach (var file in Testfiles)
         {
             var identifier = GetFullIdentifier(TestFolder, file.Identifier!);
-            Assert.IsTrue(FileService.Exists(identifier).Result);
+            ClassicAssert.IsTrue(FileService.Exists(identifier).Result);
         }
     }
     [Test]
@@ -107,7 +108,7 @@ public abstract class FileServiceTestsBase
         CollectionAssert.IsNotEmpty(files);
         var sourceFiles = Directory.GetFiles(SourceFolder, "", SearchOption.AllDirectories);
         var sourceFolders = Directory.GetDirectories(SourceFolder, "", SearchOption.AllDirectories);
-        Assert.AreEqual(sourceFiles.Concat(sourceFolders).Count(), files.Count);
+        ClassicAssert.AreEqual(sourceFiles.Concat(sourceFolders).Count(), files.Count);
         CollectionAssert.AreEquivalent(sourceFiles.Concat(sourceFolders).Select(Path.GetFileName), files.Select(Path.GetFileName));
     }
     [Test]

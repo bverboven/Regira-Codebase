@@ -8,7 +8,6 @@ using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Extensions;
 using Regira.Entities.EFcore.Attachments;
-using Regira.IO.Storage.Azure;
 using Regira.Utilities;
 using System.Text;
 using System.Text.Json.Serialization;
