@@ -1,5 +1,4 @@
-﻿using Regira.IO.Abstractions;
-using Regira.IO.Models;
+﻿using Regira.IO.Models;
 using Regira.Office.Mail.Abstractions;
 using Regira.Office.Mail.Models;
 
@@ -12,7 +11,7 @@ public static class MailInputExtensions
         return new MessageObject
         {
             From = input.From.ToMailAddress()!,
-            To = input.To?.Select(ToMailRecipient).ToList() ?? new List<IMailRecipient>(),
+            To = input.To?.Select(ToMailRecipient).ToList() ?? new List<MailRecipient>(),
             ReplyTo = input.ReplyTo?.ToMailAddress(),
             Subject = input.Subject,
             Body = input.Body,
@@ -23,11 +22,11 @@ public static class MailInputExtensions
                     FileName = x.FileName,
                     Bytes = x.Bytes,
                     ContentType = x.ContentType
-                } as INamedFile)
+                })
                 .ToList()
         };
     }
-    public static IMailAddress? ToMailAddress(this MailInput.Address? address)
+    public static MailAddress? ToMailAddress(this MailInput.Address? address)
     {
         if (address == null)
         {
@@ -40,7 +39,7 @@ public static class MailInputExtensions
             Email = address.Email,
         };
     }
-    public static IMailRecipient ToMailRecipient(this MailInput.Recipient address)
+    public static MailRecipient ToMailRecipient(this MailInput.Recipient address)
     {
         return new MailRecipient
         {

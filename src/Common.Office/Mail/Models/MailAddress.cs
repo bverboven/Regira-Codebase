@@ -4,7 +4,7 @@ using Regira.Utilities;
 
 namespace Regira.Office.Mail.Models;
 
-public class MailAddress : IMailAddress
+public record MailAddress : IMailAddress
 {
     private string _email = null!;
 

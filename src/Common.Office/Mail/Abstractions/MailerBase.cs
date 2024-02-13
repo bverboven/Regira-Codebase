@@ -1,6 +1,7 @@
 ﻿using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Office.Mail.Exceptions;
+using Regira.Office.Mail.Extensions;
 using Regira.Office.Mail.Models;
 
 namespace Regira.Office.Mail.Abstractions;
@@ -11,12 +12,12 @@ public abstract class MailerBase : IMailer
     {
         return Send(new MessageObject
         {
-            From = sender,
-            To = recipients.ToArray(),
+            From = sender.ToMailAddress(),
+            To = recipients.ToMailRecipients().ToArray(),
             Subject = subject,
             Body = message,
             IsHtml = isHtml,
-            Attachments = attachments?.ToList()
+            Attachments = attachments?.ToFiles().ToList()
         });
     }
     public virtual Task<IMailResponse> Send(IMessageObject message)

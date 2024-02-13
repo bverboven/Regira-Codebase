@@ -2,7 +2,7 @@
 
 namespace Regira.Office.Mail.Models;
 
-public class MailRecipient : MailAddress, IMailRecipient
+public record MailRecipient : MailAddress, IMailRecipient
 {
     public RecipientTypes RecipientType { get; set; } = RecipientTypes.To;
 

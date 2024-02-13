@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mail.MailGun\Mail.MailGun.csproj" />
+    <ProjectReference Include="..\..\src\Mail.MSGReader\Mail.MSGReader.csproj" />
     <ProjectReference Include="..\..\src\Mail.SendGrid\Mail.SendGrid.csproj" />
     <ProjectReference Include="..\..\src\Mail.Web\Mail.Web.csproj" />
     <ProjectReference Include="..\..\src\Serializing.Newtonsoft\Serializing.Newtonsoft.csproj" />

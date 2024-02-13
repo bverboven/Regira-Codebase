@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework.Legacy;
-using Regira.IO.Abstractions;
 using Regira.IO.Models;
 using Regira.Office.Mail.Abstractions;
 using Regira.Office.Mail.Models;
@@ -47,7 +46,7 @@ public abstract class MailerTestsBase
             To = { (MailRecipient)"bramverboven@hotmail.com" },
             Subject = $"Test from {Mailer.GetType().Name}",
             Body = "Testing with attachment...",
-            Attachments = new List<INamedFile> { attachment }
+            Attachments = new List<BinaryFileItem> { attachment }
         };
         var response = await Mailer.Send(msg);
 
