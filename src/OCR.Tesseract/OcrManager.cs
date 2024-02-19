@@ -4,7 +4,7 @@ using Tesseract;
 
 namespace Regira.Office.OCR.Tesseract;
 
-public class OcrManager
+public class OcrManager(OcrManager.Options? options = null)
 {
     public class Options
     {
@@ -12,21 +12,17 @@ public class OcrManager
         /// 3 letter code ISO language
         /// </summary>
         public string Language { get; set; } = "eng";
-
-        public string DataDirectory { get; set; } = @"./tessdata";
+        /// <summary>
+        /// Put language models in this directory
+        /// Download more models at https://github.com/tesseract-ocr/tessdata/
+        /// </summary>
+        public string DataDirectory { get; set; } = "./tessdata";
     }
-
-
-    private readonly Options _options;
-    public OcrManager(Options? options = null)
-    {
-        _options = options ?? new Options();
-    }
-
 
     public Task<string?> Read(IMemoryFile imgFile)
     {
-        using var engine = new TesseractEngine(_options.DataDirectory, _options.Language.ToLower(), EngineMode.Default);
+        options ??= new Options();
+        using var engine = new TesseractEngine(options.DataDirectory, options.Language.ToLower(), EngineMode.Default);
         using var img = Pix.LoadFromMemory(imgFile.GetBytes());
         var result = engine.Process(img);
         var text = result.GetText();
