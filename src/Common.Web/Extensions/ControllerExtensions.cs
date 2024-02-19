@@ -22,6 +22,6 @@ public static class ControllerExtensions
         var contentType = !string.IsNullOrWhiteSpace(file.ContentType)
             ? file.ContentType
             : ContentTypeUtility.GetContentType(file.FileName);
-        return ctrl.File(file.GetBytes()!, contentType, file.FileName);
+        return ctrl.File(file.GetBytes()!, contentType, inline ? null : file.FileName);
     }
 }
