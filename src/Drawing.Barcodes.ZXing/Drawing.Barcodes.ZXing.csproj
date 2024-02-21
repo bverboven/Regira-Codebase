@@ -11,12 +11,12 @@
     <AssemblyName>Regira.Drawing.Barcodes.ZXing</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.0.1</Version>
+    <Version>4.0.2</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Drawing.SkiaSharp\Drawing.SkiaSharp.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ZXing.Net.Bindings.SkiaSharp" Version="0.16.13" />
+    <PackageReference Include="ZXing.Net.Bindings.SkiaSharp" Version="0.16.14" />
   </ItemGroup>
 </Project>
