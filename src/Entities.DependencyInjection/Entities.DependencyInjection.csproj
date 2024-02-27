@@ -11,7 +11,7 @@
     <AssemblyName>Regira.Entities.DependencyInjection</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.0.3</Version>
+    <Version>4.0.4</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Entities.EFcore\Entities.EFcore.csproj" />

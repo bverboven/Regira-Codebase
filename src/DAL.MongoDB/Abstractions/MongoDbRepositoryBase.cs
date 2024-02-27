@@ -1,6 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Driver;
+using Regira.DAL.MongoDB.Core;
 using Regira.Serializing.Abstractions;
 using Regira.Utilities;
 
@@ -9,7 +10,7 @@ namespace Regira.DAL.MongoDB.Abstractions;
 public abstract class MongoDbRepositoryBase<TEntity>
     where TEntity : class, new()
 {
-    private readonly MongoDbCommunicator _communicator;
+    private readonly MongoCommunicator _communicator;
     protected readonly ISerializer Serializer;
     private readonly Func<TEntity, string?> _getIdFunc;
     private readonly Action<TEntity, string> _setIdFunc;
@@ -19,7 +20,7 @@ public abstract class MongoDbRepositoryBase<TEntity>
     protected internal IMongoCollection<BsonDocument> Collection => _collection ??= Database.GetCollection<BsonDocument>(_collectionName);
 
 
-    protected MongoDbRepositoryBase(MongoDbCommunicator communicator, ISerializer serializer,
+    protected MongoDbRepositoryBase(MongoCommunicator communicator, ISerializer serializer,
         Func<TEntity, string?> getIdFunc, Action<TEntity, string> setIdAction,
         string? collectionName = null)
     {

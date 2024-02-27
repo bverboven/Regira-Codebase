@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0;net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.DAL.MySQL.MySqlBackup</RootNamespace>
+    <PackageId>Regira.DAL.MySQL.MySqlBackup</PackageId>
+    <AssemblyName>Regira.DAL.MySQL.MySqlBackup</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>4.0.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MySqlBackup.NET.MySqlConnector" Version="2.3.8" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DAL.MySQL\DAL.MySQL.csproj" />
+  </ItemGroup>
+</Project>

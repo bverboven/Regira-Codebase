@@ -1,8 +1,8 @@
 ﻿using MongoDB.Driver;
 
-namespace Regira.DAL.MongoDB;
+namespace Regira.DAL.MongoDB.Core;
 
-public class MongoDbCommunicator
+public class MongoCommunicator
 {
     private readonly string? _database;
     protected MongoClientSettings Settings { get; }
@@ -11,7 +11,7 @@ public class MongoDbCommunicator
     private static IMongoDatabase? _dbContext;
     protected internal IMongoDatabase Database => _dbContext ??= Client.GetDatabase(_database);
 
-    public MongoDbCommunicator(MongoDbSettings settings)
+    public MongoCommunicator(MongoSettings settings)
     {
         _database = settings.DatabaseName;
         Settings = settings.ToMongoClientSettings();

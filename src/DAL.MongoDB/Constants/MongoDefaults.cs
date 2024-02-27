@@ -1,4 +1,4 @@
-﻿namespace Regira.DAL.MongoDB;
+﻿namespace Regira.DAL.MongoDB.Constants;
 
 public static class MongoDefaults
 {

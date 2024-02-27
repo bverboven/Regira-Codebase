@@ -1,27 +1,28 @@
 ﻿using MongoDB.Driver;
 using Regira.DAL.Models;
+using MongoDefaults = Regira.DAL.MongoDB.Constants.MongoDefaults;
 
-namespace Regira.DAL.MongoDB;
+namespace Regira.DAL.MongoDB.Core;
 
-public class MongoDbSettings : DbSettingsBase
+public class MongoSettings : DbSettingsBase
 {
-    public MongoDbSettings()
+    public MongoSettings()
         : this(null, null)
     {
     }
-    public MongoDbSettings(string? host, string? database, string? port = null, string? username = null, string? password = null, bool? useTls = null)
+    public MongoSettings(string? host, string? database, string? port = null, string? username = null, string? password = null, bool? useTls = null)
         : base(host ?? MongoDefaults.Host, database, port ?? MongoDefaults.Port, username, password, useTls ?? MongoDefaults.UseTls)
     {
     }
 
 
-    public static MongoDbSettings FromConnectionString(string connectionString)
+    public static MongoSettings FromConnectionString(string connectionString)
     {
         var mongoUrl = MongoUrl.Create(connectionString);
         var host = mongoUrl.Url.Split(':').First();
         var port = mongoUrl.Url.Split(':').LastOrDefault() ?? MongoDefaults.Port;
 
-        return new MongoDbSettings(host, mongoUrl.DatabaseName)
+        return new MongoSettings(host, mongoUrl.DatabaseName)
         {
             Host = host,
             DatabaseName = mongoUrl.DatabaseName,

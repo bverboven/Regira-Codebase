@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using Npgsql;
+using Regira.DAL.PostgreSQL.Constants;
 using Regira.DAL.PostgreSQL.Core;
 using Regira.System.Abstractions;
 using Regira.Utilities;
@@ -10,19 +11,6 @@ namespace Regira.DAL.PostgreSQL.Services;
 
 public class BackupRestoreManager
 {
-    public class Options
-    {
-        /// <summary>
-        /// Path where to find the backing up and restore exe-files
-        /// </summary>
-        public string ToolsDirectory { get; set; } = null!;
-    }
-    private struct Commands
-    {
-        public static string SchemaBackup => @"""{Path}"" --host {Host} --port {Port} --username ""{Username}"" --no-password --format custom --verbose --file ""{TargetPath}"" {SchemasArgs} ""{SourceDb}""";
-        public static string FullBackup => @"""{Path}"" --host {Host} --port {Port} --username ""{Username}"" --no-password --format custom --blobs --verbose --file ""{TargetPath}"" ""{SourceDb}""";
-        public static string Restore => @"""{Path}"" --host {Host} --port {Port} --username ""{Username}"" --dbname ""{TargetDb}"" --no-password  --verbose ""{SourcePath}""";
-    }
 
     private const string BackupProcessFile = "pg_dump.exe";
     private const string RestoreProcessFile = "pg_restore.exe";
@@ -37,7 +25,7 @@ public class BackupRestoreManager
     /// <param name="processHelper">Helper class to start the backing up or restore process</param>
     /// <param name="options"></param>
     /// <param name="logger"></param>
-    public BackupRestoreManager(IProcessHelper processHelper, Options options, ILogger<BackupRestoreManager>? logger = null)
+    public BackupRestoreManager(IProcessHelper processHelper, PgOptions options, ILogger<BackupRestoreManager>? logger = null)
     {
         _processHelper = processHelper;
         _logger = logger;
@@ -69,10 +57,10 @@ public class BackupRestoreManager
     {
         // compose command with args
         var schemasArgs = schemas?.Any() ?? false ? string.Join(" ", schemas.Select(x => $"--schema \"{x}\"")) : null;
-        var cmd = (schemas?.Any() ?? false ? Commands.SchemaBackup : Commands.FullBackup)
+        var cmd = (schemas?.Any() ?? false ? BackupCommands.SchemaBackup : BackupCommands.FullBackup)
             .Inject(new
             {
-                Path = _backupProcessPath,
+                ProcessPath = _backupProcessPath,
                 settings.Host,
                 settings.Port,
                 settings.Username,
@@ -127,10 +115,10 @@ set PGPASSWORD=";
         await Create(cn, targetDb);
 
         // execute restoring tool
-        var cmd = Commands.Restore
+        var cmd = BackupCommands.Restore
             .Inject(new
             {
-                Path = _restoreProcessPath,
+                ProcessPath = _restoreProcessPath,
                 settings.Host,
                 settings.Port,
                 settings.Username,
