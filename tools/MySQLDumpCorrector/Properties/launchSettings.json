@@ -1,8 +1,0 @@
-{
-    "profiles": {
-        "MySQLDumpCorrector": {
-            "commandName": "Project",
-            "commandLineArgs": "-i \"input directory/file.sql\" -p -o \"output\" ignore"
-        }
-    }
-}
