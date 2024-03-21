@@ -47,7 +47,7 @@ public static class QueryExtensions
     public static IQueryable<TEntity> FilterId<TEntity, TKey>(this IQueryable<TEntity> query, TKey? id)
         where TEntity : IEntity<TKey>
     {
-        if (default(TKey)?.Equals(id) != true)
+        if (default(TKey)?.Equals(id) == false)
         {
             query = query.Where(x => x.Id!.Equals(id));
         }

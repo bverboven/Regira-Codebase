@@ -26,7 +26,7 @@ public abstract class EntityRepository<TContext, TEntity, TKey> : EntityReposito
     {
     }
 }
-public class EntityRepository<TContext, TEntity, TKey, TSearchObject> : IEntityService<TEntity, TKey, TSearchObject>
+public class EntityRepository<TContext, TEntity, TKey, TSearchObject> : IEntityService<TEntity, TKey, TSearchObject>, IEntityRepository<TEntity, TKey>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()

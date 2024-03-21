@@ -31,6 +31,10 @@ public static class DbContextExtensions
     public static void UpdateEntityChildCollection<TEntity, TChild>(this DbContext dbContext, TEntity original, TEntity modified, Func<TEntity, ICollection<TChild>?> childrenGetter, Action<TEntity, ICollection<TChild>> childrenSetter, Action<TChild, TChild>? processExtra = null)
         where TEntity : class, IEntity<int>
         where TChild : class, IEntity<int>
+        => UpdateEntityChildCollection<TEntity, TChild, int>(dbContext, original, modified, childrenGetter, childrenSetter, processExtra);
+    public static void UpdateEntityChildCollection<TEntity, TChild, TKey>(this DbContext dbContext, TEntity original, TEntity modified, Func<TEntity, ICollection<TChild>?> childrenGetter, Action<TEntity, ICollection<TChild>> childrenSetter, Action<TChild, TChild>? processExtra = null)
+        where TEntity : class, IEntity<TKey>
+        where TChild : class, IEntity<TKey>
     {
         // ignore when no child collection is passed for either original OR modified entity
         if (childrenGetter(original) == null || childrenGetter(modified) == null)
@@ -39,15 +43,18 @@ public static class DbContextExtensions
         }
 
         // processes modified & deleted children
-        UpdateChildCollection(dbContext, childrenGetter(original)!, childrenGetter(modified)!, processExtra);
+        UpdateChildCollection<TChild, TKey>(dbContext, childrenGetter(original)!, childrenGetter(modified)!, x => x.Id!, processExtra);
         // also includes newly added children
         childrenSetter(original, childrenGetter(modified)!);
     }
     public static void UpdateChildCollection<T>(this DbContext dbContext, ICollection<T> originalItems, ICollection<T> modifiedItems, Action<T, T>? processExtra = null)
         where T : class, IEntity<int>
-        => UpdateChildCollection(dbContext, originalItems, modifiedItems, x => x.Id, processExtra);
+        => UpdateChildCollection<T, int>(dbContext, originalItems, modifiedItems, x => x.Id, processExtra);
     public static void UpdateChildCollection<T>(this DbContext dbContext, ICollection<T> originalItems, ICollection<T> modifiedItems, Func<T, object> idSelector, Action<T, T>? processExtra = null)
-        where T : class, IEntity
+        where T : class, IEntity<int>
+        => UpdateChildCollection<T, int>(dbContext, originalItems, modifiedItems, idSelector, processExtra);
+    public static void UpdateChildCollection<T, TKey>(this DbContext dbContext, ICollection<T> originalItems, ICollection<T> modifiedItems, Func<T, object> idSelector, Action<T, T>? processExtra = null)
+        where T : class, IEntity<TKey>
     {
         foreach (var originalItem in originalItems)
         {
