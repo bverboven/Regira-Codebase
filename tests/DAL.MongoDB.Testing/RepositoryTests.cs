@@ -1,6 +1,6 @@
 using MongoDB.Driver;
 using NUnit.Framework.Legacy;
-using Regira.DAL.MongoDB;
+using Regira.DAL.MongoDB.Core;
 using Regira.Serializing.Newtonsoft.Json;
 using Regira.Utilities;
 [assembly: Parallelizable(ParallelScope.Fixtures)]
@@ -12,16 +12,16 @@ namespace DAL.MongoDB.Testing;
 public class RepositoryTests : IDisposable
 {
     //private readonly string _personId;
-    private readonly MongoDbCommunicator _mongoCommunicator;
+    private readonly MongoCommunicator _mongoCommunicator;
     private readonly PersonRepository _personRepo;
     private readonly ConfigRepository _configRepo;
-    private readonly MongoDbSettings _mongoSettings;
+    private readonly MongoSettings _mongoSettings;
     public RepositoryTests()
     {
         //_personId = "test-person";
         var serializer = new JsonSerializer();
-        _mongoSettings = new MongoDbSettings("localhost", $"Test-{Guid.NewGuid()}");
-        _mongoCommunicator = new MongoDbCommunicator(_mongoSettings);
+        _mongoSettings = new MongoSettings("localhost", $"Test-{Guid.NewGuid()}");
+        _mongoCommunicator = new MongoCommunicator(_mongoSettings);
         _personRepo = new PersonRepository(_mongoCommunicator, serializer);
         _configRepo = new ConfigRepository(_mongoCommunicator, serializer);
     }

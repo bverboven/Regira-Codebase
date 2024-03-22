@@ -2,6 +2,7 @@
 using Regira.DAL.Paging;
 using Regira.Entities.Abstractions;
 using Regira.Entities.EFcore.Extensions;
+using Regira.Entities.Extensions;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Utilities;
@@ -120,5 +121,5 @@ public class EntityRepository<TContext, TEntity, TKey, TSearchObject> : IEntityS
             ? so as TSearchObject ?? ObjectUtility.Create<TSearchObject>(so)
             : default;
     public bool IsNew(TEntity item)
-        => default(TKey)?.Equals(item.Id) == true;
+        => item.IsNew();
 }

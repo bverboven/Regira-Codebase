@@ -1,5 +1,5 @@
-﻿using Regira.DAL.MongoDB;
-using Regira.DAL.MongoDB.Abstractions;
+﻿using Regira.DAL.MongoDB.Abstractions;
+using Regira.DAL.MongoDB.Core;
 using Regira.Serializing.Abstractions;
 
 namespace DAL.MongoDB.Testing;
@@ -12,6 +12,6 @@ public class Config
 }
 public class ConfigRepository : MongoDbRepositoryBase<Config>
 {
-    public ConfigRepository(MongoDbCommunicator communicator, ISerializer serializer)
+    public ConfigRepository(MongoCommunicator communicator, ISerializer serializer)
         : base(communicator, serializer, x => x.ConfigId, (x, id) => x.ConfigId = id, "config") { }
 }

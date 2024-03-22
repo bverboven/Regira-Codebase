@@ -4,6 +4,8 @@ namespace Regira.Entities.Extensions;
 
 public static class EntityExtensions
 {
+    public static bool IsNew<TKey>(this IEntity<TKey> item)
+        => item.Id?.Equals(default(TKey)) != false;
     public static void AdjustIdForEfCore(this IEnumerable<IEntity<int>> items)
     {
         foreach (var item in items)

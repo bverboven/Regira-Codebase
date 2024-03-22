@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.DAL.Paging;
 using Regira.Entities.Abstractions;
+using Regira.Entities.Extensions;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Models;
@@ -145,7 +146,7 @@ public static class ControllerExtensions
         {
             var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IMapper>();
             var item = mapper.Map<TEntity>(model);
-            var isNew = default(TKey)?.Equals(item.Id) == true;
+            var isNew = item.IsNew();
 
             var service = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, TKey>>();
             if (!isNew)
