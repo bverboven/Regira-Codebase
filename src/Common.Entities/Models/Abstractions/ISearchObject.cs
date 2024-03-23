@@ -7,7 +7,8 @@ public interface ISearchObject : ISearchObject<int>
 public interface ISearchObject<TKey>
 {
     TKey? Id { get; set; }
-    ICollection<TKey?>? Ids { get; set; }
+    ICollection<TKey>? Ids { get; set; }
+    ICollection<TKey>? Exclude { get; set; }
     string? Q { get; set; }
 
     DateTime? MinCreated { get; set; }

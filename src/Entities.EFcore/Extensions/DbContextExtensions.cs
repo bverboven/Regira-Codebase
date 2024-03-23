@@ -35,6 +35,10 @@ public static class DbContextExtensions
     public static void UpdateEntityChildCollection<TEntity, TChild, TKey>(this DbContext dbContext, TEntity original, TEntity modified, Func<TEntity, ICollection<TChild>?> childrenGetter, Action<TEntity, ICollection<TChild>> childrenSetter, Action<TChild, TChild>? processExtra = null)
         where TEntity : class, IEntity<TKey>
         where TChild : class, IEntity<TKey>
+        => UpdateEntityChildCollection<TEntity, TKey, TChild, TKey>(dbContext, original, modified, childrenGetter, childrenSetter, processExtra);
+    public static void UpdateEntityChildCollection<TEntity, TEntityKey, TChild, TChildKey>(this DbContext dbContext, TEntity original, TEntity modified, Func<TEntity, ICollection<TChild>?> childrenGetter, Action<TEntity, ICollection<TChild>> childrenSetter, Action<TChild, TChild>? processExtra = null)
+    //where TEntity : class, IEntity<TEntityKey>
+    where TChild : class, IEntity<TChildKey>
     {
         // ignore when no child collection is passed for either original OR modified entity
         if (childrenGetter(original) == null || childrenGetter(modified) == null)
@@ -43,7 +47,7 @@ public static class DbContextExtensions
         }
 
         // processes modified & deleted children
-        UpdateChildCollection<TChild, TKey>(dbContext, childrenGetter(original)!, childrenGetter(modified)!, x => x.Id!, processExtra);
+        UpdateChildCollection<TChild, TChildKey>(dbContext, childrenGetter(original)!, childrenGetter(modified)!, x => x.Id!, processExtra);
         // also includes newly added children
         childrenSetter(original, childrenGetter(modified)!);
     }

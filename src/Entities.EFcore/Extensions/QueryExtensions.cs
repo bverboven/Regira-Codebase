@@ -21,6 +21,7 @@ public static class QueryExtensions
 
         query = query.FilterId(so.Id);
         query = query.FilterIds(so.Ids);
+        query = query.FilterExclude(so.Exclude);
 
         if (TypeUtility.ImplementsInterface<IHasNormalizedContent>(typeof(T)))
         {
@@ -47,19 +48,29 @@ public static class QueryExtensions
     public static IQueryable<TEntity> FilterId<TEntity, TKey>(this IQueryable<TEntity> query, TKey? id)
         where TEntity : IEntity<TKey>
     {
-        if (default(TKey)?.Equals(id) == false)
+        if (id != null && id.Equals(default(TKey)) == false)
         {
             query = query.Where(x => x.Id!.Equals(id));
         }
 
         return query;
     }
-    public static IQueryable<TEntity> FilterIds<TEntity, TKey>(this IQueryable<TEntity> query, ICollection<TKey?>? ids)
+    public static IQueryable<TEntity> FilterIds<TEntity, TKey>(this IQueryable<TEntity> query, ICollection<TKey>? ids)
         where TEntity : IEntity<TKey>
     {
         if (ids?.Any() == true)
         {
             query = query.Where(x => ids.Contains(x.Id));
+        }
+
+        return query;
+    }
+    public static IQueryable<TEntity> FilterExclude<TEntity, TKey>(this IQueryable<TEntity> query, ICollection<TKey>? ids)
+        where TEntity : IEntity<TKey>
+    {
+        if (ids?.Any() == true)
+        {
+            query = query.Where(x => !ids.Contains(x.Id));
         }
 
         return query;

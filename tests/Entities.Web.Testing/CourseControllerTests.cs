@@ -2,9 +2,9 @@
 using Entities.TestApi.Models;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Regira.Entities.Web.Models;
 using System.Net;
 using System.Net.Http.Json;
-using Regira.Entities.Web.Models;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
@@ -173,6 +173,41 @@ public class CourseControllerTests : IDisposable
 
         var detailsResponse = await client.GetAsync($"/courses/{courseInput.Id}");
         Assert.Equal(HttpStatusCode.NotFound, detailsResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task Insert_And_FilterExclude()
+    {
+        var app = new WebApplicationFactory<Program>();
+        using var client = app.CreateClient();
+
+        var inputCourses = Enumerable.Range(1, 10)
+            .Select((_, i) => new CourseInputDto
+            {
+                Title = $"Course (test-{i.ToString().PadLeft(3, '0')})",
+                DepartmentId = Random.Shared.Next(1, 5),
+                Credits = (i % 5) + 1
+            })
+            .ToArray();
+        foreach (var courseInput in inputCourses)
+        {
+            var inputResponse = await client.PostAsJsonAsync("/courses", courseInput);
+            Assert.Equal(HttpStatusCode.OK, inputResponse.StatusCode);
+            var saveResult = await inputResponse.Content.ReadFromJsonAsync<SaveResult<CourseDto>>();
+            courseInput.Id = saveResult!.Item.Id;
+        }
+
+        var listResponse = await client.GetAsync("/courses");
+        var listResult = await listResponse.Content.ReadFromJsonAsync<ListResult<CourseDto>>();
+
+        Assert.Equal(listResult!.Items.Count, inputCourses.Length);
+
+        var listResponseExclude = await client.GetAsync("/courses?exclude=2&exclude=3");
+        var listResultExclude = await listResponseExclude.Content.ReadFromJsonAsync<ListResult<CourseDto>>();
+
+        Assert.Equal(listResultExclude!.Items.Count, inputCourses.Length - 2);
+        var excludedItems = listResultExclude!.Items.Where(x => new[] { 2, 3 }.Contains(x.Id));
+        Assert.Empty(excludedItems);
     }
 
 

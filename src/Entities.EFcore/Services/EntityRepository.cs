@@ -43,7 +43,7 @@ public class EntityRepository<TContext, TEntity, TKey, TSearchObject> : IEntityS
 
 
     public virtual async Task<TEntity?> Details(TKey id)
-        => default(TKey)?.Equals(id) == false // make sure an id is passed or return null
+        => id != null && id.Equals(default(TKey)) == false // make sure an id is passed or return null
             ? (await List(new TSearchObject { Id = id }, new PagingInfo { PageSize = 1 })).SingleOrDefault()
             : null;
     public virtual async Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
