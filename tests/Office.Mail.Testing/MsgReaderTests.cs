@@ -33,7 +33,13 @@ public class MsgReaderTests
         Assert.That(string.IsNullOrWhiteSpace(msgObj.From!.DisplayName), Is.True);
         Assert.That(msgObj.Body, Is.EqualTo(_sampleMessageObject.Body));
         Assert.That(msgObj.To.Select(x => x.Email), Is.EquivalentTo(_sampleMessageObject.To.Select(x => x.Email)));
-        Assert.That(msgObj.Attachments, Is.EquivalentTo(_sampleMessageObject.Attachments!));
+        var msgAttachments = msgObj.Attachments!.ToArray();
+        var sampleAttachments = _sampleMessageObject.Attachments!.ToArray();
+        for (var i = 0; i < msgObj.Attachments!.Count; i++)
+        {
+            Assert.That(msgAttachments[i].FileName, Is.EqualTo(sampleAttachments[i].FileName));
+            Assert.That(msgAttachments[i].Bytes, Is.EquivalentTo(sampleAttachments[i].Bytes!));
+        }
     }
     [Test]
     public void Parse_EML()
@@ -47,6 +53,12 @@ public class MsgReaderTests
         //Assert.That(string.IsNullOrWhiteSpace(msgObj.From!.DisplayName), Is.True);
         Assert.That(msgObj.Body, Is.EqualTo(_sampleMessageObject.Body));
         Assert.That(msgObj.To.Select(x => x.Email), Is.EquivalentTo(_sampleMessageObject.To.Select(x => x.Email)));
-        Assert.That(msgObj.Attachments, Is.EquivalentTo(_sampleMessageObject.Attachments!));
+        var msgAttachments = msgObj.Attachments!.ToArray();
+        var sampleAttachments = _sampleMessageObject.Attachments!.ToArray();
+        for (var i = 0; i < msgObj.Attachments!.Count; i++)
+        {
+            Assert.That(msgAttachments[i].FileName, Is.EqualTo(sampleAttachments[i].FileName));
+            Assert.That(msgAttachments[i].Bytes, Is.EquivalentTo(sampleAttachments[i].Bytes!));
+        }
     }
 }
