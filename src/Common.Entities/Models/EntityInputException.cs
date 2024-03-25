@@ -1,13 +1,12 @@
-﻿namespace Regira.Entities.Models
+﻿namespace Regira.Entities.Models;
+
+public class EntityInputException<T> : Exception
 {
-    public class EntityInputException<T> : Exception
+    public T? Item { get; set; }
+    public IDictionary<string, string> InputErrors { get; set; }
+    public EntityInputException(string message, Exception? innerException = null)
+        : base(message, innerException)
     {
-        public T? Item { get; set; }
-        public IDictionary<string, string> InputErrors { get; set; }
-        public EntityInputException(string message, Exception? innerException = null)
-            : base(message, innerException)
-        {
-            InputErrors = new Dictionary<string, string>();
-        }
+        InputErrors = new Dictionary<string, string>();
     }
 }

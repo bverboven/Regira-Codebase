@@ -220,6 +220,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mail.MSGReader", "src\Mail.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAL.MySQL.MySqlBackup", "src\DAL.MySQL.MySqlBackup\DAL.MySQL.MySqlBackup.csproj", "{4FC7D774-B788-4EC8-A3B3-56F09E877B6E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hosting.Testing", "tests\Hosting.Testing\Hosting.Testing.csproj", "{68CD76B2-80DE-4DBC-B92F-2BF1BA951104}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -546,6 +548,10 @@ Global
 		{4FC7D774-B788-4EC8-A3B3-56F09E877B6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FC7D774-B788-4EC8-A3B3-56F09E877B6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FC7D774-B788-4EC8-A3B3-56F09E877B6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68CD76B2-80DE-4DBC-B92F-2BF1BA951104}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68CD76B2-80DE-4DBC-B92F-2BF1BA951104}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68CD76B2-80DE-4DBC-B92F-2BF1BA951104}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68CD76B2-80DE-4DBC-B92F-2BF1BA951104}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -653,6 +659,7 @@ Global
 		{3DAF19FA-9AEA-465E-88D4-402F737EE5BA} = {9BB0DA64-B364-4D6E-92CC-E27B1E2A6B76}
 		{3DA18005-ABC6-4CBE-B8BB-FBD1E27C8495} = {F2AFE0BB-8433-4207-B338-E49E607EFC83}
 		{4FC7D774-B788-4EC8-A3B3-56F09E877B6E} = {22EB372C-9C93-404E-9687-34234D5CF097}
+		{68CD76B2-80DE-4DBC-B92F-2BF1BA951104} = {C282BB35-A907-4CCC-B5FD-D0ABE60C0EDB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C20C1CB-93D4-46D3-A172-85F0202D818C}

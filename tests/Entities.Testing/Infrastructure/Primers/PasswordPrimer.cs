@@ -3,20 +3,19 @@ using Regira.Entities.EFcore.Abstractions;
 using Regira.Entities.Models.Abstractions;
 using Regira.Utilities;
 
-namespace Entities.Testing.Infrastructure.Primers
-{
-    public class PasswordPrimer : EntityPrimerBase<IHasEncryptedPassword>
-    {
-        public override Task PrepareAsync(IHasEncryptedPassword entity, EntityEntry entry)
-        {
-            if (!string.IsNullOrWhiteSpace(entity.Password))
-            {
-                entity.EncryptedPassword = Encrypt(entity.Password);
-            }
+namespace Entities.Testing.Infrastructure.Primers;
 
-            return Task.CompletedTask;
+public class PasswordPrimer : EntityPrimerBase<IHasEncryptedPassword>
+{
+    public override Task PrepareAsync(IHasEncryptedPassword entity, EntityEntry entry)
+    {
+        if (!string.IsNullOrWhiteSpace(entity.Password))
+        {
+            entity.EncryptedPassword = Encrypt(entity.Password);
         }
 
-        public string Encrypt(string input) => input.Base64Encode();
+        return Task.CompletedTask;
     }
+
+    public string Encrypt(string input) => input.Base64Encode();
 }
