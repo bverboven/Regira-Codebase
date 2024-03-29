@@ -20,4 +20,16 @@ public class MailGunTests : MailerTestsBase
             Domain = config["Mail:MailGun:Domain"]!
         });
     }
+
+
+    [Test]
+    public override Task Send_Without_Attachment()
+    {
+        return base.Send_Without_Attachment();
+    }
+    [Test]
+    public override Task Send_With_Attachment()
+    {
+        return base.Send_With_Attachment();
+    }
 }

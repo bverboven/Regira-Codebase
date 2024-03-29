@@ -1,27 +1,20 @@
-﻿#if NET8_0_OR_GREATER
-using Microsoft.AspNetCore.Identity.UI.Services;
+﻿using Microsoft.AspNetCore.Identity.UI.Services;
 using Regira.Office.Mail.Abstractions;
 using Regira.Office.Mail.Models;
 
-namespace Regira.Security.Authentication.Mail;
-
-public class IdentityMailer : IEmailSender
+namespace Regira.Security.Authentication.Web.Mail;
+public class IdentityMailer(IMailer mailer, IdentityMailerOptions options) : IEmailSender
 {
-    private readonly IMailer _mailer;
-    public IdentityMailer(IMailer mailer)
-    {
-        _mailer = mailer;
-    }
 
     public Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
         var msg = new MessageObject
         {
+            From = options.Sender,
             To = { new MailRecipient { Email = email } },
             Subject = subject,
             Body = htmlMessage
         };
-        return _mailer.Send(msg);
+        return mailer.Send(msg);
     }
 }
-#endif
