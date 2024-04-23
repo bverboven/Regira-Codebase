@@ -1,10 +1,10 @@
 using Regira.Dimensions;
-using Regira.Drawing.Core;
-using Regira.Drawing.Enums;
 using Regira.Drawing.GDI.Abstractions;
 using Regira.Drawing.GDI.Utilities;
-using Regira.Drawing.Utilities;
 using Regira.IO.Extensions;
+using Regira.Media.Drawing.Core;
+using Regira.Media.Drawing.Enums;
+using Regira.Media.Drawing.Utilities;
 using Regira.Utilities;
 using System.Drawing;
 

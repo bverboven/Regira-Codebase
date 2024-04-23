@@ -1,4 +1,4 @@
-﻿namespace _Testing.Library.Blogs;
+﻿namespace Testing.Library.Blogs;
 
 public class Blog
 {

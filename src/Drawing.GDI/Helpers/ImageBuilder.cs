@@ -1,6 +1,6 @@
 using Regira.Dimensions;
-using Regira.Drawing.Core;
 using Regira.Drawing.GDI.Utilities;
+using Regira.Media.Drawing.Core;
 using System.Drawing;
 
 namespace Regira.Drawing.GDI.Helpers;

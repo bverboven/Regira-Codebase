@@ -23,7 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Drawing.SkiaSharp\Drawing.SkiaSharp.csproj" />
-    <ProjectReference Include="..\..\src\Video.FFMpeg\Video.FFMpeg.csproj" />
+    <ProjectReference Include="..\..\src\Media.FFMpeg\Media.FFMpeg.csproj" />
   </ItemGroup>
 
 </Project>

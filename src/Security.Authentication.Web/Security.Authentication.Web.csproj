@@ -1,22 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFrameworks>net8.0</TargetFrameworks>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <LangVersion>latest</LangVersion>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Authors>B.Verboven</Authors>
-        <RootNamespace>Regira.Security.Authentication.Web</RootNamespace>
-        <PackageId>Regira.Security.Authentication.Web</PackageId>
-        <AssemblyName>Regira.Security.Authentication.Web</AssemblyName>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>1701;1702;1591</NoWarn>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Common.Web\Common.Web.csproj" />
-        <ProjectReference Include="..\Security.Authentication\Security.Authentication.csproj" />
-    </ItemGroup>
-
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.Security.Authentication.Web</RootNamespace>
+    <PackageId>Regira.Security.Authentication.Web</PackageId>
+    <AssemblyName>Regira.Security.Authentication.Web</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <TargetFramework>net8.0</TargetFramework>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Web\Common.Web.csproj" />
+    <ProjectReference Include="..\Security.Authentication\Security.Authentication.csproj" />
+  </ItemGroup>
 </Project>

@@ -5,7 +5,7 @@ using Regira.IO.Storage.Abstractions;
 using Regira.IO.Storage.Compression;
 using Regira.IO.Storage.FileSystem;
 
-namespace ProjectBackupConsole;
+namespace Regira.ProjectBackupConsole;
 
 public class BackupManager
 {

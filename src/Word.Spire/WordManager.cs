@@ -1,5 +1,4 @@
-﻿using Regira.Drawing.Abstractions;
-using Regira.Office.Word.Abstractions;
+﻿using Regira.Office.Word.Abstractions;
 using Regira.Office.Word.Models;
 using Regira.Office.Word.Spire.Extensions;
 using Regira.TreeList;
@@ -23,6 +22,8 @@ using SpireHorizontalAlignment = Spire.Doc.Documents.HorizontalAlignment;
 using SpirePageOrientation = Spire.Doc.Documents.PageOrientation;
 using SpirePageSize = Spire.Doc.Documents.PageSize;
 using SpireParagraph = Spire.Doc.Documents.Paragraph;
+using Regira.Media.Drawing.Abstractions;
+
 #if NETSTANDARD2_0
 using SkiaSharp;
 using Regira.Drawing.SkiaSharp.Utilities;

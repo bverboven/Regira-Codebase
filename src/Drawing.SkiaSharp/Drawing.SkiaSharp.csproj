@@ -11,12 +11,12 @@
     <AssemblyName>Regira.Drawing.SkiaSharp</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.0.4</Version>
+    <Version>4.0.5</Version>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Common.Drawing\Common.Drawing.csproj" />
+    <PackageReference Include="SkiaSharp" Version="2.88.8" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="SkiaSharp" Version="2.88.8" />
+    <ProjectReference Include="..\Common.Media\Common.Media.csproj" />
   </ItemGroup>
 </Project>

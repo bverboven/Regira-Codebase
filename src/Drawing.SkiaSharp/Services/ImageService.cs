@@ -1,10 +1,10 @@
 ﻿using Regira.Dimensions;
-using Regira.Drawing.Abstractions;
-using Regira.Drawing.Core;
-using Regira.Drawing.Enums;
 using Regira.Drawing.SkiaSharp.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
+using Regira.Media.Drawing.Abstractions;
+using Regira.Media.Drawing.Core;
+using Regira.Media.Drawing.Enums;
 using SkiaSharp;
 
 namespace Regira.Drawing.SkiaSharp.Services;

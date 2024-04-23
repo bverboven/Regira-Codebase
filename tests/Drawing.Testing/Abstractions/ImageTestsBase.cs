@@ -1,8 +1,8 @@
 ﻿using NUnit.Framework.Legacy;
 using Regira.Dimensions;
-using Regira.Drawing.Abstractions;
-using Regira.Drawing.Enums;
 using Regira.IO.Extensions;
+using Regira.Media.Drawing.Abstractions;
+using Regira.Media.Drawing.Enums;
 using Regira.Utilities;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]

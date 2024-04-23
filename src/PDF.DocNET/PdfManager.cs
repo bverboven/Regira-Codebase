@@ -2,10 +2,10 @@
 using Docnet.Core.Editors;
 using Docnet.Core.Models;
 using Regira.Collections;
-using Regira.Drawing.Abstractions;
 using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
+using Regira.Media.Drawing.Abstractions;
 using Regira.Office.PDF.Abstractions;
 using Regira.Office.PDF.Models;
 using System.Drawing;
@@ -197,7 +197,7 @@ public class PdfManager : IPdfService
 
             using var img = new Bitmap(width, height, PixelFormat.Format32bppArgb);
             AddBytes(img, imgBytes);
-            yield return img.ToImageFile((options?.Format ?? Drawing.Enums.ImageFormat.Jpeg).ToGdiImageFormat());
+            yield return img.ToImageFile((options?.Format ?? Media.Drawing.Enums.ImageFormat.Jpeg).ToGdiImageFormat());
         }
     }
 

@@ -34,6 +34,11 @@ public static class BinaryFileExtensions
         => MemoryFileExtensions.GetBytes(file) ?? (file.HasPath() ? File.ReadAllBytes(file.Path!) : null);
     public static Stream? GetStream(this IBinaryFile file)
         => MemoryFileExtensions.GetStream(file) ?? (file.HasPath() ? File.OpenRead(file.Path!) : null);
+    /// <summary>
+    /// Gets the full filename if present, otherwise a temporary file is written to disk and its path is returned
+    /// </summary>
+    /// <param name="file"></param>
+    /// <returns></returns>
     public static string GetPath(this IBinaryFile file)
     {
         if (HasPath(file))

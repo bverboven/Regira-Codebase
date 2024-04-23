@@ -1,5 +1,5 @@
 ﻿using Regira.Dimensions;
-using Regira.Drawing.Enums;
+using Regira.Media.Drawing.Enums;
 
 namespace Regira.Office.PDF.Models;
 

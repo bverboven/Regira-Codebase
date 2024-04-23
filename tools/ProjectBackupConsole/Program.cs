@@ -1,6 +1,6 @@
-﻿using ProjectBackupConsole;
-using Regira.IO.Storage.Compression;
+﻿using Regira.IO.Storage.Compression;
 using Regira.IO.Storage.FileSystem;
+using Regira.ProjectBackupConsole;
 
 var rootIndex = Array.IndexOf(args, "-root");
 var rootPath = Environment.CurrentDirectory;

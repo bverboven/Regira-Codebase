@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Regira.Security.Authentication.Web.Models;
+﻿namespace Regira.Security.Authentication.Web.Models;
 
 public class UserTokenModel
 {

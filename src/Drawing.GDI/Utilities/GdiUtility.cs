@@ -1,12 +1,13 @@
 ﻿using Regira.Dimensions;
-using Regira.Drawing.Abstractions;
-using Regira.Drawing.Core;
-using Regira.Drawing.Utilities;
 using Regira.IO.Extensions;
+using Regira.Media.Drawing.Abstractions;
+using Regira.Media.Drawing.Core;
+using Regira.Media.Drawing.Utilities;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Reflection;
+using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
 namespace Regira.Drawing.GDI.Utilities;
 
@@ -54,15 +55,15 @@ public static class GdiUtility
         return Image.FromStream(stream);
     }
 
-    public static Enums.ImageFormat ToImageFormat(this ImageFormat format)
+    public static Media.Drawing.Enums.ImageFormat ToImageFormat(this ImageFormat format)
     {
 #if NETSTANDARD2_0
-        return (Enums.ImageFormat)Enum.Parse(typeof(Enums.ImageFormat), format.ToString());
+        return (Media.Drawing.Enums.ImageFormat)Enum.Parse(typeof(Media.Drawing.Enums.ImageFormat), format.ToString());
 #else
-            return Enum.Parse<Enums.ImageFormat>(format.ToString());
+            return Enum.Parse<Media.Drawing.Enums.ImageFormat>(format.ToString());
 #endif
     }
-    public static ImageFormat ToGdiImageFormat(this Enums.ImageFormat format)
+    public static ImageFormat ToGdiImageFormat(this Media.Drawing.Enums.ImageFormat format)
     {
         // https://stackoverflow.com/questions/45448734/how-can-i-convert-a-string-to-an-imageformat-class-property
         var prop = typeof(ImageFormat).GetProperty(format.ToString(), BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase);

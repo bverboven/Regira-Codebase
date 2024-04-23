@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0;net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.Media.FFMpeg</RootNamespace>
+    <PackageId>Regira.Media.FFMpeg</PackageId>
+    <AssemblyName>Regira.Media.FFMpeg</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>4.0.4</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FFMpegCore" Version="5.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Media\Common.Media.csproj" />
+    <ProjectReference Include="..\Common.System\Common.System.csproj" />
+    <ProjectReference Include="..\Drawing.SkiaSharp\Drawing.SkiaSharp.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="ffmpeg.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ffprobe.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

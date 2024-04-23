@@ -1,5 +1,5 @@
-﻿using Regira.Drawing.Abstractions;
-using Regira.IO.Abstractions;
+﻿using Regira.IO.Abstractions;
+using Regira.Media.Drawing.Abstractions;
 using Regira.Office.Models;
 using Regira.Office.Word.Models;
 

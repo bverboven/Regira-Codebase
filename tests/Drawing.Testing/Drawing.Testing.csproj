@@ -21,7 +21,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Common.Drawing\Common.Drawing.csproj" />
     <ProjectReference Include="..\..\src\Drawing.GDI\Drawing.GDI.csproj" />
     <ProjectReference Include="..\..\src\Drawing.SkiaSharp\Drawing.SkiaSharp.csproj" />
   </ItemGroup>
