@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net6.0;net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -14,10 +14,10 @@
     <Version>4.0.4</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="FFMpegCore" Version="4.8.0" />
+    <PackageReference Include="FFMpegCore" Version="5.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Drawing.GDI\Drawing.GDI.csproj" />
+    <ProjectReference Include="..\Drawing.SkiaSharp\Drawing.SkiaSharp.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="ffmpeg.exe">

@@ -222,7 +222,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAL.MySQL.MySqlBackup", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hosting.Testing", "tests\Hosting.Testing\Hosting.Testing.csproj", "{68CD76B2-80DE-4DBC-B92F-2BF1BA951104}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Security.Authentication.Web", "src\Security.Authentication.Web\Security.Authentication.Web.csproj", "{60024A0F-76D0-437E-B0D8-A66FCF0BCE11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Security.Authentication.Web", "src\Security.Authentication.Web\Security.Authentication.Web.csproj", "{60024A0F-76D0-437E-B0D8-A66FCF0BCE11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoTestConsole", "tools\VideoTestConsole\VideoTestConsole.csproj", "{03A48758-C594-42EA-AC59-3A21499C733B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -558,6 +560,10 @@ Global
 		{60024A0F-76D0-437E-B0D8-A66FCF0BCE11}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60024A0F-76D0-437E-B0D8-A66FCF0BCE11}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60024A0F-76D0-437E-B0D8-A66FCF0BCE11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03A48758-C594-42EA-AC59-3A21499C733B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03A48758-C594-42EA-AC59-3A21499C733B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03A48758-C594-42EA-AC59-3A21499C733B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03A48758-C594-42EA-AC59-3A21499C733B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -667,6 +673,7 @@ Global
 		{4FC7D774-B788-4EC8-A3B3-56F09E877B6E} = {22EB372C-9C93-404E-9687-34234D5CF097}
 		{68CD76B2-80DE-4DBC-B92F-2BF1BA951104} = {C282BB35-A907-4CCC-B5FD-D0ABE60C0EDB}
 		{60024A0F-76D0-437E-B0D8-A66FCF0BCE11} = {6DC10729-D5B9-4A82-9E67-07DCD04CF6B7}
+		{03A48758-C594-42EA-AC59-3A21499C733B} = {DFD0CE90-E26D-4D90-A837-797EF8782A14}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C20C1CB-93D4-46D3-A172-85F0202D818C}

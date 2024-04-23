@@ -2,15 +2,16 @@
 using FFMpegCore.Pipes;
 using Regira.Dimensions;
 using Regira.Drawing.Abstractions;
-using Regira.Drawing.GDI.Utilities;
+using Regira.Drawing.Core;
+using Regira.Drawing.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
-using System.Drawing.Imaging;
+using System.Drawing;
 using FFMegService = FFMpegCore.FFMpeg;
 
 namespace Regira.Video.FFMpeg;
 
-public class VideoManager : IVideoManager
+public class VideoManager(IImageService imageService) : IVideoManager
 {
     // https://github.com/rosenbjerg/FFMpegCore
 
@@ -72,7 +73,6 @@ public class VideoManager : IVideoManager
 
     public async Task<IImageFile?> Snapshot(IBinaryFile input, Size2D? size = null, TimeSpan? time = null)
     {
-        time ??= TimeSpan.FromSeconds(10);
         var inputPath = input.GetPath();
         if (!size.HasValue || size.Value.Width == 0 || size.Value.Height == 0)
         {
@@ -80,10 +80,23 @@ public class VideoManager : IVideoManager
             size = new Size2D(mediaInfo.PrimaryVideoStream!.Width, mediaInfo.PrimaryVideoStream!.Height);
         }
 
-        var gdiSize = size.Value.ToSize();
-        using var bitmap = await FFMegService.SnapshotAsync(inputPath, gdiSize, time);
-        using var jpeg = GdiUtility.ChangeFormat(bitmap, ImageFormat.Jpeg);
-        using var resized = GdiUtility.Resize(jpeg, gdiSize);
-        return resized.ToImageFile(ImageFormat.Jpeg);
+        var tempFile = Path.GetTempFileName();
+        var success = await FFMegService.SnapshotAsync(inputPath, tempFile, new Size((int)size.Value.Width, (int)size.Value.Height), time);
+        if (!success)
+        {
+            throw new Exception("Internal error while creating snapshot");
+        }
+        using var img = new ImageFile();
+        img.Load(tempFile);
+        if (img.Length <= 0)
+        {
+            throw new Exception("Empty file");
+        }
+        using var jpeg = imageService.ChangeFormat(img, Drawing.Enums.ImageFormat.Jpeg);
+        using var resized = imageService.Resize(jpeg, size.Value);
+
+        File.Delete(tempFile);
+
+        return resized;
     }
 }

@@ -14,7 +14,7 @@
     <Version>4.0.4</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MsgReader" Version="5.5.5" />
+    <PackageReference Include="MsgReader" Version="5.5.7" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Office\Common.Office.csproj" />

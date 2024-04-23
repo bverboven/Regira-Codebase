@@ -17,6 +17,6 @@
     <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FolkerKinzel.VCards" Version="6.2.0" />
+    <PackageReference Include="FolkerKinzel.VCards" Version="6.2.1" />
   </ItemGroup>
 </Project>

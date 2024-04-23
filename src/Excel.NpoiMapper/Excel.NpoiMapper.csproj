@@ -17,7 +17,7 @@
     <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
-    <PackageReference Include="Npoi.Mapper" Version="4.1.0" />
+    <PackageReference Include="Npoi.Mapper" Version="6.2.1" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) == 'net6.0' or $(TargetFramework) == 'net8.0'">
     <PackageReference Include="Npoi.Mapper" Version="6.2.1" />

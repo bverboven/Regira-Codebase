@@ -20,6 +20,6 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Sendgrid" Version="9.29.2" />
+    <PackageReference Include="Sendgrid" Version="9.29.3" />
   </ItemGroup>
 </Project>
