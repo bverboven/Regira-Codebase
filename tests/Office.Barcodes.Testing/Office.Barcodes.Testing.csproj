@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Barcodes.QRCoder\Barcodes.QRCoder.csproj" />
     <ProjectReference Include="..\..\src\Barcodes.Spire\Barcodes.Spire.csproj" />
+    <ProjectReference Include="..\..\src\Barcodes.UziGranot\Barcodes.UziGranot.csproj" />
     <ProjectReference Include="..\..\src\Barcodes.ZXing\Barcodes.ZXing.csproj" />
     <ProjectReference Include="..\..\src\Common.Office\Common.Office.csproj" />
   </ItemGroup>

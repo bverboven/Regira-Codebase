@@ -210,11 +210,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hosting.Testing", "tests\Ho
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Security.Authentication.Web", "src\Security.Authentication.Web\Security.Authentication.Web.csproj", "{60024A0F-76D0-437E-B0D8-A66FCF0BCE11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoTestConsole", "tools\VideoTestConsole\VideoTestConsole.csproj", "{03A48758-C594-42EA-AC59-3A21499C733B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VideoTestConsole", "tools\VideoTestConsole\VideoTestConsole.csproj", "{03A48758-C594-42EA-AC59-3A21499C733B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Media.FFMpeg", "src\Media.FFMpeg\Media.FFMpeg.csproj", "{610F14C9-B4D0-4A2C-A5B1-4FD660BC1FB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Media", "src\Common.Media\Common.Media.csproj", "{3E032092-3E1E-4F4A-87B2-18F37755F4D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Media", "src\Common.Media\Common.Media.csproj", "{3E032092-3E1E-4F4A-87B2-18F37755F4D0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Barcodes", "Barcodes", "{B294E47E-5136-47BF-95EF-B742FA7E0D7B}"
 EndProject
@@ -225,6 +225,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barcodes.ZXing", "src\Barcodes.ZXing\Barcodes.ZXing.csproj", "{F0F38B51-34E4-4DC1-8393-56EABC413149}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Office.Barcodes.Testing", "tests\Office.Barcodes.Testing\Office.Barcodes.Testing.csproj", "{CFF61D12-F788-4B3C-ABDA-E394EBD6BDCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Barcodes.UziGranot", "src\Barcodes.UziGranot\Barcodes.UziGranot.csproj", "{7B1012BA-F8D4-4CE2-B0C3-A2A9052EBFBB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -564,6 +566,10 @@ Global
 		{CFF61D12-F788-4B3C-ABDA-E394EBD6BDCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFF61D12-F788-4B3C-ABDA-E394EBD6BDCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFF61D12-F788-4B3C-ABDA-E394EBD6BDCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B1012BA-F8D4-4CE2-B0C3-A2A9052EBFBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B1012BA-F8D4-4CE2-B0C3-A2A9052EBFBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B1012BA-F8D4-4CE2-B0C3-A2A9052EBFBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B1012BA-F8D4-4CE2-B0C3-A2A9052EBFBB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -674,6 +680,7 @@ Global
 		{211DFE22-DD2F-4757-8810-11AB633BDF68} = {B294E47E-5136-47BF-95EF-B742FA7E0D7B}
 		{F0F38B51-34E4-4DC1-8393-56EABC413149} = {B294E47E-5136-47BF-95EF-B742FA7E0D7B}
 		{CFF61D12-F788-4B3C-ABDA-E394EBD6BDCF} = {C282BB35-A907-4CCC-B5FD-D0ABE60C0EDB}
+		{7B1012BA-F8D4-4CE2-B0C3-A2A9052EBFBB} = {B294E47E-5136-47BF-95EF-B742FA7E0D7B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C20C1CB-93D4-46D3-A172-85F0202D818C}
