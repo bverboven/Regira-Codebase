@@ -40,12 +40,21 @@ services.AddTransient<IFileService>(_ => {
         new Regira.Serializing.Newtonsoft.Json.JsonSerializer()
     );
 })
+
+IFileService fileService = sp.GetRequiredService<IFileService>();
+IEnumerable<string> files = await fileService.List();
+byte[]? bytes = await fileService.GetBytes(identifier);
 ```
 
 ### Office
 
 - Csv - [Tests](https://github.com/bverboven/Regira-Codebase/blob/master/tests/Office.Csv.Testing)
   - [CsvHelper](https://github.com/bverboven/Regira-Codebase/tree/master/src/Csv.CsvHelper)
+- Barcodes - [Tests](https://github.com/bverboven/Regira-Codebase/tree/master/tests/Office.Barcodes.Testing)
+  - [QRCoder](https://github.com/bverboven/Regira-Codebase/tree/master/src/Barcodes.QRCoder) (create only)
+  - [(Free)Spire.Barcode](https://github.com/bverboven/Regira-Codebase/tree/master/src/Barcodes.Spire): create & write (limited types) of barcodes (including QR codes)
+  - [UziGranot](https://github.com/bverboven/Regira-Codebase/tree/master/src/Barcodes.UziGranot)
+  - [ZXing.NET](https://github.com/bverboven/Regira-Codebase/tree/master/src/Barcodes.ZXing): create & write multiple types of barcodes (including QR Codes)
 - Excel - [Tests](https://github.com/bverboven/Regira-Codebase/blob/master/tests/Office.Excel.Testing)
   - [EPPlus](https://github.com/bverboven/Regira-Codebase/tree/master/src/Excel.EPPlus)
   - [NpoiMapper](https://github.com/bverboven/Regira-Codebase/tree/master/src/Excel.NpoiMapper)
@@ -73,23 +82,15 @@ Functions for cropping, resizing, rotating, flipping
 
 <img src="https://nunit.org/img/nunit.svg" height="16" /> [Unit Tests](https://github.com/bverboven/Regira-Codebase/tree/master/tests/Drawing.Testing)
 
-#### Barcodes
-
-- [QRCoder](https://github.com/bverboven/Regira-Codebase/tree/master/src/Drawing.Barcodes.QRCoder) (create only)
-- [(Free)Spire.Barcode](https://github.com/bverboven/Regira-Codebase/tree/master/src/Drawing.Barcodes.Spire): create & write (limited types) of barcodes (including QR codes)
-- [ZXing](https://github.com/bverboven/Regira-Codebase/tree/master/src/Drawing.Barcodes.ZXing): create & write multiple types of barcodes (including QR Codes)
-
-<img src="https://nunit.org/img/nunit.svg" height="16" /> [Unit Tests](https://github.com/bverboven/Regira-Codebase/tree/master/tests/Drawing.Barcodes.Testing)
-
 ## Tools
 
 ### ProjectFilesProcessor
 
 A console application to synchronize versions of project (*.cproj) files and push them to a custom NuGet server.
-1. First it builds a tree of project dependencies
+1. A tree of project dependencies is built
 1. If one of the parent projects has an increased version, the child projects' version will be updated
 3. Then the versions of the NuGet packages are compared with the local projects versions
-4. If needed the project package is pushed to the NuGet server
+4. When needed, the project package is pushed to the NuGet server
 
 ## Tests
 
