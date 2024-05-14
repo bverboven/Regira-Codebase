@@ -11,7 +11,7 @@
     <AssemblyName>Regira.Security.Hashing.BCryptNet</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.0.5</Version>
+    <Version>4.0.6</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Security\Common.Security.csproj" />

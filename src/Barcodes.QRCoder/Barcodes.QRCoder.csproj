@@ -11,14 +11,14 @@
     <AssemblyName>Regira.Office.Barcodes.QRCoder</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.0.4</Version>
+    <Version>4.0.5</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
     <ProjectReference Include="..\Drawing.GDI\Drawing.GDI.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <!-- Keep version 1.4.2 -> version 1.4.3 doesn't build in .net6.0 or .net7.0 ... -->
-    <PackageReference Include="QRCoder" Version="1.4.2" />
+    <!-- (version 1.4.3 doesn't build in .net6.0 or .net7.0) ... -->
+    <PackageReference Include="QRCoder" Version="1.5.1" />
   </ItemGroup>
 </Project>
