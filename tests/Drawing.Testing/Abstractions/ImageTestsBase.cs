@@ -151,7 +151,7 @@ public abstract class ImageTestsBase
         var src = Path.Combine(_inputDir, filename);
         using var image = await ReadImage(src);
 
-        using var rgbImg = _imageService.MakeTransparent(image, new[] { 225, 225, 225 });
+        using var rgbImg = _imageService.MakeTransparent(image, new[] { 200, 200, 200 });
         await WriteOutput($"{Path.GetFileNameWithoutExtension(filename)}-transparent.png", rgbImg);
     }
     

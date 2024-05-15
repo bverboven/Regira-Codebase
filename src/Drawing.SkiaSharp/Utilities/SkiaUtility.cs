@@ -55,10 +55,13 @@ public static class SkiaUtility
     }
     public static SKBitmap ChangeFormat(SKBitmap src, SKEncodedImageFormat targetFormat)
     {
-        var converted = new SKBitmap(new SKImageInfo(src.Width, src.Height));
-        using var canvas = new SKCanvas(converted);
-        canvas.Clear(SKColors.White);
-        canvas.DrawBitmap(src, new SKPoint());
+        var info = new SKImageInfo(src.Width, src.Height, src.ColorType, SKAlphaType.Premul);
+        var converted = new SKBitmap(info);
+        using (var canvas = new SKCanvas(converted))
+        {
+            canvas.Clear(SKColors.White);
+            canvas.DrawBitmap(src, new SKPoint());
+        }
         using var img = SKImage.FromBitmap(converted);
         var data = img.Encode(targetFormat, 100);
         return SKBitmap.Decode(data);
@@ -85,7 +88,7 @@ public static class SkiaUtility
 
     public static SKBitmap CropRectangle(SKBitmap src, SKRect rect)
     {
-        var target = new SKBitmap(new SKImageInfo((int)rect.Width, (int)rect.Height));
+        var target = new SKBitmap(new SKImageInfo((int)rect.Width, (int)rect.Height, src.ColorType, src.AlphaType));
         using var canvas = new SKCanvas(target);
         canvas.DrawBitmap(src, rect, new SKRect(0, 0, rect.Width, rect.Height));
         return target;
@@ -99,7 +102,7 @@ public static class SkiaUtility
     }
     public static SKBitmap ResizeFixed(SKBitmap src, SKSize wantedSize, int quality = 80)
     {
-        var target = new SKBitmap(new SKImageInfo((int)wantedSize.Width, (int)wantedSize.Height));
+        var target = new SKBitmap(new SKImageInfo((int)wantedSize.Width, (int)wantedSize.Height, src.ColorType, src.AlphaType));
         src.ScalePixels(target, ToFilterQuality(quality));
         if (quality < 100)
         {
@@ -143,25 +146,31 @@ public static class SkiaUtility
 
     public static SKBitmap MakeTransparent(SKBitmap src, int[]? rgb = null)
     {
-        rgb ??= new[] { 245, 245, 245 };
+        rgb ??= [245, 245, 245];
         if (rgb.Length != 3)
         {
             throw new ArgumentException($"{nameof(rgb)} should have 3 values (red, green, blue)");
         }
 
-        for (var r = 0; r < src.Height; r++)
+        var transparentImage = new SKBitmap(new SKImageInfo(src.Width, src.Height, src.ColorType, SKAlphaType.Premul));
+        using (var canvas = new SKCanvas(transparentImage))
         {
-            for (var c = 0; c < src.Width; c++)
+            canvas.DrawBitmap(src, 0, 0);
+        }
+
+        for (var r = 0; r < transparentImage.Height; r++)
+        {
+            for (var c = 0; c < transparentImage.Width; c++)
             {
-                var color = src.GetPixel(c, r);
+                var color = transparentImage.GetPixel(c, r);
                 if (color.Red > rgb[0] && color.Green > rgb[1] && color.Blue > rgb[2])
                 {
-                    src.SetPixel(c, r, SKColor.Parse("FFFFFFFF"));
+                    transparentImage.SetPixel(c, r, SKColors.Transparent);
                 }
             }
         }
 
-        return src;
+        return transparentImage;
     }
     public static bool IsPixelTransparent(SKColor pixel)
     {
