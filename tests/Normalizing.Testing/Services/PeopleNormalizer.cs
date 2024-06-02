@@ -34,4 +34,14 @@ public class PeopleNormalizer : IObjectNormalizer
             HandleNormalize(item.Supervisor);
         }
     }
+
+    public Task HandleNormalizeMany(IEnumerable<object?> instances, bool recursive = true)
+    {
+        foreach (var item in instances)
+        {
+            HandleNormalize(item, recursive);
+        }
+
+        return Task.CompletedTask;
+    }
 }

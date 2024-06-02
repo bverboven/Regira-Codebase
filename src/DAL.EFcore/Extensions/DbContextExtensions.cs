@@ -10,6 +10,7 @@ public static class DbContextExtension
     /// <list type="bullet">
     ///     <item><see cref="EntityState.Added"/></item>
     ///     <item><see cref="EntityState.Modified"/></item>
+    ///     <item><see cref="EntityState.Deleted"/></item>
     /// </list>
     /// </summary>
     /// <param name="dbContext"></param>

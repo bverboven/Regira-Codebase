@@ -31,6 +31,11 @@ public static class DbContextNormalizingExtensions
             .Where(e => e.State != EntityState.Deleted)
             .Where(x => entityType == null || x.Entity.GetType() == entityType || TypeUtility.GetBaseTypes(x.Entity.GetType()).Contains(entityType))
             .Select(x => x.Entity));
+    /// <summary>
+    /// <inheritdoc cref="ApplyNormalizers(DbContext, Type?)"/>
+    /// </summary>
+    /// <typeparam name="T">Entity type</typeparam>
+    /// <param name="dbContext"></param>
     public static void ApplyNormalizers<T>(this DbContext dbContext)
         => ApplyNormalizers(dbContext, typeof(T));
     /// <summary>
@@ -42,10 +47,11 @@ public static class DbContextNormalizingExtensions
     {
         var normalizingSelector = dbContext.GetService<ObjectNormalizerContainer>();
 
-        foreach (var item in items)
+        var itemsByType = items.GroupBy(item => item.GetType()).ToArray();
+        foreach (var typedItems in itemsByType)
         {
-            var normalizer = normalizingSelector.Find(item.GetType());
-            normalizer?.HandleNormalize(item);
+            var normalizer = normalizingSelector.Find(typedItems.Key);
+            normalizer?.HandleNormalizeMany(typedItems);
         }
     }
 }

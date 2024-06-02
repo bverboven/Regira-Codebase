@@ -25,4 +25,17 @@ public class DummyPersonNormalizer : IObjectNormalizer
             HandleNormalize(item);
         }
     }
+
+    public Task HandleNormalizeMany(IEnumerable<object?> instances, bool recursive = true)
+    {
+        foreach (var item in instances)
+        {
+            if (item is Person person)
+            {
+                HandleNormalize(person, recursive);
+            }
+        }
+
+        return Task.CompletedTask;
+    }
 }

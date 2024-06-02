@@ -16,8 +16,17 @@ public class ObjectNormalizer : IObjectNormalizer
     }
 
 
+    public virtual Task HandleNormalizeMany(IEnumerable<object?> instances, bool recursive = true)
+    {
+        foreach (var instance in instances)
+        {
+            HandleNormalize(instance, recursive, new HashSet<object>());
+        }
+
+        return Task.CompletedTask;
+    }
     public virtual void HandleNormalize(object? instance, bool recursive = true)
-        => HandleNormalize(instance, recursive, new HashSet<object>());
+        => HandleNormalizeMany([instance], recursive).Wait();
 
     protected internal virtual void HandleNormalize(object? instance, bool recursive, HashSet<object> processedInstances)
     {
@@ -43,7 +52,6 @@ public class ObjectNormalizer : IObjectNormalizer
 
             if (recursive)
             {
-                // ToDo: prevent Stack overflow error for recurring properties
                 if (!TypeUtility.IsSimpleType(prop.PropertyType))
                 {
                     if (TypeUtility.IsTypeACollection(prop.PropertyType))
