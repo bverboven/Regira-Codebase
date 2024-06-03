@@ -26,7 +26,7 @@ public static class DbContextNormalizingExtensions
     /// </summary>
     /// <param name="dbContext"></param>
     /// <param name="entityType"></param>
-    public static void ApplyNormalizers(this DbContext dbContext, Type? entityType = null)
+    public static Task ApplyNormalizers(this DbContext dbContext, Type? entityType = null)
         => ApplyNormalizers(dbContext, dbContext.GetPendingEntries()
             .Where(e => e.State != EntityState.Deleted)
             .Where(x => entityType == null || x.Entity.GetType() == entityType || TypeUtility.GetBaseTypes(x.Entity.GetType()).Contains(entityType))
@@ -43,15 +43,26 @@ public static class DbContextNormalizingExtensions
     /// </summary>
     /// <param name="dbContext"></param>
     /// <param name="items"></param>
-    public static void ApplyNormalizers(this DbContext dbContext, IEnumerable<object> items)
+    public static async Task ApplyNormalizers(this DbContext dbContext, IEnumerable<object> items)
     {
         var normalizingSelector = dbContext.GetService<ObjectNormalizerContainer>();
 
         var itemsByType = items.GroupBy(item => item.GetType()).ToArray();
         foreach (var typedItems in itemsByType)
         {
-            var normalizer = normalizingSelector.Find(typedItems.Key);
-            normalizer?.HandleNormalizeMany(typedItems);
+            var normalizers = normalizingSelector.FindAll(typedItems.Key);
+            var exclusiveNormalizer = normalizers.FirstOrDefault(x => x.IsExclusive);
+            if (exclusiveNormalizer != null)
+            {
+                await exclusiveNormalizer.HandleNormalizeMany(typedItems);
+            }
+            else
+            {
+                foreach (var normalizer in normalizers)
+                {
+                    await normalizer.HandleNormalizeMany(typedItems);
+                }
+            }
         }
     }
 }

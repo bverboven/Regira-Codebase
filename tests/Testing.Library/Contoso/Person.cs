@@ -25,6 +25,7 @@ public class Person : IEntityWithSerial, IHasNormalizedTitle, IHasAttachments, I
     public string? NormalizedLastName { get; set; }
 
     public string Title => $"{GivenName} {LastName}".Trim();
+    [Normalized(SourceProperties = [nameof(LastName), nameof(GivenName)])]
     public string? NormalizedTitle { get; set; }
 
     public string? Description { get; set; }

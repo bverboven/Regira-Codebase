@@ -1,4 +1,4 @@
-﻿using DAL.EFcore.Testing.Infrastructure;
+﻿using Entities.Testing.Infrastructure.Normalizers;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,10 +7,10 @@ using Regira.Normalizing.Abstractions;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
-namespace DAL.EFcore.Testing;
+namespace Entities.Testing;
 
 [TestFixture]
-internal class DbContextNormalizingTests
+internal class NormalizingTests
 {
     private Person John = null!;
     private Student Jane = null!;

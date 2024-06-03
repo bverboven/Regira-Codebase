@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Testing.Library.Contoso;
 
-public class Department : IEntityWithSerial, IHasNormalizedTitle, IHasCreated
+public class Department : IEntityWithSerial, IHasNormalizedTitle, IHasNormalizedContent, IHasCourses, IHasCreated
 {
     public int Id { get; set; }
     public int? AdministratorId { get; set; }
@@ -28,4 +28,6 @@ public class Department : IEntityWithSerial, IHasNormalizedTitle, IHasCreated
 
     public Person? Administrator { get; set; }
     public ICollection<Course>? Courses { get; set; }
+
+    public string? NormalizedContent { get; set; }
 }

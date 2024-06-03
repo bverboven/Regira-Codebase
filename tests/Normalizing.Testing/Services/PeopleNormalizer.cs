@@ -8,6 +8,7 @@ namespace Normalizing.Testing.Services;
 
 public class PeopleNormalizer : IObjectNormalizer
 {
+    public bool IsExclusive => false;
     public INormalizer DefaultNormalizer { get; }
     public PeopleNormalizer() : this(null) { }
     public PeopleNormalizer(INormalizer? normalizer)

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework.Legacy;
 using Regira.DAL.EFcore.Extensions;
 using Testing.Library.Contoso;
+using Testing.Library.Data;
 
 namespace DAL.EFcore.Testing;
 
@@ -11,13 +12,13 @@ public class AutoTruncateTests
 {
 
     private SqliteConnection _connection = null!;
-    private PeopleContext _dbContext = null!;
+    private ContosoContext _dbContext = null!;
     [SetUp]
     public void Setup()
     {
         _connection = new SqliteConnection("Filename=:memory:");
         _connection.Open();
-        _dbContext = new PeopleContext(new DbContextOptionsBuilder<PeopleContext>().UseSqlite(_connection).Options);
+        _dbContext = new ContosoContext(new DbContextOptionsBuilder<ContosoContext>().UseSqlite(_connection).Options);
     }
     [TearDown]
     public void TearDown()

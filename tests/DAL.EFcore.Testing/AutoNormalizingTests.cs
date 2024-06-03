@@ -4,6 +4,7 @@ using Regira.DAL.EFcore.Normalizing;
 using Regira.Normalizing;
 using Regira.Normalizing.Models;
 using Testing.Library.Contoso;
+using Testing.Library.Data;
 
 namespace DAL.EFcore.Testing;
 
@@ -14,13 +15,13 @@ internal class AutoNormalizingTests
     private Person Jane = null!;
     private Person Francois = null!;
     private SqliteConnection _connection = null!;
-    private PeopleContext _dbContext = null!;
+    private ContosoContext _dbContext = null!;
     [SetUp]
     public void Setup()
     {
         _connection = new SqliteConnection("Filename=:memory:");
         _connection.Open();
-        _dbContext = new PeopleContext(new DbContextOptionsBuilder<PeopleContext>().UseSqlite(_connection).Options);
+        _dbContext = new ContosoContext(new DbContextOptionsBuilder<ContosoContext>().UseSqlite(_connection).Options);
         John = new Person
         {
             GivenName = "John",

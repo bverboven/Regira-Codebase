@@ -6,7 +6,9 @@ namespace Normalizing.Testing.Services;
 
 public class DummyPersonNormalizer : IObjectNormalizer
 {
+    public bool IsExclusive => false;
     public INormalizer DefaultNormalizer { get; }
+
 
     public DummyPersonNormalizer(INormalizer? defaultNormalizer = null)
     {

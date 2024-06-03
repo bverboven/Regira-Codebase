@@ -7,16 +7,20 @@ namespace Regira.Normalizing;
 
 public class ObjectNormalizer : IObjectNormalizer
 {
-    private readonly NormalizingOptions? _options;
+    /// <summary>
+    /// When exclusive, only the first exclusive normalizer will be executed for a type
+    /// </summary>
+    public virtual bool IsExclusive => false;
     public INormalizer DefaultNormalizer { get; }
+    protected readonly NormalizingOptions? Options;
     public ObjectNormalizer(NormalizingOptions? options = null)
     {
-        _options = options;
-        DefaultNormalizer = _options?.DefaultNormalizer ?? NormalizingDefaults.DefaultPropertyNormalizer ?? new DefaultNormalizer(options);
+        Options = options;
+        DefaultNormalizer = Options?.DefaultNormalizer ?? NormalizingDefaults.DefaultPropertyNormalizer ?? new DefaultNormalizer(options);
     }
 
 
-    public virtual Task HandleNormalizeMany(IEnumerable<object?> instances, bool recursive = true)
+    public virtual Task HandleNormalizeMany(IEnumerable<object?> instances, bool recursive = false)
     {
         foreach (var instance in instances)
         {
@@ -25,7 +29,7 @@ public class ObjectNormalizer : IObjectNormalizer
 
         return Task.CompletedTask;
     }
-    public virtual void HandleNormalize(object? instance, bool recursive = true)
+    public virtual void HandleNormalize(object? instance, bool recursive = false)
         => HandleNormalizeMany([instance], recursive).Wait();
 
     protected internal virtual void HandleNormalize(object? instance, bool recursive, HashSet<object> processedInstances)
@@ -48,7 +52,7 @@ public class ObjectNormalizer : IObjectNormalizer
         // Property Normalizing
         foreach (var prop in type.GetProperties())
         {
-            NormalizingUtility.InvokePropertyNormalizer(instance, prop, _options);
+            NormalizingUtility.InvokePropertyNormalizer(instance, prop, Options);
 
             if (recursive)
             {
@@ -73,4 +77,12 @@ public class ObjectNormalizer : IObjectNormalizer
             }
         }
     }
+}
+public class ObjectNormalizer<T> : ObjectNormalizer, IObjectNormalizer<T>
+{
+    public virtual void HandleNormalize(T? item, bool recursive = false)
+        => base.HandleNormalize(item, recursive);
+
+    public virtual Task HandleNormalizeMany(IEnumerable<T?> instances, bool recursive = false)
+        => base.HandleNormalizeMany(instances.Cast<object?>(), recursive);
 }
