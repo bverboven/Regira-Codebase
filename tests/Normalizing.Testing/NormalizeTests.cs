@@ -1,7 +1,6 @@
 ﻿using Normalizing.Testing.Models;
 using NUnit.Framework.Legacy;
 using Regira.Normalizing;
-using Regira.Normalizing.Abstractions;
 
 namespace Normalizing.Testing;
 
@@ -86,7 +85,7 @@ public class NormalizeTests
         Assert.That(obj.NormalizedContent, Is.EqualTo($"{_normalizer.Normalize(obj.SourceProp1)} {_normalizer.Normalize(obj.SourceProp2)}"));
     }
     [Test]
-    public void Test_Collection_With_Recursion_True()
+    public void Test_Collection_With_Recursion()
     {
         var arr = new List<NormalizableObject2> {
             new() {SourceProp = "1. Testing the normalized attribute"},
@@ -100,7 +99,7 @@ public class NormalizeTests
         Assert.That(arr[1].NormalizedProp, Is.EqualTo(_normalizer.Normalize(arr[1].SourceProp)));
     }
     [Test]
-    public void Test_Nested_Objects_With_Recursion_True()
+    public void Test_Nested_Objects_With_Recursion()
     {
         var obj = new NestedObject
         {
@@ -128,14 +127,4 @@ public class NormalizeTests
         Assert.That(obj.Obj3.Obj2.NormalizedProp, Is.EqualTo(_normalizer.Normalize(obj.Obj3.Obj2.SourceProp)));
         Assert.That(obj.Obj3.Collection.Last().Obj2!.NormalizedProp, Is.EqualTo(_normalizer.Normalize(obj.Obj3.Collection.Last().Obj2!.SourceProp)));
     }
-
-    #region Infrastructure
-    public class TestNormalizer : INormalizer
-    {
-        public string? Normalize(string? input)
-        {
-            return input?.ToUpper().Replace(" ", "_");
-        }
-    }
-    #endregion
 }

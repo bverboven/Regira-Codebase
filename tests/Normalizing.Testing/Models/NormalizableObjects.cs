@@ -1,5 +1,5 @@
 ﻿using Regira.Normalizing;
-using static Normalizing.Testing.NormalizeTests;
+using Regira.Normalizing.Abstractions;
 
 namespace Normalizing.Testing.Models;
 
@@ -40,4 +40,10 @@ public class NestedObject
     public NormalizableObject2? Obj2 { get; set; }
     public NestedObject? Obj3 { get; set; }
     public ICollection<NestedObject>? Collection { get; set; }
+}
+
+public class TestNormalizer : INormalizer
+{
+    public string? Normalize(string? input)
+        => input?.ToUpper().Replace(" ", "_");
 }
