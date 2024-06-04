@@ -11,7 +11,7 @@
     <AssemblyName>Regira.Office.Mail.MailGun</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.0.8</Version>
+    <Version>4.0.9</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
@@ -20,7 +20,6 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <!-- Version 108.0.3 fails with "The value cannot be null or empty. (Parameter 'mediaType') in .net 7.0 (.net 6.0 is fine)" -->
-    <PackageReference Include="RestSharp" Version="110.2.0" />
+    <PackageReference Include="RestSharp" Version="111.2.0" />
   </ItemGroup>
 </Project>
