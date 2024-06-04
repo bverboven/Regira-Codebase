@@ -1,6 +1,6 @@
-﻿using NUnit.Framework.Legacy;
+﻿using Normalizing.Testing.Models;
+using NUnit.Framework.Legacy;
 using Regira.Normalizing;
-using Regira.Normalizing.Abstractions;
 
 namespace Normalizing.Testing;
 
@@ -85,7 +85,7 @@ public class NormalizeTests
         Assert.That(obj.NormalizedContent, Is.EqualTo($"{_normalizer.Normalize(obj.SourceProp1)} {_normalizer.Normalize(obj.SourceProp2)}"));
     }
     [Test]
-    public void Test_Collection()
+    public void Test_Collection_With_Recursion()
     {
         var arr = new List<NormalizableObject2> {
             new() {SourceProp = "1. Testing the normalized attribute"},
@@ -94,12 +94,12 @@ public class NormalizeTests
         _objectNormalizer.HandleNormalize(new
         {
             Collection = arr
-        });
+        }, true);
         Assert.That(arr[0].NormalizedProp, Is.EqualTo(_normalizer.Normalize(arr[0].SourceProp)));
         Assert.That(arr[1].NormalizedProp, Is.EqualTo(_normalizer.Normalize(arr[1].SourceProp)));
     }
     [Test]
-    public void Test_Nested_Objects()
+    public void Test_Nested_Objects_With_Recursion()
     {
         var obj = new NestedObject
         {
@@ -120,60 +120,11 @@ public class NormalizeTests
                 }
             }
         };
-        _objectNormalizer.HandleNormalize(obj);
+        _objectNormalizer.HandleNormalize(obj, true);
         Assert.That(obj.Obj2.NormalizedProp, Is.Not.EqualTo(obj.Obj2.SourceProp));
         Assert.That(obj.Obj3.Obj2.NormalizedProp, Is.Not.EqualTo(obj.Obj3.Obj2.SourceProp));
         Assert.That(obj.Obj2.NormalizedProp, Is.EqualTo(_normalizer.Normalize(obj.Obj2.SourceProp)));
         Assert.That(obj.Obj3.Obj2.NormalizedProp, Is.EqualTo(_normalizer.Normalize(obj.Obj3.Obj2.SourceProp)));
         Assert.That(obj.Obj3.Collection.Last().Obj2!.NormalizedProp, Is.EqualTo(_normalizer.Normalize(obj.Obj3.Collection.Last().Obj2!.SourceProp)));
     }
-
-    #region Infrastructure
-    public class TestNormalizer : INormalizer
-    {
-        public string? Normalize(string? input)
-        {
-            return input?.ToUpper().Replace(" ", "_");
-        }
-    }
-
-    class NormalizableObject1
-    {
-        [Normalized]
-        public string? NormalizedProp { get; set; }
-    }
-    class NormalizableObject2
-    {
-        public string? SourceProp { get; set; }
-        [Normalized(SourceProperty = nameof(SourceProp), SourceProperties = new[] { nameof(SourceProp) })]
-        public string? NormalizedProp { get; set; }
-    }
-    class NormalizableObject3
-    {
-        public string? SourceProp { get; set; }
-        [Normalized(SourceProperty = nameof(SourceProp), Normalizer = typeof(TestNormalizer))]
-        public string? NormalizedProp { get; set; }
-    }
-    class NormalizableObject4
-    {
-        public string? SourceProp1 { get; set; }
-        [Normalized(SourceProperty = nameof(SourceProp1))]
-        public string? NormalizedProp1 { get; set; }
-        public string? SourceProp2 { get; set; }
-        [Normalized(SourceProperty = nameof(SourceProp2), Normalizer = typeof(TestNormalizer))]
-        public string? NormalizedProp2 { get; set; }
-        [Normalized(Normalizer = typeof(TestNormalizer))]
-        public string? NormalizedProp3 { get; set; }
-        [Normalized(SourceProperties = new[] { nameof(SourceProp1), nameof(SourceProp2) })]
-        public string? NormalizedContent { get; set; }
-    }
-
-    class NestedObject
-    {
-        //public NormalizableObject1? Obj1 { get; set; }
-        public NormalizableObject2? Obj2 { get; set; }
-        public NestedObject? Obj3 { get; set; }
-        public ICollection<NestedObject>? Collection { get; set; }
-    }
-    #endregion
 }

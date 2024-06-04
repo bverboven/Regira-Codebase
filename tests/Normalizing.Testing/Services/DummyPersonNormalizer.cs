@@ -6,7 +6,9 @@ namespace Normalizing.Testing.Services;
 
 public class DummyPersonNormalizer : IObjectNormalizer
 {
+    public bool IsExclusive => false;
     public INormalizer DefaultNormalizer { get; }
+
 
     public DummyPersonNormalizer(INormalizer? defaultNormalizer = null)
     {
@@ -24,5 +26,18 @@ public class DummyPersonNormalizer : IObjectNormalizer
         {
             HandleNormalize(item);
         }
+    }
+
+    public Task HandleNormalizeMany(IEnumerable<object?> instances, bool recursive = true)
+    {
+        foreach (var item in instances)
+        {
+            if (item is Person person)
+            {
+                HandleNormalize(person, recursive);
+            }
+        }
+
+        return Task.CompletedTask;
     }
 }

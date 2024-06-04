@@ -8,6 +8,7 @@ namespace Normalizing.Testing.Services;
 
 public class PeopleNormalizer : IObjectNormalizer
 {
+    public bool IsExclusive => false;
     public INormalizer DefaultNormalizer { get; }
     public PeopleNormalizer() : this(null) { }
     public PeopleNormalizer(INormalizer? normalizer)
@@ -33,5 +34,15 @@ public class PeopleNormalizer : IObjectNormalizer
 
             HandleNormalize(item.Supervisor);
         }
+    }
+
+    public Task HandleNormalizeMany(IEnumerable<object?> instances, bool recursive = true)
+    {
+        foreach (var item in instances)
+        {
+            HandleNormalize(item, recursive);
+        }
+
+        return Task.CompletedTask;
     }
 }
