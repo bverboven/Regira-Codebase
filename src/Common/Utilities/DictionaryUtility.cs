@@ -196,6 +196,8 @@ public static class DictionaryUtility
 
         return value;
     }
+    public static IDictionary<string, object> NonNullable(this IDictionary<string, object?> source)
+        => source.Where(x => x.Value != null).ToDictionary(x => x.Key, x => x.Value!);
 
     public static IDictionary<string, object?> Flatten(this IDictionary<string, object?> source, FlattenOptions? options = null)
     {
