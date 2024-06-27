@@ -14,7 +14,7 @@
     <Version>4.0.8</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="libphonenumber-csharp" Version="8.13.37" />
+    <PackageReference Include="libphonenumber-csharp" Version="8.13.39" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
