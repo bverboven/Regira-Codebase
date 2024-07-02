@@ -1,5 +1,5 @@
-﻿using FolkerKinzel.VCards.Models;
-using FolkerKinzel.VCards.Models.Enums;
+﻿using FolkerKinzel.VCards.Enums;
+using FolkerKinzel.VCards.Models;
 using Regira.Office.VCards.Abstractions;
 using Regira.Office.VCards.Models;
 using Regira.Office.VCards.Utilities;
@@ -14,10 +14,10 @@ internal static class Converter
         var fkName = item.NameViews?.FirstOrDefault()?.Value;
         var name = new VCardName
         {
-            GivenName = fkName?.FirstName.FirstOrDefault(),
-            SurName = fkName?.LastName.FirstOrDefault(),
-            Prefix = fkName?.Prefix.FirstOrDefault(),
-            Suffix = fkName?.Suffix.FirstOrDefault()
+            GivenName = fkName?.GivenNames.FirstOrDefault(),
+            SurName = fkName?.FamilyNames.FirstOrDefault(),
+            Prefix = fkName?.Prefixes.FirstOrDefault(),
+            Suffix = fkName?.Suffixes.FirstOrDefault()
         };
         var tels = item.Phones
             ?.Select(phone =>
@@ -26,7 +26,7 @@ internal static class Converter
                 if (phone?.Parameters.PhoneType.HasValue ?? false)
                 {
                     var types = ConvertUtility
-                        .ConvertBitFields<PhoneTypes, VCardTelType>(phone.Parameters.PhoneType.Value)
+                        .ConvertBitFields<Tel, VCardTelType>(phone.Parameters.PhoneType.Value)
                         .ToArray();
                     if (types.Any())
                     {
@@ -37,7 +37,7 @@ internal static class Converter
                 if (phone?.Parameters.PropertyClass.HasValue ?? false)
                 {
                     var types = ConvertUtility
-                        .ConvertBitFields<PropertyClassTypes, VCardTelType>(phone.Parameters.PropertyClass.Value)
+                        .ConvertBitFields<PCl, VCardTelType>(phone.Parameters.PropertyClass.Value)
                         .ToArray();
                     if (types.Any())
                     {
@@ -58,7 +58,7 @@ internal static class Converter
                 if (e?.Parameters.PropertyClass.HasValue ?? false)
                 {
                     var types = ConvertUtility
-                        .ConvertBitFields<PropertyClassTypes, VCardPropertyType>(e.Parameters.PropertyClass.Value)
+                        .ConvertBitFields<PCl, VCardPropertyType>(e.Parameters.PropertyClass.Value)
                         .ToArray();
                     if (types.Any())
                     {
@@ -90,7 +90,7 @@ internal static class Converter
                 if (x?.Parameters.PropertyClass.HasValue ?? false)
                 {
                     var types = ConvertUtility
-                        .ConvertBitFields<PropertyClassTypes, VCardPropertyType>(x.Parameters.PropertyClass.Value)
+                        .ConvertBitFields<PCl, VCardPropertyType>(x.Parameters.PropertyClass.Value)
                         .ToArray();
                     if (types.Any())
                     {
@@ -134,7 +134,7 @@ internal static class Converter
                 if (tel.Type.HasValue)
                 {
                     var telTypes = ConvertUtility
-                        .ConvertBitFields<VCardTelType, PhoneTypes>(tel.Type.Value)
+                        .ConvertBitFields<VCardTelType, Tel>(tel.Type.Value)
                         .ToArray();
                     if (telTypes.Any())
                     {
@@ -142,7 +142,7 @@ internal static class Converter
                     }
 
                     var propTypes = ConvertUtility
-                        .ConvertBitFields<VCardTelType, PropertyClassTypes>(tel.Type.Value)
+                        .ConvertBitFields<VCardTelType, PCl>(tel.Type.Value)
                         .ToArray();
                     if (propTypes.Any())
                     {
@@ -159,7 +159,7 @@ internal static class Converter
                 if (email.Type.HasValue)
                 {
                     var types = ConvertUtility
-                        .ConvertBitFields<VCardPropertyType, PropertyClassTypes>(email.Type.Value)
+                        .ConvertBitFields<VCardPropertyType, PCl>(email.Type.Value)
                         .ToArray();
                     if (types.Any())
                     {
@@ -193,7 +193,7 @@ internal static class Converter
                     if (x.Type.HasValue)
                     {
                         var types = ConvertUtility
-                            .ConvertBitFields<VCardPropertyType, PropertyClassTypes>(x.Type.Value)
+                            .ConvertBitFields<VCardPropertyType, PCl>(x.Type.Value)
                             .ToArray();
                         if (types.Any())
                         {
@@ -204,7 +204,7 @@ internal static class Converter
                     return address;
                 }
             );
-        var orgs = item.Organization != null ? new[] { new OrganizationProperty(item.Organization?.Name) } : null;
+        var orgs = item.Organization != null ? new[] { new OrgProperty(item.Organization?.Name) } : null;
         return new FKvCard
         {
             DisplayNames = new List<TextProperty>

@@ -1,10 +1,10 @@
 ﻿using FolkerKinzel.VCards;
+using FolkerKinzel.VCards.Enums;
 using FolkerKinzel.VCards.Extensions;
 using Regira.IO.Utilities;
 using Regira.Office.VCards.Abstractions;
 using Regira.Office.VCards.Exceptions;
 using static Regira.Office.VCards.FolkerKinzel.Converting.Converter;
-using FKvCard = FolkerKinzel.VCards.VCard;
 using VCard = Regira.Office.VCards.Models.VCard;
 
 namespace Regira.Office.VCards.FolkerKinzel;
@@ -17,8 +17,10 @@ public class VCardManager : IVCardService
     }
     public IEnumerable<VCard> ReadMany(string content)
     {
-        var tr = new StringReader(content);
-        var items = FKvCard.DeserializeVcf(tr);
+        //var tr = new StringReader(content);
+        //var items = FKvCard.DeserializeVcf(tr);
+        using var stream = FileUtility.GetStreamFromString(content);
+        var items = Vcf.Deserialize(stream);
         if (!items.Any())
         {
             throw new InvalidCardException("Invalid card", content);
@@ -30,13 +32,13 @@ public class VCardManager : IVCardService
     {
         var vCard = Convert(item);
         var stream = new MemoryStream();
-        vCard.SerializeVcf(stream, GetVersion(version), null, VcfOptions.Default, true);
+        vCard.SerializeVcf(stream, GetVersion(version), null, Opts.Default, true);
         return FileUtility.GetString(stream)!;
     }
     public string Write(IEnumerable<VCard> items, VCardVersion version = VCardVersion.V3_0)
     {
         var stream = new MemoryStream();
-        items.Select(Convert).ToList().SerializeVcf(stream, GetVersion(version), null, VcfOptions.Default, true);
+        items.Select(Convert).ToList().SerializeVcf(stream, GetVersion(version), null, Opts.Default, true);
         return FileUtility.GetString(stream)!;
     }
 
