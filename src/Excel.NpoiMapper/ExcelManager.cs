@@ -4,6 +4,7 @@ using NPOI.XSSF.UserModel;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Office.Excel.Abstractions;
+using Regira.Office.MimeTypes;
 using Regira.Utilities;
 
 namespace Regira.Office.Excel.NpoiMapper;
@@ -44,7 +45,7 @@ public class ExcelManager : IExcelManager
 
     public IMemoryFile Create(ExcelSheet sheet)
     {
-        return Create(new[] { sheet });
+        return Create([sheet]);
     }
     public IMemoryFile Create(IEnumerable<ExcelSheet> sheets)
     {
@@ -68,7 +69,7 @@ public class ExcelManager : IExcelManager
 
         var ms = new MemoryStream();
         workbook.Write(ms, true);
-        return ms.ToMemoryFile();
+        return ms.ToMemoryFile(ContentTypes.XLSX);
     }
 
     protected void FillSheet(ISheet sheet, IList<IDictionary<string, object?>> data)

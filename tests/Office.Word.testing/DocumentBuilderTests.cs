@@ -1,7 +1,5 @@
 ﻿using NUnit.Framework.Legacy;
 using Regira.IO.Extensions;
-using Regira.IO.Models;
-using Regira.IO.Storage.FileSystem;
 using Regira.Office.Word.Models;
 using Regira.Office.Word.Spire;
 using Regira.Utilities;
@@ -55,23 +53,23 @@ public class DocumentBuilderTests
         };
         paragraphs.Insert(0, headingParagraph);
 
-        using var fpHeaderFile = new BinaryFileItem { Path = fpHeaderPath };
+        using var fpHeaderFile = File.OpenRead(fpHeaderPath).ToBinaryFile();
         var fpHeader = new WordTemplateInput { Template = fpHeaderFile };
-        using var headerFile = new BinaryFileItem { Path = headerPath };
+        using var headerFile = File.OpenRead(headerPath).ToBinaryFile();
         var header = new WordTemplateInput { Template = headerFile };
 
         var manager = new WordManager();
         var builder = new DocumentBuilder(manager);
-        await using var stream = builder.WithParagraphs(paragraphs)
+        using var docFile = builder.WithParagraphs(paragraphs)
             .AddHeader(new WordHeaderFooterInput { Template = fpHeader, Type = HeaderFooterType.FirstPage })
             .AddHeader(new WordHeaderFooterInput { Template = header })
             .Build();
 
-        var file = await FileSystemUtility.SaveStream(outputPath, stream);
+        var file = await docFile.SaveAs(outputPath);
         ClassicAssert.IsTrue(file.Exists);
         ClassicAssert.IsTrue(file.Length > 0);
 
-        var content = manager.GetText(new WordTemplateInput { Template = stream.ToBinaryFile() });
+        var content = manager.GetText(new WordTemplateInput { Template = docFile });
         ClassicAssert.IsTrue(content.Contains(headingParagraph.Text));
     }
 }

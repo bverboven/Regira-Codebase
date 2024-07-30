@@ -2,7 +2,6 @@
 using Regira.Collections;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
-using Regira.IO.Models;
 using Regira.Office.Models;
 using Regira.Office.Word.Models;
 using Regira.Office.Word.Spire;
@@ -39,7 +38,7 @@ public class WordTests
             File.Delete(outputPath);
         }
 
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile.ToBinaryFile()
@@ -62,7 +61,7 @@ public class WordTests
             File.Delete(outputPath);
         }
 
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var pi = Math.Round(Math.PI, 10).ToString(CultureInfo.InvariantCulture);
         var input = new WordTemplateInput
         {
@@ -97,7 +96,7 @@ public class WordTests
         var mergedInputs = new[] { srcPath1, srcPath2 }
             .Select(srcPath => new WordTemplateInput
             {
-                Template = new BinaryFileItem { Path = srcPath },//File.Open(srcPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite),
+                Template = File.OpenRead(srcPath).ToBinaryFile(),
                 Options = new() { InheritFont = true, EnforceEvenAmountOfPages = true }
             })
             .ToArray();
@@ -106,8 +105,8 @@ public class WordTests
         var headerFooterInput = new WordTemplateInput
         {
             Template = mergedFile.ToBinaryFile(),
-            Headers = { new WordHeaderFooterInput { Template = new WordTemplateInput { Template = new BinaryFileItem { Path = srcHeaderFooter } } } },
-            Footers = { new WordHeaderFooterInput { Template = new WordTemplateInput { Template = new BinaryFileItem { Path = srcHeaderFooter } } } }
+            Headers = { new WordHeaderFooterInput { Template = new WordTemplateInput { Template = File.OpenRead(srcHeaderFooter).ToBinaryFile() } } },
+            Footers = { new WordHeaderFooterInput { Template = new WordTemplateInput { Template = File.OpenRead(srcHeaderFooter).ToBinaryFile() } } }
         };
         using var outputFile = mgr.Create(headerFooterInput)
             .ToBinaryFile();
@@ -138,9 +137,9 @@ public class WordTests
             File.Delete(outputPath);
         }
 
-        using var inputFile = new BinaryFileItem { Path = srcPath };
-        using var headerTemplate = new BinaryFileItem { Path = headerFile };
-        using var footerTemplate = new BinaryFileItem { Path = footerFile };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
+        using var headerTemplate = File.OpenRead(headerFile).ToBinaryFile();
+        using var footerTemplate = File.OpenRead(footerFile).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile,
@@ -177,9 +176,9 @@ public class WordTests
             File.Delete(outputPath);
         }
 
-        using var inputFile = new BinaryFileItem { Path = srcPath };
-        using var headerTemplate = new BinaryFileItem { Path = headerFile };
-        using var footerTemplate = new BinaryFileItem { Path = footerFile };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
+        using var headerTemplate = File.OpenRead(headerFile).ToBinaryFile();
+        using var footerTemplate = File.OpenRead(footerFile).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile,
@@ -216,7 +215,7 @@ public class WordTests
             { "title", "A title for this word document" },
             { "date", DateTime.Today.ToShortDateString() }
         };
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile,
@@ -248,7 +247,7 @@ public class WordTests
             File.Delete(outputPath);
         }
 
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile,
@@ -284,7 +283,7 @@ public class WordTests
                 new {Id = "31", Title = "Item #31", Price = 350}
             }.Select(x => DictionaryUtility.ToDictionary(x))
             .ToList();
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile,
@@ -315,7 +314,7 @@ public class WordTests
         {
             File.Delete(outputPath);
         }
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile
@@ -336,7 +335,7 @@ public class WordTests
         {
             File.Delete(outputPath);
         }
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile
@@ -357,7 +356,7 @@ public class WordTests
         {
             File.Delete(outputPath);
         }
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile
@@ -383,7 +382,7 @@ public class WordTests
         {
             File.Delete(outputPath);
         }
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile
@@ -404,7 +403,7 @@ public class WordTests
         {
             File.Delete(outputPath);
         }
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile
@@ -425,7 +424,7 @@ public class WordTests
         {
             File.Delete(outputPath);
         }
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile
@@ -446,7 +445,7 @@ public class WordTests
         {
             File.Delete(outputPath);
         }
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile
@@ -464,7 +463,7 @@ public class WordTests
         //Assert.Ignore("Not supported for now...");
         var srcPath = Path.Combine(_assetsDir, "Input", "template.docx");
         var outputPath = Path.Combine(_assetsDir, "Output", "image-{0}.jpg");
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile
@@ -499,7 +498,7 @@ public class WordTests
             }
             .Select(x => DictionaryUtility.ToDictionary(x))
             .ToList();
-        using var doc1Template = new BinaryFileItem { Path = doc1Src };
+        using var doc1Template = File.OpenRead(doc1Src).ToBinaryFile();
         var doc1Input = new WordTemplateInput
         {
             Template = doc1Template,
@@ -509,7 +508,7 @@ public class WordTests
         };
         // doc2
         var doc2Src = Path.Combine(_assetsDir, "Input", "template_image.docx");
-        using var doc2Template = new BinaryFileItem { Path = doc2Src };
+        using var doc2Template = File.OpenRead(doc2Src).ToBinaryFile();
         var imgFile = Path.Combine(_assetsDir, "Input", "sample1.jpg");
         var doc2Input = new WordTemplateInput
         {
@@ -529,7 +528,7 @@ public class WordTests
             {"doc1", doc1Input},
             {"doc2", doc2Input}
         };
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile,
@@ -560,7 +559,7 @@ public class WordTests
 
         // doc1
         var doc1Src = Path.Combine(_assetsDir, "Input", "extern-small-font.docx");
-        var doc1Template = new BinaryFileItem { Path = doc1Src };
+        var doc1Template = File.OpenRead(doc1Src).ToBinaryFile();
         var doc1Input = new WordTemplateInput
         {
             Template = doc1Template,
@@ -572,7 +571,7 @@ public class WordTests
         {
             {"ExternDoc", doc1Input}
         };
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile,
@@ -601,7 +600,7 @@ public class WordTests
         ]
     }
 }";
-        using var inputFile = new BinaryFileItem { Path = srcPath };
+        using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = JsonSerializer.Deserialize<WordTemplateInput>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
         input.Template = inputFile;
         var mgr = new WordManager();
@@ -696,7 +695,7 @@ public class WordTests
         // use a copy so I can keep the original open for editing
         var tmpFile = Path.Combine(Path.GetTempPath(), Path.GetFileName(srcPath));
         File.Copy(srcPath, tmpFile, true);
-        using var inputFile = new BinaryFileItem { Path = tmpFile };
+        using var inputFile = File.OpenRead(tmpFile).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile,
@@ -767,18 +766,18 @@ public class WordTests
         // use a copy so I can keep the original open for editing
         var tmpFile = Path.Combine(Path.GetTempPath(), Path.GetFileName(srcPath));
         File.Copy(srcPath, tmpFile, true);
-        using var inputFile = new BinaryFileItem { Path = tmpFile };
+        using var inputFile = File.OpenRead(tmpFile).ToBinaryFile();
 
         // customer
         var customerFile = Path.Combine(_assetsDir, "Input", "Factuur", "customer.dotx");
-        using var customerTemplate = new BinaryFileItem { Path = customerFile };
+        using var customerTemplate = File.OpenRead(customerFile).ToBinaryFile();
         var customerInput = new WordTemplateInput
         {
             Template = customerTemplate
         };
         // invoice-details
         var invoiceDetailsFile = Path.Combine(_assetsDir, "Input", "Factuur", "invoice-details.dotx");
-        using var invoiceDetailsTemplate = new BinaryFileItem { Path = invoiceDetailsFile };
+        using var invoiceDetailsTemplate = File.OpenRead(invoiceDetailsFile).ToBinaryFile();
         var invoiceDetailsInput = new WordTemplateInput
         {
             Template = invoiceDetailsTemplate
@@ -787,28 +786,28 @@ public class WordTests
         var invoiceLinesFile = Path.Combine(_assetsDir, "Input", "Factuur", "invoice-lines.dotx");
         var tmpLinesFile = Path.Combine(Path.GetTempPath(), Path.GetFileName(invoiceLinesFile));
         File.Copy(invoiceLinesFile, tmpLinesFile, true);
-        using var invoiceLinesTemplate = new BinaryFileItem { Path = tmpLinesFile };
+        using var invoiceLinesTemplate = File.OpenRead(tmpLinesFile).ToBinaryFile();
         var invoiceLinesInput = new WordTemplateInput
         {
             Template = invoiceLinesTemplate
         };
         // invoice-summary
         var invoiceSummaryFile = Path.Combine(_assetsDir, "Input", "Factuur", "invoice-summary.dotx");
-        using var invoiceSummaryTemplate = new BinaryFileItem { Path = invoiceSummaryFile };
+        using var invoiceSummaryTemplate = File.OpenRead(invoiceSummaryFile).ToBinaryFile();
         var invoiceSummaryInput = new WordTemplateInput
         {
             Template = invoiceSummaryTemplate
         };
         // header
         var headerFile = Path.Combine(_assetsDir, "Input", "Factuur", "header.dotx");
-        using var headerTemplate = new BinaryFileItem { Path = headerFile };
+        using var headerTemplate = File.OpenRead(headerFile).ToBinaryFile();
         var headerInput = new WordTemplateInput
         {
             Template = headerTemplate
         };
         // footer
         var footerFile = Path.Combine(_assetsDir, "Input", "Factuur", "footer-inline.dotx");
-        using var footerTemplate = new BinaryFileItem { Path = footerFile };
+        using var footerTemplate = File.OpenRead(footerFile).ToBinaryFile();
         var footerInput = new WordTemplateInput
         {
             Template = footerTemplate

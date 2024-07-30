@@ -83,7 +83,7 @@ public class BarcodeTestsBase
             return;
         }
 
-        var input = Convert.ToBase64String(Enumerable.Range(0, 2500).Select((_, i) => (byte)(i % 8)).ToArray());
+        var input = Convert.ToBase64String(Enumerable.Range(0, 5000).Select((_, i) => (byte)(i % 8)).ToArray());
         Assert.Throws<InputException>(() =>
         {
             Writer.Create(input);

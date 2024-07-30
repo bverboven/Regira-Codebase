@@ -36,6 +36,7 @@ services.AddTransient<IFileService>(_ => {
         new GitHubOptions {
                 Uri = GITHUB_URI_,
                 // Key = TOKEN_IF_REQUIRED
+                // RootFolder will be derived from Uri (+ "/contents/")
         },
         new Regira.Serializing.Newtonsoft.Json.JsonSerializer()
     );
@@ -86,9 +87,10 @@ Functions for cropping, resizing, rotating, flipping
 
 ### ProjectFilesProcessor
 
-A console application to synchronize versions of project (*.cproj) files and push them to a custom NuGet server.
-1. A tree of project dependencies is built
-1. If one of the parent projects has an increased version, the child projects' version will be updated
+A console application that takes care of *versioning* the project (*.cproj) files and syncing their *NuGet packages* with a custom NuGet server.
+
+1. A tree of project dependencies is built in memory
+1. If a project has a (manually) increased version, all dependent projects will also have their version updated
 3. Then the versions of the NuGet packages are compared with the local projects versions
 4. When needed, the project package is pushed to the NuGet server
 

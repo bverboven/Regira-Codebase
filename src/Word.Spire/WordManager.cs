@@ -23,6 +23,8 @@ using SpirePageOrientation = Spire.Doc.Documents.PageOrientation;
 using SpirePageSize = Spire.Doc.Documents.PageSize;
 using SpireParagraph = Spire.Doc.Documents.Paragraph;
 using Regira.Media.Drawing.Abstractions;
+using Regira.Office.MimeTypes;
+
 
 #if NETSTANDARD2_0
 using SkiaSharp;
@@ -58,7 +60,7 @@ public class WordManager : IWordManager
     {
         using var doc = CreateDocument(input);
         var convertedStream = ConvertDocument(doc, options);
-        return convertedStream.ToMemoryFile();
+        return convertedStream.ToMemoryFile(options.OutputFormat == RegiraFileFormat.Doc ? ContentTypes.DOC : ContentTypes.DOCX);
     }
 
     public string GetText(WordTemplateInput input)
@@ -102,10 +104,8 @@ public class WordManager : IWordManager
     }
 
 
-    protected internal IMemoryFile ToMemoryFile(Document doc, FileFormat format = FileFormat.Docx)
-    {
-        return doc.ToStream(format).ToMemoryFile();
-    }
+    protected internal IMemoryFile ToMemoryFile(Document doc, SpireFileFormat format = SpireFileFormat.Docx)
+        => doc.ToStream(format).ToMemoryFile(format == SpireFileFormat.Doc ? ContentTypes.DOC : ContentTypes.DOCX);
     protected internal Document MergeDocuments(IEnumerable<WordTemplateInput> inputs)
     {
         var doc = new Document();

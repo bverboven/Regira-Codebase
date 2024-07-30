@@ -19,9 +19,10 @@ public static class ControllerExtensions
         // make content-disposition available for axios client
         ctrl.Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
 
+        var bytes = file.GetBytes()!;
         var contentType = !string.IsNullOrWhiteSpace(file.ContentType)
             ? file.ContentType
-            : ContentTypeUtility.GetContentType(file.FileName);
-        return ctrl.File(file.GetBytes()!, contentType, inline ? null : file.FileName);
+            : ContentTypeUtility.GetContentType(file.FileName) ?? ContentTypeUtility.GetContentType(bytes);
+        return ctrl.File(bytes!, contentType, inline ? null : file.FileName);
     }
 }

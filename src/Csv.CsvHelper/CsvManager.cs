@@ -3,6 +3,7 @@ using CsvHelper.Configuration;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Office.Csv.Abstractions;
+using Regira.Office.MimeTypes;
 using Regira.Utilities;
 using System.Globalization;
 
@@ -138,7 +139,7 @@ public class CsvManager<T> : ICsvManager<T>
         await Write(sw, items);
 
         ms.Seek(0, SeekOrigin.Begin);
-        return ms.ToMemoryFile();
+        return ms.ToMemoryFile(ContentTypes.CSV);
     }
     protected internal virtual async Task Write(TextWriter tw, IEnumerable<T> items)
     {

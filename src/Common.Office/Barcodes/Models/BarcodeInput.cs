@@ -6,7 +6,7 @@ public class BarcodeInput : BarcodeInputBase
 {
     public BarcodeInput()
     {
-        Format = BarcodeFormat.Code39;
+        Format = BarcodeFormat.Code128;
     }
 
     public static implicit operator BarcodeInput(string content) => new() { Content = content };

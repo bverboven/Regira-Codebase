@@ -2,6 +2,7 @@
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Office.Excel.Abstractions;
+using Regira.Office.MimeTypes;
 using Regira.Utilities;
 using System.Data;
 
@@ -63,7 +64,7 @@ public class ExcelManager : IExcelManager
 
     public IMemoryFile Create(ExcelSheet sheet)
     {
-        return Create(new[] { sheet });
+        return Create([sheet]);
     }
     public IMemoryFile Create(DataSet dataSet)
     {
@@ -94,7 +95,7 @@ public class ExcelManager : IExcelManager
         package.Stream.Position = 0;
         package.Stream.CopyTo(ms);
         ms.Position = 0;
-        return ms.ToMemoryFile();
+        return ms.ToMemoryFile(ContentTypes.XLSX);
     }
     public IMemoryFile Create(IEnumerable<ExcelSheet> sheets)
     {
@@ -119,7 +120,7 @@ public class ExcelManager : IExcelManager
         package.Stream.Position = 0;
         package.Stream.CopyTo(ms);
         ms.Position = 0;
-        return ms.ToMemoryFile();
+        return ms.ToMemoryFile(ContentTypes.XLSX);
     }
 
     protected void FillSheet(ExcelWorksheet sheet, IList<IDictionary<string, object?>> data)

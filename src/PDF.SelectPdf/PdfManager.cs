@@ -1,5 +1,6 @@
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
+using Regira.Office.MimeTypes;
 using Regira.Office.PDF.Abstractions;
 using Regira.Office.PDF.Models;
 using Regira.Utilities;
@@ -27,7 +28,7 @@ public class PdfManager : IHtmlToPdfService
         var ms = new MemoryStream();
         doc.Save(ms);
         doc.Close();
-        return ms.ToMemoryFile();
+        return ms.ToMemoryFile(ContentTypes.PDF);
     }
 
     protected PdfDocument GetPdfDocument(HtmlInput template)

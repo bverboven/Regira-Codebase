@@ -6,10 +6,10 @@ namespace Regira.IO.Extensions;
 
 public static class MemoryFileExtensions
 {
-    public static IMemoryFile ToMemoryFile(this byte[] bytes)
-        => new BinaryFileItem { Bytes = bytes };
-    public static IMemoryFile ToMemoryFile(this Stream stream)
-        => new BinaryFileItem { Stream = stream };
+    public static IMemoryFile ToMemoryFile(this byte[] bytes, string? contentType = null)
+        => new BinaryFileItem { Bytes = bytes, Length = bytes?.Length ?? 0, ContentType = contentType };
+    public static IMemoryFile ToMemoryFile(this Stream stream, string? contentType = null)
+        => new BinaryFileItem { Stream = stream, Length = stream?.Length ?? 0, ContentType = contentType };
 
     public static bool HasBytes(this IMemoryFile file)
         => file.Bytes != null;

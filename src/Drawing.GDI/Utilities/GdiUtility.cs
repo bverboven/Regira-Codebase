@@ -36,12 +36,14 @@ public static class GdiUtility
         }
 
         var bytes = stream.ToArray();
+        var imgFormat = format.ToImageFormat();
 
         return new ImageFile
         {
             Bytes = bytes,
             Size = new Size2D(img.Width, img.Height),
-            Format = format.ToImageFormat(),
+            Format = imgFormat,
+            ContentType = $"image/{imgFormat.ToString().ToLower()}",
             Length = bytes.Length
         };
     }
@@ -60,7 +62,7 @@ public static class GdiUtility
 #if NETSTANDARD2_0
         return (Media.Drawing.Enums.ImageFormat)Enum.Parse(typeof(Media.Drawing.Enums.ImageFormat), format.ToString());
 #else
-            return Enum.Parse<Media.Drawing.Enums.ImageFormat>(format.ToString());
+        return Enum.Parse<Media.Drawing.Enums.ImageFormat>(format.ToString());
 #endif
     }
     public static ImageFormat ToGdiImageFormat(this Media.Drawing.Enums.ImageFormat format)

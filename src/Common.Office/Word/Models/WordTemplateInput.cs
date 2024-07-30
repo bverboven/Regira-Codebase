@@ -4,7 +4,7 @@ namespace Regira.Office.Word.Models;
 
 public class WordTemplateInput
 {
-    public IBinaryFile Template { get; set; } = null!;
+    public IMemoryFile Template { get; set; } = null!;
     //public string Filename { get; set; }
     //public Stream TemplateStream { get; set; }
     //public byte[] TemplateBytes { get; set; }

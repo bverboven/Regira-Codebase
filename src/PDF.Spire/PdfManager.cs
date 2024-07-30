@@ -1,14 +1,15 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
-using System.Text;
-using Regira.Drawing.GDI.Utilities;
+﻿using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Abstractions;
+using Regira.Office.MimeTypes;
 using Regira.Office.PDF.Abstractions;
 using Regira.Office.PDF.Models;
 using Spire.Pdf;
 using Spire.Pdf.Graphics;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Text;
 
 namespace Regira.Office.PDF.Spire;
 
@@ -41,7 +42,7 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
         var merged = PdfDocument.MergeFiles(pdfPaths.ToArray());
         var ms = new MemoryStream();
         merged.Save(ms);
-        return ms.ToMemoryFile();
+        return ms.ToMemoryFile(ContentTypes.PDF);
     }
     public IMemoryFile Merge(IEnumerable<IBinaryFile> items)
     {
@@ -93,7 +94,7 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
     {
         var ms = new MemoryStream();
         doc.SaveToStream(ms);
-        return ms.ToMemoryFile();
+        return ms.ToMemoryFile(ContentTypes.PDF);
     }
 
 }

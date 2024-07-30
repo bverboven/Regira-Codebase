@@ -6,6 +6,7 @@ using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Abstractions;
+using Regira.Office.MimeTypes;
 using Regira.Office.PDF.Abstractions;
 using Regira.Office.PDF.Models;
 using System.Drawing;
@@ -14,15 +15,8 @@ using System.Runtime.InteropServices;
 
 namespace Regira.Office.PDF.DocNET;
 
-public class PdfManager : IPdfService
+public class PdfManager(IImageService? imageService = null) : IPdfService
 {
-    private readonly IImageService? _imageService;
-    public PdfManager(IImageService? imageService = null)
-    {
-        _imageService = imageService;
-    }
-
-
     public int GetPageCount(IBinaryFile pdf)
     {
         using var docReader = DocLib.Instance.GetDocReader(pdf.GetBytes(), new PageDimensions());
@@ -35,7 +29,8 @@ public class PdfManager : IPdfService
         foreach (var range in ranges)
         {
             var splitBytes = DocLib.Instance.Split(pdf.GetBytes(), range.Start - 1, (range.End ?? GetPageCount(pdf)) - 1);
-            yield return splitBytes.ToMemoryFile();
+            var file = splitBytes.ToMemoryFile(ContentTypes.PDF);
+            yield return file;
         }
     }
     public IMemoryFile Merge(IEnumerable<string> pdfPaths)
@@ -56,7 +51,7 @@ public class PdfManager : IPdfService
         }
 
         var mergedBytes = DocLib.Instance.Merge(partlyMergedPdfs.ToArray());
-        return mergedBytes.ToMemoryFile();
+        return mergedBytes.ToMemoryFile(ContentTypes.PDF);
     }
     public IMemoryFile? Merge(IEnumerable<IBinaryFile> items)
     {
@@ -70,7 +65,7 @@ public class PdfManager : IPdfService
         var ms = resultBytes != null
             ? new MemoryStream(resultBytes)
             : null;
-        return ms?.ToMemoryFile();
+        return ms?.ToMemoryFile(ContentTypes.PDF);
     }
     public IMemoryFile? RemovePages(IBinaryFile pdf, IEnumerable<int> pages)
     {
@@ -155,7 +150,7 @@ public class PdfManager : IPdfService
 
     public IMemoryFile ImagesToPdf(ImagesInput input)
     {
-        if (_imageService == null)
+        if (imageService == null)
         {
             throw new NullReferenceException($"{nameof(IImageService)} is not initialized");
         }
@@ -168,8 +163,8 @@ public class PdfManager : IPdfService
         var jpegImages = input.Images
             .Select(imgBytes =>
                 {
-                    var imageFile = _imageService.Parse(imgBytes)!;
-                    var resized = _imageService.Resize(imageFile, maxDim);
+                    var imageFile = imageService.Parse(imgBytes)!;
+                    var resized = imageService.Resize(imageFile, maxDim);
                     return new JpegImage
                     {
                         Bytes = resized.Bytes,
@@ -181,7 +176,7 @@ public class PdfManager : IPdfService
             .ToArray();
 
         var pdfBytes = DocLib.Instance.JpegToPdf(jpegImages);
-        return pdfBytes.ToMemoryFile();
+        return pdfBytes.ToMemoryFile(ContentTypes.PDF);
     }
     public IEnumerable<IImageFile> ToImages(IBinaryFile pdf, PdfImageOptions? options = null)
     {

@@ -39,7 +39,5 @@ public class BinaryFileItem : IBinaryFile
         => new() { Bytes = bytes, Length = bytes?.Length ?? 0 };
 
     public void Dispose()
-    {
-        Stream?.Dispose();
-    }
+        => Stream?.Dispose();
 }

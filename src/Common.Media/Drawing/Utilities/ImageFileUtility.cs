@@ -14,6 +14,7 @@ public static class ImageFileUtility
         var bytes = File.ReadAllBytes(path);
         img.Bytes = bytes;
         img.Length = bytes.Length;
+        img.ContentType = ContentTypeUtility.GetContentType(path);
         return img;
     }
     public static IImageFile ToImageFile(this IBinaryFile file)
@@ -29,12 +30,13 @@ public static class ImageFileUtility
         {
             Bytes = file.Bytes,
             Stream = file.Stream,
-            Length = file.GetLength()
+            Length = file.GetLength(),
+            ContentType = file.ContentType,
         };
     }
 
 
-    public static string ToBase64(IMemoryFile file, string contentType = "image/png")
+    public static string ToBase64(IMemoryFile file, string? contentType = null)
     {
         var bytes = file.GetBytes();
         if (bytes?.Any() != true)
@@ -42,12 +44,13 @@ public static class ImageFileUtility
             throw new Exception("Could not get contents of file");
         }
 
+        contentType ??= file.ContentType ?? "image/png";
         return $"data:{contentType};base64,{bytes.GetBase64String()}";
     }
     public static IImageFile FromBase64(string contents)
     {
         string? contentType = null;
-        var firstChars = contents.Truncate(64);
+        var firstChars = contents.Truncate(64)!;
         if (firstChars.Contains(','))
         {
             contentType = firstChars.Split(';').FirstOrDefault()?.Split(':').LastOrDefault();
@@ -58,7 +61,7 @@ public static class ImageFileUtility
         {
             Bytes = bytes,
             Length = bytes.Length,
-            ContentType = contentType
+            ContentType = contentType,
         };
     }
 }
