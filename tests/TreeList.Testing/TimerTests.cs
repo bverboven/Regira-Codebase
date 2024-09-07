@@ -39,8 +39,8 @@ public class TimerTests
         var addByChildrenSelectorAvg = TimeFillByGetChildren(persons, 5);
         var addSelfAvg = TimeAddSelf(persons, 5);
 
-        CollectionAssert.AreEquivalent(addSelfAvg.Tree.Select(n => n.Value), addByParentsSelectorAvg.Tree.Select(n => n.Value));
-        CollectionAssert.AreEquivalent(addByParentsSelectorAvg.Tree.Select(n => n.Value), addByChildrenSelectorAvg.Tree.Select(n => n.Value));
+        Assert.That(addByParentsSelectorAvg.Tree.Select(n => n.Value), Is.EquivalentTo(addSelfAvg.Tree.Select(n => n.Value)));
+        Assert.That(addByChildrenSelectorAvg.Tree.Select(n => n.Value), Is.EquivalentTo(addByParentsSelectorAvg.Tree.Select(n => n.Value)));
     }
     [Test]
     public void Simple()
@@ -54,7 +54,7 @@ public class TimerTests
             ClassicAssert.IsTrue(!listParents.Any() && treeParent == null || listParents.Contains(treeParent));
             var listChildren = persons.Where(p => p.Parent == node.Value).ToArray();
             var treeChildren = node.Children.Select(c => c.Value).ToArray();
-            CollectionAssert.AreEquivalent(listChildren, treeChildren);
+            Assert.That(treeChildren, Is.EquivalentTo(listChildren));
         }
     }
     [Test]

@@ -1,4 +1,5 @@
-﻿using NUnit.Framework.Legacy;
+﻿using Regira.IO.Storage.FileSystem;
+using Regira.System.Projects.Services;
 using Regira.TreeList;
 using System.Diagnostics;
 
@@ -36,22 +37,22 @@ public class CreationTests
         var directories = data.Values;
         var roots = data.Roots;
 
-        ClassicAssert.AreEqual(directories.Length, tree.Count);
-        CollectionAssert.AreEquivalent(roots, tree.Roots.Select(n => n.Value));
+        Assert.That(tree.Count, Is.EqualTo(directories.Length));
+        Assert.That(tree.Roots.Select(n => n.Value), Is.EquivalentTo(roots));
         foreach (var node in tree)
         {
             if (node.Parent == null)
             {
-                CollectionAssert.Contains(roots, node.Value);
+                Assert.That(roots, Has.Member(node.Value));
             }
             else
             {
-                ClassicAssert.AreEqual(node.Parent.Value, Path.GetDirectoryName(node.Value));
+                Assert.That(Path.GetDirectoryName(node.Value), Is.EqualTo(node.Parent.Value));
             }
 
             var subDirectories = Directory.GetDirectories(node.Value).ToArray();
             var childDirectories = node.Children.Select(n => n.Value).ToArray();
-            CollectionAssert.AreEquivalent(subDirectories, childDirectories);
+            Assert.That(childDirectories, Is.EquivalentTo(subDirectories));
         }
     }
     [Test]
@@ -64,7 +65,7 @@ public class CreationTests
         {
             var subDirectories = Directory.GetDirectories(root.Value, string.Empty, SearchOption.AllDirectories);
             var offspring = root.GetOffspring().Select(o => o.Value);
-            CollectionAssert.AreEquivalent(subDirectories, offspring);
+            Assert.That(offspring, Is.EquivalentTo(subDirectories));
         }
     }
     [Test]
@@ -81,7 +82,7 @@ public class CreationTests
             .OrderByDescending(d => d.Split('\\').Length)
             .ThenBy(d => d)
             .First();
-        ClassicAssert.AreEqual(highestSegmentCountDirectory, lowestLevelChild.Value);
+        Assert.That(lowestLevelChild.Value, Is.EqualTo(highestSegmentCountDirectory));
 
         var ancestors = lowestLevelChild.GetAncestors()
             .Select(a => a.Value)
@@ -95,7 +96,7 @@ public class CreationTests
                 r.Add(Path.Combine(_testDirectory, r.LastOrDefault() ?? string.Empty, s));
                 return r;
             });
-        CollectionAssert.AreEquivalent(parentDirectories, ancestors);
+        Assert.That(ancestors, Is.EquivalentTo(parentDirectories));
     }
 
     [Test]
@@ -106,16 +107,16 @@ public class CreationTests
         var roots = data.Roots;
         var items = data.Values;
 
-        ClassicAssert.AreEqual(items.Length, tree.Count);
+        Assert.That(tree.Count, Is.EqualTo(items.Length));
         foreach (var node in tree)
         {
             if (node.Parent == null)
             {
-                CollectionAssert.Contains(roots, node.Value);
+                Assert.That(roots, Has.Member(node.Value));
             }
             else
             {
-                ClassicAssert.AreEqual(node.Parent!.Value.Path, node.Value.ParentDirectory);
+                Assert.That(node.Value.ParentDirectory, Is.EqualTo(node.Parent!.Value.Path));
             }
 
             // only directories can have children
@@ -123,7 +124,7 @@ public class CreationTests
             {
                 var subPaths = Directory.GetDirectories(node.Value.Path).Concat(Directory.GetFiles(node.Value.Path)).ToArray();
                 var childPaths = node.Children.Select(n => n.Value.Path).ToArray();
-                CollectionAssert.AreEquivalent(subPaths, childPaths);
+                Assert.That(childPaths, Is.EquivalentTo(subPaths));
             }
         }
     }
@@ -150,10 +151,53 @@ public class CreationTests
             .Select(n => n.Value)
             .ToArray();
 
-        CollectionAssert.AreNotEqual(sortedItems, treeItems);
-        CollectionAssert.AreEqual(sortedItems, sortedNodeValues);
+        Assert.That(treeItems, Is.Not.EqualTo(sortedItems).AsCollection);
+        Assert.That(sortedNodeValues, Is.EqualTo(sortedItems).AsCollection);
         // slow
-        CollectionAssert.AreEquivalent(sortedItems, treeItems);
+        Assert.That(treeItems, Is.EquivalentTo(sortedItems));
+    }
+
+    string? GetSolutionFolder(string? folder = null)
+    {
+        folder ??= AppContext.BaseDirectory;
+        do
+        {
+            var solutionFiles = Directory.GetFiles(folder, "*.sln", SearchOption.TopDirectoryOnly);
+            if (solutionFiles.Any())
+            {
+                return Path.GetDirectoryName(solutionFiles.First());
+            }
+            folder = Path.GetDirectoryName(folder);
+        } while (folder != null);
+
+        return null;
+    }
+
+    [Test]
+    public async Task ReverseTree()
+    {
+        var pm = new ProjectManager(new ProjectService(new ProjectParser(), new TextFileService(new BinaryFileService.FileServiceOptions { RootFolder = GetSolutionFolder() ?? "" })));
+        var tree = await pm.BuildTree();
+        var reverseTree = tree.ReverseTree();
+        // print tree
+        Debug.Print("TREE");
+        foreach (var node in tree)
+        {
+            Debug.Print($"{"".PadLeft(node.Level * 2, '.')}{node.Value.Title}");
+        }
+        Debug.Print("REVERSE");
+        foreach (var node in reverseTree)
+        {
+            Debug.Print($"{"".PadLeft(node.Level * 2, '.')}{node.Value.Title}");
+        }
+        Assert.That(tree, Is.Not.EqualTo(reverseTree));
+        Assert.That(tree, Is.Not.EquivalentTo(reverseTree));
+        Assert.That(tree.Select(n => n.Value).Distinct(), Is.EquivalentTo(reverseTree.Select(n => n.Value).Distinct()));
+        var treeRootValues = tree.Roots.Select(n => n.Value).Distinct();
+        var reverseTreeNodes = reverseTree.GetSelf(treeRootValues);
+        Assert.That(reverseTreeNodes.All(n => n.Parent != null), Is.True);
+        var reverseTreeBottomNodes = reverseTree.Where(n => !n.Children.Any()).Select(n => n.Value).Distinct();
+        Assert.That(reverseTreeBottomNodes, Is.EquivalentTo(treeRootValues));
     }
 
     [Test]
@@ -166,7 +210,7 @@ public class CreationTests
             .Select(n => n.Value)
             .ToArray();
         var treeView = tree.ToTreeView();
-        CollectionAssert.AreEqual(sortedValues, treeView);
+        Assert.That(treeView, Is.EqualTo(sortedValues).AsCollection);
     }
 
     private TestData<string> GetDirectoryData()

@@ -4,7 +4,9 @@ namespace Regira.TreeList;
 
 public class TreeList<T> : List<TreeNode<T>>
 {
-    public class Options
+    public TreeOptions? Options { get; set; }
+
+    public class TreeOptions
     {
         public bool EnableAutoCheck { get; set; } = true;
         public bool ThrowOnError { get; set; } = true;
@@ -15,31 +17,31 @@ public class TreeList<T> : List<TreeNode<T>>
     public TreeNode<T>[] Roots { get; private set; } = Array.Empty<TreeNode<T>>();
 
 
-    public TreeList(Options? options = null)
+    public TreeList(TreeOptions? options = null)
     {
-        options ??= new Options();
-        EnableAutoCheck = options.EnableAutoCheck;
-        ThrowOnError = options.ThrowOnError;
+        Options ??= options ?? new TreeOptions();
+        EnableAutoCheck = Options.EnableAutoCheck;
+        ThrowOnError = Options.ThrowOnError;
     }
-    public TreeList(int capacity, Options? options = null)
+    public TreeList(int capacity, TreeOptions? options = null)
         : base(capacity)
     {
-        options ??= new Options();
+        options ??= new TreeOptions();
         EnableAutoCheck = options.EnableAutoCheck;
         ThrowOnError = options.ThrowOnError;
     }
-    public TreeList(IEnumerable<T> collection, Options? options = null)
+    public TreeList(IEnumerable<T> collection, TreeOptions? options = null)
     {
-        options ??= new Options();
+        options ??= new TreeOptions();
         EnableAutoCheck = options.EnableAutoCheck;
         ThrowOnError = options.ThrowOnError;
 
         AddValues(collection);
     }
-    public TreeList(IEnumerable<TreeNode<T>> collection, Options? options = null)
+    public TreeList(IEnumerable<TreeNode<T>> collection, TreeOptions? options = null)
         : base(collection)
     {
-        options ??= new Options();
+        options ??= new TreeOptions();
         EnableAutoCheck = options.EnableAutoCheck;
         ThrowOnError = options.ThrowOnError;
 
@@ -151,7 +153,6 @@ public class TreeList<T> : List<TreeNode<T>>
         var items = this.Where(predicate);
         return items.Count(Remove);
     }
-
 
     public bool IsValidChild(TreeNode<T> parent, T child)
     {

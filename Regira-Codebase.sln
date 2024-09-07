@@ -226,7 +226,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barcodes.ZXing", "src\Barco
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Office.Barcodes.Testing", "tests\Office.Barcodes.Testing\Office.Barcodes.Testing.csproj", "{CFF61D12-F788-4B3C-ABDA-E394EBD6BDCF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Barcodes.UziGranot", "src\Barcodes.UziGranot\Barcodes.UziGranot.csproj", "{7B1012BA-F8D4-4CE2-B0C3-A2A9052EBFBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barcodes.UziGranot", "src\Barcodes.UziGranot\Barcodes.UziGranot.csproj", "{7B1012BA-F8D4-4CE2-B0C3-A2A9052EBFBB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Projects", "src\System.Projects\System.Projects.csproj", "{B4C2C455-56AD-4C18-86E4-54BA6457631F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -570,6 +572,10 @@ Global
 		{7B1012BA-F8D4-4CE2-B0C3-A2A9052EBFBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B1012BA-F8D4-4CE2-B0C3-A2A9052EBFBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B1012BA-F8D4-4CE2-B0C3-A2A9052EBFBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4C2C455-56AD-4C18-86E4-54BA6457631F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4C2C455-56AD-4C18-86E4-54BA6457631F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4C2C455-56AD-4C18-86E4-54BA6457631F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4C2C455-56AD-4C18-86E4-54BA6457631F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -681,6 +687,7 @@ Global
 		{F0F38B51-34E4-4DC1-8393-56EABC413149} = {B294E47E-5136-47BF-95EF-B742FA7E0D7B}
 		{CFF61D12-F788-4B3C-ABDA-E394EBD6BDCF} = {C282BB35-A907-4CCC-B5FD-D0ABE60C0EDB}
 		{7B1012BA-F8D4-4CE2-B0C3-A2A9052EBFBB} = {B294E47E-5136-47BF-95EF-B742FA7E0D7B}
+		{B4C2C455-56AD-4C18-86E4-54BA6457631F} = {BDF8C00A-257C-4D5D-BD42-EC9CABE899DB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C20C1CB-93D4-46D3-A172-85F0202D818C}

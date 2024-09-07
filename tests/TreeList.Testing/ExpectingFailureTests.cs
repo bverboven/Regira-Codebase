@@ -19,7 +19,7 @@ public class ExpectingFailureTests
         person0.Parent = person1;
 
         var tree = persons.ToTreeList(p => p.Parent!);
-        CollectionAssert.IsEmpty(tree);
+        Assert.That(tree, Is.Empty);
     }
     [Test]
     public void ToTreeList_With_Invalid_Relation()
@@ -45,7 +45,7 @@ public class ExpectingFailureTests
         var person1 = persons[1];
         var person2 = persons[2];
 
-        var tree = new TreeList<SimplePerson>(new TreeList<SimplePerson>.Options
+        var tree = new TreeList<SimplePerson>(new TreeList<SimplePerson>.TreeOptions
         {
             EnableAutoCheck = true,
             ThrowOnError = false

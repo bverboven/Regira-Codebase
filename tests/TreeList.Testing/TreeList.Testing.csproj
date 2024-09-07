@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Common\Common.csproj" />
+    <ProjectReference Include="..\..\src\System.Projects\System.Projects.csproj" />
     <ProjectReference Include="..\..\src\TreeList\TreeList.csproj" />
   </ItemGroup>
 </Project>
