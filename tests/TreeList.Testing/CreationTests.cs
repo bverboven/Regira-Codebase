@@ -157,7 +157,7 @@ public class CreationTests
         Assert.That(treeItems, Is.EquivalentTo(sortedItems));
     }
 
-    string? GetSolutionFolder(string? folder = null)
+    string? FindSolutionFolder(string? folder = null)
     {
         folder ??= AppContext.BaseDirectory;
         do
@@ -176,7 +176,7 @@ public class CreationTests
     [Test]
     public async Task ReverseTree()
     {
-        var pm = new ProjectManager(new ProjectService(new ProjectParser(), new TextFileService(new BinaryFileService.FileServiceOptions { RootFolder = GetSolutionFolder() ?? "" })));
+        var pm = new ProjectManager(new ProjectService(new ProjectParser(), new TextFileService(new BinaryFileService.FileServiceOptions { RootFolder = FindSolutionFolder() ?? "" })));
         var tree = await pm.BuildTree();
         var reverseTree = tree.ReverseTree();
         // print tree
