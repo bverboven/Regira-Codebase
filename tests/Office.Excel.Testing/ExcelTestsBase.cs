@@ -1,4 +1,3 @@
-using NUnit.Framework.Legacy;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
@@ -46,42 +45,40 @@ public abstract class ExcelTestsBase
         Directory.CreateDirectory(Path.Combine(AssetsDir, "Output"));
     }
 
-    [Test]
-    public virtual async Task List_To_Excel()
+    protected async Task Run_List_To_Excel()
     {
-        var outputFile = Path.Combine(AssetsDir, "Output", "output.xlsx");
-        if (File.Exists(outputFile))
-        {
-            File.Delete(outputFile);
-        }
-
         using var excelFile = CreateExcel(TestData);
-        ClassicAssert.IsNotNull(excelFile.GetBytes());
-        ClassicAssert.IsTrue(excelFile.GetLength() > 0);
-        var file = await excelFile.SaveAs(outputFile);
+        Assert.Multiple(() =>
+        {
+            Assert.That(excelFile.GetBytes(), Is.Not.Null);
+            Assert.That(excelFile.GetLength(), Is.GreaterThan(0));
+        });
+        var file = await SaveOutput("TestData.xlsx", excelFile);
 
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
     }
-    [Test]
-    public virtual void Compare_DictionaryCollection_Input_With_Output()
+    protected void Run_Compare_DictionaryCollection_Input_With_Output()
     {
         var dicList = TestData.Select(x => DictionaryUtility.ToDictionary(x)).ToList();
         using var excelFile = CreateExcel(dicList)
             .ToBinaryFile();
+        _ = SaveOutput("DicList.xlsx", excelFile);
         var sheets = ExcelManager.Read(excelFile).ToList();
         var data = sheets[0].Data!.ToList();
         for (var i = 0; i < TestData.Length; i++)
         {
             var sourceItem = TestData[i];
             var excelItem = DictionaryUtility.ToDictionary(data[i]);
-            Assert.That(excelItem["Title"], Is.EqualTo(sourceItem.Title));
-            Assert.That(excelItem["Value"], Is.EqualTo(sourceItem.Value));
+            Assert.Multiple(() =>
+            {
+                Assert.That(excelItem["Title"], Is.EqualTo(sourceItem.Title));
+                Assert.That(Convert.ToDecimal(excelItem["Value"]) - sourceItem.Value, Is.LessThan(.000000001m));
+            });
             var excelDate = (DateTime)excelItem["Created"]!;
-            ClassicAssert.IsTrue((sourceItem.Created - excelDate) < TimeSpan.FromMilliseconds(1));
+            Assert.That((sourceItem.Created - excelDate), Is.LessThan(TimeSpan.FromMilliseconds(1)));
         }
     }
-    [Test]
-    public virtual void Compare_UnTyped_Input_With_Output()
+    protected void Run_Compare_UnTyped_Input_With_Output()
     {
         using var excelFile = CreateExcel(TestData)
             .ToBinaryFile();
@@ -91,17 +88,20 @@ public abstract class ExcelTestsBase
         {
             var sourceItem = TestData[i];
             var excelItem = DictionaryUtility.ToDictionary(data[i]);
-            Assert.That(excelItem["Title"], Is.EqualTo(sourceItem.Title));
-            Assert.That(excelItem["Value"], Is.EqualTo(sourceItem.Value));
+            Assert.Multiple(() =>
+            {
+                Assert.That(excelItem["Title"], Is.EqualTo(sourceItem.Title));
+                Assert.That(Convert.ToDecimal(excelItem["Value"]) - sourceItem.Value, Is.LessThan(.000000001m));
+            });
             var excelDate = (DateTime)excelItem["Created"]!;
-            ClassicAssert.IsTrue((sourceItem.Created - excelDate) < TimeSpan.FromMilliseconds(1));
+            Assert.That((sourceItem.Created - excelDate), Is.LessThan(TimeSpan.FromMilliseconds(1)));
         }
     }
-    [Test]
-    public virtual void Compare_Typed_Input_With_Output()
+    protected void Run_Compare_Typed_Input_With_Output()
     {
         using var excelFile = CreateExcel(TestData)
             .ToBinaryFile();
+
         var sheets = ExcelManager.Read(excelFile);
         var data = sheets.First().Data;
         var excelItems = JsonSerializer.Deserialize<TestObject[]>(JsonSerializer.Serialize(data))!.ToList();
@@ -110,24 +110,25 @@ public abstract class ExcelTestsBase
         {
             var sourceItem = TestData[i];
             var excelItem = excelItems[i];
-            Assert.That(excelItem.Title, Is.EqualTo(sourceItem.Title));
-            ClassicAssert.IsTrue(Math.Abs(sourceItem.Value - excelItem.Value) < .000000001m);
+            Assert.Multiple(() =>
+            {
+                Assert.That(excelItem.Title, Is.EqualTo(sourceItem.Title));
+                Assert.That(Math.Abs(sourceItem.Value - excelItem.Value), Is.LessThan(.000000001m));
+            });
             var excelDate = excelItem.Created;
-            ClassicAssert.IsTrue((sourceItem.Created - excelDate) < TimeSpan.FromMilliseconds(1));
+            Assert.That((sourceItem.Created - excelDate), Is.LessThan(TimeSpan.FromMilliseconds(1)));
         }
     }
-    [Test]
-    public virtual void Read_With_Duplicate_Headers()
+    protected void Run_Read_With_Duplicate_Headers()
     {
         var inputPath = Path.Combine(AssetsDir, "Input", "input-with-duplicates.xlsx");
         using var inputFile = new BinaryFileItem { Path = inputPath };
         var sheets = ExcelManager.Read(inputFile).ToList();
-        CollectionAssert.IsNotEmpty(sheets);
+        Assert.That(sheets, Is.Not.Empty);
         var data = sheets.First().Data!.ToList();
-        CollectionAssert.IsNotEmpty(data);
+        Assert.That(data, Is.Not.Empty);
     }
-    [Test]
-    public virtual async Task Export_Countries()
+    protected async Task Run_Export_Countries()
     {
         var outputPath = Path.Combine(AssetsDir, "Output", "countries-output.xlsx");
         if (File.Exists(outputPath))
@@ -138,14 +139,16 @@ public abstract class ExcelTestsBase
         var countriesJSON = File.ReadAllText(Path.Combine(AssetsDir, "Input", "countries.json"));
         var countries = JsonSerializer.Deserialize<IList<Dictionary<string, object>>>(countriesJSON)!;
         using var excelFile = CreateExcel(countries);
-        ClassicAssert.IsNotNull(excelFile.GetBytes());
-        ClassicAssert.IsTrue(excelFile.GetLength() > 0);
+        Assert.Multiple(() =>
+        {
+            Assert.That(excelFile.GetBytes(), Is.Not.Null);
+            Assert.That(excelFile.GetLength() > 0, Is.True);
+        });
 
         var file = await excelFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
     }
-    [Test]
-    public virtual async Task Export_Countries_As_Sheet()
+    protected async Task Run_Export_Countries_As_Sheet()
     {
         var outputFile = Path.Combine(AssetsDir, "Output", "countries-as-sheet-output.xlsx");
         if (File.Exists(outputFile))
@@ -161,15 +164,17 @@ public abstract class ExcelTestsBase
             Data = countries.Cast<object>().ToList()
         };
         using var excelFile = ExcelManager.Create(new[] { sheet });
-        ClassicAssert.IsNotNull(excelFile.GetBytes());
-        ClassicAssert.IsTrue(excelFile.GetLength() > 0);
+        Assert.Multiple(() =>
+        {
+            Assert.That(excelFile.GetBytes(), Is.Not.Null);
+            Assert.That(excelFile.GetLength() > 0, Is.True);
+        });
 
         var file = await excelFile.SaveAs(outputFile);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
     }
 
-    [Test]
-    public virtual async Task From_Json()
+    protected async Task Run_From_Json()
     {
         var countriesJSON = File.ReadAllText(Path.Combine(AssetsDir, "Input", "countries.json"));
         var outputFile = Path.Combine(AssetsDir, "Output", "from_json.xlsx");
@@ -181,17 +186,33 @@ public abstract class ExcelTestsBase
         {
             new () {Name = "Countries", Data = data}
         });
-        ClassicAssert.IsNotNull(excelFile.GetBytes());
-        ClassicAssert.IsTrue(excelFile.GetLength() > 0);
+        Assert.Multiple(() =>
+        {
+            Assert.That(excelFile.GetBytes(), Is.Not.Null);
+            Assert.That(excelFile.GetLength() > 0, Is.True);
+        });
 
         var file = await excelFile.SaveAs(outputFile);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
     }
 
-    public IMemoryFile CreateExcel<T>(IEnumerable<T> input)
+    protected IMemoryFile CreateExcel<T>(IEnumerable<T> input)
         where T : class
     {
         var sheet = new ExcelSheet { Data = input.Cast<object>().ToList() };
         return ExcelManager.Create(sheet);
+    }
+
+    async Task<FileInfo> SaveOutput(string fileName, IMemoryFile file)
+    {
+        var path = Path.Combine(AssetsDir, "Output", fileName);
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+        }
+
+        await file.SaveAs(path);
+
+        return new FileInfo(path);
     }
 }

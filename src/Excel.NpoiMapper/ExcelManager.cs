@@ -33,14 +33,12 @@ public class ExcelManager : IExcelManager
         for (var i = 0; i < sheetCount; i++)
         {
             var sheetName = mapper.Workbook.GetSheetName(i);
-            sheets.Add(new ExcelSheet
+            yield return new ExcelSheet
             {
                 Name = sheetName,
                 Data = mapper.Take<object>(i).Select(r => r.Value).ToList()
-            });
+            };
         }
-
-        return sheets;
     }
 
     public IMemoryFile Create(ExcelSheet sheet)

@@ -1,12 +1,12 @@
-using Regira.Office.Excel.EPPlus;
+﻿using Regira.Office.Excel.ClosedXML;
 
 namespace Office.Excel.Testing;
 
 [TestFixture]
 [Parallelizable(ParallelScope.Self)]
-public class EPPlustTests : ExcelTestsBase
+public class ClosedXMLTests : ExcelTestsBase
 {
-    public EPPlustTests()
+    public ClosedXMLTests()
     {
         ExcelManager = new ExcelManager();
     }
