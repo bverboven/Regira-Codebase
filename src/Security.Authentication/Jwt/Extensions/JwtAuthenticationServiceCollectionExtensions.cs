@@ -2,6 +2,7 @@ using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Regira.Security.Authentication.Jwt.Abstraction;
 using Regira.Security.Authentication.Jwt.Models;
 using Regira.Security.Authentication.Jwt.Services;
 using System.IdentityModel.Tokens.Jwt;
@@ -28,7 +29,7 @@ public static class JwtAuthenticationServiceCollectionExtensions
         }
 
         return services
-            .AddTransient(_ => new JwtTokenHelper(options))
+            .AddTransient<ITokenHelper>(_ => new JwtTokenHelper(options))
             .AddAuthentication(options.AuthenticationScheme)
             .AddJwtBearer(options.AuthenticationScheme, x =>
             {

@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Regira.Security.Authentication.Jwt.Abstraction;
 using Regira.Security.Authentication.Jwt.Extensions;
-using Regira.Security.Authentication.Jwt.Services;
 using Regira.Security.Authentication.Web.Constants;
 using Regira.Security.Authentication.Web.Models;
 using Regira.Utilities;
@@ -16,7 +16,7 @@ namespace Regira.Security.Authentication.Web.Controllers;
 
 [ApiController]
 [Route("auth")]
-public abstract class AccountControllerBase<TUser>(JwtTokenHelper tokenHelper, UserManager<TUser> userManager, IUserClaimsPrincipalFactory<TUser> claimsFactory, ILogger? logger = null) : ControllerBase
+public abstract class AccountControllerBase<TUser>(ITokenHelper tokenHelper, UserManager<TUser> userManager, IUserClaimsPrincipalFactory<TUser> claimsFactory, ILogger? logger = null) : ControllerBase
     where TUser : IdentityUser<string>
 {
     [AllowAnonymous]
