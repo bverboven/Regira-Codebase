@@ -28,7 +28,7 @@ public abstract class MailerTestsBase
         };
         var response = await Mailer.Send(msg);
 
-        ClassicAssert.IsTrue(response.Success);
+        Assert.That(response.Success, Is.True);
     }
     public async virtual Task Send_With_Attachment()
     {
@@ -47,6 +47,6 @@ public abstract class MailerTestsBase
         };
         var response = await Mailer.Send(msg);
 
-        ClassicAssert.IsTrue(response.Success);
+        Assert.That(response.Success, Is.True);
     }
 }

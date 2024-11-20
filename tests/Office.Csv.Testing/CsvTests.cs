@@ -36,7 +36,7 @@ public class CsvTests
     {
         var csvMgr = new CsvManager<dynamic>(new CsvManager<dynamic>.Options { Culture = CultureInfo.CurrentCulture });
         var records = await csvMgr.Read(input);
-        CollectionAssert.IsNotEmpty(records);
+        Assert.That(records, Is.Not.Empty);
         ClassicAssert.AreEqual("1", records.First().Id);
         ClassicAssert.AreEqual("one", records.First().Name);
     }
@@ -53,11 +53,11 @@ public class CsvTests
         using var inputFile = new BinaryFileItem { Path = inputPath };
         var cities = await csvMgr.Read(inputFile);
 
-        CollectionAssert.IsNotEmpty(cities);
+        Assert.That(cities, Is.Not.Empty);
         var firstCity = cities.First();
-        ClassicAssert.AreEqual("Youngstown", firstCity.City);
+        Assert.That(firstCity.City, Is.EqualTo("Youngstown"));
         var lastCity = cities.Last();
-        ClassicAssert.AreEqual("Ravenna", lastCity.City);
+        Assert.That(lastCity.City, Is.EqualTo("Ravenna"));
     }
     [Test]
     public async Task Write_Products()
@@ -133,7 +133,7 @@ public class CsvTests
             var p2 = writtenProducts[i];
             foreach (var key in p1.Keys)
             {
-                ClassicAssert.AreEqual(p1[key]?.ToString() ?? string.Empty, p2[key]);
+                Assert.That(p2[key], Is.EqualTo(p1[key]?.ToString() ?? string.Empty));
             }
         }
     }

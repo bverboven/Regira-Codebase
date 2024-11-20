@@ -69,11 +69,11 @@ public class ZipUtilityTests
         }
 
         var unzippedFiles = Directory.GetFiles(targetDir, "*", SearchOption.AllDirectories);
-        CollectionAssert.IsNotEmpty(unzippedFiles);
-        ClassicAssert.AreEqual(files.Length, unzippedFiles.Length);
+        Assert.That(unzippedFiles, Is.Not.Empty);
+        Assert.That(unzippedFiles.Length, Is.EqualTo(files.Length));
         var expectedFiles = files.Select(f => f.Substring(_assetsDir.Length)).ToArray();
         var actualFiles = unzippedFiles.Select(f => f.Substring(targetDir.Length)).ToArray();
-        CollectionAssert.AreEquivalent(expectedFiles, actualFiles);
+        Assert.That(actualFiles, Is.EquivalentTo(expectedFiles));
     }
 
     [Test]
@@ -92,11 +92,11 @@ public class ZipUtilityTests
         var unzippedFiles = Directory.GetFiles(targetDir, "*", SearchOption.AllDirectories);
 
         // test
-        CollectionAssert.IsNotEmpty(unzippedFiles);
-        ClassicAssert.AreEqual(files.Length, unzippedFiles.Length);
+        Assert.That(unzippedFiles, Is.Not.Empty);
+        Assert.That(unzippedFiles.Length, Is.EqualTo(files.Length));
         var expectedFiles = files.Select(f => f.Substring(_assetsDir.Length)).ToArray();
         var actualFiles = unzippedFiles.Select(f => f.Substring(targetDir.Length)).ToArray();
-        CollectionAssert.AreEquivalent(expectedFiles, actualFiles);
+        Assert.That(actualFiles, Is.EquivalentTo(expectedFiles));
     }
     [Test]
     public void Update_Zip_Add_Files()
@@ -127,11 +127,11 @@ public class ZipUtilityTests
         var unzippedFiles = Directory.GetFiles(targetDir, "*", SearchOption.AllDirectories);
 
         // test
-        CollectionAssert.IsNotEmpty(unzippedFiles);
-        ClassicAssert.AreEqual(dir1Files.Length + dir2Files.Length, unzippedFiles.Length);
+        Assert.That(unzippedFiles, Is.Not.Empty);
+        Assert.That(unzippedFiles.Length, Is.EqualTo(dir1Files.Length + dir2Files.Length));
         var expectedFiles = dir1Files.Concat(dir2Files.Select(f2 => f2.Path)).Select(f => f?.Substring(_assetsDir.Length)).ToArray();
         var actualFiles = unzippedFiles.Select(f => f.Substring(targetDir.Length)).ToArray();
-        CollectionAssert.AreEquivalent(expectedFiles, actualFiles);
+        Assert.That(actualFiles, Is.EquivalentTo(expectedFiles));
     }
     [Test]
     public void Update_Zip_Remove_Files()
@@ -154,11 +154,11 @@ public class ZipUtilityTests
         var unzippedFiles = Directory.GetFiles(targetDir, "*", SearchOption.AllDirectories);
 
         // test
-        CollectionAssert.IsNotEmpty(unzippedFiles);
-        ClassicAssert.AreEqual(files.Length - dir2Files.Length, unzippedFiles.Length);
+        Assert.That(unzippedFiles, Is.Not.Empty);
+        Assert.That(unzippedFiles.Length, Is.EqualTo(files.Length - dir2Files.Length));
 
         var expectedFiles = files.Where(f => dir2Files.All(f2 => f2.Path != f)).Select(f => f.Substring(_assetsDir.Length)).ToArray();
         var actualFiles = unzippedFiles.Select(f => f.Substring(targetDir.Length)).ToArray();
-        CollectionAssert.AreEquivalent(expectedFiles, actualFiles);
+        Assert.That(actualFiles, Is.EquivalentTo(expectedFiles));
     }
 }

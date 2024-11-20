@@ -51,7 +51,7 @@ public class TimerTests
         {
             var listParents = persons.Where(p => p.Children.Contains(node.Value)).ToArray();
             var treeParent = node.Parent?.Value;
-            ClassicAssert.IsTrue(!listParents.Any() && treeParent == null || listParents.Contains(treeParent));
+            Assert.That(!listParents.Any() && treeParent == null || listParents.Contains(treeParent), Is.True);
             var listChildren = persons.Where(p => p.Parent == node.Value).ToArray();
             var treeChildren = node.Children.Select(c => c.Value).ToArray();
             Assert.That(treeChildren, Is.EquivalentTo(listChildren));
@@ -74,8 +74,8 @@ public class TimerTests
         TreeNode<SimplePerson> prevNode = null!;
         foreach (var sortedNode in sortedNodes)
         {
-            ClassicAssert.IsTrue(sortedNode.Parent == null || sortedNode.Parent == prevNode || sortedNode.Parent == prevNode?.Parent
-                          || sortedNode.GetAncestors().Intersect(prevNode!.GetAncestors()).Any());
+            Assert.That(sortedNode.Parent == null || sortedNode.Parent == prevNode || sortedNode.Parent == prevNode?.Parent
+                          || sortedNode.GetAncestors().Intersect(prevNode!.GetAncestors()).Any(), Is.True);
             prevNode = sortedNode;
         }
     }
@@ -88,7 +88,7 @@ public class TimerTests
         {
             var listParents = persons.Where(p => p.Contacts.Any(c => c.Contact == node.Value)).ToArray();
             var treeParent = node.Parent?.Value;
-            ClassicAssert.IsTrue(!listParents.Any() && treeParent == null || listParents.Contains(treeParent));
+            Assert.That(!listParents.Any() && treeParent == null || listParents.Contains(treeParent), Is.True);
         }
     }
 

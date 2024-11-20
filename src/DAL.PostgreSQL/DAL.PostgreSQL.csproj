@@ -11,11 +11,11 @@
     <AssemblyName>Regira.DAL.PostgreSQL</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.0.12</Version>
+    <Version>4.0.13</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.35" />
-    <PackageReference Include="Npgsql" Version="8.0.5" />
+    <PackageReference Include="Npgsql" Version="8.0.6" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.System\Common.System.csproj" />

@@ -19,7 +19,7 @@ public class Symmetric_Tests
     {
         var encrypter = new SymmetricEncrypter(new CryptoOptions { Secret = secret });
         var encrypted = encrypter.Encrypt(plaintext);
-        ClassicAssert.AreEqual(expected, encrypted);
+        Assert.That(encrypted, Is.EqualTo(expected));
     }
 
     [TestCase("32087901-04E0-47EB-959E-A3A7EBB36DCD", null, "RHpJu+UBzo7ZiE7QEEJZYh4anOdJPjw/IP7JhDD80eXrdq49zx7Pg0Q7CUiTitZ9")]
@@ -33,7 +33,7 @@ public class Symmetric_Tests
     {
         var decrypter = new SymmetricEncrypter(new CryptoOptions { Secret = secret });
         var decrypted = decrypter.Decrypt(encrypted);
-        ClassicAssert.AreEqual(plaintext, decrypted);
+        Assert.That(decrypted, Is.EqualTo(plaintext));
     }
 
     [Test]
@@ -56,6 +56,6 @@ public class Symmetric_Tests
         var encrypted = encrypter.Encrypt(plaintext);
         var decrypter = new SymmetricEncrypter();
         var decrypted = decrypter.Decrypt(encrypted);
-        ClassicAssert.AreEqual(plaintext, decrypted);
+        Assert.That(decrypted, Is.EqualTo(plaintext));
     }
 }

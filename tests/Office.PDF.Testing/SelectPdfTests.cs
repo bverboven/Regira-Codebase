@@ -49,7 +49,7 @@ public class SelectPdfTests
         using var pdf = pdfPrinter.Create(template);
         using var stream = pdf.GetStream()!;
         ClassicAssert.IsNotNull(stream);
-        ClassicAssert.IsTrue(stream.Length > 0);
+        Assert.That(stream.Length > 0, Is.True);
         var outputPath = Path.Combine(_outputDir, "pdf-table.pdf");
         File.WriteAllBytes(outputPath, FileUtility.GetBytes(stream)!);
     }
@@ -78,7 +78,7 @@ public class SelectPdfTests
         using var pdf = pdfPrinter.Create(template);
         using var stream = pdf.GetStream()!;
         ClassicAssert.IsNotNull(stream);
-        ClassicAssert.IsTrue(stream.Length > 0);
+        Assert.That(stream.Length > 0, Is.True);
         var outputPath = Path.Combine(_outputDir, "pdf-with-parameters.pdf");
         File.WriteAllBytes(outputPath, FileUtility.GetBytes(stream)!);
     }
@@ -110,7 +110,7 @@ public class SelectPdfTests
         using var pdf = pdfPrinter.Create(template);
         using var stream = pdf.GetStream()!;
         ClassicAssert.IsNotNull(stream);
-        ClassicAssert.IsTrue(stream.Length > 0);
+        Assert.That(stream.Length > 0, Is.True);
         var outputPath = Path.Combine(_outputDir, "pdf-with-header.pdf");
         File.WriteAllBytes(outputPath, FileUtility.GetBytes(stream)!);
     }

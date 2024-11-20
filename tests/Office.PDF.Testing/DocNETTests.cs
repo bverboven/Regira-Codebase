@@ -51,7 +51,7 @@ Simple PDF File 2
  Boring. More, a little more text. The end, and just as well.";
         await using var pdfStream = File.OpenRead(Path.Combine(_inputDir, "sample.pdf"));
         var pdfText = _pdfService.GetText(pdfStream.ToBinaryFile());
-        ClassicAssert.AreEqual(expectedText, pdfText);
+        Assert.That(pdfText, Is.EqualTo(expectedText));
     }
 
     [Test]
@@ -66,7 +66,7 @@ Simple PDF File 2
         var inputPageCount = inputDocs.Select(doc => _pdfService.GetPageCount(File.ReadAllBytes(doc).ToBinaryFile())).Sum();
         var mergedPageCount = _pdfService.GetPageCount(merged.ToBinaryFile());
 
-        ClassicAssert.AreEqual(inputPageCount, mergedPageCount);
+        Assert.That(mergedPageCount, Is.EqualTo(inputPageCount));
 
         var outputPath = Path.Combine(_outputDir, "merged-by-path.pdf");
         await File.WriteAllBytesAsync(outputPath, merged.GetBytes()!);
@@ -83,7 +83,7 @@ Simple PDF File 2
         var inputPageCount = inputStreams.Select(doc => _pdfService.GetPageCount(doc)).Sum();
         var mergedPageCount = _pdfService.GetPageCount(merged.ToBinaryFile());
 
-        ClassicAssert.AreEqual(inputPageCount, mergedPageCount);
+        Assert.That(mergedPageCount, Is.EqualTo(inputPageCount));
 
         var outputPath = Path.Combine(_outputDir, "merged-by-stream.pdf");
         await File.WriteAllBytesAsync(outputPath, merged.GetBytes()!);

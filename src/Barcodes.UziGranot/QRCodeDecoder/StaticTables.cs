@@ -47,7 +47,7 @@ namespace QRCodeDecoderLibrary
     internal class StaticTables
     {
         // alignment symbols position as function of dimension
-        internal static readonly byte[][] AlignmentPositionArray =
+        internal static readonly byte[]?[] AlignmentPositionArray =
             {
         null,
         null,

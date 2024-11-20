@@ -46,7 +46,7 @@ public abstract class QRCodeTestsBase
         using var barCodeImg = QRWriter.Create(input);
         await barCodeImg.SaveAs(Path.Combine(OutputDir, $"{outputName}.jpg"));
         ClassicAssert.IsNotNull(barCodeImg.GetBytes());
-        ClassicAssert.IsTrue(barCodeImg.GetLength() > 0);
+        Assert.That(barCodeImg.GetLength() > 0, Is.True);
     }
     public virtual async Task Check_Dimensions(string content, int size)
     {
@@ -64,8 +64,8 @@ public abstract class QRCodeTestsBase
         using var barCodeImg = QRWriter.Create(input);
         await barCodeImg.SaveAs(Path.Combine(OutputDir, $"barcode-{input.Size.Width}x{input.Size.Height}-zxing.jpg"));
         ClassicAssert.IsNotNull(barCodeImg.GetBytes());
-        ClassicAssert.IsTrue(barCodeImg.GetLength() > 0);
-        ClassicAssert.AreEqual(input.Size.Width, barCodeImg.Size?.Width);
+        Assert.That(barCodeImg.GetLength() > 0, Is.True);
+        Assert.That(barCodeImg.Size?.Width, Is.EqualTo(input.Size.Width));
     }
     public virtual void TooLong_Expect_InputException()
     {
@@ -94,7 +94,7 @@ public abstract class QRCodeTestsBase
 
         var result = QRReader.Read(inputImg);
         var content = string.Join(Environment.NewLine, result?.Contents!);
-        ClassicAssert.AreEqual(expectedContent, content);
+        Assert.That(content, Is.EqualTo(expectedContent));
     }
 
     public virtual Task Create_And_Read_QRCode()
@@ -108,7 +108,7 @@ public abstract class QRCodeTestsBase
         var input = "This is a test";
         var inputBytes = QRWriter?.Create(input);
         var content = QRReader.Read(inputBytes!)?.Contents?.FirstOrDefault();
-        ClassicAssert.AreEqual(input, content);
+        Assert.That(content, Is.EqualTo(input));
         return Task.CompletedTask;
     }
 }

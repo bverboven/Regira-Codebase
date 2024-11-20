@@ -56,7 +56,7 @@ public class MollieTests
     public async Task GetPayment()
     {
         var items = (await _repo.List()).AsList();
-        CollectionAssert.IsNotEmpty(items);
+        Assert.That(items, Is.Not.Empty);
         var details = await _repo.Details(items.Last().Id!);
         ClassicAssert.IsNotNull(details);
     }
@@ -66,10 +66,10 @@ public class MollieTests
     {
         var items = (await _repo.List(DictionaryUtility.ToDictionary(new { MinAmount = 5m })))
             .AsList();
-        CollectionAssert.IsNotEmpty(items);
+        Assert.That(items, Is.Not.Empty);
         foreach (var payment in items)
         {
-            ClassicAssert.IsTrue(payment.Amount > 5);
+            Assert.That(payment.Amount > 5, Is.True);
         }
     }
 

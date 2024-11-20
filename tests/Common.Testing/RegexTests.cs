@@ -41,7 +41,7 @@ Vivamus tempus enim lacinia nisi molestie vulputate. Praesent 1:2:3:4:5:6:7:8 tu
     public void TestValidEmail(string? input, bool expected)
     {
         var isValid = RegexUtility.IsValidEmail(input);
-        ClassicAssert.AreEqual(expected, isValid);
+        Assert.That(isValid, Is.EqualTo(expected));
     }
 
     [TestCase("http://regira.com", true)]
@@ -132,9 +132,9 @@ Vivamus tempus enim lacinia nisi molestie vulputate. Praesent 1:2:3:4:5:6:7:8 tu
     {
         var matches = RegexUtility.ExtractEmails(TestInput);
         ClassicAssert.IsNotEmpty(matches);
-        ClassicAssert.IsTrue(matches.Length == 2);
-        CollectionAssert.Contains(matches, "info@regira.com");
-        CollectionAssert.Contains(matches, "bbv.info@regira.com");
+        Assert.That(matches.Length == 2, Is.True);
+        Assert.That(matches, Has.Member("info@regira.com"));
+        Assert.That(matches, Has.Member("bbv.info@regira.com"));
     }
     [Test]
     public void TestExtractUrls()
@@ -142,8 +142,8 @@ Vivamus tempus enim lacinia nisi molestie vulputate. Praesent 1:2:3:4:5:6:7:8 tu
         var matches = RegexUtility.ExtractUrls(TestInput);
         ClassicAssert.IsNotEmpty(matches);
         //Assert.IsTrue(matches.Length == 2);//ToDo: pattern is also extracting parts of email-addresses for now
-        CollectionAssert.Contains(matches, "regira.com");
-        CollectionAssert.Contains(matches, "https://www.regira.com");
+        Assert.That(matches, Has.Member("regira.com"));
+        Assert.That(matches, Has.Member("https://www.regira.com"));
     }
     [Test]
     public void TestExtractPhoneNumbers()
@@ -151,17 +151,17 @@ Vivamus tempus enim lacinia nisi molestie vulputate. Praesent 1:2:3:4:5:6:7:8 tu
         var matches = RegexUtility.ExtractPhoneNumbers(TestInput);
         ClassicAssert.IsNotEmpty(matches);
         //Assert.IsTrue(matches.Length == 3); // also extracting IP 192.168.0.1
-        CollectionAssert.Contains(matches, "+32 3 384 30");
-        CollectionAssert.Contains(matches, "0032 (0)3 384 30 44");
-        CollectionAssert.Contains(matches, "0475 99 99");
+        Assert.That(matches, Has.Member("+32 3 384 30"));
+        Assert.That(matches, Has.Member("0032 (0)3 384 30 44"));
+        Assert.That(matches, Has.Member("0475 99 99"));
     }
     [Test]
     public void TestExtractIPs()
     {
         var matches = RegexUtility.ExtractIPAddresses(TestInput);
         ClassicAssert.IsNotEmpty(matches);
-        ClassicAssert.IsTrue(matches.Length == 2);
-        CollectionAssert.Contains(matches, "192.168.0.1");
-        CollectionAssert.Contains(matches, "1:2:3:4:5:6:7:8");
+        Assert.That(matches.Length == 2, Is.True);
+        Assert.That(matches, Has.Member("192.168.0.1"));
+        Assert.That(matches, Has.Member("1:2:3:4:5:6:7:8"));
     }
 }

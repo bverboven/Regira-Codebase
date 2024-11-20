@@ -1,4 +1,3 @@
-using NUnit.Framework.Legacy;
 using Regira.IO.Models;
 using Regira.IO.Storage;
 using Regira.IO.Storage.Abstractions;
@@ -10,10 +9,10 @@ namespace IO.Testing.Abstractions;
 
 public abstract class FileProcessorTestsBase
 {
-    protected readonly string AssetsDir;
-    protected string TestFolder;
-    protected BinaryFileItem[] TestFiles;
-    protected IFileService FileService;
+    protected readonly string AssetsDir = null!;
+    protected string TestFolder = null!;
+    protected BinaryFileItem[] TestFiles = null!;
+    protected IFileService FileService = null!;
 
     protected FileProcessorTestsBase()
     {
@@ -23,25 +22,25 @@ public abstract class FileProcessorTestsBase
 
 
     [Test]
-    public void Recursive_Directories()
+    public async Task Recursive_Directories()
     {
         var fileProcessor = new FileProcessor(FileService);
         var filesWithRecursiveSearchObject = new List<string>();
-        fileProcessor
-            .ProcessFiles(new FileSearchObject
-            {
-                FolderUri = TestFolder,
-                Recursive = true
-            }, async (f, _) => { filesWithRecursiveSearchObject.Add(f); }, false);
+        await fileProcessor
+              .ProcessFiles(new FileSearchObject
+              {
+                  FolderUri = TestFolder,
+                  Recursive = true
+              }, (f, _) => { filesWithRecursiveSearchObject.Add(f); return Task.CompletedTask; }, false);
 
         var filesFromRecursiveDirectories = new List<string>();
-        fileProcessor
-            .ProcessFiles(new FileSearchObject
-            {
-                FolderUri = TestFolder
-            }, async (f, _) => { filesFromRecursiveDirectories.Add(f); }, true);
+        await fileProcessor
+              .ProcessFiles(new FileSearchObject
+              {
+                  FolderUri = TestFolder
+              }, (f, _) => { filesFromRecursiveDirectories.Add(f); return Task.CompletedTask; }, true);
         //var str = $"new [] {{{string.Join($",{Environment.NewLine}", filesFromRecursiveDirectories.Select(x => $@"@""{x}"""))}}}";
-        CollectionAssert.AreEquivalent(filesWithRecursiveSearchObject, filesFromRecursiveDirectories);
+        Assert.That(filesFromRecursiveDirectories, Is.EquivalentTo(filesWithRecursiveSearchObject));
     }
     [Test]
     public void Recursive_DirectoriesAsync()
@@ -53,7 +52,7 @@ public abstract class FileProcessorTestsBase
             {
                 FolderUri = TestFolder,
                 Recursive = true
-            }, async (f, s) => { filesWithRecursiveSearchObject.Add(f); }, false)
+            }, (f, s) => { filesWithRecursiveSearchObject.Add(f); return Task.CompletedTask; }, false)
             .Wait();
 
         var filesFromRecursiveDirectories = new List<string>();
@@ -61,10 +60,10 @@ public abstract class FileProcessorTestsBase
             .ProcessFiles(new FileSearchObject
             {
                 FolderUri = TestFolder
-            }, async (f, s) => { filesFromRecursiveDirectories.Add(f); }, true)
+            }, (f, s) => { filesFromRecursiveDirectories.Add(f); return Task.CompletedTask; }, true)
             .Wait();
         //var str = $"new [] {{{string.Join($",{Environment.NewLine}", filesFromRecursiveDirectories.Select(x => $@"@""{x}"""))}}}";
-        CollectionAssert.AreEquivalent(filesWithRecursiveSearchObject, filesFromRecursiveDirectories);
+        Assert.That(filesFromRecursiveDirectories, Is.EquivalentTo(filesWithRecursiveSearchObject));
     }
 
 

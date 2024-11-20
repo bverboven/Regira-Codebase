@@ -66,10 +66,10 @@ public class DocumentBuilderTests
             .Build();
 
         var file = await docFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
-        ClassicAssert.IsTrue(file.Length > 0);
+        Assert.That(file.Exists, Is.True);
+        Assert.That(file.Length > 0, Is.True);
 
         var content = manager.GetText(new WordTemplateInput { Template = docFile });
-        ClassicAssert.IsTrue(content.Contains(headingParagraph.Text));
+        Assert.That(content.Contains(headingParagraph.Text), Is.True);
     }
 }

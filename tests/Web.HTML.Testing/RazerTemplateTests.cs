@@ -39,7 +39,7 @@ public class RazerTemplateTests
 
         ClassicAssert.IsNotNull(parsedHtml);
         ClassicAssert.AreNotEqual(inputHtml, parsedHtml);
-        ClassicAssert.IsTrue(parsedHtml.Contains($"<p>Hello {model}!</p>"));
+        Assert.That(parsedHtml.Contains($"<p>Hello {model}!</p>"), Is.True);
 
         File.WriteAllText(Path.Combine(_assetsDir, "Output", "simple-razor.html"), parsedHtml);
     }
@@ -66,10 +66,10 @@ public class RazerTemplateTests
 
         ClassicAssert.IsNotNull(parsedHtml);
         ClassicAssert.AreNotEqual(inputHtml, parsedHtml);
-        ClassicAssert.IsTrue(parsedHtml.Contains($"<p>Order: {model.Title}</p>"));
+        Assert.That(parsedHtml.Contains($"<p>Order: {model.Title}</p>"), Is.True);
         foreach (var orderline in model.OrderLines)
         {
-            ClassicAssert.IsTrue(parsedHtml.Contains($"<li>{orderline.Title}: {orderline.Amount} x {orderline.Price}</li>"));
+            Assert.That(parsedHtml.Contains($"<li>{orderline.Title}: {orderline.Amount} x {orderline.Price}</li>"), Is.True);
         }
 
         File.WriteAllText(Path.Combine(_assetsDir, "Output", "razor-order.html"), parsedHtml);

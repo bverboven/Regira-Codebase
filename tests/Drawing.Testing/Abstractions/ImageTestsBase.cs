@@ -62,10 +62,10 @@ public abstract class ImageTestsBase
 
         await WriteOutput($"{Path.GetFileNameWithoutExtension(filename)}-resized.jpg", resized);
 
-        ClassicAssert.AreEqual(image.Size!.Value.Width, original!.Value.Width);
-        ClassicAssert.AreEqual(image.Size!.Value.Height, original.Value.Height);
-        ClassicAssert.IsTrue(resized.Size!.Value.Width <= wantedSize.Width);
-        ClassicAssert.IsTrue(resized.Size!.Value.Height <= wantedSize.Height);
+        Assert.That(original!.Value.Width, Is.EqualTo(image.Size!.Value.Width));
+        Assert.That(original.Value.Height, Is.EqualTo(image.Size!.Value.Height));
+        Assert.That(resized.Size!.Value.Width <= wantedSize.Width, Is.True);
+        Assert.That(resized.Size!.Value.Height <= wantedSize.Height, Is.True);
     }
 
     [TestCase("img-1.jpg")]
@@ -81,10 +81,10 @@ public abstract class ImageTestsBase
 
         await WriteOutput($"{Path.GetFileNameWithoutExtension(filename)}-resized-fixed.jpg", resized);
 
-        ClassicAssert.AreEqual(image.Size!.Value.Width, original!.Value.Width);
-        ClassicAssert.AreEqual(image.Size!.Value.Height, original.Value.Height);
-        ClassicAssert.AreEqual(resized.Size!.Value.Width, targetSize.Width);
-        ClassicAssert.AreEqual(resized.Size!.Value.Height, targetSize.Height);
+        Assert.That(original!.Value.Width, Is.EqualTo(image.Size!.Value.Width));
+        Assert.That(original.Value.Height, Is.EqualTo(image.Size!.Value.Height));
+        Assert.That(targetSize.Width, Is.EqualTo(resized.Size!.Value.Width));
+        Assert.That(targetSize.Height, Is.EqualTo(resized.Size!.Value.Height));
     }
 
     [Test]
@@ -92,8 +92,8 @@ public abstract class ImageTestsBase
     {
         using var image = await ReadImage("img-1.jpg");
         using var rotatedR = _imageService.Rotate(image, 90);
-        ClassicAssert.AreEqual(image.Size!.Value.Width, rotatedR.Size!.Value.Height);
-        ClassicAssert.AreEqual(image.Size!.Value.Height, rotatedR.Size!.Value.Width);
+        Assert.That(rotatedR.Size!.Value.Height, Is.EqualTo(image.Size!.Value.Width));
+        Assert.That(rotatedR.Size!.Value.Width, Is.EqualTo(image.Size!.Value.Height));
 
         //var target90R = Path.Combine(_assetsDir, "Output", "img-1-90right.jpg");
         //rotatedR.Save(target90R);
@@ -104,8 +104,8 @@ public abstract class ImageTestsBase
     {
         using var image = await ReadImage("img-1.jpg");
         using var rotatedL = _imageService.Rotate(image, -90);
-        ClassicAssert.AreEqual(image.Size!.Value.Width, rotatedL.Size!.Value.Height);
-        ClassicAssert.AreEqual(image.Size!.Value.Height, rotatedL.Size!.Value.Width);
+        Assert.That(rotatedL.Size!.Value.Height, Is.EqualTo(image.Size!.Value.Width));
+        Assert.That(rotatedL.Size!.Value.Width, Is.EqualTo(image.Size!.Value.Height));
 
         //var target90L = Path.Combine(_assetsDir, "Output", "img-1-90left.jpg");
         //rotatedL.Save(target90L);

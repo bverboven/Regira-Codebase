@@ -52,7 +52,7 @@ public class BarcodeTestsBase
         using var barCodeImg = Writer.Create(input);
         await barCodeImg.SaveAs(Path.Combine(OutputDir, $"{outputName}-{input.Format.ToString().ToLowerInvariant()}.jpg"));
         ClassicAssert.IsNotNull(barCodeImg.GetBytes());
-        ClassicAssert.IsTrue(barCodeImg.GetLength() > 0);
+        Assert.That(barCodeImg.GetLength() > 0, Is.True);
     }
     public virtual async Task Check_Dimensions(string content, BarcodeFormat format, int[] size)
     {
@@ -71,9 +71,9 @@ public class BarcodeTestsBase
         using var barCodeImg = Writer.Create(input);
         await barCodeImg.SaveAs(Path.Combine(OutputDir, $"barcode-{input.Format}-{input.Size.Width}x{input.Size.Height}.jpg"));
         ClassicAssert.IsNotNull(barCodeImg.GetBytes());
-        ClassicAssert.IsTrue(barCodeImg.GetLength() > 0);
-        ClassicAssert.AreEqual(input.Size.Width, barCodeImg.Size?.Width);
-        ClassicAssert.AreEqual(input.Size.Height, barCodeImg.Size?.Height);
+        Assert.That(barCodeImg.GetLength() > 0, Is.True);
+        Assert.That(barCodeImg.Size?.Width, Is.EqualTo(input.Size.Width));
+        Assert.That(barCodeImg.Size?.Height, Is.EqualTo(input.Size.Height));
     }
     public virtual void TooLong_Expect_InputException()
     {
@@ -101,7 +101,7 @@ public class BarcodeTestsBase
         var input = new ImageFile().Load(Path.Combine(InputDir, inputImg));
 
         var content = string.Join(Environment.NewLine, Reader.Read(input)?.Contents!);
-        ClassicAssert.AreEqual(expectedContent, content);
+        Assert.That(content, Is.EqualTo(expectedContent));
     }
 
     public virtual Task Create_And_Read_Barcode()
@@ -119,7 +119,7 @@ public class BarcodeTestsBase
         };
         var inputBytes = Writer?.Create(input)!;
         var result = Reader.Read(inputBytes);
-        ClassicAssert.AreEqual(input.Content, result?.Contents?.FirstOrDefault());
+        Assert.That(result?.Contents?.FirstOrDefault(), Is.EqualTo(input.Content));
         return Task.CompletedTask;
     }
 }

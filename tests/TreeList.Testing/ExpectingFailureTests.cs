@@ -55,6 +55,6 @@ public class ExpectingFailureTests
         var node2 = tree.AddValue(person2, node1);
         var invalidNode = tree.AddValue(person0, node2);
 
-        ClassicAssert.IsNull(invalidNode);
+        Assert.That(invalidNode, Is.Null);
     }
 }

@@ -26,7 +26,7 @@ public class PropertyUtility
     {
         Contract.Assert(property != null);
 
-        Name = property.Name;
+        Name = property!.Name;
         _valueGetter = MakeFastPropertyGetter(property);
         _valueSetter = property.SetValue;
     }
@@ -63,9 +63,9 @@ public class PropertyUtility
     {
         Contract.Assert(propertyInfo != null);
 
-        var getMethod = propertyInfo.GetMethod;
+        var getMethod = propertyInfo!.GetMethod;
         Contract.Assert(getMethod != null);
-        Contract.Assert(!getMethod.IsStatic);
+        Contract.Assert(!getMethod!.IsStatic);
         Contract.Assert(getMethod.GetParameters().Length == 0);
 
         // Instance methods in the CLR can be turned into static methods where the first parameter

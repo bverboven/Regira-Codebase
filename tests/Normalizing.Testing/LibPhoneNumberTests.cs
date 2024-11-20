@@ -28,7 +28,7 @@ public class LibPhoneNumberTests
     {
         var output = _formatter.Normalize(input);
 
-        ClassicAssert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 
     [TestCase("+32 486 99 99 99", "+32 486 99 99 99")]
@@ -41,6 +41,6 @@ public class LibPhoneNumberTests
     {
         var output = _formatter.Format(input);
 
-        ClassicAssert.AreEqual(expected, output);
+        Assert.That(output, Is.EqualTo(expected));
     }
 }

@@ -22,7 +22,7 @@ public class BCryptNet_Hash_Tests
 
         var verifier = new Hasher(new CryptoOptions { Secret = secret });
         var success = verifier.Verify(plaintext, hashed);
-        ClassicAssert.IsTrue(success);
+        Assert.That(success, Is.True);
     }
     [Test]
     public void Verify_Hasher_Failure()

@@ -11,7 +11,7 @@
     <AssemblyName>Regira.Office.Excel.NpoiMapper</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.0.15</Version>
+    <Version>4.0.16</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="BouncyCastle.Cryptography" Version="2.4.0" />
@@ -23,6 +23,12 @@
     <PackageReference Include="Npoi.Mapper" Version="4.1.0" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) == 'net6.0' or $(TargetFramework) == 'net8.0'">
-    <PackageReference Include="Npoi.Mapper" Version="6.2.1" />
+    <PackageReference Include="Npoi.Mapper" Version="6.2.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Upgraded for vulnerabilities -->
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.9" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.11" />
+    <PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
   </ItemGroup>
 </Project>

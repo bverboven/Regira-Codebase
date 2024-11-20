@@ -72,70 +72,70 @@ public class CollectionTests
     public void Filter_Non_Existing_Prop()
     {
         var actual = _persons.FilterItems(new { nonExisting = 123 });
-        CollectionAssert.IsEmpty(actual);
+        Assert.That(actual, Is.Empty);
     }
     [Test]
     public void Filter_On_Enum()
     {
         var expected = _persons.Where(x => x.PersonType == PersonType.Brother);
         var actual = _persons.FilterItems(new { personType = PersonType.Brother });
-        CollectionAssert.AreEquivalent(expected, actual);
+        Assert.That(actual, Is.EquivalentTo(expected));
     }
     [Test]
     public void Filter_On_EnumInt()
     {
         var expected = _persons.Where(x => x.PersonType == PersonType.Brother);
         var actual = _persons.FilterItems(new { personType = (int)PersonType.Brother });
-        CollectionAssert.AreEquivalent(expected, actual);
+        Assert.That(actual, Is.EquivalentTo(expected));
     }
     [Test]
     public void Filter_On_EnumString()
     {
         var expected = _persons.Where(x => x.PersonType == PersonType.Brother);
         var actual = _persons.FilterItems(new { personType = "brother" });
-        CollectionAssert.AreEquivalent(expected, actual);
+        Assert.That(actual, Is.EquivalentTo(expected));
     }
     [Test]
     public void Filter_On_Weight()
     {
         var expected = _persons.Where(x => x.Weight == 55);
         var actual = _persons.FilterItems(new { weight = 55 });
-        CollectionAssert.AreEquivalent(expected, actual);
+        Assert.That(actual, Is.EquivalentTo(expected));
     }
     [Test]
     public void Filter_On_MinWeight()
     {
         var expected = _persons.Where(x => x.Weight >= 65);
         var actual = _persons.FilterItems(new { MinWeight = 65 });
-        CollectionAssert.AreEquivalent(expected, actual);
+        Assert.That(actual, Is.EquivalentTo(expected));
     }
     [Test]
     public void Filter_On_MaxWeight()
     {
         var expected = _persons.Where(x => x.Weight <= 70);
         var actual = _persons.FilterItems(new { MaxWeight = 70 });
-        CollectionAssert.AreEquivalent(expected, actual);
+        Assert.That(actual, Is.EquivalentTo(expected));
     }
     [Test]
     public void Filter_On_StringContains()
     {
         var expected = _persons.Where(x => x.Name?.Contains("ver", StringComparison.InvariantCultureIgnoreCase) == true);
         var actual = _persons.FilterItems(new { Name = "*ver*" });
-        CollectionAssert.AreEquivalent(expected, actual);
+        Assert.That(actual, Is.EquivalentTo(expected));
     }
     [Test]
     public void Filter_On_StringStartsWith()
     {
         var expected = _persons.Where(x => x.Name?.StartsWith("jan", StringComparison.InvariantCultureIgnoreCase) == true);
         var actual = _persons.FilterItems(new { Name = "jan*" });
-        CollectionAssert.AreEquivalent(expected, actual);
+        Assert.That(actual, Is.EquivalentTo(expected));
     }
     [Test]
     public void Filter_On_StringEndsWith()
     {
         var expected = _persons.Where(x => x.Name?.EndsWith("boven", StringComparison.InvariantCultureIgnoreCase) == true);
         var actual = _persons.FilterItems(new { Name = "*boven" });
-        CollectionAssert.AreEquivalent(expected, actual);
+        Assert.That(actual, Is.EquivalentTo(expected));
     }
     [Test]
     public void Filter_On_Nested_Prop()
@@ -143,7 +143,7 @@ public class CollectionTests
         var expected = _persons.Where(x => x.Spouse?.Id == 3);
         var so = new { spouse = new { id = 3 } };
         var actual = _persons.FilterItems(so);
-        CollectionAssert.AreEquivalent(expected, actual);
+        Assert.That(actual, Is.EquivalentTo(expected));
     }
     [Test]
     public void Filter_Combined()
@@ -159,7 +159,7 @@ public class CollectionTests
             Spouse = new { id = 6 }
         };
         var actual = _persons.FilterItems(so);
-        CollectionAssert.AreEquivalent(expected, actual);
+        Assert.That(actual, Is.EquivalentTo(expected));
     }
 
     [Test]
@@ -178,13 +178,13 @@ public class CollectionTests
             };
         });
 
-        ClassicAssert.AreEqual(testItems.Count, indexDic.Count);
+        Assert.That(indexDic.Count, Is.EqualTo(testItems.Count));
 
         var fileLines = await File.ReadAllLinesAsync(tempFile);
         foreach (var kvp in indexDic)
         {
             var expected = Array.IndexOf(fileLines, kvp.value);
-            ClassicAssert.AreEqual(expected, kvp.index);
+            Assert.That(kvp.index, Is.EqualTo(expected));
         }
         File.Delete(tempFile);
     }

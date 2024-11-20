@@ -1,6 +1,7 @@
 ﻿using Regira.IO.Storage.Compression;
 using Regira.IO.Storage.FileSystem;
 using Regira.ProjectBackupConsole;
+using static Regira.IO.Storage.FileSystem.BinaryFileService;
 
 var rootIndex = Array.IndexOf(args, "-root");
 var rootPath = Environment.CurrentDirectory;
@@ -17,7 +18,7 @@ if (outputDirIndex != -1 && outputDirIndex + 1 < args.Length)
 
 var rootDir = new DirectoryInfo(rootPath);
 
-var fileService = new BinaryFileService(rootDir.FullName);
+var fileService = new BinaryFileService(new FileServiceOptions { RootFolder = rootDir.FullName });
 var zipBuilder = new ZipBuilder();
 
 Console.WriteLine($"Zipping {rootDir.FullName}");

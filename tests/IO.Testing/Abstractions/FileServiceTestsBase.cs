@@ -26,35 +26,35 @@ public abstract class FileServiceTestsBase
     public virtual void Expect_Empty_Folder()
     {
         var files = GetStorageFiles(TestFolder);
-        CollectionAssert.IsEmpty(files);
+        Assert.That(files, Is.Empty);
     }
     [Test]
     public virtual void Create_Files()
     {
         var savedFiles = SaveTestFiles(TestFolder);
-        ClassicAssert.AreEqual(Testfiles.Length, savedFiles.Length);
+        Assert.That(savedFiles.Length, Is.EqualTo(Testfiles.Length));
         var files = GetStorageFiles(TestFolder);
-        ClassicAssert.AreEqual(Testfiles.Length, files.Count());
+        Assert.That(files.Count(), Is.EqualTo(Testfiles.Length));
         foreach (var file in Testfiles)
         {
             var identifier = GetFullIdentifier(TestFolder, file.Identifier!);
-            ClassicAssert.IsTrue(FileService.Exists(identifier).Result);
+            Assert.That(FileService.Exists(identifier).Result, Is.True);
         }
     }
     [Test]
     public virtual void Update_Files()
     {
         var createdFiles = SaveTestFiles(TestFolder);
-        ClassicAssert.AreEqual(Testfiles.Length, createdFiles.Length);
+        Assert.That(createdFiles.Length, Is.EqualTo(Testfiles.Length));
         // save again (update)
         var updatedFiles = SaveTestFiles(TestFolder);
-        ClassicAssert.AreEqual(createdFiles.Length, updatedFiles.Length);
+        Assert.That(updatedFiles.Length, Is.EqualTo(createdFiles.Length));
         var files = GetStorageFiles(TestFolder);
-        ClassicAssert.AreEqual(Testfiles.Length, files.Count());
+        Assert.That(files.Count(), Is.EqualTo(Testfiles.Length));
         foreach (var file in Testfiles)
         {
             var identifier = GetFullIdentifier(TestFolder, file.Identifier!);
-            ClassicAssert.IsTrue(FileService.Exists(identifier).Result);
+            Assert.That(FileService.Exists(identifier).Result, Is.True);
         }
     }
     [Test]
@@ -62,13 +62,13 @@ public abstract class FileServiceTestsBase
     {
         var savedFiles = SaveTestFiles(TestFolder);
         var files1 = GetStorageFiles(TestFolder);
-        CollectionAssert.IsNotEmpty(files1);
+        Assert.That(files1, Is.Not.Empty);
         foreach (var file in savedFiles)
         {
             FileService.Delete(file).Wait();
         }
         var files2 = GetStorageFiles(TestFolder);
-        CollectionAssert.IsEmpty(files2);
+        Assert.That(files2, Is.Empty);
     }
     [Test]
     public virtual void Check_Bytes()
@@ -79,7 +79,7 @@ public abstract class FileServiceTestsBase
             var testBytes = file.Bytes;
             var identifier = GetFullIdentifier(TestFolder, file.Identifier!);
             var blobBytes = FileService.GetBytes(identifier).Result;
-            CollectionAssert.AreEqual(testBytes, blobBytes);
+            Assert.That(blobBytes, Is.EqualTo(testBytes).AsCollection);
         }
     }
     [Test]
@@ -91,9 +91,9 @@ public abstract class FileServiceTestsBase
             FolderUri = $@"{TestFolder}/dir2/dir2.2"
         };
         var files = (await FileService.List(so)).AsList();
-        CollectionAssert.IsNotEmpty(files);
+        Assert.That(files, Is.Not.Empty);
         var sourceFiles = Directory.GetFiles(Path.Combine(SourceFolder, "dir2", "dir2.2"));
-        CollectionAssert.AreEquivalent(sourceFiles.Select(Path.GetFileName), files.Select(Path.GetFileName));
+        Assert.That(files.Select(Path.GetFileName), Is.EquivalentTo(sourceFiles.Select(Path.GetFileName)));
     }
     [Test]
     public virtual async Task Filter_Recursive()
@@ -105,11 +105,11 @@ public abstract class FileServiceTestsBase
             Recursive = true,
         };
         var files = (await FileService.List(so)).AsList();
-        CollectionAssert.IsNotEmpty(files);
+        Assert.That(files, Is.Not.Empty);
         var sourceFiles = Directory.GetFiles(SourceFolder, "", SearchOption.AllDirectories);
         var sourceFolders = Directory.GetDirectories(SourceFolder, "", SearchOption.AllDirectories);
-        ClassicAssert.AreEqual(sourceFiles.Concat(sourceFolders).Count(), files.Count);
-        CollectionAssert.AreEquivalent(sourceFiles.Concat(sourceFolders).Select(Path.GetFileName), files.Select(Path.GetFileName));
+        Assert.That(files.Count, Is.EqualTo(sourceFiles.Concat(sourceFolders).Count()));
+        Assert.That(files.Select(Path.GetFileName), Is.EquivalentTo(sourceFiles.Concat(sourceFolders).Select(Path.GetFileName)));
     }
     [Test]
     public virtual async Task Filter_By_EntryType()
@@ -123,7 +123,7 @@ public abstract class FileServiceTestsBase
             Type = FileEntryTypes.Files
         };
         var files = (await FileService.List(so)).AsList();
-        CollectionAssert.IsNotEmpty(files);
+        Assert.That(files, Is.Not.Empty);
         // folders
         so = new FileSearchObject
         {
@@ -132,7 +132,7 @@ public abstract class FileServiceTestsBase
             Type = FileEntryTypes.Directories
         };
         var folders = (await FileService.List(so)).AsList();
-        CollectionAssert.IsNotEmpty(folders);
+        Assert.That(folders, Is.Not.Empty);
         // both
         so = new FileSearchObject
         {
@@ -141,8 +141,8 @@ public abstract class FileServiceTestsBase
             Type = FileEntryTypes.All
         };
         var both = (await FileService.List(so)).AsList();
-        CollectionAssert.IsNotEmpty(both);
-        CollectionAssert.AreEquivalent(folders.Concat(files), both);
+        Assert.That(both, Is.Not.Empty);
+        Assert.That(both, Is.EquivalentTo(folders.Concat(files)));
     }
     [Test]
     public virtual async Task Filter_By_Extension()
@@ -155,12 +155,12 @@ public abstract class FileServiceTestsBase
             Extensions = new[] { ".log", ".text" }
         };
         var files = (await FileService.List(so)).AsList();
-        CollectionAssert.IsNotEmpty(files);
+        Assert.That(files, Is.Not.Empty);
         var sourceFiles = Directory.GetFiles(SourceFolder, "", SearchOption.AllDirectories).Where(f => so.Extensions.Any(f.EndsWith)).ToArray();
         var sourceFolders = Directory.GetDirectories(SourceFolder, "", SearchOption.AllDirectories)
             .Where(d => sourceFiles.Any(f => f.StartsWith(d)))
             .Distinct();
-        CollectionAssert.AreEquivalent(sourceFolders.Concat(sourceFiles).Select(Path.GetFileName), files.Select(Path.GetFileName));
+        Assert.That(files.Select(Path.GetFileName), Is.EquivalentTo(sourceFolders.Concat(sourceFiles).Select(Path.GetFileName)));
     }
 
 

@@ -11,12 +11,12 @@
     <AssemblyName>Regira.Office.OCR.PaddleOCR</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.0.15</Version>
+    <Version>4.0.16</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.10.0.20240616" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.10.0.20241108" />
     <PackageReference Include="Sdcb.PaddleInference" Version="2.5.0.1" />
-    <PackageReference Include="Sdcb.PaddleInference.runtime.win64.mkl" Version="2.5.1" />
+    <PackageReference Include="Sdcb.PaddleInference.runtime.win64.mkl" Version="2.6.1" />
     <!-- Keep using v2.6.0.5, v2.7.* causes error: Could not load type Sdcb.PaddleOCR.Models.Details.VersionedRecognizationModel />-->
     <PackageReference Include="Sdcb.PaddleOCR" Version="2.6.0.5" />
     <!-- Keep using v2.6.0.5, in v2.7.0.1 LocalFullModels is not available -->

@@ -1,5 +1,6 @@
 ﻿using IO.Testing.Abstractions;
 using Regira.IO.Storage.FileSystem;
+using static Regira.IO.Storage.FileSystem.BinaryFileService;
 
 namespace IO.Testing.FileSystem;
 
@@ -11,7 +12,7 @@ public class FsStorageTests : FileServiceTestsBase
     public void Setup()
     {
         Testfiles = GetTestFiles(SourceFolder).ToArray();
-        FileService = new BinaryFileService(AssetsDir);
+        FileService = new BinaryFileService(new FileServiceOptions { RootFolder = AssetsDir });
     }
     [TearDown]
     public void TearDown()

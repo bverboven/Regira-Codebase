@@ -13,11 +13,19 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthentic
     // https://josef.codes/asp-net-core-protect-your-api-with-api-keys/
 
     private readonly IApiKeyOwnerService _apiKeyOwnerService;
+#if NET8_0_OR_GREATER
+    public ApiKeyAuthenticationHandler(IOptionsMonitor<ApiKeyAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, IApiKeyOwnerService apiKeyOwnerService)
+        : base(options, logger, encoder)
+    {
+        _apiKeyOwnerService = apiKeyOwnerService ?? throw new ArgumentNullException(nameof(apiKeyOwnerService));
+    }
+#else
     public ApiKeyAuthenticationHandler(IOptionsMonitor<ApiKeyAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IApiKeyOwnerService apiKeyOwnerService)
         : base(options, logger, encoder, clock)
     {
         _apiKeyOwnerService = apiKeyOwnerService ?? throw new ArgumentNullException(nameof(apiKeyOwnerService));
     }
+#endif
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {

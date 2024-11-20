@@ -44,7 +44,7 @@ public class RepositoryTests : IDisposable
     {
         var person = new Person { Title = "B.Verboven", BirthDate = new DateTime(1980, 5, 6) };
         var affected = await _personRepo.Save(person);
-        ClassicAssert.AreEqual(1, affected);
+        Assert.That(affected, Is.EqualTo(1));
         ClassicAssert.IsNotNull(person.Id);
 
         await _personRepo.Delete(person);
@@ -54,7 +54,7 @@ public class RepositoryTests : IDisposable
     {
         var person = new Person { Id = Guid.NewGuid().ToString(), Title = "B.Verboven", BirthDate = new DateTime(1980, 5, 6) };
         var affected = await _personRepo.Save(person);
-        ClassicAssert.AreEqual(1, affected);
+        Assert.That(affected, Is.EqualTo(1));
         ClassicAssert.IsNotNull(person.Id);
 
         await _personRepo.Delete(person);
@@ -65,7 +65,7 @@ public class RepositoryTests : IDisposable
     {
         var item = new Config { ConfigId = "123456", Key = "MyKey", Value = "Testing" };
         var affected = await _configRepo.Save(item);
-        ClassicAssert.AreEqual(1, affected);
+        Assert.That(affected, Is.EqualTo(1));
 
         await _configRepo.Delete(item);
     }
@@ -78,7 +78,7 @@ public class RepositoryTests : IDisposable
 
         var persons = (await _personRepo.List(new { person.Id })).AsList();
         ClassicAssert.IsNotEmpty(persons);
-        ClassicAssert.AreEqual(1, persons.Count);
+        Assert.That(persons.Count, Is.EqualTo(1));
 
         await _personRepo.Delete(person);
     }
@@ -101,13 +101,13 @@ public class RepositoryTests : IDisposable
         var person = new Person { Title = "B.Verboven", BirthDate = new DateTime(1980, 5, 6) };
         await _personRepo.Save(person);
 
-        ClassicAssert.AreEqual(new DateTime(1980, 5, 6), person.BirthDate);
+        Assert.That(person.BirthDate, Is.EqualTo(new DateTime(1980, 5, 6)));
         // ReSharper disable once PossibleInvalidOperationException
         person.BirthDate = person.BirthDate.Value.AddYears(-1);
         var affected = await _personRepo.Save(person);
-        ClassicAssert.AreEqual(1, affected);
+        Assert.That(affected, Is.EqualTo(1));
         var person2 = (await _personRepo.List(new { person.Id })).First();
-        ClassicAssert.AreEqual(new DateTime(1979, 5, 6), person2.BirthDate);
+        Assert.That(person2.BirthDate, Is.EqualTo(new DateTime(1979, 5, 6)));
 
         await _personRepo.Delete(person);
     }
@@ -119,13 +119,13 @@ public class RepositoryTests : IDisposable
         var person = new Person { Id = personId, Title = "B.Verboven", BirthDate = new DateTime(1980, 5, 6) };
         await _personRepo.Save(person);
 
-        ClassicAssert.AreEqual(new DateTime(1980, 5, 6), person.BirthDate);
+        Assert.That(person.BirthDate, Is.EqualTo(new DateTime(1980, 5, 6)));
         // ReSharper disable once PossibleInvalidOperationException
         person.BirthDate = person.BirthDate.Value.AddYears(-1);
         var affected = await _personRepo.Save(person);
-        ClassicAssert.AreEqual(1, affected);
+        Assert.That(affected, Is.EqualTo(1));
         var person2 = await _personRepo.Details(personId);
-        ClassicAssert.AreEqual(new DateTime(1979, 5, 6), person2!.BirthDate);
+        Assert.That(person2!.BirthDate, Is.EqualTo(new DateTime(1979, 5, 6)));
 
         await _personRepo.Delete(person);
     }
@@ -137,7 +137,7 @@ public class RepositoryTests : IDisposable
         await _personRepo.Save(person);
 
         var affected = await _personRepo.Delete(person);
-        ClassicAssert.AreEqual(1, affected);
+        Assert.That(affected, Is.EqualTo(1));
         var persons = await _personRepo.List(new { person.Id });
         ClassicAssert.IsEmpty(persons);
     }
@@ -148,7 +148,7 @@ public class RepositoryTests : IDisposable
         await _personRepo.Save(person);
 
         var affected = await _personRepo.Delete(person);
-        ClassicAssert.AreEqual(1, affected);
+        Assert.That(affected, Is.EqualTo(1));
         var persons = await _personRepo.List(new { person.Id });
         ClassicAssert.IsEmpty(persons);
     }

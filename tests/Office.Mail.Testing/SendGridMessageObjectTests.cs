@@ -29,24 +29,24 @@ public class SendGridMessageObjectTests
         // added [assembly: InternalsVisibleTo("Mail.Testing")] to internal Sendgrid extensions
         var sgMsg = msg.ToMailMessage();
 
-        ClassicAssert.AreEqual(msg.From?.Email, sgMsg.From?.Email);
-        ClassicAssert.AreEqual(msg.From?.DisplayName, sgMsg.From?.Name);
+        Assert.That(sgMsg.From?.Email, Is.EqualTo(msg.From?.Email));
+        Assert.That(sgMsg.From?.Name, Is.EqualTo(msg.From?.DisplayName));
 
-        ClassicAssert.AreEqual(msg.ReplyTo?.Email, sgMsg.ReplyTo?.Email);
-        ClassicAssert.AreEqual(msg.ReplyTo?.DisplayName, sgMsg.ReplyTo?.Name);
+        Assert.That(sgMsg.ReplyTo?.Email, Is.EqualTo(msg.ReplyTo?.Email));
+        Assert.That(sgMsg.ReplyTo?.Name, Is.EqualTo(msg.ReplyTo?.DisplayName));
 
         // Cannot test recipients -> no such getter on SendGrid's MailMessage object
 
-        ClassicAssert.AreEqual(msg.Subject, sgMsg.Subject);
+        Assert.That(sgMsg.Subject, Is.EqualTo(msg.Subject));
         if (msg.IsHtml)
         {
-            ClassicAssert.AreEqual(msg.Body, sgMsg.HtmlContent);
-            ClassicAssert.IsNull(sgMsg.PlainTextContent);
+            Assert.That(sgMsg.HtmlContent, Is.EqualTo(msg.Body));
+            Assert.That(sgMsg.PlainTextContent, Is.Null);
         }
         else
         {
-            ClassicAssert.AreEqual(msg.Body, sgMsg.PlainTextContent);
-            ClassicAssert.IsNull(sgMsg.HtmlContent);
+            Assert.That(sgMsg.PlainTextContent, Is.EqualTo(msg.Body));
+            Assert.That(sgMsg.HtmlContent, Is.Null);
         }
     }
 }

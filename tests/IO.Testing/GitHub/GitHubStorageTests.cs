@@ -17,7 +17,7 @@ public class GitHubStorageTests
     {
         var fileService = GetFileService();
         var files = (await fileService.List()).AsList();
-        CollectionAssert.IsNotEmpty(files);
+        Assert.That(files, Is.Not.Empty);
     }
     [Test]
     public virtual async Task Filter_By_Folder()
@@ -28,7 +28,7 @@ public class GitHubStorageTests
         };
         var fileService = GetFileService();
         var files = (await fileService.List(so)).AsList();
-        CollectionAssert.IsNotEmpty(files);
+        Assert.That(files, Is.Not.Empty);
     }
     [Test]
     public virtual async Task Filter_Recursive()
@@ -39,7 +39,7 @@ public class GitHubStorageTests
         };
         var fileService = GetFileService();
         var files = (await fileService.List(so)).AsList();
-        CollectionAssert.IsNotEmpty(files);
+        Assert.That(files, Is.Not.Empty);
     }
     [Test]
     public virtual async Task Filter_By_EntryType()
@@ -52,7 +52,7 @@ public class GitHubStorageTests
         };
         var fileService = GetFileService();
         var files = (await fileService.List(so)).AsList();
-        CollectionAssert.IsNotEmpty(files);
+        Assert.That(files, Is.Not.Empty);
         // folders
         so = new FileSearchObject
         {
@@ -60,7 +60,7 @@ public class GitHubStorageTests
             Type = FileEntryTypes.Directories
         };
         var folders = (await fileService.List(so)).AsList();
-        CollectionAssert.IsNotEmpty(folders);
+        Assert.That(folders, Is.Not.Empty);
         // both
         so = new FileSearchObject
         {
@@ -68,8 +68,8 @@ public class GitHubStorageTests
             Type = FileEntryTypes.All
         };
         var both = (await fileService.List(so)).AsList();
-        CollectionAssert.IsNotEmpty(both);
-        CollectionAssert.AreEquivalent(folders.Concat(files), both);
+        Assert.That(both, Is.Not.Empty);
+        Assert.That(both, Is.EquivalentTo(folders.Concat(files)));
     }
     [Test]
     public virtual async Task Filter_By_Extension()
@@ -81,11 +81,11 @@ public class GitHubStorageTests
         };
         var fileService = GetFileService();
         var files = (await fileService.List(so)).AsList();
-        CollectionAssert.IsNotEmpty(files);
+        Assert.That(files, Is.Not.Empty);
         foreach (var file in files)
         {
             var pathWithoutQuery = file.Split('?').First();
-            ClassicAssert.IsTrue(so.Extensions.Any(e => pathWithoutQuery.EndsWith(e, StringComparison.CurrentCultureIgnoreCase)));
+            Assert.That(so.Extensions.Any(e => pathWithoutQuery.EndsWith(e, StringComparison.CurrentCultureIgnoreCase)), Is.True);
         }
     }
     [Test]
@@ -99,13 +99,13 @@ public class GitHubStorageTests
             Recursive = true
         };
         var files = (await fileService.List(fso)).AsList();
-        CollectionAssert.IsNotEmpty(files);
+        Assert.That(files, Is.Not.Empty);
         // Getting file contents is sometimes very slow (penalty for testing too much?)
         foreach (var file in files.Take(1))
         {
             var bytes = await fileService.GetBytes(file);
             ClassicAssert.IsNotNull(bytes);
-            ClassicAssert.IsTrue(bytes!.Length > 0);
+            Assert.That(bytes!.Length > 0, Is.True);
         }
     }
 

@@ -12,8 +12,8 @@ public class CountryUtilityTests
     {
         var countries = CountryUtility.GetAllCountries()
             .ToArray();
-        CollectionAssert.IsNotEmpty(countries);
-        CollectionAssert.AllItemsAreUnique(countries);
+        Assert.That(countries, Is.Not.Empty);
+        Assert.That(countries, Is.Unique);
     }
 
     [TestCase("BE", "Belgium")]
@@ -61,6 +61,6 @@ public class CountryUtilityTests
     public void Test_Get_By_Language(string lang, string[] expectedCodes)
     {
         var countries = CountryUtility.GetCountriesByLanguage(lang);
-        CollectionAssert.AreEquivalent(expectedCodes, countries.Select(c => c.Iso2Code));
+        Assert.That(countries.Select(c => c.Iso2Code), Is.EquivalentTo(expectedCodes));
     }
 }

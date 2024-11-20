@@ -47,7 +47,7 @@ public class WordTests
         using var outputFile = mgr.Create(input);
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
     }
 
@@ -74,11 +74,11 @@ public class WordTests
         using var outputFile = mgr.Create(input);
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
         var hasPi = HasContent(outputFile.ToBinaryFile(), pi);
-        ClassicAssert.IsTrue(hasPi);
+        Assert.That(hasPi, Is.True);
     }
     [Test]
     public async Task Merge()
@@ -117,13 +117,13 @@ public class WordTests
         mergedInputs.Select(x => x.Template).Dispose();
         headerFooterInput.Headers.Concat(headerFooterInput.Footers).Select(x => x.Template.Template).Dispose();
 
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
         var hasDoc1Content = HasContent(outputFile, "Vertical images");
-        ClassicAssert.IsTrue(hasDoc1Content);
+        Assert.That(hasDoc1Content, Is.True);
         var hasDoc2Content = HasContent(outputFile, "Some text in Arial");
-        ClassicAssert.IsTrue(hasDoc2Content);
+        Assert.That(hasDoc2Content, Is.True);
     }
     [Test]
     public async Task Add_Header_And_Footer()
@@ -154,13 +154,13 @@ public class WordTests
         input.Headers.Concat(input.Footers).Select(x => x.Template.Template).Dispose();
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
         var hasHeader = HasContent(outputFile, "Header");
-        ClassicAssert.IsTrue(hasHeader);
+        Assert.That(hasHeader, Is.True);
         var hasFooter = HasContent(outputFile, "Testing by");
-        ClassicAssert.IsTrue(hasFooter);
+        Assert.That(hasFooter, Is.True);
         var hasJibberisch = HasContent(outputFile, "Jibberisch");
         ClassicAssert.IsFalse(hasJibberisch);
     }
@@ -191,13 +191,13 @@ public class WordTests
         input.Headers.Concat(input.Footers).Select(x => x.Template.Template).Dispose();
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
         var hasHeader = HasContent(outputFile, "Header");
-        ClassicAssert.IsTrue(hasHeader);
+        Assert.That(hasHeader, Is.True);
         var hasFooter = HasContent(outputFile, "Testing by");
-        ClassicAssert.IsTrue(hasFooter);
+        Assert.That(hasFooter, Is.True);
         var hasJibberisch = HasContent(outputFile, "Jibberisch");
         ClassicAssert.IsFalse(hasJibberisch);
     }
@@ -226,13 +226,13 @@ public class WordTests
             .ToBinaryFile();
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
         foreach (var parameterValue in parameters.Values)
         {
             var hasParameter = HasContent(outputFile, parameterValue.ToString()!);
-            ClassicAssert.IsTrue(hasParameter);
+            Assert.That(hasParameter, Is.True);
         }
     }
     // skipping Insert_Image() ...
@@ -263,7 +263,7 @@ public class WordTests
             .ToBinaryFile();
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
     }
     // skipping Insert_Table() ...
@@ -297,11 +297,11 @@ public class WordTests
 
         var file = await outputFile.SaveAs(outputPath);
 
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
         var hasContent = HasContent(outputFile, "Item #12");
-        ClassicAssert.IsTrue(hasContent);
+        Assert.That(hasContent, Is.True);
         var hasTitleParameter = HasContent(outputFile, "{{ title }}");
         ClassicAssert.IsFalse(hasTitleParameter);
     }
@@ -323,7 +323,7 @@ public class WordTests
         using var outputFile = mgr.Convert(input, FileFormat.Pdf);
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
     }
     [Test]
@@ -344,7 +344,7 @@ public class WordTests
         using var outputFile = mgr.Convert(input, FileFormat.Pdf);
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
     }
     [Test]
@@ -370,7 +370,7 @@ public class WordTests
         using var outputFile = mgr.Convert(input, options);
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
     }
     [Test]
@@ -391,7 +391,7 @@ public class WordTests
         using var outputFile = mgr.Convert(input, FileFormat.Html);
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
     }
     [Test]
@@ -412,7 +412,7 @@ public class WordTests
         using var outputFile = mgr.Convert(input, FileFormat.Rtf);
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
     }
     [Test]
@@ -433,7 +433,7 @@ public class WordTests
         using var outputFile = mgr.Convert(input, FileFormat.EPub);
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
     }
     [Test]
@@ -454,7 +454,7 @@ public class WordTests
         using var outputFile = mgr.Convert(input, FileFormat.Odt);
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
     }
     [Test]
@@ -474,7 +474,7 @@ public class WordTests
         for (var i = 0; i < images.Length; i++)
         {
             var file = await images[i].SaveAs(string.Format(outputPath, i + 1));
-            ClassicAssert.IsTrue(file.Exists);
+            Assert.That(file.Exists, Is.True);
             ClassicAssert.Greater(file.Length, 0);
         }
         images.Dispose();
@@ -539,11 +539,11 @@ public class WordTests
             .ToBinaryFile();
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
         var hasContent = HasContent(outputFile, "Item #12");
-        ClassicAssert.IsTrue(hasContent);
+        Assert.That(hasContent, Is.True);
         var hasDoc2Parameter = HasContent(outputFile, "<{ doc2  }>");
         ClassicAssert.IsFalse(hasDoc2Parameter);
     }
@@ -581,7 +581,7 @@ public class WordTests
         using var outputFile = mgr.Create(input);
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
     }
 
@@ -608,11 +608,11 @@ public class WordTests
             .ToBinaryFile();
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
         var hasContent = HasContent(outputFile, "Item #31");
-        ClassicAssert.IsTrue(hasContent);
+        Assert.That(hasContent, Is.True);
         var hasTitleParameter = HasContent(outputFile, "{{ title }}");
         ClassicAssert.IsFalse(hasTitleParameter);
     }
@@ -642,7 +642,7 @@ public class WordTests
             .ToBinaryFile();
 
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
     }
 
@@ -708,7 +708,7 @@ public class WordTests
         using var outputFile = mgr.Create(input)
             .ToBinaryFile();
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
         // pdf
@@ -717,12 +717,12 @@ public class WordTests
         await pdfFile.SaveAs(pdfPath);
 
         var hasCustomerTitleValue = HasContent(outputFile, invoice.customer.title);
-        ClassicAssert.IsTrue(hasCustomerTitleValue);
+        Assert.That(hasCustomerTitleValue, Is.True);
         var hasCustomerTitleParameter = HasContent(outputFile, "{{ customer.title }}");
         ClassicAssert.IsFalse(hasCustomerTitleParameter);
 
         var hasInvoiceLineTitleValue = HasContent(outputFile, invoiceLines[1]["invoiceLineTitle"]!.ToString()!);
-        ClassicAssert.IsTrue(hasInvoiceLineTitleValue);
+        Assert.That(hasInvoiceLineTitleValue, Is.True);
         var hasInvoiceLineTitleParameter = HasContent(outputFile, "{{invoiceLineTitle}}");
         ClassicAssert.IsFalse(hasInvoiceLineTitleParameter);
     }
@@ -835,7 +835,7 @@ public class WordTests
         using var outputFile = mgr.Create(input)
             .ToBinaryFile();
         var file = await outputFile.SaveAs(outputPath);
-        ClassicAssert.IsTrue(file.Exists);
+        Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
         // pdf

@@ -50,7 +50,7 @@ public class JwtTokenHelper : ITokenHelper
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
-    public bool Validate(string token)
+    public async Task<bool> Validate(string token)
     {
         var secretKey = Encoding.ASCII.GetBytes(_secret);
         var symmetricKey = new SymmetricSecurityKey(secretKey);
@@ -62,7 +62,7 @@ public class JwtTokenHelper : ITokenHelper
             ValidIssuer = _authority,
             ValidAudiences = _validAudiences ?? (_defaultAudience != null ? new[] { _defaultAudience } : null)
         };
-        var validateResult = tokenHandler.ValidateToken(token, validationParams);
+        var validateResult = await tokenHandler.ValidateTokenAsync(token, validationParams);
 
         return validateResult.IsValid;
     }

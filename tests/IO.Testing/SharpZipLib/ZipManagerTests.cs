@@ -51,11 +51,11 @@ public class ZipManagerTests
             .ToArray();
 
         // test
-        CollectionAssert.IsNotEmpty(unzippedFiles);
-        ClassicAssert.AreEqual(files.Length, unzippedFiles.Length);
+        Assert.That(unzippedFiles, Is.Not.Empty);
+        Assert.That(unzippedFiles.Length, Is.EqualTo(files.Length));
         var expectedFiles = files.Select(f => f.Substring(_assetsDir.Length)).ToArray();
         var actualFiles = unzippedFiles.Select(f => f?.Substring(targetDir.Length)).ToArray();
-        CollectionAssert.AreEquivalent(expectedFiles, actualFiles);
+        Assert.That(actualFiles, Is.EquivalentTo(expectedFiles));
     }
     [Test]
     public void Update_Zip_Add_Files()

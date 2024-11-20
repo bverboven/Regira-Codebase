@@ -29,7 +29,7 @@ public class MessageObjectTests
     public void Error_Invalid_Email(string? email)
     {
         // ReSharper disable once ObjectCreationAsStatement
-        Assert.Throws<EmailFormatException>(() => new MailAddress { Email = email });
+        Assert.Throws<EmailFormatException>(() => new MailAddress { Email = email! });
     }
 
     [TestCase(MailConstants.SIMPLE_INPUT)]
@@ -40,11 +40,11 @@ public class MessageObjectTests
 
         var msg = mailInput.ToMessageObject();
         TestMailAddress((MailAddress)msg.From!.Email, input.from);
-        ClassicAssert.IsNull(msg.ReplyTo);
+        Assert.That(msg.ReplyTo, Is.Null);
         TestMailAddress((MailAddress)msg.To.First().Email, input.to[0]);
         ClassicAssert.AreEqual(msg.Subject, input.subject);
         ClassicAssert.AreEqual(msg.Body, input.body);
-        ClassicAssert.IsTrue(msg.IsHtml);
+        Assert.That(msg.IsHtml, Is.True);
     }
 
     [TestCase(MailConstants.INPUT_REPLYTO)]
@@ -65,7 +65,7 @@ public class MessageObjectTests
         var mailInput = _serializer.Deserialize<MailInput>(serializedInput)!;
 
         var msg = mailInput.ToMessageObject();
-        ClassicAssert.IsNull(msg.From);
+        Assert.That(msg.From, Is.Null);
         ClassicAssert.IsFalse(((IDictionary<string, object?>)input).ContainsKey("from"));
         TestMailAddress(msg.From!, null);
     }
@@ -77,7 +77,7 @@ public class MessageObjectTests
         var mailInput = _serializer.Deserialize<MailInput>(serializedInput)!;
 
         var msg = mailInput.ToMessageObject();
-        CollectionAssert.IsEmpty(msg.To);
+        Assert.That(msg.To, Is.Empty);
         ClassicAssert.IsFalse(((IDictionary<string, object?>)input).ContainsKey("to"));
         TestMailAddress(msg.To.FirstOrDefault(), null);
     }
@@ -136,10 +136,10 @@ public class MessageObjectTests
         }
 
         inputDic.TryGetValue("subject", out object? subject);
-        ClassicAssert.AreEqual(msg.Subject, subject);
+        Assert.That(subject, Is.EqualTo(msg.Subject));
 
         inputDic.TryGetValue("body", out object? body);
-        ClassicAssert.AreEqual(msg.Body, body);
+        Assert.That(body, Is.EqualTo(msg.Body));
 
         if (inputDic.ContainsKey("isHtml"))
         {
@@ -147,7 +147,7 @@ public class MessageObjectTests
         }
         else
         {
-            ClassicAssert.IsTrue(msg.IsHtml);
+            Assert.That(msg.IsHtml, Is.True);
         }
     }
 
@@ -157,25 +157,25 @@ public class MessageObjectTests
         var inputDic = input as IDictionary<string, object?>;
         if (input == null)
         {
-            ClassicAssert.IsNull(address);
+            Assert.That(address, Is.Null);
             return;
         }
 
         if (inputDic?.ContainsKey("displayName") ?? false)
         {
-            ClassicAssert.AreEqual(address!.DisplayName, inputDic["displayName"]);
+            Assert.That(inputDic["displayName"], Is.EqualTo(address!.DisplayName));
         }
         else
         {
-            ClassicAssert.IsNull(address!.DisplayName);
+            Assert.That(address!.DisplayName, Is.Null);
         }
         if (inputDic?.ContainsKey("email") ?? false)
         {
-            ClassicAssert.AreEqual(address.Email, inputDic["email"]);
+            Assert.That(inputDic["email"], Is.EqualTo(address.Email));
         }
         else
         {
-            ClassicAssert.AreEqual(address.Email, input);
+            Assert.That(input, Is.EqualTo(address.Email));
         }
     }
 }

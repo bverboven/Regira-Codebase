@@ -40,8 +40,8 @@ public class AutoTruncateTests
 
         _dbContext.Persons.Add(item);
 
-        ClassicAssert.IsTrue(item.GivenName.Length > 32);
-        ClassicAssert.IsTrue(item.LastName.Length > 64);
+        Assert.That(item.GivenName.Length > 32, Is.True);
+        Assert.That(item.LastName.Length > 64, Is.True);
         Assert.That(item.Description, Is.EqualTo(description));
 
         _dbContext.AutoTruncateStringsToMaxLengthForEntries();

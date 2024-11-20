@@ -101,8 +101,8 @@ public class DictionaryUtilityTests
         dynamic? obj = _plainObj;
         var dic = DictionaryUtility.ToDictionary(obj);
         var keys = ((ICollection<string>)dic.Keys).ToArray(); // use ToArray to remove case insensitivity on key collection
-        CollectionAssert.Contains(keys, "Id");
-        CollectionAssert.DoesNotContain(keys, "id");
+        Assert.That(keys, Has.Member("Id"));
+        Assert.That(keys, Has.No.Member("id"));
         Assert.That(obj?.Id, Is.EqualTo(dic["id"]));
         Assert.That(obj?.Title, Is.EqualTo(dic["title"]));
         Assert.That(obj?.Created, Is.EqualTo(dic["created"]));
@@ -115,7 +115,7 @@ public class DictionaryUtilityTests
         CollectionAssert.IsNotEmpty(dic["Values"]);
         var src = (int[])obj.Values;
         var result = (IList<object>)dic["Values"];
-        CollectionAssert.AreEqual(src, result);
+        Assert.That(result, Is.EqualTo(src).AsCollection);
     }
     [Test]
     public void Nested_Object()
@@ -240,7 +240,7 @@ public class DictionaryUtilityTests
         };
         var target = DictionaryUtility.Flatten(source, new FlattenOptions { IgnoreCollections = true });
         Assert.That(target.ContainsKey("factuurLijnen"), Is.True);
-        CollectionAssert.IsNotEmpty((IList<IDictionary<string, object?>>)target["factuurLijnen"]!);
+        Assert.That((IList<IDictionary<string, object?>>)target["factuurLijnen"]!, Is.Not.Empty);
     }
     [Test]
     public void Flatten_Nested_CollectionValues()
@@ -587,7 +587,7 @@ public class DictionaryUtilityTests
         var targetFactuurLijnen = target["factuurLijnen"] as IEnumerable<IDictionary<string, object?>>;
         Assert.That(targetFactuurLijnen, Is.InstanceOf<IEnumerable<IDictionary<string, object?>>>());
         // ReSharper disable once AssignNullToNotNullAttribute
-        var factuurlijnen = targetFactuurLijnen.ToList();
+        var factuurlijnen = targetFactuurLijnen!.ToList();
         var lijn1 = factuurlijnen[0];
         var sourceFactuurLijnen = (IDictionary<string, object?>[])source["factuurLijnen"]!;
         Assert.That(sourceFactuurLijnen[0]["omschrijving"], Is.EqualTo(lijn1["omschrijving"]));
@@ -613,16 +613,16 @@ public class DictionaryUtilityTests
             } }
         };
         var target = DictionaryUtility.Unflatten(source);
-        var targetFactuurLijnen = ((IEnumerable<IDictionary<string, object?>>)target["factuurLijnen"]).ToArray();
-        var sourceFactuurLijnen = (IDictionary<string, object?>[])source["factuurLijnen"];
+        var targetFactuurLijnen = ((IEnumerable<IDictionary<string, object?>>)target["factuurLijnen"]!).ToArray();
+        var sourceFactuurLijnen = (IDictionary<string, object?>[])source["factuurLijnen"]!;
         var targetLijn2 = targetFactuurLijnen[1];
         var sourceLijn2 = sourceFactuurLijnen[1];
         Assert.That(targetLijn2["nested"] as IDictionary<string, object?>, Is.Not.Null);
-        var targetNestedProp = (IDictionary<string, object?>)targetLijn2["nested"];
+        var targetNestedProp = (IDictionary<string, object?>)targetLijn2["nested"]!;
         Assert.That(sourceLijn2["nested.first"], Is.EqualTo(targetNestedProp["first"]));
-        var targetNestedSecond = ((IEnumerable<IDictionary<string, object?>>)targetNestedProp["second"]).ToList();
-        var sourceNestedSecond = ((IEnumerable<IDictionary<string, object?>>)sourceLijn2["nested.second"]).ToList();
-        var targetNestedSecondFoo = (IDictionary<string, object?>)targetNestedSecond[0]["foo"];
+        var targetNestedSecond = ((IEnumerable<IDictionary<string, object?>>)targetNestedProp["second"]!).ToList();
+        var sourceNestedSecond = ((IEnumerable<IDictionary<string, object?>>)sourceLijn2["nested.second"]!).ToList();
+        var targetNestedSecondFoo = (IDictionary<string, object?>)targetNestedSecond[0]["foo"]!;
         Assert.That(sourceNestedSecond[0]["foo.value"], Is.EqualTo(targetNestedSecondFoo["value"]));
     }
     [Test]
@@ -655,19 +655,19 @@ public class DictionaryUtilityTests
         };
         var target = DictionaryUtility.Unflatten(source, new FlattenOptions { Separator = ":" });
 
-        var targetLeverancier = (IDictionary<string, object?>)target["leverancier"];
+        var targetLeverancier = (IDictionary<string, object?>)target["leverancier"]!;
         Assert.That(targetLeverancier.ContainsKey("adres"), Is.True);
         Assert.That(targetLeverancier["adres"], Is.InstanceOf<IDictionary<string, object?>>());
-        var targetLeverancierAdres = (IDictionary<string, object?>)targetLeverancier["adres"];
+        var targetLeverancierAdres = (IDictionary<string, object?>)targetLeverancier["adres"]!;
         Assert.That(source["leverancier:adres:straat"], Is.EqualTo(targetLeverancierAdres["straat"]));
 
-        var targetFactuurLijnen = ((IEnumerable<IDictionary<string, object?>>)target["factuurLijnen"]).ToArray();
+        var targetFactuurLijnen = ((IEnumerable<IDictionary<string, object?>>)target["factuurLijnen"]!).ToArray();
         var targetLijn2 = targetFactuurLijnen[1];
         Assert.That(targetLijn2["nested"] as IDictionary<string, object?>, Is.Not.Null);
-        var targetNestedProp = (IDictionary<string, object?>)targetLijn2["nested"];
+        var targetNestedProp = (IDictionary<string, object?>)targetLijn2["nested"]!;
         Assert.That(source["factuurLijnen:0:nested:first"], Is.EqualTo(targetNestedProp["first"]));
-        var targetNestedSecond = ((IEnumerable<IDictionary<string, object?>>)targetNestedProp["second"]).ToList();
-        var targetNestedSecondFoo = (IDictionary<string, object?>)targetNestedSecond[0]["foo"];
+        var targetNestedSecond = ((IEnumerable<IDictionary<string, object?>>)targetNestedProp["second"]!).ToList();
+        var targetNestedSecondFoo = (IDictionary<string, object?>)targetNestedSecond[0]["foo"]!;
         Assert.That(source["factuurLijnen:1:nested:second:0:foo:value"], Is.EqualTo(targetNestedSecondFoo["value"]));
     }
     #endregion

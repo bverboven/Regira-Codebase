@@ -30,15 +30,15 @@ public class EnumTests
     {
         var values = EnumUtility.ListValidFlagValues<TestEnum>().ToArray();
         var values2 = EnumUtility.ListFlagValues<TestEnum>(/*false*/);
-        CollectionAssert.AreEquivalent(values, values2);
-        CollectionAssert.AreEquivalent(_validFlags, values);
+        Assert.That(values2, Is.EquivalentTo(values));
+        Assert.That(values, Is.EquivalentTo(_validFlags));
     }
     [Test]
     public void List_All_FlagValues()
     {
         var values = EnumUtility.ListFlagValues<TestEnum>(true).ToArray();
         var expected = _validFlags.Concat(_combos);
-        CollectionAssert.AreEquivalent(expected, values);
+        Assert.That(values, Is.EquivalentTo(expected));
     }
     [Test]
     public void List_Also_Undefined_FlagValues()
@@ -46,7 +46,7 @@ public class EnumTests
         var values = EnumUtility.ListFlagValues<TestEnum>(true, false).ToArray();
         var maxValue = (int)EnumUtility.GetMaxFlagValue<TestEnum>();
         var expected = Enumerable.Range(0, maxValue + 1).Select(v => (TestEnum)v);
-        CollectionAssert.AreEquivalent(expected, values);
+        Assert.That(values, Is.EquivalentTo(expected));
     }
 
     [Test]
@@ -54,41 +54,41 @@ public class EnumTests
     {
         var allCombinations = EnumUtility.ListValidFlagValues<TestEnum>()
             .ToArray();
-        CollectionAssert.Contains(allCombinations, TestEnum.One);
-        CollectionAssert.Contains(allCombinations, TestEnum.Two);
-        CollectionAssert.Contains(allCombinations, TestEnum.Four);
+        Assert.That(allCombinations, Has.Member(TestEnum.One));
+        Assert.That(allCombinations, Has.Member(TestEnum.Two));
+        Assert.That(allCombinations, Has.Member(TestEnum.Four));
 
-        CollectionAssert.Contains(allCombinations, TestEnum.None);
+        Assert.That(allCombinations, Has.Member(TestEnum.None));
         var firstAndSecond = TestEnum.One | TestEnum.Two;
-        CollectionAssert.DoesNotContain(allCombinations, firstAndSecond);
+        Assert.That(allCombinations, Has.No.Member(firstAndSecond));
         var secondAndThird = TestEnum.Two | TestEnum.Four;
-        CollectionAssert.DoesNotContain(allCombinations, secondAndThird);
+        Assert.That(allCombinations, Has.No.Member(secondAndThird));
         var firstAndThird = TestEnum.One | TestEnum.Four;
-        CollectionAssert.DoesNotContain(allCombinations, firstAndThird);
-        CollectionAssert.DoesNotContain(allCombinations, TestEnum.Three);
-        CollectionAssert.DoesNotContain(allCombinations, TestEnum.Seven);
-        CollectionAssert.DoesNotContain(allCombinations, TestEnum.SixtyNine);
+        Assert.That(allCombinations, Has.No.Member(firstAndThird));
+        Assert.That(allCombinations, Has.No.Member(TestEnum.Three));
+        Assert.That(allCombinations, Has.No.Member(TestEnum.Seven));
+        Assert.That(allCombinations, Has.No.Member(TestEnum.SixtyNine));
 
-        CollectionAssert.DoesNotContain(allCombinations, (TestEnum)8);
+        Assert.That(allCombinations, Has.No.Member((TestEnum)8));
     }
     [Test]
     public void All_Combinations_Are_Included()
     {
         var allCombinations = EnumUtility.ListFlagValues<TestEnum>(true)
             .ToArray();
-        CollectionAssert.Contains(allCombinations, TestEnum.None);
-        CollectionAssert.Contains(allCombinations, TestEnum.One);
-        CollectionAssert.Contains(allCombinations, TestEnum.Two);
-        CollectionAssert.Contains(allCombinations, TestEnum.Four);
+        Assert.That(allCombinations, Has.Member(TestEnum.None));
+        Assert.That(allCombinations, Has.Member(TestEnum.One));
+        Assert.That(allCombinations, Has.Member(TestEnum.Two));
+        Assert.That(allCombinations, Has.Member(TestEnum.Four));
         var firstAndSecond = TestEnum.One | TestEnum.Two;
-        CollectionAssert.Contains(allCombinations, firstAndSecond);
+        Assert.That(allCombinations, Has.Member(firstAndSecond));
         var secondAndThird = TestEnum.Two | TestEnum.Four;
-        CollectionAssert.Contains(allCombinations, secondAndThird);
+        Assert.That(allCombinations, Has.Member(secondAndThird));
         var firstAndThird = TestEnum.One | TestEnum.Four;
-        CollectionAssert.Contains(allCombinations, firstAndThird);
-        CollectionAssert.Contains(allCombinations, TestEnum.Three);
-        CollectionAssert.Contains(allCombinations, TestEnum.Seven);
-        CollectionAssert.Contains(allCombinations, TestEnum.SixtyNine);
+        Assert.That(allCombinations, Has.Member(firstAndThird));
+        Assert.That(allCombinations, Has.Member(TestEnum.Three));
+        Assert.That(allCombinations, Has.Member(TestEnum.Seven));
+        Assert.That(allCombinations, Has.Member(TestEnum.SixtyNine));
     }
 
     [Test]

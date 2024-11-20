@@ -75,7 +75,7 @@ public static class RegexUtility
             return false;
         }
 
-        if (!allowShortNumber && input.Length <= 6)
+        if (!allowShortNumber && input!.Length <= 6)
         {
             return false;
         }

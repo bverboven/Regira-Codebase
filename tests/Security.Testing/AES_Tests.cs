@@ -21,7 +21,7 @@ public class AES_Tests
         var encrypted = encrypter.Encrypt(plaintext);
         var decrypter = new AesEncrypter(new CryptoOptions { Secret = secret });
         var decrypted = decrypter.Decrypt(encrypted);
-        ClassicAssert.AreEqual(plaintext, decrypted);
+        Assert.That(decrypted, Is.EqualTo(plaintext));
     }
     [Test]
     public void Decrypt_Encrypted_Failure()
@@ -42,6 +42,6 @@ public class AES_Tests
         var encrypted = encrypter.Encrypt(plaintext);
         var decrypter = new AesEncrypter();
         var decrypted = decrypter.Decrypt(encrypted);
-        ClassicAssert.AreEqual(plaintext, decrypted);
+        Assert.That(decrypted, Is.EqualTo(plaintext));
     }
 }

@@ -32,12 +32,12 @@ public static class PdfTestHelper
             new() { Start = (int)Math.Ceiling(pageCount / 2d) + 1, End = pageCount - 1 }
         };
         var splidPdfs = pdfSplitter.Split(pdfStream.ToBinaryFile(), ranges).ToArray();
-        ClassicAssert.AreEqual(ranges.Length, splidPdfs.Length);
+        Assert.That(splidPdfs.Length, Is.EqualTo(ranges.Length));
         for (var i = 0; i < splidPdfs.Length; i++)
         {
             var splitPdf = splidPdfs[i];
             var splitPageCount = pdfSplitter.GetPageCount(splitPdf.ToBinaryFile());
-            ClassicAssert.AreEqual(ranges[i].End - ranges[i].Start + 1, splitPageCount);
+            Assert.That(splitPageCount, Is.EqualTo(ranges[i].End - ranges[i].Start + 1));
             await FileSystemUtility.SaveStream(Path.Combine(outputDir, $"split-{i + 1}.pdf"), splitPdf.GetStream());
         }
         // clean up
@@ -75,7 +75,7 @@ public static class PdfTestHelper
         var mergedPageCount = pdfSplitter.GetPageCount(merged.ToBinaryFile());
 
         await FileSystemUtility.SaveStream(Path.Combine(outputDir, "split-merged.pdf"), merged.GetStream());
-        ClassicAssert.AreEqual(expectedPageCount, mergedPageCount);
+        Assert.That(mergedPageCount, Is.EqualTo(expectedPageCount));
         // clean up
         splidPdfs.Dispose();
     }
@@ -102,6 +102,6 @@ public static class PdfTestHelper
             count++;
         }
 
-        ClassicAssert.AreEqual(2, count);
+        Assert.That(count, Is.EqualTo(2));
     }
 }

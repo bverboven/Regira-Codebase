@@ -56,87 +56,87 @@ END:VCARD";
     {
         var item = _manager.Read(content);
         ClassicAssert.IsNotNull(item);
-        ClassicAssert.AreEqual("Gump", item.Name!.SurName);
-        ClassicAssert.AreEqual("Forrest", item.Name.GivenName);
-        ClassicAssert.AreEqual("Mr.", item.Name.Prefix);
-        ClassicAssert.AreEqual("Forrest Gump", item.FormattedName);
+        Assert.That(item.Name!.SurName, Is.EqualTo("Gump"));
+        Assert.That(item.Name.GivenName, Is.EqualTo("Forrest"));
+        Assert.That(item.Name.Prefix, Is.EqualTo("Mr."));
+        Assert.That(item.FormattedName, Is.EqualTo("Forrest Gump"));
         switch (version)
         {
             case VCardVersion.V2_1:
             case VCardVersion.V3_0:
-                ClassicAssert.AreEqual("+1-111-555-1212", item.Tels!.First().Uri);
-                ClassicAssert.AreEqual("+1-404-555-1212", item.Tels!.Last().Uri);
+                Assert.That(item.Tels!.First().Uri, Is.EqualTo("+1-111-555-1212"));
+                Assert.That(item.Tels!.Last().Uri, Is.EqualTo("+1-404-555-1212"));
                 break;
             case VCardVersion.V4_0:
-                ClassicAssert.AreEqual("tel:+1-111-555-1212", item.Tels!.First().Uri);
-                ClassicAssert.AreEqual("tel:+1-404-555-1212", item.Tels!.Last().Uri);
+                Assert.That(item.Tels!.First().Uri, Is.EqualTo("tel:+1-111-555-1212"));
+                Assert.That(item.Tels!.Last().Uri, Is.EqualTo("tel:+1-404-555-1212"));
                 break;
         }
-        ClassicAssert.IsTrue((VCardTelType.Cell | VCardTelType.Work) == item.Tels!.First().Type);
-        ClassicAssert.IsTrue((VCardTelType.Voice | VCardTelType.Home) == item.Tels!.Last().Type);
-        ClassicAssert.AreEqual("forrestgump@example.com", item.Emails!.First().Text);
+        Assert.That((VCardTelType.Cell | VCardTelType.Work) == item.Tels!.First().Type, Is.True);
+        Assert.That((VCardTelType.Voice | VCardTelType.Home) == item.Tels!.Last().Type, Is.True);
+        Assert.That(item.Emails!.First().Text, Is.EqualTo("forrestgump@example.com"));
 
         // ReSharper disable PossibleInvalidOperationException
-        ClassicAssert.AreEqual(VCardPropertyType.Home, item.Emails!.First().Type!.Value);
-        ClassicAssert.AreEqual(VCardPropertyType.Work, item.Emails!.Last().Type!.Value);
+        Assert.That(item.Emails!.First().Type!.Value, Is.EqualTo(VCardPropertyType.Home));
+        Assert.That(item.Emails!.Last().Type!.Value, Is.EqualTo(VCardPropertyType.Work));
         // ReSharper restore PossibleInvalidOperationException
 
-        ClassicAssert.AreEqual("100 Waters Edge", item.Addresses!.First().StreetAndNumber);
-        ClassicAssert.AreEqual("42 Plantation St.", item.Addresses!.Last().StreetAndNumber);
-        ClassicAssert.AreEqual("Baytown", item.Addresses!.First().Locality);
-        ClassicAssert.AreEqual("Baytown", item.Addresses!.Last().Locality);
+        Assert.That(item.Addresses!.First().StreetAndNumber, Is.EqualTo("100 Waters Edge"));
+        Assert.That(item.Addresses!.Last().StreetAndNumber, Is.EqualTo("42 Plantation St."));
+        Assert.That(item.Addresses!.First().Locality, Is.EqualTo("Baytown"));
+        Assert.That(item.Addresses!.Last().Locality, Is.EqualTo("Baytown"));
 
-        ClassicAssert.AreEqual("Bubba Gump Shrimp Co.", item.Organization!.Name);
+        Assert.That(item.Organization!.Name, Is.EqualTo("Bubba Gump Shrimp Co."));
     }
     public virtual void CanWrite(VCard vCard, VCardVersion version)
     {
         var content = _manager.Write(vCard, version);
-        ClassicAssert.IsTrue(!string.IsNullOrWhiteSpace(content));
+        Assert.That(!string.IsNullOrWhiteSpace(content), Is.True);
 
         var lines = content.Trim().Split(Environment.NewLine);
-        StringAssert.StartsWith("BEGIN:VCARD", lines.First());
-        StringAssert.EndsWith("END:VCARD", lines.Last());
+        Assert.That(lines.First(), Does.StartWith("BEGIN:VCARD"));
+        Assert.That(lines.Last(), Does.EndWith("END:VCARD"));
 
         var nameLine = lines.First(l => l.StartsWith("N:"));
-        StringAssert.Contains(vCard.Name!.SurName, nameLine);
-        StringAssert.Contains(vCard.Name!.GivenName, nameLine);
-        StringAssert.Contains(vCard.Name!.Prefix, nameLine);
+        Assert.That(nameLine, Does.Contain(vCard.Name!.SurName));
+        Assert.That(nameLine, Does.Contain(vCard.Name!.GivenName));
+        Assert.That(nameLine, Does.Contain(vCard.Name!.Prefix));
 
         var telLines = lines.Where(l => l.StartsWith("TEL")).ToArray();
-        StringAssert.Contains(vCard.Tels!.First().Uri!.ToUpper(), telLines.First().ToUpper());
+        Assert.That(telLines.First().ToUpper(), Does.Contain(vCard.Tels!.First().Uri!.ToUpper()));
         switch (version)
         {
             case VCardVersion.V2_1:
-                StringAssert.Contains("WORK;VOICE", telLines.Last().ToUpper());
+                Assert.That(telLines.Last().ToUpper(), Does.Contain("WORK;VOICE"));
                 break;
             case VCardVersion.V3_0:
-                StringAssert.Contains("WORK,VOICE", telLines.Last().ToUpper());
+                Assert.That(telLines.Last().ToUpper(), Does.Contain("WORK,VOICE"));
                 break;
             case VCardVersion.V4_0:
-                StringAssert.Contains("WORK,VOICE,TEXT", telLines.Last().ToUpper());
+                Assert.That(telLines.Last().ToUpper(), Does.Contain("WORK,VOICE,TEXT"));
                 break;
         }
         if (version == VCardVersion.V4_0)
         {
             var emailLines = lines.Where(l => l.StartsWith("EMAIL")).ToArray();
-            StringAssert.Contains("HOME", emailLines.Last().ToUpper());
-            StringAssert.Contains("WORK", emailLines.Last().ToUpper());
+            Assert.That(emailLines.Last().ToUpper(), Does.Contain("HOME"));
+            Assert.That(emailLines.Last().ToUpper(), Does.Contain("WORK"));
         }
 
         var addressLines = lines.Where(l => l.StartsWith("ADR")).ToArray();
-        StringAssert.Contains("Albertlei 12", addressLines.First());
+        Assert.That(addressLines.First(), Does.Contain("Albertlei 12"));
         switch (version)
         {
             case VCardVersion.V2_1:
-                StringAssert.Contains(";HOME", addressLines.First().ToUpper());
+                Assert.That(addressLines.First().ToUpper(), Does.Contain(";HOME"));
                 break;
             case VCardVersion.V3_0:
             case VCardVersion.V4_0:
-                StringAssert.Contains(";TYPE=HOME", addressLines.First().ToUpper());
+                Assert.That(addressLines.First().ToUpper(), Does.Contain(";TYPE=HOME"));
                 break;
         }
 
         var orgLines = lines.Where(l => l.StartsWith("ORG"));
-        StringAssert.Contains("Regira bv", orgLines.First());
+        Assert.That(orgLines.First(), Does.Contain("Regira bv"));
     }
 }

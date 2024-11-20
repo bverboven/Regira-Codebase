@@ -38,8 +38,8 @@ public class ObjectUtilityTests
         Assert.That(obj.LifeExpectancy, Is.EqualTo(expected.LifeExpectancy));
         Assert.That(obj.Population, Is.EqualTo(expected.Population));
         Assert.That(obj.CallingCode, Is.Null);
-        CollectionAssert.AreEquivalent(expected.Languages, obj.Languages);
-        CollectionAssert.AreEquivalent(expected.Numbers, obj.Numbers);
+        Assert.That(obj.Languages, Is.EquivalentTo(expected.Languages));
+        Assert.That(obj.Numbers, Is.EquivalentTo(expected.Numbers));
     }
 
     [Test]
@@ -72,7 +72,7 @@ public class ObjectUtilityTests
         Assert.That(obj.LifeExpectancy, Is.EqualTo(expected.LifeExpectancy));
         Assert.That(obj.Population, Is.EqualTo(expected.Population));
         Assert.That(obj.CallingCode, Is.Null);
-        CollectionAssert.AreEquivalent(expected.Languages, obj.Languages);
-        CollectionAssert.AreEquivalent(expected.Numbers, obj.Numbers);
+        Assert.That(obj.Languages, Is.EquivalentTo(expected.Languages));
+        Assert.That(obj.Numbers, Is.EquivalentTo(expected.Numbers));
     }
 }

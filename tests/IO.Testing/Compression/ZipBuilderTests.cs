@@ -38,7 +38,7 @@ public class ZipBuilderTests
             .For(_sourceFiles)
             .Build();
         ClassicAssert.IsNotEmpty(zipFile.GetBytes()!);
-        ClassicAssert.IsTrue(zipFile.GetLength() > 0);
+        Assert.That(zipFile.GetLength() > 0, Is.True);
     }
     [Test]
     public async Task Can_Add_Files_To_Existing_Zip()
@@ -49,15 +49,15 @@ public class ZipBuilderTests
         using var zipFile = await zipBuilder1
             .For(files1)
             .Build();
-        ClassicAssert.AreEqual(files1.Length, ZipUtility.Unzip(zipFile.ToBinaryFile()).Count);
+        Assert.That(ZipUtility.Unzip(zipFile.ToBinaryFile()).Count, Is.EqualTo(files1.Length));
         var zipStream1Length = zipFile.Stream?.Length;
         var zipBuilder2 = new ZipBuilder();
         await zipBuilder2
             .For(zipFile.Stream)
             .For(files2)
             .Build();
-        ClassicAssert.IsTrue(zipFile.Stream?.Length > zipStream1Length);
-        ClassicAssert.AreEqual(_sourceFiles.Length, ZipUtility.Unzip(zipFile.ToBinaryFile()).Count);
+        Assert.That(zipFile.Stream?.Length > zipStream1Length, Is.True);
+        Assert.That(ZipUtility.Unzip(zipFile.ToBinaryFile()).Count, Is.EqualTo(_sourceFiles.Length));
     }
 
     [Test]
@@ -70,9 +70,9 @@ public class ZipBuilderTests
         //FileSystemUtility.SaveStream("zipped.zip", zipStream);
         var unzippedFiles = ZipUtility.Unzip(zipFile.ToBinaryFile());
         // compare count
-        ClassicAssert.AreEqual(_sourceFiles.Length, unzippedFiles.Count);
+        Assert.That(unzippedFiles.Count, Is.EqualTo(_sourceFiles.Length));
         // compare bytes
-        CollectionAssert.AreEqual(_sourceFiles.Select(f => f.Bytes), unzippedFiles.Select(f => FileUtility.GetBytes(f.Stream)));
+        Assert.That(unzippedFiles.Select(f => FileUtility.GetBytes(f.Stream)), Is.EqualTo(_sourceFiles.Select(f => f.Bytes)).AsCollection);
         unzippedFiles.Dispose();
     }
 }

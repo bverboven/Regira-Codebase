@@ -98,7 +98,7 @@ public class NewtonsoftTests
 
         var expected = $@"{{""status"":""{TestStatus.Hard}"",""isArchived"":0}}";
         Assert.That(json, Is.EqualTo(expected));
-        ClassicAssert.IsTrue(json.Contains(TestStatus.Hard.ToString()));
+        Assert.That(json.Contains(TestStatus.Hard.ToString()), Is.True);
         Assert.That(output.Status, Is.EqualTo(input.Status));
     }
 }
