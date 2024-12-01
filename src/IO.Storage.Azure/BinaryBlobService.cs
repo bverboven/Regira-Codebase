@@ -109,6 +109,16 @@ public class BinaryBlobService : IFileService
             yield return folder;
         }
     }
+
+    protected async IAsyncEnumerable<BlobItem> ListBlobs(FileSearchObject so)
+    {
+        var relativeFolderUri = FileNameUtility.GetRelativeUri(so.FolderUri, RootFolder);
+        var blobPages = Container.GetBlobsAsync(BlobTraits.None, BlobStates.None, relativeFolderUri);
+        await foreach (var blob in blobPages)
+        {
+            yield return blob;
+        }
+    }
     protected async Task<Response<BlobDownloadResult>?> Download(string identifier)
     {
         await Communicator.Open();
@@ -119,16 +129,6 @@ public class BinaryBlobService : IFileService
         }
 
         return await blob.DownloadContentAsync();
-    }
-
-    protected async IAsyncEnumerable<BlobItem> ListBlobs(FileSearchObject so)
-    {
-        var relativeFolderUri = FileNameUtility.GetRelativeUri(so.FolderUri, RootFolder);
-        var blobPages = Container.GetBlobsAsync(BlobTraits.None, BlobStates.None, relativeFolderUri);
-        await foreach (var blob in blobPages)
-        {
-            yield return blob;
-        }
     }
 
     public async Task Move(string sourceIdentifier, string targetIdentifier)
