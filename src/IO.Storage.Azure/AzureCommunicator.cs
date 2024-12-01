@@ -10,7 +10,7 @@ public class AzureCommunicator
 
     private readonly string _containerName;
     private readonly string _connectionString;
-    public AzureCommunicator(AzureConfig config)
+    public AzureCommunicator(AzureOptions config)
     {
         _containerName = config.ContainerName ?? throw new ArgumentNullException(nameof(config.ContainerName));
         _connectionString = config.ConnectionString ?? throw new ArgumentNullException(nameof(config.ConnectionString));

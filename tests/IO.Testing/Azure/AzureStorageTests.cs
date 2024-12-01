@@ -19,7 +19,7 @@ public class AzureStorageTests : FileServiceTestsBase
         var azureConnectionString = configuration["Storage:Azure:ConnectionString"];
             
         Testfiles = GetTestFiles(SourceFolder).ToArray();
-        var cf = new AzureConfig
+        var cf = new AzureOptions
         {
             ConnectionString = azureConnectionString,
             ContainerName = BLOB_CONTAINER

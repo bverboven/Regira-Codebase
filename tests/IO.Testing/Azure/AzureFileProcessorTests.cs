@@ -22,7 +22,7 @@ public class AzureFileProcessorTests : FileProcessorTestsBase
         TestFolder = Guid.NewGuid().ToString();
         CreateTestFiles();
 
-        var cf = new AzureConfig
+        var cf = new AzureOptions
         {
             ConnectionString = azureConnectionString,
             ContainerName = BLOB_CONTAINER

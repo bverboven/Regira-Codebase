@@ -1,3 +1,4 @@
+using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Regira.IO.Storage.Abstractions;
@@ -38,28 +39,13 @@ public class BinaryBlobService : IFileService
     }
     public async Task<byte[]?> GetBytes(string identifier)
     {
-#if NETSTANDARD2_0
-        using var stream = await GetStream(identifier);
-#else
-        await using var stream = await GetStream(identifier);
-#endif
-        if (stream == null || stream == Stream.Null)
-        {
-            return null;
-        }
-        return FileUtility.GetBytes(stream);
+        var response = await Download(identifier);
+        return response?.Value.Content.ToArray();
     }
     public async Task<Stream?> GetStream(string identifier)
     {
-        await Communicator.Open();
-        var blob = GetBlobReference(identifier);
-        if (!await blob.ExistsAsync())
-        {
-            return null;
-        }
-
-        var response = await blob.DownloadAsync();
-        return response.Value.Content;
+        var response = await Download(identifier);
+        return response?.Value.Content.ToStream();
     }
     public async Task<IEnumerable<string>> List(FileSearchObject? so = null)
     {
@@ -122,6 +108,17 @@ public class BinaryBlobService : IFileService
             }
             yield return folder;
         }
+    }
+    protected async Task<Response<BlobDownloadResult>?> Download(string identifier)
+    {
+        await Communicator.Open();
+        var blob = GetBlobReference(identifier);
+        if (!await blob.ExistsAsync())
+        {
+            return null;
+        }
+
+        return await blob.DownloadContentAsync();
     }
 
     protected async IAsyncEnumerable<BlobItem> ListBlobs(FileSearchObject so)
