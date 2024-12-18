@@ -1,4 +1,4 @@
-using NUnit.Framework.Legacy;
+using NUnit.Framework.Internal;
 using Regira.IO.Models;
 using Regira.IO.Storage;
 using Regira.IO.Storage.Abstractions;
@@ -6,6 +6,13 @@ using Regira.Utilities;
 
 namespace IO.Testing.Abstractions;
 
+public static class FileServiceTestUtility
+{
+    public static IList<BinaryFileItem> CreateSourceFiles(string folder)
+        => TestFilesCreator.Create(folder).ToArray();
+    public static void RemoveSourceFiles(string folder)
+        => Directory.Delete(folder, true);
+}
 public abstract class FileServiceTestsBase
 {
     protected IFileService FileService = null!;

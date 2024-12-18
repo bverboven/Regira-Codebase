@@ -1,4 +1,3 @@
-using NUnit.Framework.Legacy;
 using Regira.IO.Compression.SharpZipLib;
 using Regira.IO.Storage.FileSystem;
 using Regira.IO.Storage.Utilities;
@@ -31,7 +30,7 @@ public class ZipManagerTests
     [Test]
     public async Task Create_Zip()
     {
-         Assert.Ignore("ToDo");
+        Assert.Ignore("ToDo");
         var targetDir = new DirectoryInfo(Path.Combine(_assetsDir, "..\\unzipped")).FullName;
         var files = Directory.GetFiles(_assetsDir, "*", SearchOption.AllDirectories);
 

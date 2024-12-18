@@ -3,20 +3,15 @@ using Regira.IO.Utilities;
 
 namespace Regira.IO.Storage.SimpleTCP;
 
-public class TCPService : ITextFileService
+public class TCPService(TCPCommunicator communicator) : ITextFileService
 {
-    public string RootFolder => throw new NotSupportedException();
-
-    private readonly TCPCommunicator _communicator;
-    public TCPService(TCPCommunicator communicator)
-    {
-        _communicator = communicator;
-    }
+    public string Root => throw new NotSupportedException();
+    public string RootFolder => Root;
 
 
     public Task<string> Save(string identifier, byte[] bytes, string? contentType = null)
     {
-        _communicator.Open().Write(bytes);
+        communicator.Open().Write(bytes);
         return Task.FromResult(string.Empty);
     }
     public Task<string> Save(string identifier, Stream stream, string? contentType = null)
@@ -26,7 +21,7 @@ public class TCPService : ITextFileService
     }
     public Task<string> Save(string identifier, string contents, string? contentType = null)
     {
-        var client = _communicator.Open();
+        var client = communicator.Open();
         var msg = client.WriteAndGetReply(contents);
         return Task.FromResult(msg.MessageString);
     }

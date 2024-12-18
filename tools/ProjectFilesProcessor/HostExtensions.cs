@@ -51,7 +51,7 @@ public static class HostExtensions
                 .AddTransient<ITextFileService>(p =>
                 {
                     var projectOptions = p.GetRequiredService<ProjectOptions>();
-                    return new TextFileService(new BinaryFileService.FileServiceOptions
+                    return new TextFileService(new FileSystemOptions
                     {
                         RootFolder = projectOptions.SourceDirectory ?? new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, "../../../../../")).FullName
                     });

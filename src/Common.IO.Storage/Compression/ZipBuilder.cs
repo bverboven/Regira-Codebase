@@ -34,7 +34,7 @@ public class ZipBuilder
         }
 
         var zipStream = new MemoryStream();
-        using var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Create, true);
+        using var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Update, true);
         foreach (var file in _files)
         {
             ZipUtility.AddFile(zipArchive, file);

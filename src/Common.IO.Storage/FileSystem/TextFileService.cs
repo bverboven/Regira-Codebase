@@ -1,13 +1,7 @@
 ﻿namespace Regira.IO.Storage.FileSystem;
 
-public class TextFileService : BinaryFileService, Abstractions.ITextFileService
+public class TextFileService(FileSystemOptions options) : BinaryFileService(options), Abstractions.ITextFileService
 {
-    public TextFileService(FileServiceOptions options)
-        : base(options)
-    {
-    }
-
-
     public Task<string?> GetContents(string identifier)
     {
         var uri = FileNameUtility.GetAbsoluteUri(identifier, RootFolder);

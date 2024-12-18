@@ -4,19 +4,10 @@ using System.Text;
 
 namespace Regira.IO.Storage;
 
-public class DefaultTextFileService : ITextFileService
+public class DefaultTextFileService(IFileService binaryFileService, Encoding? encoding = null) : ITextFileService
 {
-
-    private readonly IFileService _binaryFileService;
-    private readonly Encoding? _encoding;
-    public DefaultTextFileService(IFileService binaryFileService, Encoding? encoding = null)
-    {
-        _binaryFileService = binaryFileService;
-        _encoding = encoding ?? Encoding.Default;
-    }
-
-
-    public string RootFolder => _binaryFileService.RootFolder;
+    public string Root => binaryFileService.Root;
+    public string RootFolder => Root;
 
 
     public async Task<string?> GetContents(string identifier)
@@ -26,33 +17,33 @@ public class DefaultTextFileService : ITextFileService
     }
     public Task<string> Save(string identifier, string contents, string? contentType = null)
     {
-        using var stream = FileUtility.GetStreamFromString(contents, _encoding);
+        using var stream = FileUtility.GetStreamFromString(contents, encoding);
         return Save(identifier, stream, contentType);
     }
 
 
     public Task<bool> Exists(string identifier)
-        => _binaryFileService.Exists(identifier);
+        => binaryFileService.Exists(identifier);
     public Task<byte[]?> GetBytes(string identifier)
-        => _binaryFileService.GetBytes(identifier);
+        => binaryFileService.GetBytes(identifier);
     public Task<Stream?> GetStream(string identifier)
-        => _binaryFileService.GetStream(identifier);
+        => binaryFileService.GetStream(identifier);
     public Task<IEnumerable<string>> List(FileSearchObject? so = null)
-        => _binaryFileService.List(so);
+        => binaryFileService.List(so);
 
     public Task Move(string sourceIdentifier, string targetIdentifier)
-        => _binaryFileService.Move(sourceIdentifier, targetIdentifier);
+        => binaryFileService.Move(sourceIdentifier, targetIdentifier);
     public Task<string> Save(string identifier, byte[] bytes, string? contentType = null)
-        => _binaryFileService.Save(identifier, bytes, contentType);
+        => binaryFileService.Save(identifier, bytes, contentType);
     public Task<string> Save(string identifier, Stream stream, string? contentType = null)
-        => _binaryFileService.Save(identifier, stream, contentType);
+        => binaryFileService.Save(identifier, stream, contentType);
     public Task Delete(string identifier)
-        => _binaryFileService.Delete(identifier);
+        => binaryFileService.Delete(identifier);
 
     public string GetAbsoluteUri(string identifier)
-        => _binaryFileService.GetAbsoluteUri(identifier);
+        => binaryFileService.GetAbsoluteUri(identifier);
     public string GetIdentifier(string uri)
-        => _binaryFileService.GetIdentifier(uri);
+        => binaryFileService.GetIdentifier(uri);
     public string? GetRelativeFolder(string identifier)
-        => _binaryFileService.GetRelativeFolder(identifier);
+        => binaryFileService.GetRelativeFolder(identifier);
 }

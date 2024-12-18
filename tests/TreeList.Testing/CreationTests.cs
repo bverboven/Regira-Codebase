@@ -176,7 +176,7 @@ public class CreationTests
     [Test]
     public async Task ReverseTree()
     {
-        var pm = new ProjectManager(new ProjectService(new ProjectParser(), new TextFileService(new BinaryFileService.FileServiceOptions { RootFolder = FindSolutionFolder() ?? "" })));
+        var pm = new ProjectManager(new ProjectService(new ProjectParser(), new TextFileService(new FileSystemOptions { RootFolder = FindSolutionFolder() ?? "" })));
         var tree = await pm.BuildTree();
         var reverseTree = tree.ReverseTree();
         // print tree

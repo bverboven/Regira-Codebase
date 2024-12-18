@@ -7,33 +7,27 @@ using Regira.IO.Utilities;
 
 namespace Regira.IO.Storage.Azure;
 
-public class BinaryBlobService : IFileService
+public class BinaryBlobService(AzureCommunicator communicator) : IFileService
 {
     protected internal BlobContainerClient Container
     {
         get
         {
-            if (Communicator.Container == null)
+            if (communicator.Container == null)
             {
                 throw new Exception("ContainerClient is not opened yet!");
             }
 
-            return Communicator.Container!;
+            return communicator.Container!;
         }
     }
-    public string RootFolder => Container.Uri.ToString();
-
-
-    protected internal AzureCommunicator Communicator { get; }
-    public BinaryBlobService(AzureCommunicator communicator)
-    {
-        Communicator = communicator;
-    }
+    public string Root => Container.Uri.ToString();
+    public string RootFolder => Root;
 
 
     public async Task<bool> Exists(string identifier)
     {
-        await Communicator.Open();
+        await communicator.Open();
         var blob = GetBlobReference(identifier);
         return await blob.ExistsAsync();
     }
@@ -51,7 +45,7 @@ public class BinaryBlobService : IFileService
     {
         so ??= new FileSearchObject();
 
-        await Communicator.Open();
+        await communicator.Open();
         var identifiers = new List<string>();
         await foreach (var blob in ListBlobs(so))
         {
@@ -121,7 +115,7 @@ public class BinaryBlobService : IFileService
     }
     protected async Task<Response<BlobDownloadResult>?> Download(string identifier)
     {
-        await Communicator.Open();
+        await communicator.Open();
         var blob = GetBlobReference(identifier);
         if (!await blob.ExistsAsync())
         {
@@ -133,7 +127,7 @@ public class BinaryBlobService : IFileService
 
     public async Task Move(string sourceIdentifier, string targetIdentifier)
     {
-        await Communicator.Open();
+        await communicator.Open();
         var sourceBlob = GetBlobReference(sourceIdentifier);
         var targetBlob = GetBlobReference(targetIdentifier);
         await targetBlob.StartCopyFromUriAsync(GetBlobUri(sourceIdentifier));
@@ -141,7 +135,7 @@ public class BinaryBlobService : IFileService
     }
     public async Task<string> Save(string identifier, byte[] bytes, string? contentType = null)
     {
-        await Communicator.Open();
+        await communicator.Open();
         var blob = GetBlobReference(identifier, contentType ?? ContentTypeUtility.GetContentType(identifier));
         var headers = new BlobHttpHeaders
         {
@@ -153,7 +147,7 @@ public class BinaryBlobService : IFileService
     }
     public async Task<string> Save(string identifier, Stream stream, string? contentType = null)
     {
-        await Communicator.Open();
+        await communicator.Open();
         var blob = GetBlobReference(identifier, contentType ?? ContentTypeUtility.GetContentType(identifier));
         stream.Position = 0;
         var bomBytes = new byte[4];
@@ -169,7 +163,7 @@ public class BinaryBlobService : IFileService
     }
     public async Task Delete(string identifier)
     {
-        await Communicator.Open();
+        await communicator.Open();
         var blob = GetBlobReference(identifier);
         await blob.DeleteIfExistsAsync();
     }
@@ -178,19 +172,19 @@ public class BinaryBlobService : IFileService
 
     public string GetAbsoluteUri(string identifier)
     {
-        Communicator.Open().Wait();
+        communicator.Open().Wait();
         return FileNameUtility.GetUri(identifier, RootFolder);
     }
 
     public string GetIdentifier(string uri)
     {
-        Communicator.Open().Wait();
+        communicator.Open().Wait();
         return FileNameUtility.GetRelativeUri(uri, RootFolder);
     }
 
     public string? GetRelativeFolder(string identifier)
     {
-        Communicator.Open().Wait();
+        communicator.Open().Wait();
         return FileNameUtility.GetRelativeFolder(identifier, RootFolder);
     }
 

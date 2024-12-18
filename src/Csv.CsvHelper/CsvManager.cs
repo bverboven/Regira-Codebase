@@ -5,17 +5,11 @@ using Regira.IO.Extensions;
 using Regira.Office.Csv.Abstractions;
 using Regira.Office.MimeTypes;
 using Regira.Utilities;
-using System.Globalization;
 
 namespace Regira.Office.Csv.CsvHelper;
 
-public class CsvManager : CsvManager<IDictionary<string, object>>, ICsvManager
+public class CsvManager(CsvOptions? options = null) : CsvManager<IDictionary<string, object>>(options), ICsvManager
 {
-    public CsvManager(Options? options = null)
-        : base(options)
-    {
-    }
-
     protected internal override async Task<List<IDictionary<string, object>>> Read(TextReader tr)
     {
         using var csvReader = GetReader(tr);
@@ -34,7 +28,7 @@ public class CsvManager : CsvManager<IDictionary<string, object>>, ICsvManager
         while (await csvReader.ReadAsync())
         {
             var dic = new Dictionary<string, object>();
-            for (var i = 0; i < numberOfKeys; i++)
+            for (var i = 0; i < keys.Count; i++)
             {
                 if (csvReader.TryGetField<string>(i, out var value))
                 {
@@ -50,7 +44,7 @@ public class CsvManager : CsvManager<IDictionary<string, object>>, ICsvManager
     protected internal override async Task Write(TextWriter tw, IEnumerable<IDictionary<string, object>> items)
     {
 #if NETSTANDARD2_0
-            using var csvWriter = GetWriter(tw);
+        using var csvWriter = GetWriter(tw);
 #else
         await using var csvWriter = GetWriter(tw);
 #endif
@@ -67,30 +61,13 @@ public class CsvManager : CsvManager<IDictionary<string, object>>, ICsvManager
             await csvWriter.NextRecordAsync();
             foreach (var key in keys)
             {
-                csvWriter.WriteField(item.ContainsKey(key) ? item[key] : string.Empty);
+                csvWriter.WriteField(item.TryGetValue(key, out var value) ? value : string.Empty);
             }
         }
     }
 }
-public class CsvManager<T> : ICsvManager<T>
+public class CsvManager<T>(CsvOptions? options = null) : ICsvManager<T>
 {
-
-    // ReSharper disable once StaticMemberInGenericType
-    static readonly CultureInfo DEFAULT_CULTURE = CultureInfo.InvariantCulture;
-    public class Options
-    {
-        public string Delimiter = ",";
-        public CultureInfo Culture { get; set; } = DEFAULT_CULTURE;
-        public bool IgnoreBadData = false;
-        public bool PreserveWhitespace = false;
-    }
-
-    protected readonly Options CsvOptions;
-    public CsvManager(Options? options = null)
-    {
-        CsvOptions = options ?? new Options();
-    }
-
     public async Task<List<T>> Read(string input)
     {
         using var sr = new StringReader(input);
@@ -98,12 +75,7 @@ public class CsvManager<T> : ICsvManager<T>
     }
     public async Task<List<T>> Read(IBinaryFile input)
     {
-        using var ms = input.GetStream();
-        if (ms == null)
-        {
-            throw new Exception("Could not get contents of file");
-        }
-
+        using var ms = input.GetStream() ?? throw new Exception("Could not get contents of file");
         using var sr = new StreamReader(ms);
         return await Read(sr);
     }
@@ -119,7 +91,7 @@ public class CsvManager<T> : ICsvManager<T>
     public async Task<string> Write(IEnumerable<T> items)
     {
 #if NETSTANDARD2_0
-            using var sw = new StringWriter();
+        using var sw = new StringWriter();
 #else
         await using var sw = new StringWriter();
 #endif
@@ -130,8 +102,8 @@ public class CsvManager<T> : ICsvManager<T>
     {
         // create a MemoryStream to avoid error "Cannot access a closed Stream"
 #if NETSTANDARD2_0
-            var ms = new MemoryStream();
-            var sw = new StreamWriter(ms);
+        var ms = new MemoryStream();
+        var sw = new StreamWriter(ms);
 #else
         var ms = new MemoryStream();
         var sw = new StreamWriter(ms);
@@ -144,7 +116,7 @@ public class CsvManager<T> : ICsvManager<T>
     protected internal virtual async Task Write(TextWriter tw, IEnumerable<T> items)
     {
 #if NETSTANDARD2_0
-            using var csvWriter = GetWriter(tw);
+        using var csvWriter = GetWriter(tw);
 #else
         await using var csvWriter = GetWriter(tw);
 
@@ -156,13 +128,14 @@ public class CsvManager<T> : ICsvManager<T>
     protected CsvWriter GetWriter(TextWriter tw) => new(tw, GetConfiguration(), true);
     protected CsvConfiguration GetConfiguration()
     {
-        var config = new CsvConfiguration(CsvOptions.Culture)
+        options ??= new CsvOptions();
+        var config = new CsvConfiguration(options.Culture)
         {
-            TrimOptions = CsvOptions.PreserveWhitespace ? TrimOptions.None : TrimOptions.Trim,
-            Delimiter = CsvOptions.Delimiter
+            TrimOptions = options.PreserveWhitespace ? TrimOptions.None : TrimOptions.Trim,
+            Delimiter = options.Delimiter
         };
 
-        if (CsvOptions.IgnoreBadData)
+        if (options.IgnoreBadData)
         {
             config.BadDataFound = null;
         }

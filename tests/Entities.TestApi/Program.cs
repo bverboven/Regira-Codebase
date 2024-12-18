@@ -8,10 +8,10 @@ using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Extensions;
 using Regira.Entities.EFcore.Attachments;
+using Regira.IO.Storage.FileSystem;
 using Regira.Utilities;
 using System.Text;
 using System.Text.Json.Serialization;
-using Regira.IO.Storage.FileSystem;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
@@ -44,7 +44,7 @@ builder.Services
     .AddDbContext<ContosoContext>((_, db) => db.UseSqlite(ApiConfiguration.ConnectionString))
     .AddAutoMapper(c => c.AllowNullCollections = true)
     .UseEntities<ContosoContext>()
-    .ConfigureAttachmentService(_ => new BinaryFileService(new BinaryFileService.FileServiceOptions { RootFolder = ApiConfiguration.AttachmentsDirectory }))
+    .ConfigureAttachmentService(_ => new BinaryFileService(new FileSystemOptions { RootFolder = ApiConfiguration.AttachmentsDirectory }))
     //.ConfigureAttachmentService(_ => new BinaryBlobService(new AzureCommunicator(new AzureConfig
     //{
     //    ConnectionString = builder.Configuration["Storage:Azure:ConnectionString"],

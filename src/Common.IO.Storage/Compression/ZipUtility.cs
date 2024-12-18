@@ -8,14 +8,14 @@ namespace Regira.IO.Storage.Compression;
 
 public static class ZipUtility
 {
-    public static ZipArchive ToZipArchive(IBinaryFile file)
+    public static ZipArchive ToZipArchive(this IBinaryFile file)
         => new(file.GetStream() ?? throw new Exception("Could not retrieve stream"), ZipArchiveMode.Update, true);
 
-    public static IMemoryFile Zip(IEnumerable<IBinaryFile> files)
+    public static IMemoryFile Zip(this IEnumerable<IBinaryFile> files)
     {
         var zipStream = new MemoryStream();
 
-        using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
+        using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Update, true))
         {
             AddFiles(archive, files);
         }
@@ -23,7 +23,7 @@ public static class ZipUtility
 
         return zipStream.ToMemoryFile();
     }
-    public static IMemoryFile Zip(IEnumerable<string> paths, string? baseFolder = null)
+    public static IMemoryFile Zip(this IEnumerable<string> paths, string? baseFolder = null)
     {
         var zipFiles = GetFiles(paths, baseFolder);
         return Zip(zipFiles);
@@ -62,24 +62,22 @@ public static class ZipUtility
         using var archive = new ZipArchive(zipArchive, ZipArchiveMode.Update, true);
         AddFiles(archive, files);
     }
-    public static void AddFiles(ZipArchive archive, IEnumerable<IBinaryFile> files)
+    public static void AddFiles(this ZipArchive archive, IEnumerable<IBinaryFile> files)
     {
         foreach (var zipFile in files)
         {
             AddFile(archive, zipFile);
         }
     }
-    public static void AddFile(ZipArchive archive, IBinaryFile file)
+    public static void AddFile(this ZipArchive archive, IBinaryFile file)
     {
         using var fileStream = file.GetStream();
         if (fileStream != null)
         {
-            var filename = file.Identifier ?? file.FileName;
-            if (string.IsNullOrWhiteSpace(filename))
-            {
-                throw new Exception($"{nameof(file.Identifier)} and {nameof(file.FileName)} of file should not be empty");
-            }
-            var entry = archive.CreateEntry(filename);
+            var filename = file.Identifier
+                ?? file.FileName
+                ?? throw new Exception($"{nameof(file.Identifier)} and {nameof(file.FileName)} of file should not be empty");
+            var entry = archive.Find(filename) ?? archive.CreateEntry(filename);
             using var entryStream = entry.Open();
             fileStream.Seek(0, SeekOrigin.Begin);
             fileStream.CopyTo(entryStream);
@@ -99,7 +97,7 @@ public static class ZipUtility
         using var archive = new ZipArchive(zipArchive, ZipArchiveMode.Update, true);
         RemoveFiles(archive, files);
     }
-    public static void RemoveFiles(ZipArchive zipArchive, IEnumerable<IBinaryFile> files)
+    public static void RemoveFiles(this ZipArchive zipArchive, IEnumerable<IBinaryFile> files)
     {
         var entries = zipArchive.Entries.Where(e => files.Any(f => (f.Identifier ?? f.FileName) == e.FullName)).ToArray();
         foreach (var entry in entries)
@@ -108,7 +106,10 @@ public static class ZipUtility
         }
     }
 
-    private static string[] ExtractFiles(string targetDirectory, IEnumerable<ZipArchiveEntry> entries)
+    public static ZipArchiveEntry? Find(this ZipArchive zipArchive, string identifier)
+        => zipArchive.Entries.SingleOrDefault(e => e.FullName == identifier);
+
+    public static string[] ExtractFiles(string targetDirectory, IEnumerable<ZipArchiveEntry> entries)
     {
         var files = new List<string>();
 
@@ -135,27 +136,26 @@ public static class ZipUtility
 
         return files.ToArray();
     }
-    private static IBinaryFile[] ExtractFiles(ZipArchive archive)
+    public static IBinaryFile ToBinaryFile(this ZipArchiveEntry entry)
     {
-        return archive.Entries
-            .Select(entry =>
-            {
-                var ms = new MemoryStream();
-                using var entryStream = entry.Open();
-                entryStream.CopyTo(ms);
-                IBinaryFile item = new BinaryFileItem
-                {
-                    Identifier = entry.FullName,
-                    FileName = entry.Name,
-                    Length = entry.Length,
-                    Stream = ms
-                };
-                return item;
-            })
-            .ToArray();
+        var ms = new MemoryStream();
+        using var entryStream = entry.Open();
+        entryStream.CopyTo(ms);
+        var item = new BinaryFileItem
+        {
+            Identifier = entry.FullName,
+            FileName = entry.Name,
+            Length = entry.Length,
+            Stream = ms
+        };
+        return item;
     }
+    public static IBinaryFile[] ExtractFiles(this ZipArchive archive)
+        => archive.Entries
+            .Select(ToBinaryFile)
+            .ToArray();
 
-    private static IEnumerable<IBinaryFile> GetFiles(IEnumerable<string> paths, string? baseFolder = null)
+    public static IEnumerable<IBinaryFile> GetFiles(IEnumerable<string> paths, string? baseFolder = null)
     {
         var fileCollection = paths.ToArray();
         baseFolder ??= FileNameHelper.GetBaseFolder(fileCollection);
@@ -170,7 +170,7 @@ public static class ZipUtility
             });
     }
 
-    private static bool IsDirectory(ZipArchiveEntry entry)
+    public static bool IsDirectory(this ZipArchiveEntry entry)
     {
         return entry.FullName.EndsWith("/");
     }

@@ -4,32 +4,28 @@ using Renci.SshNet.Sftp;
 
 namespace Regira.IO.Storage.SSH;
 
-public class SftpService : IFileService
+public class SftpService(SftpCommunicator communicator) : IFileService
 {
-    public string RootFolder => _communicator.ContainerName;
-    private readonly SftpCommunicator _communicator;
-    public SftpService(SftpCommunicator communicator)
-    {
-        _communicator = communicator;
-    }
+    public string Root => communicator.ContainerName;
+    public string RootFolder => Root;
 
 
     public async Task<bool> Exists(string identifier)
     {
-        var client = await _communicator.Open();
+        var client = await communicator.Open();
         var fileUri = FileNameUtility.GetUri(identifier, RootFolder);
         return client.Exists(fileUri);
     }
     public async Task<byte[]?> GetBytes(string identifier)
     {
-        var client = await _communicator.Open();
+        var client = await communicator.Open();
         var fileUri = FileNameUtility.GetUri(identifier, RootFolder);
 
         return client.ReadAllBytes(fileUri);
     }
     public async Task<Stream?> GetStream(string identifier)
     {
-        var client = await _communicator.Open();
+        var client = await communicator.Open();
         var fileUri = FileNameUtility.GetUri(identifier, RootFolder);
 
         return client.OpenRead(fileUri);
@@ -38,7 +34,7 @@ public class SftpService : IFileService
     {
         so ??= new FileSearchObject();
         var folderUri = !string.IsNullOrWhiteSpace(so.FolderUri) ? FileNameUtility.GetUri(so.FolderUri!, RootFolder) : RootFolder;
-        var client = await _communicator.Open();
+        var client = await communicator.Open();
         var sftpFiles = List(client, folderUri, so.Recursive);
         var files = sftpFiles
             .Where(f => so.Type == FileEntryTypes.Files && f.IsRegularFile
@@ -66,7 +62,7 @@ public class SftpService : IFileService
 
     public async Task Move(string sourceIdentifier, string targetIdentifier)
     {
-        var client = await _communicator.Open();
+        var client = await communicator.Open();
         var sourceUri = FileNameUtility.GetUri(sourceIdentifier, RootFolder);
         var targetUri = FileNameUtility.GetUri(targetIdentifier, RootFolder);
 #if NETSTANDARD2_0
@@ -86,7 +82,7 @@ public class SftpService : IFileService
     }
     public async Task<string> Save(string identifier, byte[] bytes, string? contentType = null)
     {
-        var client = await _communicator.Open();
+        var client = await communicator.Open();
         var fileUri = FileNameUtility.GetUri(identifier, RootFolder);
 
         await CreateDirectory(identifier);
@@ -96,7 +92,7 @@ public class SftpService : IFileService
     }
     public async Task<string> Save(string identifier, Stream stream, string? contentType = null)
     {
-        var client = await _communicator.Open();
+        var client = await communicator.Open();
         var fileUri = FileNameUtility.GetUri(identifier, RootFolder);
 
         await CreateDirectory(identifier);
@@ -112,19 +108,19 @@ public class SftpService : IFileService
 
     protected async Task CreateDirectory(string identifier)
     {
-        var dir = FileNameUtility.GetRelativeFolder(identifier, RootFolder);
+        var dir = FileNameUtility.GetRelativeFolder(identifier, RootFolder)!;
         if (!string.IsNullOrWhiteSpace(dir) && !await Exists(dir))
         {
             var dirUri = FileNameUtility.GetUri(dir, RootFolder);
             await CreateDirectory(dirUri);
 
-            var client = await _communicator.Open();
+            var client = await communicator.Open();
             client.CreateDirectory(dirUri);
         }
     }
     public async Task Delete(string identifier)
     {
-        var client = await _communicator.Open();
+        var client = await communicator.Open();
         var fileUri = FileNameUtility.GetUri(identifier, RootFolder);
 
         if (!client.Exists(fileUri))

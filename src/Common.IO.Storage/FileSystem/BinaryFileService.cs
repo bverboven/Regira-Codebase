@@ -1,23 +1,13 @@
 using Regira.IO.Storage.Abstractions;
 
 namespace Regira.IO.Storage.FileSystem;
-
-public class BinaryFileService : IFileService
+public class BinaryFileService(FileSystemOptions options) : IFileService
 {
-    public class FileServiceOptions
-    {
-        public string RootFolder { get; set; } = string.Empty;
-    }
-    public string RootFolder { get; }
-    [Obsolete("Deprecated, use constructor with FileServiceOptions instead", false)]
-    public BinaryFileService(string rootFolder)
-        : this(new FileServiceOptions { RootFolder = rootFolder })
-    {
-    }
-    public BinaryFileService(FileServiceOptions options)
-    {
-        RootFolder = options.RootFolder;
-    }
+    [Obsolete("Please use FileSystem.FileServiceOptions instead", false)]
+    public class FileServiceOptions : FileSystemOptions;
+
+    public string Root => options.RootFolder;
+    public string RootFolder => Root;
 
 
     public Task<bool> Exists(string identifier)

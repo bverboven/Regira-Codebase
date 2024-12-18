@@ -9,19 +9,10 @@ namespace Regira.IO.Storage.GitHub;
 /// <summary>
 /// Based on https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28
 /// </summary>
-public class GitHubService : IFileService
+public class GitHubService(GitHubOptions options, ISerializer serializer) : IFileService
 {
-    public string RootFolder { get; }
-
-    private readonly GitHubOptions _options;
-    private readonly ISerializer _serializer;
-    public GitHubService(GitHubOptions options, ISerializer serializer)
-    {
-        _options = options;
-        _serializer = serializer;
-        // Remove trailing slash when using api trees (https://docs.github.com/en/rest/git/trees)
-        RootFolder = _options.Uri.TrimEnd('/') + "/contents/";
-    }
+    public string Root { get; } = options.Uri.TrimEnd('/') + "/contents/"; // Remove trailing slash when using api trees (https://docs.github.com/en/rest/git/trees)
+    public string RootFolder => Root;
 
     public async Task<bool> Exists(string identifier)
     {
@@ -56,7 +47,7 @@ public class GitHubService : IFileService
         var response = await httpClient.GetAsync(listUri);
         response.EnsureSuccessStatusCode();
         var content = await response.Content.ReadAsStringAsync();
-        var items = _serializer.Deserialize<GitHubItem[]>(content)!;
+        var items = serializer.Deserialize<GitHubItem[]>(content)!;
 
         var files = new List<string>();
         foreach (var item in items)
@@ -128,10 +119,10 @@ public class GitHubService : IFileService
             BaseAddress = new Uri(RootFolder)
         };
 
-        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(_options.UserAgent ?? Assembly.GetExecutingAssembly().GetName().Name);
-        if (!string.IsNullOrEmpty(_options.Key))
+        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(options.UserAgent ?? Assembly.GetExecutingAssembly().GetName().Name);
+        if (!string.IsNullOrEmpty(options.Key))
         {
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.Key);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.Key);
         }
 
         return httpClient;
