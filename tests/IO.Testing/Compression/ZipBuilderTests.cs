@@ -37,7 +37,7 @@ public class ZipBuilderTests
         using var zipFile = await zipBuilder
             .For(_sourceFiles)
             .Build();
-        ClassicAssert.IsNotEmpty(zipFile.GetBytes()!);
+        Assert.That(zipFile.GetBytes()!, Is.Not.Empty);
         Assert.That(zipFile.GetLength() > 0, Is.True);
     }
     [Test]

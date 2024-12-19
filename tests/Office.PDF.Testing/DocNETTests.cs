@@ -107,8 +107,8 @@ Simple PDF File 2
         var textsWithEmptyPages = _pdfService.GetTextPerPage(bf);
         using var resultPdf = _pdfService.RemoveEmptyPages(bf);
         var texts = _pdfService.GetTextPerPage(resultPdf!.ToBinaryFile());
-        ClassicAssert.IsNotEmpty(texts);
-        ClassicAssert.IsNotEmpty(textsWithEmptyPages.Where(string.IsNullOrWhiteSpace));
+        Assert.That(texts, Is.Not.Empty);
+        Assert.That(textsWithEmptyPages.Where(string.IsNullOrWhiteSpace), Is.Not.Empty);
         ClassicAssert.IsEmpty(texts.Where(string.IsNullOrWhiteSpace));
     }
 

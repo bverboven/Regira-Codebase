@@ -33,7 +33,7 @@ public class RepositoryTests : IDisposable
         await _personRepo.Save(person);
 
         var collections = await _mongoCommunicator.ListCollectionNames().ToListAsync();
-        ClassicAssert.IsNotEmpty(collections);
+        Assert.That(collections, Is.Not.Empty);
 
         _personRepo.Delete(person).Wait();
     }
@@ -77,7 +77,7 @@ public class RepositoryTests : IDisposable
         await _personRepo.Save(person);
 
         var persons = (await _personRepo.List(new { person.Id })).AsList();
-        ClassicAssert.IsNotEmpty(persons);
+        Assert.That(persons, Is.Not.Empty);
         Assert.That(persons.Count, Is.EqualTo(1));
 
         await _personRepo.Delete(person);

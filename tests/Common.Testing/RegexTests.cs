@@ -131,7 +131,7 @@ Vivamus tempus enim lacinia nisi molestie vulputate. Praesent 1:2:3:4:5:6:7:8 tu
     public void TestExtractEmails()
     {
         var matches = RegexUtility.ExtractEmails(TestInput);
-        ClassicAssert.IsNotEmpty(matches);
+        Assert.That(matches, Is.Not.Empty);
         Assert.That(matches.Length == 2, Is.True);
         Assert.That(matches, Has.Member("info@regira.com"));
         Assert.That(matches, Has.Member("bbv.info@regira.com"));
@@ -140,7 +140,7 @@ Vivamus tempus enim lacinia nisi molestie vulputate. Praesent 1:2:3:4:5:6:7:8 tu
     public void TestExtractUrls()
     {
         var matches = RegexUtility.ExtractUrls(TestInput);
-        ClassicAssert.IsNotEmpty(matches);
+        Assert.That(matches, Is.Not.Empty);
         //Assert.IsTrue(matches.Length == 2);//ToDo: pattern is also extracting parts of email-addresses for now
         Assert.That(matches, Has.Member("regira.com"));
         Assert.That(matches, Has.Member("https://www.regira.com"));
@@ -149,7 +149,7 @@ Vivamus tempus enim lacinia nisi molestie vulputate. Praesent 1:2:3:4:5:6:7:8 tu
     public void TestExtractPhoneNumbers()
     {
         var matches = RegexUtility.ExtractPhoneNumbers(TestInput);
-        ClassicAssert.IsNotEmpty(matches);
+        Assert.That(matches, Is.Not.Empty);
         //Assert.IsTrue(matches.Length == 3); // also extracting IP 192.168.0.1
         Assert.That(matches, Has.Member("+32 3 384 30"));
         Assert.That(matches, Has.Member("0032 (0)3 384 30 44"));
@@ -159,7 +159,7 @@ Vivamus tempus enim lacinia nisi molestie vulputate. Praesent 1:2:3:4:5:6:7:8 tu
     public void TestExtractIPs()
     {
         var matches = RegexUtility.ExtractIPAddresses(TestInput);
-        ClassicAssert.IsNotEmpty(matches);
+        Assert.That(matches, Is.Not.Empty);
         Assert.That(matches.Length == 2, Is.True);
         Assert.That(matches, Has.Member("192.168.0.1"));
         Assert.That(matches, Has.Member("1:2:3:4:5:6:7:8"));

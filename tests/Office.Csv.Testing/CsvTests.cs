@@ -34,7 +34,7 @@ public class CsvTests
     [TestCase(SAMPLE_1)]
     public async Task Read(string input)
     {
-        var csvMgr = new CsvManager<dynamic>(new CsvOptions { Culture = CultureInfo.CurrentCulture });
+        var csvMgr = new CsvManager<dynamic>(new CsvHelperOptions { Culture = CultureInfo.CurrentCulture });
         var records = await csvMgr.Read(input);
         Assert.That(records, Is.Not.Empty);
         ClassicAssert.AreEqual("1", records.First().Id);
@@ -45,7 +45,7 @@ public class CsvTests
     {
         var inputPath = Path.Combine(_inputDir, "cities.csv");
 
-        var csvMgr = new CsvManager<CsvCity>(new CsvOptions
+        var csvMgr = new CsvManager<CsvCity>(new CsvHelperOptions
         {
             Culture = CultureInfo.CurrentCulture,
             IgnoreBadData = true
@@ -75,7 +75,7 @@ public class CsvTests
         var csvMgr = new CsvManager<CsvProduct>();
 
         var csvString = await csvMgr.Write(products);
-        ClassicAssert.IsNotEmpty(csvString);
+        Assert.That(csvString, Is.Not.Empty);
 
         using var csvFile = await csvMgr.WriteFile(products);
         await csvFile.SaveAs(outputPath);
@@ -101,10 +101,10 @@ public class CsvTests
             .Select(p => DictionaryUtility.ToDictionary(p))
             .ToList();
 
-        var csvMgr = new CsvManager(new CsvOptions { Culture = CultureInfo.CurrentCulture });
+        var csvMgr = new CsvManager(new CsvHelperOptions { Culture = CultureInfo.CurrentCulture });
 
         var csvString = await csvMgr.Write(products!);
-        ClassicAssert.IsNotEmpty(csvString);
+        Assert.That(csvString, Is.Not.Empty);
 
         using var csvFile = await csvMgr.WriteFile(products!);
         await csvFile.SaveAs(outputPath);
@@ -123,7 +123,7 @@ public class CsvTests
         var products = productRule.Generate(100)
             .Select(p => DictionaryUtility.ToDictionary(p))
             .ToList();
-        var csvMgr = new CsvManager(new CsvOptions { Culture = CultureInfo.CurrentCulture });
+        var csvMgr = new CsvManager(new CsvHelperOptions { Culture = CultureInfo.CurrentCulture });
 
         var csvString = await csvMgr.Write(products!);
         var writtenProducts = await csvMgr.Read(csvString);

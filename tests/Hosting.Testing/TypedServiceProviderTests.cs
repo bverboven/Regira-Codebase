@@ -39,6 +39,19 @@ public class TypedServiceProviderTests
         Assert.That(serviceC, Is.TypeOf<ServiceC>());
     }
     [Test]
+    public void Test_TypedServiceProviders()
+    {
+        var services = new ServiceCollection()
+            .AddTypedProvider<TypeA, ITestImplementation>(p => new ServiceA())
+            .AddTypedProvider<TypeA, ITestImplementation>(p => new ServiceB())
+            .AddTypedProvider<TypeC, IDummy>(p => new ServiceC());
+        var sp = services.BuildServiceProvider();
+        var servicesA = sp.GetTypedImplementations<TypeA, ITestImplementation>();
+
+        Assert.That(servicesA.Count(), Is.EqualTo(2));
+        Assert.That(servicesA, Is.All.AssignableTo<ITestImplementation>());
+    }
+    [Test]
     public void Test_TypedServiceProvider_Without_Factory()
     {
         var services = new ServiceCollection()

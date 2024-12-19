@@ -23,7 +23,7 @@ public static class BinaryFileExtensions
             return binaryFile;
         }
 
-        return new BinaryFileItem
+        var item = new BinaryFileItem
         {
             Bytes = file.Bytes,
             Stream = file.Stream,
@@ -31,6 +31,13 @@ public static class BinaryFileExtensions
             ContentType = file.ContentType,
             FileName = filename
         };
+
+        if (string.IsNullOrWhiteSpace(item.FileName) && file is INamedFile namedFile)
+        {
+            item.FileName = filename ?? namedFile.FileName;
+        }
+
+        return item;
     }
 
     public static bool HasPath(this IBinaryFile file)

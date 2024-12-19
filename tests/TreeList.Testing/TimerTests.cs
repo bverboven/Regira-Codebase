@@ -102,7 +102,7 @@ public class TimerTests
                 //var tree = persons.ToTreeList(x => x.Parent);
                 var personList = persons.AsList();
                 var tree = personList.ToTreeList(personList.FindAll(p => p.Parent == null), node => personList.Where(p => p.Parent == node.Value));
-                ClassicAssert.IsNotEmpty(tree);
+                Assert.That(tree, Is.Not.Empty);
                 return new { duration = (DateTime.Now - start).TotalMilliseconds, tree };
             })
             .ToList();
@@ -122,7 +122,7 @@ public class TimerTests
                 var start = DateTime.Now;
                 var tree = new TreeList<SimplePerson>();
                 tree.Fill(persons, x => new[] { x.Parent }.Where(p => p != null)!);
-                ClassicAssert.IsNotEmpty(tree);
+                Assert.That(tree, Is.Not.Empty);
                 return new { duration = (DateTime.Now - start).TotalMilliseconds, tree };
             })
             .ToList();
@@ -168,7 +168,7 @@ public class TimerTests
                         }
                     }
 
-                    ClassicAssert.IsNotEmpty(tree);
+                    Assert.That(tree, Is.Not.Empty);
                 }
 
                 return new
@@ -220,7 +220,7 @@ public class TimerTests
                     }
                 }
 
-                ClassicAssert.IsNotEmpty(tree);
+                Assert.That(tree, Is.Not.Empty);
                 return new
                 {
                     duration = (DateTime.Now - start).TotalMilliseconds,

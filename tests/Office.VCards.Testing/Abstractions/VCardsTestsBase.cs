@@ -43,7 +43,7 @@ END:VCARD";
     public virtual void Write_Empty()
     {
         var content = _manager.Write(new VCard());
-        ClassicAssert.IsNotEmpty(content);
+        Assert.That(content, Is.Not.Empty);
     }
     [Test]
     public virtual void Can_Write_V2_1() => CanWrite(CardSamples.BramCard, VCardVersion.V2_1);

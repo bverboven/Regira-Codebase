@@ -3,16 +3,17 @@ using CsvHelper.Configuration;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Office.Csv.Abstractions;
+using Regira.Office.Csv.Models;
 using Regira.Office.MimeTypes;
 using Regira.Utilities;
 
 namespace Regira.Office.Csv.CsvHelper;
 
-public class CsvManager(CsvOptions? options = null) : CsvManager<IDictionary<string, object>>(options), ICsvManager
+public class CsvManager(CsvHelperOptions? options = null) : CsvManager<IDictionary<string, object>>(options), ICsvManager
 {
-    protected internal override async Task<List<IDictionary<string, object>>> Read(TextReader tr)
+    protected internal override async Task<List<IDictionary<string, object>>> Read(TextReader tr, CsvOptions? options = null)
     {
-        using var csvReader = GetReader(tr);
+        using var csvReader = GetReader(tr, options);
 
         // headers
         var keys = new List<string>();
@@ -41,12 +42,12 @@ public class CsvManager(CsvOptions? options = null) : CsvManager<IDictionary<str
 
         return items;
     }
-    protected internal override async Task Write(TextWriter tw, IEnumerable<IDictionary<string, object>> items)
+    protected internal override async Task Write(TextWriter tw, IEnumerable<IDictionary<string, object>> items, CsvOptions? options = null)
     {
 #if NETSTANDARD2_0
-        using var csvWriter = GetWriter(tw);
+        using var csvWriter = GetWriter(tw, options);
 #else
-        await using var csvWriter = GetWriter(tw);
+        await using var csvWriter = GetWriter(tw, options);
 #endif
 
         var itemList = items.AsList();
@@ -66,76 +67,71 @@ public class CsvManager(CsvOptions? options = null) : CsvManager<IDictionary<str
         }
     }
 }
-public class CsvManager<T>(CsvOptions? options = null) : ICsvManager<T>
+public class CsvManager<T>(CsvHelperOptions? defaultOptions = null) : ICsvManager<T>
 {
-    public async Task<List<T>> Read(string input)
+    public async Task<List<T>> Read(string input, CsvOptions? options = null)
     {
         using var sr = new StringReader(input);
-        return await Read(sr);
+        return await Read(sr, options);
     }
-    public async Task<List<T>> Read(IBinaryFile input)
+    public async Task<List<T>> Read(IBinaryFile input, CsvOptions? options = null)
     {
         using var ms = input.GetStream() ?? throw new Exception("Could not get contents of file");
         using var sr = new StreamReader(ms);
-        return await Read(sr);
+        return await Read(sr, options);
     }
-    protected internal virtual async Task<List<T>> Read(TextReader tr)
+    protected internal virtual async Task<List<T>> Read(TextReader tr, CsvOptions? options = null)
     {
-        using var csvReader = GetReader(tr);
+        using var csvReader = GetReader(tr, options);
 
         var records = csvReader.GetRecordsAsync<T>();
         return await records.ToListAsync();
     }
 
 
-    public async Task<string> Write(IEnumerable<T> items)
+    public async Task<string> Write(IEnumerable<T> items, CsvOptions? options = null)
     {
 #if NETSTANDARD2_0
         using var sw = new StringWriter();
 #else
         await using var sw = new StringWriter();
 #endif
-        await Write(sw, items);
+        await Write(sw, items, options);
         return sw.ToString();
     }
-    public async Task<IMemoryFile> WriteFile(IEnumerable<T> items)
+    public async Task<IMemoryFile> WriteFile(IEnumerable<T> items, CsvOptions? options = null)
     {
         // create a MemoryStream to avoid error "Cannot access a closed Stream"
-#if NETSTANDARD2_0
         var ms = new MemoryStream();
         var sw = new StreamWriter(ms);
-#else
-        var ms = new MemoryStream();
-        var sw = new StreamWriter(ms);
-#endif
-        await Write(sw, items);
+
+        await Write(sw, items, options);
 
         ms.Seek(0, SeekOrigin.Begin);
         return ms.ToMemoryFile(ContentTypes.CSV);
     }
-    protected internal virtual async Task Write(TextWriter tw, IEnumerable<T> items)
+    protected internal virtual async Task Write(TextWriter tw, IEnumerable<T> items, CsvOptions? options = null)
     {
 #if NETSTANDARD2_0
-        using var csvWriter = GetWriter(tw);
+        using var csvWriter = GetWriter(tw, options);
 #else
-        await using var csvWriter = GetWriter(tw);
-
+        await using var csvWriter = GetWriter(tw, options);
 #endif
         await csvWriter.WriteRecordsAsync(items);
     }
 
-    protected CsvReader GetReader(TextReader tr) => new(tr, GetConfiguration(), true);
-    protected CsvWriter GetWriter(TextWriter tw) => new(tw, GetConfiguration(), true);
-    protected CsvConfiguration GetConfiguration()
+    protected CsvReader GetReader(TextReader tr, CsvOptions? options) => new(tr, GetConfiguration(options), true);
+    protected CsvWriter GetWriter(TextWriter tw, CsvOptions? options) => new(tw, GetConfiguration(options), true);
+    protected CsvConfiguration GetConfiguration(CsvOptions? options)
     {
-        options ??= new CsvOptions();
-        var config = new CsvConfiguration(options.Culture)
+        defaultOptions ??= new CsvHelperOptions();
+        var config = new CsvConfiguration(options?.Culture ?? defaultOptions.Culture)
         {
-            TrimOptions = options.PreserveWhitespace ? TrimOptions.None : TrimOptions.Trim,
-            Delimiter = options.Delimiter
+            TrimOptions = defaultOptions.PreserveWhitespace ? TrimOptions.None : TrimOptions.Trim,
+            Delimiter = options?.Delimiter ?? defaultOptions.Delimiter,
         };
 
-        if (options.IgnoreBadData)
+        if (defaultOptions.IgnoreBadData)
         {
             config.BadDataFound = null;
         }

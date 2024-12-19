@@ -17,4 +17,9 @@ public static class TypedServiceProviderExtensions
         var provider = sp.GetService<ITypedServiceProvider<T, TService>>();
         return provider != null ? provider.Provide() : default;
     }
+    public static IEnumerable<TService> GetTypedImplementations<T, TService>(this IServiceProvider sp)
+    {
+        var providers = sp.GetServices<ITypedServiceProvider<T, TService>>();
+        return providers.Select(p => p.Provide());
+    }
 }
