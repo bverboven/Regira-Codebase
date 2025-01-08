@@ -13,7 +13,7 @@ using Regira.Utilities;
 namespace Entities.Testing;
 
 [TestFixture]
-public class PrimerTests
+public class InterceptorTests
 {
     private SqliteConnection _connection = null!;
     [SetUp]
@@ -30,12 +30,14 @@ public class PrimerTests
 
 
     [Test]
-    public async Task Execute_EntityPrimer_By_ExtensionMethod()
+    public async Task Execute_EntityPrimer_By_Interceptor()
     {
-        IServiceCollection services = new ServiceCollection();
-        services.AddDbContext<ProductContext>(db => db.UseSqlite(_connection));
-        services.Add(new ServiceDescriptor(typeof(IEntityPrimer<Product>), _ => new ProductPrimer(), ServiceLifetime.Transient));
-        services.RegisterPrimerContainer<ProductContext>();
+        var services = new ServiceCollection()
+            .AddDbContext<ProductContext>(db =>
+                db.UseSqlite(_connection)
+                    .AddPrimerInterceptors([new ProductPrimer()])
+            );
+
         var sp = services.BuildServiceProvider();
         var dbContext = sp.GetRequiredService<ProductContext>();
         await dbContext.Database.EnsureCreatedAsync();
@@ -46,7 +48,7 @@ public class PrimerTests
         };
         dbContext.Products.Add(item);
 
-        await dbContext.ApplyPrimers();
+        await dbContext.SaveChangesAsync();
 
         Assert.That(item.Description, Is.EqualTo(ProductPrimer.DescriptionMessage));
         Assert.That(item.Created, Is.EqualTo(DateTime.MinValue));
@@ -57,9 +59,12 @@ public class PrimerTests
     public async Task ApplyTo_Interface()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddDbContext<ProductContext>(db => db.UseSqlite(_connection));
         services.Add(new ServiceDescriptor(typeof(IEntityPrimer<IHasEncryptedPassword>), _ => new PasswordPrimer(), ServiceLifetime.Transient));
-        services.RegisterPrimerContainer<ProductContext>();
+        services.AddDbContext<ProductContext>(db =>
+                db.UseSqlite(_connection)
+                    .AddPrimerInterceptors(services)
+            );
+
         var sp = services.BuildServiceProvider();
         var dbContext = sp.GetRequiredService<ProductContext>();
         await dbContext.Database.EnsureCreatedAsync();
@@ -72,7 +77,7 @@ public class PrimerTests
 
         dbContext.UserAccounts.Add(account);
 
-        await dbContext.ApplyPrimers();
+        await dbContext.SaveChangesAsync();
 
         ClassicAssert.IsNotNull(account.EncryptedPassword);
         Assert.That(account.EncryptedPassword, Is.EqualTo(account.Password.Base64Encode()));
@@ -83,8 +88,11 @@ public class PrimerTests
     public async Task Fill_Timestamps()
     {
         IServiceCollection services = new ServiceCollection();
-        services.Add(new ServiceDescriptor(typeof(IEntityPrimer<IHasTimestamps>), _ => new TimestampPrimer(), ServiceLifetime.Transient));
-        services.AddDbContext<ProductContext>(db => db.UseSqlite(_connection));
+        services.AddDbContext<ProductContext>((db) =>
+        {
+            db.UseSqlite(_connection)
+                .AddPrimerInterceptors([new TimestampPrimer()]);
+        });
         services.RegisterPrimerContainer<ProductContext>();
 
         var sp = services.BuildServiceProvider();
@@ -99,7 +107,6 @@ public class PrimerTests
         };
         dbContext.Products.Add(item);
 
-        await dbContext.ApplyPrimers();
         await dbContext.SaveChangesAsync();
 
         Assert.That(item.Created, Is.EqualTo(created));
@@ -107,21 +114,22 @@ public class PrimerTests
 
         dbContext.Entry(item).State = EntityState.Modified;
 
-        await dbContext.ApplyPrimers();
         await dbContext.SaveChangesAsync();
         Assert.That(item.Created, Is.EqualTo(created));
         Assert.That(item.LastModified, Is.Not.Null);
 
         Assert.That(item.LastModified, Is.GreaterThan(item.Created));
     }
-
     [Test]
     public async Task Fill_ChildCollection_Timestamps()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddDbContext<ProductContext>(db => db.UseSqlite(_connection).EnableSensitiveDataLogging());
         services.Add(new ServiceDescriptor(typeof(IEntityPrimer<IHasTimestamps>), _ => new TimestampPrimer(), ServiceLifetime.Transient));
-        services.RegisterPrimerContainer<ProductContext>();
+        services.AddDbContext<ProductContext>(db =>
+            db.UseSqlite(_connection)
+                .AddPrimerInterceptors(services)
+        );
+
         var sp = services.BuildServiceProvider();
 
         var created = DateTime.Now.AddDays(-1);
@@ -144,7 +152,6 @@ public class PrimerTests
             };
             dbContext.Categories.Add(item);
 
-            await dbContext.ApplyPrimers();
             await dbContext.SaveChangesAsync();
         }
 
@@ -172,7 +179,7 @@ public class PrimerTests
             dbContext.Update(originalItem);
             dbContext.Entry(originalItem).CurrentValues.SetValues(modifiedItem);
 
-            await dbContext.ApplyPrimers();
+            await dbContext.SaveChangesAsync();
 
             Assert.That(originalItem.Title, Is.EqualTo(modifiedItem.Title));
             Assert.That(originalItem.Created, Is.EqualTo(created));
@@ -198,23 +205,24 @@ public class PrimerTests
     public async Task Execute_Base_Primers()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddDbContext<ProductContext>(db => db.UseSqlite(_connection));
         services.Add(new ServiceDescriptor(typeof(IEntityPrimer<IHasTimestamps>), _ => new TimestampPrimer(), ServiceLifetime.Transient));
         services.Add(new ServiceDescriptor(typeof(IEntityPrimer<IEntity>), _ => new NormalizingPrimer(), ServiceLifetime.Transient));
         services.Add(new ServiceDescriptor(typeof(IEntityPrimer<Product>), _ => new ProductPrimer(), ServiceLifetime.Transient));
-        services.RegisterPrimerContainer<ProductContext>();
+        services.AddDbContext<ProductContext>(db =>
+            db.UseSqlite(_connection)
+                .AddPrimerInterceptors(services)
+        );
+
         var sp = services.BuildServiceProvider();
         var dbContext = sp.GetRequiredService<ProductContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
-        var dbPrimer = sp.GetRequiredService<EntityPrimerContainer>();
         var item = new Product
         {
             Title = "Product (test)"
         };
         dbContext.Products.Add(item);
 
-        await dbPrimer.ApplyPrimers();
         await dbContext.SaveChangesAsync();
 
         Assert.That(item.Id, Is.GreaterThan(0));
@@ -226,7 +234,6 @@ public class PrimerTests
         var newTitle = "Product (modified)";
         item1!.Title = newTitle;
 
-        await dbPrimer.ApplyPrimers();
         await dbContext.SaveChangesAsync();
 
         Assert.That(item1.Title, Is.EqualTo(newTitle));
@@ -238,24 +245,26 @@ public class PrimerTests
     public async Task Execute_Base_Primers_In_Order()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddDbContext<ProductContext>(db => db.UseSqlite(_connection));
         services.Add(new ServiceDescriptor(typeof(IEntityPrimer<IEntity>), _ => new NormalizingPrimer(), ServiceLifetime.Transient));
         // overwrites Normalized title using Uppercase Normalizer
         services.Add(new ServiceDescriptor(typeof(IEntityPrimer<IHasNormalizedTitle>), _ => new TitlePrimer(), ServiceLifetime.Transient));
         services.Add(new ServiceDescriptor(typeof(IEntityPrimer<Product>), _ => new ProductPrimer(), ServiceLifetime.Transient));
-        services.RegisterPrimerContainer<ProductContext>();
+        services.AddDbContext<ProductContext>(db =>
+            db.UseSqlite(_connection)
+                .AddPrimerInterceptors(services)
+        );
+
         var sp = services.BuildServiceProvider();
         var dbContext = sp.GetRequiredService<ProductContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
-        var dbPrimer = sp.GetRequiredService<EntityPrimerContainer>();
         var item = new Product
         {
             Title = "Product (test)"
         };
         dbContext.Products.Add(item);
 
-        await dbPrimer.ApplyPrimers();
+        await dbContext.SaveChangesAsync();
 
         Assert.That(item.Description, Is.EqualTo(ProductPrimer.DescriptionMessage));
         Assert.That(item.NormalizedTitle, Is.EqualTo("PRODUCT TEST"));
@@ -265,27 +274,28 @@ public class PrimerTests
     public async Task Execute_Matching_Primers()
     {
         IServiceCollection services = new ServiceCollection();
-        services.AddDbContext<ProductContext>(db => db.UseSqlite(_connection));
         services.Add(new ServiceDescriptor(typeof(IEntityPrimer<Category>), p => new CategoryPrimer(
             p.GetRequiredService<ProductContext>(),
             new TimestampPrimer(),
             new NormalizingPrimer()
         ), ServiceLifetime.Transient));
         services.Add(new ServiceDescriptor(typeof(IEntityPrimer<Product>), _ => new ProductPrimer(), ServiceLifetime.Transient));
-        services.RegisterPrimerContainer<ProductContext>();
+        services.AddDbContext<ProductContext>(db =>
+            db.UseSqlite(_connection)
+                .AddPrimerInterceptors(services)
+        );
 
         var sp = services.BuildServiceProvider();
         var dbContext = sp.GetRequiredService<ProductContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
-        var dbPrimer = sp.GetRequiredService<EntityPrimerContainer>();
         var item = new Category
         {
             Title = "Category (test)"
         };
         dbContext.Categories.Add(item);
 
-        await dbPrimer.ApplyPrimers();
+        await dbContext.SaveChangesAsync();
 
         Assert.That(item.NormalizedTitle, Is.EqualTo("Category test"));
         Assert.That(item.Created, Is.Not.EqualTo(DateTime.MinValue));
@@ -299,22 +309,24 @@ public class PrimerTests
         var items = Enumerable.Range(0, 10).Select((_, i) => new Category { Title = $"Category #{i + 1}" }).ToArray();
 
         IServiceCollection services = new ServiceCollection();
-        services.AddDbContext<ProductContext>(db => db.UseSqlite(_connection));
         services.Add(new ServiceDescriptor(typeof(IEntityPrimer<IHasTimestamps>), _ => new TimestampPrimer(), ServiceLifetime.Transient));
         services.Add(new ServiceDescriptor(typeof(IEntityPrimer<Category>), p => new CategoryPrimer(
             p.GetRequiredService<ProductContext>(),
             p.GetRequiredService<IEntityPrimer<IHasTimestamps>>(),
             new NormalizingPrimer()
         ), ServiceLifetime.Transient));
-        services.RegisterPrimerContainer<ProductContext>();
+        services.AddDbContext<ProductContext>(db =>
+            db.UseSqlite(_connection)
+                .AddPrimerInterceptors(services)
+        );
+
         var sp = services.BuildServiceProvider();
         var dbContext = sp.GetRequiredService<ProductContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
         dbContext.Categories.AddRange(items);
 
-        var dbPrimer = sp.GetRequiredService<EntityPrimerContainer>();
-        await dbPrimer.ApplyPrimers();
+        await dbContext.SaveChangesAsync();
 
         for (var i = 1; i < items.Length; i++)
         {
