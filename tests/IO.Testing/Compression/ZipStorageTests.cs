@@ -1,13 +1,13 @@
-﻿using IO.Testing.Abstractions;
+﻿using System.Text;
+using IO.Testing.Abstractions;
 using Regira.Collections;
 using Regira.IO.Abstractions;
 using Regira.IO.Models;
 using Regira.IO.Storage;
 using Regira.IO.Storage.Abstractions;
 using Regira.IO.Storage.Compression;
-using System.Text;
 
-namespace IO.Testing.FileSystem;
+namespace IO.Testing.Compression;
 
 [TestFixture]
 [Parallelizable(ParallelScope.Self)]

@@ -7,6 +7,7 @@ using Regira.Entities.Web.Models;
 using Regira.Utilities;
 using System.Net;
 using System.Net.Http.Json;
+using Entities.TestApi;
 using Testing.Library.Data;
 
 namespace Entities.Web.Testing;

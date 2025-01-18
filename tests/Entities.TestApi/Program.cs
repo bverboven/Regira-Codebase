@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.Json.Serialization;
 using Entities.TestApi.Infrastructure;
 using Entities.TestApi.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -10,8 +12,6 @@ using Regira.Entities.DependencyInjection.Extensions;
 using Regira.Entities.EFcore.Attachments;
 using Regira.IO.Storage.FileSystem;
 using Regira.Utilities;
-using System.Text;
-using System.Text.Json.Serialization;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
@@ -132,4 +132,7 @@ app.Run();
 // Make Program public
 // https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-7.0
 // ReSharper disable once PartialTypeWithSinglePart
-public partial class Program { }
+namespace Entities.TestApi
+{
+    public partial class Program { }
+}

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Web.Models;
 using System.Net;
 using System.Net.Http.Json;
+using Entities.TestApi;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 

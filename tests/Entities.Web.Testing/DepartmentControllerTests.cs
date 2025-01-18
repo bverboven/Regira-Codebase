@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Net.Http.Json;
+using Entities.TestApi;
 using Regira.Entities.Web.Models;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
