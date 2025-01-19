@@ -20,7 +20,7 @@ public class CountryUtilityTests
     [TestCase("DE", "Germany")]
     [TestCase("PL", "Poland")]
     [TestCase("CD", "Congo (DRC)")]
-    [TestCase("TR", "Turkey")]
+    [TestCase("TR", "Türkiye")]
     [TestCase("MN", "Mongolia")]
     [TestCase("XX", null)]
     [TestCase(null, null)]
