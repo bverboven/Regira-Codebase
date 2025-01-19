@@ -56,20 +56,23 @@ public class BinaryBlobService(AzureCommunicator communicator) : IFileService
 
         var recursive = so.Recursive;
         var relativeFolderUri = FileNameUtility.GetRelativeUri(so.FolderUri, RootFolder);
-        var foldersToExclude = GetFolders(relativeFolderUri).Concat(new[] { relativeFolderUri }).ToArray();
+        var foldersToExclude = GetFolders(relativeFolderUri).Concat([relativeFolderUri]).ToArray();
         var filteredFiles = identifiers
-            .Where(f => recursive || FileNameUtility.GetRelativeFolder(f, RootFolder) == relativeFolderUri)
+            .Where(f => recursive || (FileNameUtility.GetRelativeFolder(f, RootFolder) ?? string.Empty) == relativeFolderUri)
             .Where(f => so.Extensions == null || so.Extensions.Any(e => e.TrimStart('*') == Path.GetExtension(f)))
             .ToList();
 
         var files = filteredFiles;
 
         IEnumerable<string> result = new List<string>();
-        var listFiles = so.Type == FileEntryTypes.All || so.Type == FileEntryTypes.Files;
-        if (listFiles)
+        var onlyListFiles = so.Type == FileEntryTypes.Files;
+        if (onlyListFiles)
         {
-            result = result.Concat(files);
+            return files;
         }
+
+        result = result.Concat(files);
+
         var listFolders = so.Type == FileEntryTypes.All || so.Type == FileEntryTypes.Directories;
         if (listFolders)
         {
@@ -78,10 +81,16 @@ public class BinaryBlobService(AzureCommunicator communicator) : IFileService
                 : filteredFiles;
             var folders = filesForFetchingFolders
                 .SelectMany(GetFolders)
-                .Where(d => recursive || FileNameUtility.GetRelativeFolder(d, RootFolder) == relativeFolderUri)
+                .Where(d => recursive || (FileNameUtility.GetRelativeFolder(d, RootFolder) ?? string.Empty) == relativeFolderUri)
                 .Except(foldersToExclude)
                 .Distinct()
                 .ToList();
+            var onlyListFolders = so.Type == FileEntryTypes.Directories;
+            if (onlyListFolders)
+            {
+                return folders;
+            }
+
             result = result.Concat(folders);
         }
 

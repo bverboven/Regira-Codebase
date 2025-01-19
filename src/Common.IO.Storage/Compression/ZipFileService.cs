@@ -1,9 +1,9 @@
-﻿using Regira.IO.Abstractions;
+﻿using System.IO.Compression;
+using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
 using Regira.IO.Storage.Abstractions;
 using Regira.IO.Utilities;
-using System.IO.Compression;
 
 namespace Regira.IO.Storage.Compression;
 public class ZipFileService(ZipFileCommunicator communicator) : IFileService, IDisposable
@@ -12,7 +12,7 @@ public class ZipFileService(ZipFileCommunicator communicator) : IFileService, ID
     public string RootFolder => Root;
     private BinaryFileItem? _sourceFile;
     protected IMemoryFile SourceFile
-        => _sourceFile ??= (BinaryFileItem)new MemoryStream();
+        => _sourceFile ??= new MemoryStream();
     private ZipArchive? _zipArchive;
     protected ZipArchive ZipArchive
         => _zipArchive ??= (communicator.SourceFile ?? SourceFile)
@@ -27,8 +27,12 @@ public class ZipFileService(ZipFileCommunicator communicator) : IFileService, ID
     }
     public async Task<byte[]?> GetBytes(string identifier)
     {
+#if NETCOREAPP3_1_OR_GREATER
+        await using var stream = await GetStream(identifier);
+#else
         using var stream = await GetStream(identifier);
-        return FileUtility.GetBytes(stream);
+#endif
+        return stream.GetBytes();
     }
     public Task<IEnumerable<string>> List(FileSearchObject? so = null)
     {
@@ -44,22 +48,18 @@ public class ZipFileService(ZipFileCommunicator communicator) : IFileService, ID
             }
             if (so.Extensions?.Any() == true)
             {
-                identifiers = identifiers.Where(x => so.Extensions.Any(e => x.EndsWith(e)));
+                identifiers = identifiers.Where(x => so.Extensions.Any(x.EndsWith));
             }
         }
 
         return Task.FromResult(identifiers);
     }
-    public async Task<string> Save(string identifier, byte[] bytes, string? contentType = null)
+    public Task<string> Save(string identifier, byte[] bytes, string? contentType = null)
     {
         var file = bytes.ToBinaryFile(contentType);
         file.Identifier = identifier;
-        //if (await Exists(identifier))
-        //{
-        //    await Delete(identifier);
-        //}
         ZipArchive.AddFile(file);
-        return identifier;
+        return Task.FromResult(identifier);
     }
     public Task<string> Save(string identifier, Stream stream, string? contentType = null)
     {
@@ -96,7 +96,7 @@ public class ZipFileService(ZipFileCommunicator communicator) : IFileService, ID
     public string GetIdentifier(string uri) => uri;
     public string? GetRelativeFolder(string identifier)
     {
-        var pos = identifier.LastIndexOf("/");
+        var pos = identifier.LastIndexOf("/", StringComparison.Ordinal);
         return pos > -1
             ? identifier.Substring(0, pos).TrimEnd('/') + '/'
             : null;

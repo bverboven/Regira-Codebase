@@ -1,47 +1,59 @@
-using IO.Testing.Abstractions;
+using IO.Testing.Helpers;
 using Microsoft.Extensions.Configuration;
+using Regira.IO.Extensions;
 using Regira.IO.Storage.Azure;
-using Regira.IO.Storage.Azure.Utilities;
 
 namespace IO.Testing.Azure;
 
 [TestFixture]
 [Parallelizable(ParallelScope.Self)]
-public class AzureStorageTests : FileServiceTestsBase
+public class AzureStorageTests
 {
-    private const string BLOB_CONTAINER = "test-container";
+    public StorageTestHelper.StorageTestContext<BinaryBlobService> StorageTestContext { get; set; }
     [SetUp]
-    public void Setup()
+    public async Task Setup()
     {
-        var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddUserSecrets(typeof(AzureStorageTests).Assembly, true);
-        var configuration = configBuilder.Build();
-        var azureConnectionString = configuration["Storage:Azure:ConnectionString"];
-            
-        Testfiles = GetTestFiles(SourceFolder).ToArray();
-        var cf = new AzureOptions
+        StorageTestContext = StorageTestHelper.CreateDecoratedFileService((_, _) =>
         {
-            ConnectionString = azureConnectionString,
-            ContainerName = BLOB_CONTAINER
-        };
-        var cm = new AzureCommunicator(cf);
-        FileService = new BinaryBlobService(cm);
-        //ClearTestFolder("XXX");
+            var configBuilder = new ConfigurationBuilder();
+            configBuilder.AddUserSecrets(typeof(AzureStorageTests).Assembly, true);
+            var configuration = configBuilder.Build();
+            var azureConnectionString = configuration["Storage:Azure:ConnectionString"];
+            var cf = new AzureOptions
+            {
+                ConnectionString = azureConnectionString,
+                ContainerName = "test-container"
+            };
+            var cm = new AzureCommunicator(cf);
+            return new BinaryBlobService(cm);
+        });
+        // create initial files on Azure
+        foreach (var file in StorageTestContext.SourceFiles)
+        {
+            await StorageTestContext.FileService.Save(file.Identifier!, file.GetBytes()!, file.ContentType);
+        }
     }
+
     [TearDown]
-    public void TearDown()
-    {
-        ClearTestFolder(TestFolder);
-        RemoveTestFiles(SourceFolder);
-    }
+    public async Task TearDown() => await StorageTestContext.DisposeAsync();
 
+    [Test]
+    public async Task List() => await StorageTestContext.Test_List();
+    [Test]
+    public async Task GetBytes() => await StorageTestContext.Test_GetBytes();
+    [Test]
+    public async Task Filter_By_Folder() => await StorageTestContext.Test_Filter_By_Folder();
+    [Test]
+    public async Task Filter_By_Extension() => await StorageTestContext.Test_Filter_By_Extension();
+    [Test]
+    public async Task Filter_Recursive() => await StorageTestContext.Test_Filter_Recursive();
+    [Test]
+    public async Task Filter_By_EntryType() => await StorageTestContext.Test_Filter_By_EntryType();
 
-    protected override string GetFullIdentifier(string folder, string identifier)
-    {
-        return FileNameUtility.Combine(folder, identifier);
-    }
-    protected override string GetCleanFileName(string filename)
-    {
-        return FileNameUtility.GetCleanFileName(filename);
-    }
+    [Test]
+    public async Task Add_File() => await StorageTestContext.Test_Add_File();
+    [Test]
+    public async Task Update_File() => await StorageTestContext.Test_Update_File();
+    [Test]
+    public async Task Remove_File() => await StorageTestContext.Test_Remove_File();
 }

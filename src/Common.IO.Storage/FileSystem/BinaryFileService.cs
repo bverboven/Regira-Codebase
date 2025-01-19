@@ -3,7 +3,7 @@ using Regira.IO.Storage.Abstractions;
 namespace Regira.IO.Storage.FileSystem;
 public class BinaryFileService(FileSystemOptions options) : IFileService
 {
-    [Obsolete("Please use FileSystem.FileServiceOptions instead", false)]
+    [Obsolete("Please use FileSystemOptions instead", false)]
     public class FileServiceOptions : FileSystemOptions;
 
     public string Root => options.RootFolder;
@@ -47,15 +47,15 @@ public class BinaryFileService(FileSystemOptions options) : IFileService
         var listFiles = so.Type == FileEntryTypes.All || so.Type == FileEntryTypes.Files;
         var listDirectories = so.Type == FileEntryTypes.All || so.Type == FileEntryTypes.Directories;
 
-        var options = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+        var searchOptions = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
         var absoluteFolderUri = FileNameUtility.GetAbsoluteUri(folderUri, RootFolder);
-
+        
         IEnumerable<string> result = Array.Empty<string>();
 
         if (Directory.Exists(absoluteFolderUri))
         {
             // files
-            var files = Directory.EnumerateFiles(absoluteFolderUri, extensions, options)
+            var files = Directory.EnumerateFiles(absoluteFolderUri, extensions, searchOptions)
                 .Select(fileUri => FileNameUtility.GetRelativeUri(fileUri, RootFolder))
                 .Where(f => so.Extensions == null || so.Extensions.Any(e => e.TrimStart('*') == Path.GetExtension(f)));
             string[]? fileList = null;
@@ -70,7 +70,7 @@ public class BinaryFileService(FileSystemOptions options) : IFileService
             // directories
             if (listDirectories)
             {
-                var folders = Directory.EnumerateDirectories(absoluteFolderUri, "", options)
+                var folders = Directory.EnumerateDirectories(absoluteFolderUri, "", searchOptions)
                     .Select(dirUri => FileNameUtility.GetRelativeUri(dirUri, RootFolder));
                 if (so.Extensions != null)
                 {

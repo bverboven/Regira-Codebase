@@ -1,3 +1,4 @@
+using IO.Testing.Helpers;
 using NUnit.Framework.Legacy;
 using Regira.IO.Extensions;
 using Regira.IO.Models;

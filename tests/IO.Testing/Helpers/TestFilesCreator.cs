@@ -1,6 +1,6 @@
 using Regira.IO.Models;
 
-namespace IO.Testing;
+namespace IO.Testing.Helpers;
 
 public class TestFilesCreator
 {

@@ -1,17 +1,18 @@
-﻿using IO.Testing.Abstractions;
+﻿using IO.Testing.Helpers;
 using Microsoft.Extensions.Configuration;
 using Regira.IO.Storage.SSH;
-using FileNameUtility = Regira.IO.Storage.SSH.FileNameUtility;
 
 namespace IO.Testing.SSH;
 
 [TestFixture]
 [Ignore("wait for proper config")]
 [Parallelizable(ParallelScope.Self)]
-public class SshStorageTests : FileServiceTestsBase
+public class SshStorageTests
 {
+    public StorageTestHelper.IStorageTestContext StorageTestContext { get; set; }
     [SetUp]
-    public void Setup()
+    public void Setup() => StorageTestContext = StorageTestHelper.CreateDecoratedFileService((_, folder)
+        =>
     {
         var configBuilder = new ConfigurationBuilder();
         configBuilder.AddUserSecrets(GetType().Assembly, true);
@@ -25,24 +26,30 @@ public class SshStorageTests : FileServiceTestsBase
             UserName = sshSection["Username"],
             Password = sshSection["Password"]
         };
-        FileService = new SftpService(new SftpCommunicator(config));
-            
-        Testfiles = GetTestFiles(SourceFolder).ToArray();
-    }
+
+        return new SftpService(new SftpCommunicator(config));
+    });
     [TearDown]
-    public void TearDown()
-    {
-        ClearTestFolder(TestFolder);
-        RemoveTestFiles(SourceFolder);
-    }
+    public async Task TearDown() => await StorageTestContext.DisposeAsync();
 
 
-    protected override string GetFullIdentifier(string folder, string identifier)
-    {
-        return FileNameUtility.Combine(folder, identifier);
-    }
-    protected override string GetCleanFileName(string filename)
-    {
-        return FileNameUtility.GetCleanFileName(filename);
-    }
+    [Test]
+    public async Task List() => await StorageTestContext.Test_List();
+    [Test]
+    public async Task GetBytes() => await StorageTestContext.Test_GetBytes();
+    [Test]
+    public async Task Filter_By_Folder() => await StorageTestContext.Test_Filter_By_Folder();
+    [Test]
+    public async Task Filter_By_Extension() => await StorageTestContext.Test_Filter_By_Extension();
+    [Test]
+    public async Task Filter_Recursive() => await StorageTestContext.Test_Filter_Recursive();
+    [Test]
+    public async Task Filter_By_EntryType() => await StorageTestContext.Test_Filter_By_EntryType();
+
+    [Test]
+    public async Task Add_File() => await StorageTestContext.Test_Add_File();
+    [Test]
+    public async Task Update_File() => await StorageTestContext.Test_Update_File();
+    [Test]
+    public async Task Remove_File() => await StorageTestContext.Test_Remove_File();
 }

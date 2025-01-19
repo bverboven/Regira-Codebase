@@ -1,3 +1,4 @@
+using IO.Testing.Helpers;
 using Regira.IO.Compression.SharpZipLib;
 using Regira.IO.Storage.FileSystem;
 using Regira.IO.Storage.Utilities;

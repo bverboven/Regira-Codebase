@@ -2,19 +2,14 @@
 
 namespace Regira.IO.Storage.Azure;
 
-public class AzureCommunicator
+public class AzureCommunicator(AzureOptions config)
 {
     public bool IsOpened { get; set; }
 
     internal BlobContainerClient? Container { get; set; }
 
-    private readonly string _containerName;
-    private readonly string _connectionString;
-    public AzureCommunicator(AzureOptions config)
-    {
-        _containerName = config.ContainerName ?? throw new ArgumentNullException(nameof(config.ContainerName));
-        _connectionString = config.ConnectionString ?? throw new ArgumentNullException(nameof(config.ConnectionString));
-    }
+    private readonly string _containerName = config.ContainerName ?? throw new ArgumentNullException(nameof(config.ContainerName));
+    private readonly string _connectionString = config.ConnectionString ?? throw new ArgumentNullException(nameof(config.ConnectionString));
 
 
     public async Task Open()

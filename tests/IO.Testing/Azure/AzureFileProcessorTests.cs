@@ -1,4 +1,4 @@
-using IO.Testing.Abstractions;
+using IO.Testing.Helpers;
 using Microsoft.Extensions.Configuration;
 using Regira.IO.Extensions;
 using Regira.IO.Storage.Azure;
@@ -6,42 +6,40 @@ using Regira.IO.Storage.Azure;
 namespace IO.Testing.Azure;
 
 [TestFixture]
-[Parallelizable(ParallelScope.Self)]
-public class AzureFileProcessorTests : FileProcessorTestsBase
+[Parallelizable(ParallelScope.Fixtures)]
+public class AzureFileProcessorTests
 {
-    private const string BLOB_CONTAINER = "test-container";
-    private BinaryBlobService _blobService = null!;
+    private const string TEST_FOLDER = "file_processor";
+    public StorageTestHelper.StorageTestContext<BinaryBlobService> StorageTestContext { get; set; }
     [SetUp]
-    public void Setup()
+    public async Task Setup()
     {
-        var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddUserSecrets(typeof(AzureStorageTests).Assembly, true);
-        var configuration = configBuilder.Build();
-        var azureConnectionString = configuration["Storage:Azure:ConnectionString"];
-
-        TestFolder = Guid.NewGuid().ToString();
-        CreateTestFiles();
-
-        var cf = new AzureOptions
+        StorageTestContext = StorageTestHelper.CreateDecoratedFileService((_, _) =>
         {
-            ConnectionString = azureConnectionString,
-            ContainerName = BLOB_CONTAINER
-        };
-        var cm = new AzureCommunicator(cf);
-        _blobService = new BinaryBlobService(cm);
-        foreach (var file in TestFiles)
+            var configBuilder = new ConfigurationBuilder();
+            configBuilder.AddUserSecrets(typeof(AzureStorageTests).Assembly, true);
+            var configuration = configBuilder.Build();
+            var azureConnectionString = configuration["Storage:Azure:ConnectionString"];
+            var cf = new AzureOptions
+            {
+                ConnectionString = azureConnectionString,
+                ContainerName = "test-container"
+            };
+            var cm = new AzureCommunicator(cf);
+            return new BinaryBlobService(cm);
+        });
+        // create initial files on Azure
+        foreach (var file in StorageTestContext.SourceFiles)
         {
-            _blobService.Save(Path.Combine(TestFolder, file.Identifier!), file.GetBytes()!).Wait();
+            await StorageTestContext.FileService.Save($"{TEST_FOLDER}/{file.Identifier}", file.GetBytes()!, file.ContentType);
         }
-        FileService = _blobService;
     }
+
     [TearDown]
-    public void TearDown()
-    {
-        foreach (var file in TestFiles)
-        {
-            _blobService.Delete(Path.Combine(TestFolder, file.Identifier!)).Wait();
-        }
-        RemoveTestFiles();
-    }
+    public async Task TearDown() => await StorageTestContext.DisposeAsync();
+
+    [Test]
+    public Task Recursive_Directories() => StorageTestContext.Test_Recursive_Directories(TEST_FOLDER);
+    [Test]
+    public Task Recursive_Directories_Async() => StorageTestContext.Test_Recursive_DirectoriesAsync(TEST_FOLDER);
 }
