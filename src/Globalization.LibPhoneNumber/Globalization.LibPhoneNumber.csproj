@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
@@ -11,10 +11,10 @@
     <AssemblyName>Regira.Globalization.LibPhoneNumber</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.0.14</Version>
+    <Version>4.1.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="libphonenumber-csharp" Version="8.13.50" />
+    <PackageReference Include="libphonenumber-csharp" Version="8.13.52" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />

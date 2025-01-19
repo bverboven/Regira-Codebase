@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
@@ -11,17 +11,18 @@
     <AssemblyName>Regira.Web</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.0.14</Version>
+    <Version>4.1.0</Version>
   </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
+    <!-- Upgrading to v2.3.0 causes errors in other projects (LinkGenerator is missing) -->
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
     <!-- Upgraded for vulnerabilities -->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="9.0.1" />
   </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework) != 'netstandard2.0'">
+  <ItemGroup Condition="$(TargetFramework) == 'net6.0' or $(TargetFramework) == 'net8.0' or $(TargetFramework) == 'net9.0'">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
