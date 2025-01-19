@@ -32,7 +32,7 @@ public class MemoryCacheProvider : CacheProvider
     {
         var fullKey = GetKey(key);
         var cachedItem = Cache.GetCacheItem(fullKey);
-        return (T?)cachedItem.Value;
+        return (T?)cachedItem?.Value;
     }
     public override void Set<T>(string key, T? value, int? duration = null)
         where T : default
