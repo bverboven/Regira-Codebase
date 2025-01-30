@@ -27,7 +27,7 @@ public static class AttachmentExtensions
 
 
     public static EntityAttachmentSearchObject? ToSearchObject(this object? so)
-        => so != default
+        => so != null
             ? so as EntityAttachmentSearchObject ?? ObjectUtility.Create<EntityAttachmentSearchObject>(so)
-            : default;
+            : null;
 }

@@ -9,25 +9,16 @@ using Regira.Utilities;
 
 namespace Regira.Entities.EFcore.Services;
 
-public class EntityRepository<TContext, TEntity> : EntityRepository<TContext, TEntity, int>, IEntityRepository<TEntity>
+public class EntityRepository<TContext, TEntity>(TContext dbContext)
+    : EntityRepository<TContext, TEntity, int>(dbContext), IEntityRepository<TEntity>
     where TContext : DbContext
-    where TEntity : class, IEntity<int>
-{
-    public EntityRepository(TContext dbContext)
-        : base(dbContext)
-    {
-    }
-}
-public abstract class EntityRepository<TContext, TEntity, TKey> : EntityRepository<TContext, TEntity, TKey, SearchObject<TKey>>
+    where TEntity : class, IEntity<int>;
+public abstract class EntityRepository<TContext, TEntity, TKey>(TContext dbContext)
+    : EntityRepository<TContext, TEntity, TKey, SearchObject<TKey>>(dbContext)
     where TContext : DbContext
-    where TEntity : class, IEntity<TKey>
-{
-    protected EntityRepository(TContext dbContext)
-        : base(dbContext)
-    {
-    }
-}
-public class EntityRepository<TContext, TEntity, TKey, TSearchObject> : IEntityService<TEntity, TKey, TSearchObject>, IEntityRepository<TEntity, TKey>
+    where TEntity : class, IEntity<TKey>;
+public class EntityRepository<TContext, TEntity, TKey, TSearchObject>(TContext dbContext)
+    : IEntityService<TEntity, TKey, TSearchObject>, IEntityRepository<TEntity, TKey>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
@@ -35,11 +26,7 @@ public class EntityRepository<TContext, TEntity, TKey, TSearchObject> : IEntityS
     public virtual DbSet<TEntity> DbSet => DbContext.Set<TEntity>();
     public virtual IQueryable<TEntity> Query => DbSet;
 
-    protected readonly TContext DbContext;
-    public EntityRepository(TContext dbContext)
-    {
-        DbContext = dbContext;
-    }
+    protected readonly TContext DbContext = dbContext;
 
 
     public virtual async Task<TEntity?> Details(TKey id)
@@ -117,9 +104,9 @@ public class EntityRepository<TContext, TEntity, TKey, TSearchObject> : IEntityS
     }
 
     public virtual TSearchObject? Convert(object? so)
-        => so != default
+        => so != null
             ? so as TSearchObject ?? ObjectUtility.Create<TSearchObject>(so)
-            : default;
+            : null;
     public bool IsNew(TEntity item)
         => item.IsNew();
 }

@@ -1,11 +1,11 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using Regira.DAL.PostgreSQL.Constants;
 using Regira.DAL.PostgreSQL.Core;
 using Regira.System.Abstractions;
 using Regira.Utilities;
-using System.Data;
 
 namespace Regira.DAL.PostgreSQL.Services;
 

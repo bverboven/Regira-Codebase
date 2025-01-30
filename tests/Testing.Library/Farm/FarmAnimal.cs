@@ -2,15 +2,9 @@
 
 namespace Testing.Library.Farm;
 
-public class FarmAnimal : Animal
+public class FarmAnimal(string name, string species) : Animal(name)
 {
-    public FarmAnimal(string name, string species)
-        : base(name)
-    {
-        Species = species;
-    }
-
-    public override string Species { get; }
+    public override string Species { get; } = species;
 
     [Precision(18, 2)]
     public decimal Value { get; set; }

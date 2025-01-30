@@ -55,12 +55,12 @@ public class RazerTemplateTests
             Title = "Order #1",
             Created = DateTime.Now,
             ImgBase64 = logoBase64,
-            OrderLines = new[]
-            {
+            OrderLines =
+            [
                 new OrderLine{ Title = "Item #1", Amount = 2, Price = 10 },
                 new OrderLine{ Title = "Item #2", Amount = 1, Price = 25 },
-                new OrderLine{ Title = "Item #3", Amount = 3, Price = 7.5m },
-            }
+                new OrderLine{ Title = "Item #3", Amount = 3, Price = 7.5m }
+            ]
         };
         var parsedHtml = _parser.Parse(inputHtml, model).Result;
 

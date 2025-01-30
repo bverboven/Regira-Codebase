@@ -3,9 +3,7 @@ using Regira.Entities.Attachments.Models;
 
 namespace Regira.Entities.Attachments.Abstractions;
 
-public interface IAttachmentService : IAttachmentService<int>
-{
-}
+public interface IAttachmentService : IAttachmentService<int>;
 public interface IAttachmentService<TKey> : IEntityService<Attachment<TKey>, TKey>
 {
     Task<byte[]?> GetBytes(IAttachment<TKey> item);

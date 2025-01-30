@@ -5,18 +5,15 @@ using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.DependencyInjection;
 
-public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> : ComplexEntityServiceBuilder<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>
+public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(
+    EntityServiceBuilder<TContext, TEntity, int> services)
+    : ComplexEntityServiceBuilder<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>(services)
     where TContext : DbContext
     where TEntity : class, IEntity<int>
     where TSearchObject : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
-    public ComplexEntityServiceBuilder(EntityServiceBuilder<TContext, TEntity, int> services)
-        : base(services)
-    {
-    }
-
     public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> HasRepository<TService>()
         where TService : class, IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>
     {
@@ -44,18 +41,14 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
         return this;
     }
 }
-public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> : EntityServiceBuilder<TContext, TEntity, TKey>
+public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
+    EntityServiceBuilder<TContext, TEntity, TKey> services) : EntityServiceBuilder<TContext, TEntity, TKey>(services)
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
-    public ComplexEntityServiceBuilder(EntityServiceBuilder<TContext, TEntity, TKey> services)
-        : base(services)
-    {
-    }
-
     /// <summary>
     /// <inheritdoc cref="EntityServiceBuilder{TContext,TEntity}.HasRepository{TService}"/><br />
     /// <list type="bullet">

@@ -1,11 +1,11 @@
-﻿using Entities.TestApi.Infrastructure;
+﻿using System.Net;
+using System.Net.Http.Json;
+using Entities.TestApi;
+using Entities.TestApi.Infrastructure;
 using Entities.TestApi.Models;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Web.Models;
-using System.Net;
-using System.Net.Http.Json;
-using Entities.TestApi;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
@@ -36,7 +36,7 @@ public class CourseControllerTests : IDisposable
 
         var result = await response.Content.ReadFromJsonAsync<ListResult<CourseDto>>();
         Assert.NotNull(result!.Items);
-        Assert.Equal(0, result.Items.Count);
+        Assert.Empty(result.Items);
     }
     [Fact]
     public async Task Get_404()
@@ -207,7 +207,7 @@ public class CourseControllerTests : IDisposable
         var listResultExclude = await listResponseExclude.Content.ReadFromJsonAsync<ListResult<CourseDto>>();
 
         Assert.Equal(listResultExclude!.Items.Count, inputCourses.Length - 2);
-        var excludedItems = listResultExclude!.Items.Where(x => new[] { 2, 3 }.Contains(x.Id));
+        var excludedItems = listResultExclude.Items.Where(x => new[] { 2, 3 }.Contains(x.Id));
         Assert.Empty(excludedItems);
     }
 

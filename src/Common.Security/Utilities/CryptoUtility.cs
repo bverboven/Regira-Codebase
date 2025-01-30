@@ -4,7 +4,8 @@ namespace Regira.Security.Utilities;
 
 public static class CryptoUtility
 {
-    static readonly byte[] DefaultSalt = { 82, 101, 103, 105, 114, 97, 39, 115, 32, 115, 101, 99, 114, 101, 116, 32, 83, 65, 76, 84 };
+    static readonly byte[] DefaultSalt = [82, 101, 103, 105, 114, 97, 39, 115, 32, 115, 101, 99, 114, 101, 116, 32, 83, 65, 76, 84
+    ];
     public static HashAlgorithm CreateHasher(string? algorithm = null)
     {
         switch (algorithm?.ToUpper())

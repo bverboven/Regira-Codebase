@@ -20,7 +20,7 @@ public class JsonSerializer : ISerializer
         public bool WriteIndented { get; set; } = false;
     }
 
-    private readonly List<JsonConverter> _converters = new();
+    private readonly List<JsonConverter> _converters = [];
     private readonly IContractResolver _contractResolver;
     private readonly Formatting _formatting;
 
@@ -77,7 +77,7 @@ public class JsonSerializer : ISerializer
     {
         if (content == null)
         {
-            return default;
+            return null;
         }
 
         var settings = GetSettings();

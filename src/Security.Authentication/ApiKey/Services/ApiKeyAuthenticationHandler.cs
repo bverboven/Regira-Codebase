@@ -1,24 +1,24 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using System.Security.Claims;
+using System.Text.Encodings.Web;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Regira.Security.Authentication.ApiKey.Abstraction;
 using Regira.Security.Authentication.ApiKey.Models;
-using System.Security.Claims;
-using System.Text.Encodings.Web;
 
 namespace Regira.Security.Authentication.ApiKey.Services;
 
-public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthenticationOptions>
+public class ApiKeyAuthenticationHandler(
+    IOptionsMonitor<ApiKeyAuthenticationOptions> options,
+    ILoggerFactory logger,
+    UrlEncoder encoder,
+    IApiKeyOwnerService apiKeyOwnerService)
+    : AuthenticationHandler<ApiKeyAuthenticationOptions>(options, logger, encoder)
 {
     // https://josef.codes/asp-net-core-protect-your-api-with-api-keys/
 
-    private readonly IApiKeyOwnerService _apiKeyOwnerService;
+    private readonly IApiKeyOwnerService _apiKeyOwnerService = apiKeyOwnerService ?? throw new ArgumentNullException(nameof(apiKeyOwnerService));
 #if NET8_0_OR_GREATER
-    public ApiKeyAuthenticationHandler(IOptionsMonitor<ApiKeyAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, IApiKeyOwnerService apiKeyOwnerService)
-        : base(options, logger, encoder)
-    {
-        _apiKeyOwnerService = apiKeyOwnerService ?? throw new ArgumentNullException(nameof(apiKeyOwnerService));
-    }
 #else
     public ApiKeyAuthenticationHandler(IOptionsMonitor<ApiKeyAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IApiKeyOwnerService apiKeyOwnerService)
         : base(options, logger, encoder, clock)

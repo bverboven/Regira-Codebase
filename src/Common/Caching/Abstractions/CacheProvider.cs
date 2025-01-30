@@ -18,20 +18,14 @@ public abstract class CacheProvider : ICacheProvider
     public abstract void Remove(string key);
     public abstract void RemoveAll();
 
-    private class CacheEnumerator : IEnumerator<KeyValuePair<string, object?>>, IDictionaryEnumerator
+    private class CacheEnumerator(IList<string> keys, Func<string, object?> getter)
+        : IEnumerator<KeyValuePair<string, object?>>, IDictionaryEnumerator
     {
         private int _index;
-        private readonly IList<string> _keys;
-        private readonly Func<string, object?> _getter;
-        public CacheEnumerator(IList<string> keys, Func<string, object?> getter)
-        {
-            _keys = keys;
-            _getter = getter;
-        }
 
         public bool MoveNext()
         {
-            if (++_index >= _keys.Count)
+            if (++_index >= keys.Count)
             {
                 return false;
             }
@@ -44,9 +38,9 @@ public abstract class CacheProvider : ICacheProvider
 
         object IEnumerator.Current => Current;
 
-        public object Key => _keys[_index];
-        public object? Value => _getter(_keys[_index]);
-        public KeyValuePair<string, object?> Current => new(_keys[_index], Value);
+        public object Key => keys[_index];
+        public object? Value => getter(keys[_index]);
+        public KeyValuePair<string, object?> Current => new(keys[_index], Value);
         public DictionaryEntry Entry => new(Current.Key, Current.Value);
 
         public void Dispose()

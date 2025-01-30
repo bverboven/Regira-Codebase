@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using System.Collections.Concurrent;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
-using System.Collections.Concurrent;
 
 namespace Regira.DAL.EFcore.Extensions;
 
@@ -17,7 +17,7 @@ public static class EntityTypeExtensions
         {
             var properties = entityType.GetProperties()
                 .Where(p => p.PropertyInfo != null)
-                .ToDictionary(p => p, p => p.PropertyInfo.GetCustomAttributes(false).Cast<Attribute>().ToArray());
+                .ToDictionary(p => p, p => p.PropertyInfo!.GetCustomAttributes(false).Cast<Attribute>().ToArray());
             AttributesMetadataCache.Add(entityType, properties);
         }
 

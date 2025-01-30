@@ -2,13 +2,8 @@
 
 namespace Regira.Office.Mail.Exceptions;
 
-public class MailException : Exception
+public class MailException(string message, Exception? innerException = null) : Exception(message, innerException)
 {
     public IMessageObject? MessageObject { get; set; }
     public string? ResponseContent { get; set; }
-
-    public MailException(string message, Exception? innerException = null)
-        : base(message, innerException)
-    {
-    }
 }

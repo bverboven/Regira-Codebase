@@ -5,10 +5,4 @@ namespace Office.VCards.Testing;
 
 [TestFixture]
 [Parallelizable(ParallelScope.All)]
-public class FolkerKinzelTests : VCardsTestsBase
-{
-    public FolkerKinzelTests()
-        : base(new VCardManager())
-    {
-    }
-}
+public class FolkerKinzelTests() : VCardsTestsBase(new VCardManager());

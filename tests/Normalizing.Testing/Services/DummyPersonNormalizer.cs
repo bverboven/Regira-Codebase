@@ -4,16 +4,11 @@ using Testing.Library.Contoso;
 
 namespace Normalizing.Testing.Services;
 
-public class DummyPersonNormalizer : IObjectNormalizer
+public class DummyPersonNormalizer(INormalizer? defaultNormalizer = null) : IObjectNormalizer
 {
     public bool IsExclusive => false;
-    public INormalizer DefaultNormalizer { get; }
+    public INormalizer DefaultNormalizer { get; } = defaultNormalizer ?? NormalizingDefaults.DefaultPropertyNormalizer ?? new DefaultNormalizer();
 
-
-    public DummyPersonNormalizer(INormalizer? defaultNormalizer = null)
-    {
-        DefaultNormalizer = defaultNormalizer ?? NormalizingDefaults.DefaultPropertyNormalizer ?? new DefaultNormalizer();
-    }
 
     public void HandleNormalize(Person item)
     {

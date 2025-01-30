@@ -3,9 +3,7 @@
 namespace Regira.Entities.Abstractions;
 
 public interface IEntityWriteService<in TEntity> : IEntityWriteService<TEntity, int>
-    where TEntity : class, IEntity<int>
-{
-}
+    where TEntity : class, IEntity<int>;
 public interface IEntityWriteService<in TEntity, in TKey>
     where TEntity : class, IEntity<TKey>
 {

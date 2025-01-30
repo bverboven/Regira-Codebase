@@ -2,7 +2,7 @@
 
 namespace Regira.IO.Storage.Helpers;
 
-public class FileNameHelper
+public class FileNameHelper(IFileService fileService, FileNameHelper.Options? options = null)
 {
     public class Options
     {
@@ -13,13 +13,7 @@ public class FileNameHelper
     }
 
     //https://stackoverflow.com/questions/1078003/c-how-would-you-make-a-unique-filename-by-adding-a-number#answer-1078016
-    private readonly IFileService _fileService;
-    private readonly string _numberPattern;
-    public FileNameHelper(IFileService fileService, Options? options = null)
-    {
-        _fileService = fileService;
-        _numberPattern = options?.NumberPattern ?? "-({0})";
-    }
+    private readonly string _numberPattern = options?.NumberPattern ?? "-({0})";
 
 
     public async Task<string> NextAvailableFileName(string identifier)
@@ -33,14 +27,14 @@ public class FileNameHelper
             }
 
             var nextIdentifier = identifier;
-            if (!await _fileService.Exists(nextIdentifier))
+            if (!await fileService.Exists(nextIdentifier))
             {
                 return nextIdentifier;
             }
 
             int min = 1, max = 2; // min is inclusive, max is exclusive/untested
             nextIdentifier = string.Format(identifierFormat, max);
-            while (await _fileService.Exists(nextIdentifier))
+            while (await fileService.Exists(nextIdentifier))
             {
                 min = max;
                 max *= 2;
@@ -51,7 +45,7 @@ public class FileNameHelper
             {
                 var pivot = (max + min) / 2;
                 nextIdentifier = string.Format(identifierFormat, pivot);
-                if (await _fileService.Exists(nextIdentifier))
+                if (await fileService.Exists(nextIdentifier))
                 {
                     min = pivot;
                 }
@@ -64,7 +58,7 @@ public class FileNameHelper
             return string.Format(identifierFormat, max);
         }
 
-        if (!await _fileService.Exists(identifier))
+        if (!await fileService.Exists(identifier))
         {
             return identifier;
         }

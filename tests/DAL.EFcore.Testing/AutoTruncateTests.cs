@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework.Legacy;
 using Regira.DAL.EFcore.Extensions;
 using Testing.Library.Contoso;
 using Testing.Library.Data;

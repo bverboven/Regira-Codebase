@@ -1,36 +1,27 @@
-﻿using Regira.IO.Storage;
+﻿using System.Xml.Linq;
+using Regira.IO.Storage;
 using Regira.IO.Storage.Abstractions;
 using Regira.ProjectFilesProcessor.Models;
-using System.Xml.Linq;
 
 namespace Regira.ProjectFilesProcessor.Services;
 
-public class ProjectService
+public class ProjectService(ProjectParser parser, ITextFileService fileService)
 {
-    private readonly ProjectParser _parser;
-    private readonly ITextFileService _fileService;
-    public ProjectService(ProjectParser parser, ITextFileService fileService)
-    {
-        _parser = parser;
-        _fileService = fileService;
-    }
-
-
     public async Task<Project> Details(string uri)
     {
         var xml = await Load(uri);
-        var project = _parser.Parse(xml);
-        project.ProjectFile = _fileService.GetAbsoluteUri(uri);
+        var project = parser.Parse(xml);
+        project.ProjectFile = fileService.GetAbsoluteUri(uri);
         return project;
     }
 
     public async Task<IEnumerable<Project>> List()
     {
-        var projectUris = await _fileService.List(new FileSearchObject
+        var projectUris = await fileService.List(new FileSearchObject
         {
             Recursive = true,
             Type = FileEntryTypes.Files,
-            Extensions = new[] { ".csproj" }
+            Extensions = [".csproj"]
         });
         var projects = await Task.WhenAll(projectUris.Select(Details));
         return projects;
@@ -43,14 +34,14 @@ public class ProjectService
         }
 
         var source = await Load(item.ProjectFile);
-        var doc = _parser.Update(source, item);
+        var doc = parser.Update(source, item);
         var contents = doc.ToString(SaveOptions.OmitDuplicateNamespaces);
-        await _fileService.Save(item.ProjectFile, contents);
+        await fileService.Save(item.ProjectFile, contents);
     }
 
     protected async Task<XDocument> Load(string uri)
     {
-        var content = await _fileService.GetContents(uri);
+        var content = await fileService.GetContents(uri);
         return XDocument.Parse(content!);
     }
 }

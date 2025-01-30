@@ -3,9 +3,7 @@ using Regira.Utilities;
 
 namespace Regira.Entities.EFcore.Attachments;
 
-public class DefaultIdentifierGenerator : DefaultIdentifierGenerator<int, int, int>, IIdentifierGenerator
-{
-}
+public class DefaultIdentifierGenerator : DefaultIdentifierGenerator<int, int, int>, IIdentifierGenerator;
 
 public class DefaultIdentifierGenerator<TEntityAttachmentKey, TObjectKey, TAttachmentKey> : IIdentifierGenerator<TEntityAttachmentKey, TObjectKey, TAttachmentKey>
 {

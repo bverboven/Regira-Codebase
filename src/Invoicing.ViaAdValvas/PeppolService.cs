@@ -1,25 +1,16 @@
-﻿using Regira.Serializing.Abstractions;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
+using Regira.Serializing.Abstractions;
 
 namespace Regira.Invoicing.ViaAdValvas;
 
-public class PeppolService
+public class PeppolService(GatewaySettings settings, ISerializer serializer)
 {
-    private readonly GatewaySettings _settings;
-    private readonly ISerializer _serializer;
-    public PeppolService(GatewaySettings settings, ISerializer serializer)
-    {
-        _settings = settings;
-        _serializer = serializer;
-    }
-
-
     public async Task<UblDocumentResponse> Send(XDocument ublDoc)
     {
         var sendUrl = "document?format=json";
         using var http = new HttpClient
         {
-            BaseAddress = new Uri(_settings.Uri),
+            BaseAddress = new Uri(settings.Uri),
             DefaultRequestHeaders =
             {
                 { "ContentType", "text/plain" }
@@ -28,7 +19,7 @@ public class PeppolService
 
         var request = CreateRequest(ublDoc);
         // JSON should not be camelCase for AdValVas
-        var serializedRequest = _serializer.Serialize(request);
+        var serializedRequest = serializer.Serialize(request);
         var httpResponse = await http.PostAsync(sendUrl, new StringContent(serializedRequest));
         if (!httpResponse.IsSuccessStatusCode)
         {
@@ -41,7 +32,7 @@ public class PeppolService
 
         var serializedResponse = await httpResponse.Content.ReadAsStringAsync();
 
-        var response = _serializer.Deserialize<ValidateResponse>(serializedResponse);
+        var response = serializer.Deserialize<ValidateResponse>(serializedResponse);
         if (response?.Status != true)
         {
             throw new PeppolResponseException("Sending document failed")
@@ -59,7 +50,7 @@ public class PeppolService
         var referenceId = UblDocumentUtility.GetReferenceId(doc);
         var receiverId = $"{UblDocumentUtility.GetRecipientSchemeId(doc)}:{UblDocumentUtility.GetRecipientId(doc)}";
         var date = DateTime.Now;
-        var seal = SealUtility.Generate(_settings.SecretKey, _settings.Token, date, _settings.SenderID, referenceId);
+        var seal = SealUtility.Generate(settings.SecretKey, settings.Token, date, settings.SenderID, referenceId);
 
         var isCreditNote = doc.Root?.Name.LocalName == "CreditNote";
 
@@ -74,9 +65,9 @@ public class PeppolService
             MessageReference = referenceId,
             ReceiverIdentification = receiverId,
             Seal = seal,
-            SenderIdentification = _settings.SenderID,
-            SenderName = _settings.SenderName,
-            Token = _settings.Token,
+            SenderIdentification = settings.SenderID,
+            SenderName = settings.SenderName,
+            Token = settings.Token,
             DocumentType = $"{(isCreditNote ? "CreditNote" : "Invoice")} EN-UBL CIUS PEPPOL",
             Document = bytes.Select(b => (int)b).ToArray()
         };

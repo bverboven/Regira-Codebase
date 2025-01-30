@@ -1,7 +1,7 @@
-﻿using Regira.Office.Mail.Abstractions;
+﻿using System.Runtime.CompilerServices;
+using Regira.Office.Mail.Abstractions;
 using Regira.Office.Mail.Models;
 using SendGrid.Helpers.Mail;
-using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Office.Mail.Testing")]
 namespace Regira.Office.Mail.SendGrid.Extensions;

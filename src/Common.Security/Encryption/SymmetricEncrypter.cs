@@ -1,8 +1,8 @@
-﻿using Regira.Security.Abstractions;
+﻿using System.Security.Cryptography;
+using System.Text;
+using Regira.Security.Abstractions;
 using Regira.Security.Core;
 using Regira.Security.Utilities;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Regira.Security.Encryption;
 

@@ -1,24 +1,18 @@
-﻿using Dapper;
+﻿using System.Text;
+using System.Text.RegularExpressions;
+using Dapper;
 using MySqlConnector;
 using Regira.DAL.MySQL.Models;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Regira.DAL.MySQL.Services;
 
-public class SQLDumpManager
+public class SQLDumpManager(MySqlSettings dbSettings, string? splitter)
 {
 #if NETSTANDARD2_0
-    public class Result
+    public class Result(string output, string failed)
     {
-        public string Output { get; set; }
-        public string Failed { get; set; }
-
-        public Result(string output, string failed)
-        {
-            Output = output;
-            Failed = failed;
-        }
+        public string Output { get; set; } = output;
+        public string Failed { get; set; } = failed;
     }
 #else
     public record Result(string Output, string Failed);
@@ -38,13 +32,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 SET GLOBAL log_bin_trust_function_creators = 0;
 ";
 
-    private readonly MySqlSettings _dbSettings;
-    private readonly string _splitter;
-    public SQLDumpManager(MySqlSettings dbSettings, string? splitter)
-    {
-        _dbSettings = dbSettings;
-        _splitter = splitter ?? DefaultSplitter;
-    }
+    private readonly string _splitter = splitter ?? DefaultSplitter;
 
     /// <summary>
     /// Preconditions:
@@ -71,7 +59,7 @@ SET GLOBAL log_bin_trust_function_creators = 0;
 
 
         var tmpDatabaseName = $"_temp_{Guid.NewGuid():N}";
-        var tmpDbSettings = _dbSettings.Clone<MySqlSettings>();
+        var tmpDbSettings = dbSettings.Clone<MySqlSettings>();
         tmpDbSettings.DatabaseName = null;
 
         try
@@ -81,7 +69,7 @@ SET GLOBAL log_bin_trust_function_creators = 0;
             {
                 await createTmpDbConnection.ExecuteAsync($"CREATE SCHEMA {tmpDatabaseName};");
             }
-            var queryDbSettings = _dbSettings.Clone<MySqlSettings>();
+            var queryDbSettings = dbSettings.Clone<MySqlSettings>();
             queryDbSettings.DatabaseName = tmpDatabaseName;
             var connectionString = queryDbSettings.BuildConnectionString(
                 new("SslMode", "None"),

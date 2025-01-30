@@ -1,4 +1,7 @@
-﻿using Regira.Drawing.GDI.Utilities;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
+using System.Text;
+using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Abstractions;
@@ -7,9 +10,6 @@ using Regira.Office.PDF.Abstractions;
 using Regira.Office.PDF.Models;
 using Spire.Pdf;
 using Spire.Pdf.Graphics;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Text;
 
 namespace Regira.Office.PDF.Spire;
 

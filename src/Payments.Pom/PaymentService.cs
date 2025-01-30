@@ -1,37 +1,30 @@
-﻿using Regira.Payments.Abstraction;
+﻿using System.Net;
+using Regira.Payments.Abstraction;
 using Regira.Payments.Enums;
 using Regira.Payments.Models;
 using Regira.Serializing.Abstractions;
-using System.Net;
 #if !NETSTANDARD2_0
 using System.Net.Http.Json;
 #endif
 
 namespace Regira.Payments.Pom;
 
-public class PaymentService : IPaymentService
+public class PaymentService(PomSettings settings, ISerializer serializer) : IPaymentService
 {
-    private readonly PomSettings _settings;
-    private readonly ISerializer _serializer;
     private string? _authToken;
-    public PaymentService(PomSettings settings, ISerializer serializer)
-    {
-        _settings = settings;
-        _serializer = serializer;
-    }
 
 
     public async Task<IPayment?> Details(string paymentId)
     {
         using var client = await GetPomClient();
-        var url = _settings.PaylinkStatusApi
+        var url = settings.PaylinkStatusApi
             .Replace("{paymentId}", WebUtility.UrlEncode(paymentId));
         var response = await client.GetAsync(url);
         var content = await response.Content.ReadAsStringAsync();
         try
         {
             response.EnsureSuccessStatusCode();
-            var paymentResponse = _serializer.Deserialize<PomPayment>(content);
+            var paymentResponse = serializer.Deserialize<PomPayment>(content);
             if (paymentResponse?.PaymentStatus == "NOT_FOUND")
             {
                 return null;
@@ -52,9 +45,9 @@ public class PaymentService : IPaymentService
     {
         var item = Convert(payment);
         using var client = await GetPomClient();
-        var url = _settings.CreatePaylinkApi;
+        var url = settings.CreatePaylinkApi;
 #if NETSTANDARD2_0
-        var serializedPayment = _serializer.Serialize(item);
+        var serializedPayment = serializer.Serialize(item);
         var response = await client.PostAsync(url, new StringContent(serializedPayment));
 #else
         var response = await client.PostAsJsonAsync(url, item);
@@ -72,7 +65,7 @@ public class PaymentService : IPaymentService
             throw GetPomException(ex, content, "Saving POM payment failed");
 #endif
         }
-        var paymentResponse = _serializer.Deserialize<PomPaymentResponse>(content)!;
+        var paymentResponse = serializer.Deserialize<PomPaymentResponse>(content)!;
         item.Id = paymentResponse.PomDocumentId;
     }
 
@@ -117,8 +110,8 @@ public class PaymentService : IPaymentService
 #endif
     protected async Task Authenticate(HttpClient client)
     {
-        var serializedSettings = _serializer.Serialize(_settings);
-        var response = await client.PostAsync(_settings.AuthApi, new StringContent(serializedSettings));
+        var serializedSettings = serializer.Serialize(settings);
+        var response = await client.PostAsync(settings.AuthApi, new StringContent(serializedSettings));
         var content = await response.Content.ReadAsStringAsync();
         try
         {
@@ -132,7 +125,7 @@ public class PaymentService : IPaymentService
             throw GetPomException(ex, content, "Authenticating failed");
 #endif
         }
-        var pomAuthResponse = _serializer.Deserialize<PomAuthResponse>(content)!;
+        var pomAuthResponse = serializer.Deserialize<PomAuthResponse>(content)!;
         _authToken = pomAuthResponse.AuthToken;
     }
 
@@ -173,7 +166,7 @@ public class PaymentService : IPaymentService
     {
         var item = new PomPayment
         {
-            SenderContractNumber = _settings.SenderContractNumber,
+            SenderContractNumber = settings.SenderContractNumber,
             Amount = Math.Round(payment.Amount, 2)
         };
         if (!string.IsNullOrWhiteSpace(payment.Currency))

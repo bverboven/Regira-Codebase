@@ -1,21 +1,16 @@
-﻿using NUnit.Framework.Legacy;
+﻿using System.Reflection;
 using Regira.IO.Models;
 using Regira.Office.Mail.Abstractions;
 using Regira.Office.Mail.Models;
-using System.Reflection;
 
 namespace Office.Mail.Testing.Abstractions;
 
 public abstract class MailerTestsBase
 {
     protected IMailer Mailer = null!;
-    protected readonly string Assets;
-    protected MailerTestsBase()
-    {
-        // ReSharper disable AssignNullToNotNullAttribute
-        Assets = new DirectoryInfo(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "../../..", "Assets")).FullName;
-        // ReSharper restore AssignNullToNotNullAttribute
-    }
+    protected readonly string Assets = new DirectoryInfo(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "../../..", "Assets")).FullName;
+    // ReSharper disable AssignNullToNotNullAttribute
+    // ReSharper restore AssignNullToNotNullAttribute
 
     public async virtual Task Send_Without_Attachment()
     {

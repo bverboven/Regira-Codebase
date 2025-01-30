@@ -1,18 +1,13 @@
-﻿using PhoneNumbers;
+﻿using System.Globalization;
+using PhoneNumbers;
 using Regira.Normalizing.Abstractions;
-using System.Globalization;
 
 namespace Regira.Globalization.LibPhoneNumber;
 
-public class PhoneNumberFormatter : INormalizer, IFormatter
+public class PhoneNumberFormatter(CultureInfo? culture = null) : INormalizer, IFormatter
 {
-    protected CultureInfo Culture { get; }
-    protected PhoneNumberUtil PhoneNumberUtil { get; }
-    public PhoneNumberFormatter(CultureInfo? culture = null)
-    {
-        Culture = culture ?? CultureInfo.CurrentCulture;
-        PhoneNumberUtil = PhoneNumberUtil.GetInstance();
-    }
+    protected CultureInfo Culture { get; } = culture ?? CultureInfo.CurrentCulture;
+    protected PhoneNumberUtil PhoneNumberUtil { get; } = PhoneNumberUtil.GetInstance();
 
 
     public string? Normalize(string? input)

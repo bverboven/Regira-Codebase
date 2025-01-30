@@ -1,8 +1,6 @@
 ﻿namespace Regira.Office.Excel;
 
-public class ExcelSheet : ExcelSheet<object>
-{
-}
+public class ExcelSheet : ExcelSheet<object>;
 
 public class ExcelSheet<T>
 {

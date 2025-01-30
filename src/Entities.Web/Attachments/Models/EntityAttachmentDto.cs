@@ -1,8 +1,6 @@
 ﻿namespace Regira.Entities.Web.Attachments.Models;
 
-public class EntityAttachmentDto : EntityAttachmentDto<int, int, int>
-{
-}
+public class EntityAttachmentDto : EntityAttachmentDto<int, int, int>;
 public class EntityAttachmentDto<TKey, TObjectId, TAttachmentId>
 {
     public TKey Id { get; set; } = default!;

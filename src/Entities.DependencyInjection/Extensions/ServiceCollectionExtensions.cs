@@ -1,7 +1,7 @@
-﻿using AutoMapper;
+﻿using System.Reflection;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace Regira.Entities.DependencyInjection.Extensions;
 

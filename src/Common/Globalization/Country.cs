@@ -28,9 +28,9 @@ public class Country
         }
 
         var key = $"{lang}-{Iso2Code}";
-        if (NamesByLanguage?.ContainsKey(key) == true)
+        if (NamesByLanguage?.TryGetValue(key, out var name) is true)
         {
-            return NamesByLanguage[key];
+            return name;
         }
 
         return null;

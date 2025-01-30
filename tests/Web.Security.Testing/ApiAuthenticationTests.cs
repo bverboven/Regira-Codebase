@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using System.Net;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Regira.Security.Authentication.ApiKey.Models;
 using Shouldly;
-using System.Net;
 using Web.Security.Testing.Infrastructure;
 using Web.Security.Testing.Infrastructure.ApiKey;
 using Xunit;

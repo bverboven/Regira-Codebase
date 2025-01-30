@@ -3,21 +3,14 @@ using Regira.Utilities;
 
 namespace Regira.Office.PDF.Abstractions;
 
-public abstract class PdfInputBase
+public abstract class PdfInputBase(int dpi = DimensionsUtility.DPI.DEFAULT)
 {
-    public int DPI { get; set; }
-    public PageOrientation Orientation { get; set; }
-    public PageSize Format { get; set; }
+    public int DPI { get; set; } = dpi;
+    public PageOrientation Orientation { get; set; } = PageOrientation.Portrait;
+    public PageSize Format { get; set; } = PageSize.A4;
+
     /// <summary>
     /// Width of margins in points
     /// </summary>
-    public Margins Margins { get; set; }
-
-    protected PdfInputBase(int dpi = DimensionsUtility.DPI.DEFAULT)
-    {
-        DPI = dpi;
-        Orientation = PageOrientation.Portrait;
-        Format = PageSize.A4;
-        Margins = DimensionsUtility.MmToPt(10f, dpi);
-    }
+    public Margins Margins { get; set; } = DimensionsUtility.MmToPt(10f, dpi);
 }

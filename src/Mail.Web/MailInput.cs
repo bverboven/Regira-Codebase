@@ -1,5 +1,5 @@
-﻿using Regira.Office.Mail.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Regira.Office.Mail.Models;
 
 namespace Regira.Office.Mail.Web;
 

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Mollie.Api.Client;
 using Mollie.Api.Models;
 using Mollie.Api.Models.Payment.Request;
@@ -7,25 +8,16 @@ using Regira.Payments.Enums;
 using Regira.Payments.Models;
 using Regira.Payments.Mollie.Config;
 using Regira.Utilities;
-using System.Globalization;
 
 namespace Regira.Payments.Mollie.Services;
 
 // https://github.com/Viincenttt/MollieApi
-public class PaymentService
+public class PaymentService(MollieConfig config)
 {
-    private readonly int _maxPageSize;
-    private readonly PaymentClient _paymentClient;
-    private readonly Func<IPayment, string>? _webhookFactory;
-    private readonly Func<IPayment, string>? _redirectFactory;
-
-    public PaymentService(MollieConfig config)
-    {
-        _maxPageSize = config.MaxPageSize;
-        _paymentClient = new PaymentClient(config.Key);
-        _redirectFactory = config.RedirectFactory;
-        _webhookFactory = config.WebhookFactory;
-    }
+    private readonly int _maxPageSize = config.MaxPageSize;
+    private readonly PaymentClient _paymentClient = new(config.Key);
+    private readonly Func<IPayment, string>? _webhookFactory = config.WebhookFactory;
+    private readonly Func<IPayment, string>? _redirectFactory = config.RedirectFactory;
 
 
     public async Task<IPayment?> Details(object id)

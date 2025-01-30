@@ -1,15 +1,19 @@
-﻿using Regira.Normalizing.Abstractions;
-using Regira.Normalizing.Models;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Reflection;
+using Regira.Normalizing.Abstractions;
+using Regira.Normalizing.Models;
 
 namespace Regira.Normalizing;
 
 public class NormalizingUtility
 {
-
+#if NET9_0_OR_GREATER
+    private static readonly Lock Lock1 = new();
+    private static readonly Lock Lock2 = new();
+#else
     private static readonly object Lock1 = new();
     private static readonly object Lock2 = new();
+#endif
     private static readonly IDictionary<PropertyInfo, NormalizedAttribute?> CachedAttributes = new ConcurrentDictionary<PropertyInfo, NormalizedAttribute?>();
     private static readonly IDictionary<Type, MethodInfo?> CachedNormalizers = new ConcurrentDictionary<Type, MethodInfo?>();
 
@@ -35,7 +39,7 @@ public class NormalizingUtility
             return;
         }
 
-        var propNames = attribute.SourceProperties ?? new[] { attribute.SourceProperty ?? prop.Name };
+        var propNames = attribute.SourceProperties ?? [attribute.SourceProperty ?? prop.Name];
 
         var targetValues = propNames
             .Aggregate(new List<string>(), (r, propName) =>

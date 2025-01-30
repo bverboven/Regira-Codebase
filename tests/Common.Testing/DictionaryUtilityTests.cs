@@ -1,6 +1,6 @@
+using System.Text.Json;
 using NUnit.Framework.Legacy;
 using Regira.Utilities;
-using System.Text.Json;
 
 namespace Common.Testing;
 

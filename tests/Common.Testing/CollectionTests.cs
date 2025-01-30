@@ -1,5 +1,4 @@
 ﻿using Common.Testing.Models;
-using NUnit.Framework.Legacy;
 using Regira.Utilities;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
@@ -10,63 +9,64 @@ namespace Common.Testing;
 [Parallelizable(ParallelScope.All)]
 public class CollectionTests
 {
-    private readonly List<Person> _persons;
-    public CollectionTests()
-    {
-        _persons = new List<Person>
+    private readonly List<Person> _persons =
+    [
+        new Person
         {
-            new Person
-            {
-                Id = 1,
-                Name = "Lutgard Wittocx",
-                PersonType = PersonType.Parent,
-                Weight = 65,
-                BirthDate = new DateTime(1956, 3, 7)
-            },
-            new Person
-            {
-                Id = 2,
-                Name = "Jan Verboven",
-                PersonType = PersonType.Parent,
-                Weight = 60,
-                BirthDate = new DateTime(1954, 5, 8)
-            },
-            new Person
-            {
-                Id = 3,
-                Name = "Bram Verboven",
-                PersonType = PersonType.Unknown,
-                Weight = 75,
-                BirthDate = new DateTime(1979, 5, 6),
-                Spouse = new Person {Id = 6, Name = "Ursule Muleka"}
-            },
-            new Person
-            {
-                Id = 4,
-                Name = "Dries Verboven",
-                PersonType = PersonType.Brother,
-                Weight = 80,
-                BirthDate = new DateTime(1981, 10, 30)
-            },
-            new Person
-            {
-                Id = 5,
-                Name = "Simon Verboven",
-                PersonType = PersonType.Brother,
-                Weight = 70,
-                BirthDate = new DateTime(1983, 3, 25)
-            },
-            new Person
-            {
-                Id = 6,
-                Name = "Ursule Muleka",
-                PersonType = PersonType.Spouse,
-                Weight = 55,
-                BirthDate = new DateTime(1974, 8, 11),
-                Spouse = new Person {Id = 3, Name = "Bram Verboven"}
-            }
-        };
-    }
+            Id = 1,
+            Name = "Lutgard Wittocx",
+            PersonType = PersonType.Parent,
+            Weight = 65,
+            BirthDate = new DateTime(1956, 3, 7)
+        },
+
+        new Person
+        {
+            Id = 2,
+            Name = "Jan Verboven",
+            PersonType = PersonType.Parent,
+            Weight = 60,
+            BirthDate = new DateTime(1954, 5, 8)
+        },
+
+        new Person
+        {
+            Id = 3,
+            Name = "Bram Verboven",
+            PersonType = PersonType.Unknown,
+            Weight = 75,
+            BirthDate = new DateTime(1979, 5, 6),
+            Spouse = new Person { Id = 6, Name = "Ursule Muleka" }
+        },
+
+        new Person
+        {
+            Id = 4,
+            Name = "Dries Verboven",
+            PersonType = PersonType.Brother,
+            Weight = 80,
+            BirthDate = new DateTime(1981, 10, 30)
+        },
+
+        new Person
+        {
+            Id = 5,
+            Name = "Simon Verboven",
+            PersonType = PersonType.Brother,
+            Weight = 70,
+            BirthDate = new DateTime(1983, 3, 25)
+        },
+
+        new Person
+        {
+            Id = 6,
+            Name = "Ursule Muleka",
+            PersonType = PersonType.Spouse,
+            Weight = 55,
+            BirthDate = new DateTime(1974, 8, 11),
+            Spouse = new Person { Id = 3, Name = "Bram Verboven" }
+        }
+    ];
 
     [Test]
     public void Filter_Non_Existing_Prop()

@@ -9,7 +9,8 @@ public class NotNullOrEmptyCollectionAttribute : ValidationAttribute
     {
         if (value is not ICollection { Count: > 0 } collection || !collection.GetEnumerator().MoveNext())
         {
-            return new ValidationResult(ErrorMessage ?? "Collection should not be empty", new[] { validationContext.MemberName }!);
+            return new ValidationResult(ErrorMessage ?? "Collection should not be empty", [validationContext.MemberName
+            ]!);
         }
 
         return ValidationResult.Success;

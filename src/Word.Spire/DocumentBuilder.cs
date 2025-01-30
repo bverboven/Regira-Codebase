@@ -7,20 +7,14 @@ using RegiraFileFormat = Regira.Office.Models.FileFormat;
 
 namespace Regira.Office.Word.Spire;
 
-public class DocumentBuilder
+public class DocumentBuilder(WordManager manager)
 {
-    private readonly WordManager _manager;
     private WordDocumentSettings? _settings;
     private WordTemplateInput[]? _inputs;
     private ConversionOptions? _conversionOptions;
     private IEnumerable<Paragraph>? _paragraphs;
     private ICollection<WordHeaderFooterInput>? _headers;
     private ICollection<WordHeaderFooterInput>? _footers;
-
-    public DocumentBuilder(WordManager manager)
-    {
-        _manager = manager;
-    }
 
 
     public DocumentBuilder Load(params WordTemplateInput[] inputs)
@@ -61,7 +55,7 @@ public class DocumentBuilder
     {
         // Create Document
         using var doc = _inputs != null
-            ? _manager.MergeDocuments(_inputs)
+            ? manager.MergeDocuments(_inputs)
             : new Document();
 
         // PageSettings
@@ -73,15 +67,15 @@ public class DocumentBuilder
             }
             foreach (Section section in doc.Sections)
             {
-                section.PageSetup.PageSize = _manager.GetPageSize(_settings.PageSize);
-                section.PageSetup.Orientation = _manager.GetPageOrientation(_settings.PageOrientation);
+                section.PageSetup.PageSize = manager.GetPageSize(_settings.PageSize);
+                section.PageSetup.Orientation = manager.GetPageOrientation(_settings.PageOrientation);
             }
         }
 
         // Paragraphs
         if (_paragraphs?.Any() ?? false)
         {
-            _manager.AddParagraphs(doc, _paragraphs);
+            manager.AddParagraphs(doc, _paragraphs);
         }
 
         // Headers
@@ -89,8 +83,8 @@ public class DocumentBuilder
         {
             foreach (var headerInput in _headers)
             {
-                using var headerDoc = _manager.CreateDocument(headerInput.Template);
-                _manager.AddHeader(doc, headerDoc, headerInput.Type);
+                using var headerDoc = manager.CreateDocument(headerInput.Template);
+                manager.AddHeader(doc, headerDoc, headerInput.Type);
             }
         }
         // Footers
@@ -98,14 +92,14 @@ public class DocumentBuilder
         {
             foreach (var footerInput in _footers)
             {
-                using var footerDoc = _manager.CreateDocument(footerInput.Template);
-                _manager.AddFooter(doc, footerDoc, footerInput.Type);
+                using var footerDoc = manager.CreateDocument(footerInput.Template);
+                manager.AddFooter(doc, footerDoc, footerInput.Type);
             }
         }
 
         // ConversionOptions
         _conversionOptions ??= new ConversionOptions();
-        var stream = _manager.ConvertDocument(doc, _conversionOptions);
+        var stream = manager.ConvertDocument(doc, _conversionOptions);
         return stream.ToMemoryFile(_conversionOptions.OutputFormat == RegiraFileFormat.Doc ? ContentTypes.DOC : ContentTypes.DOCX);
     }
 }

@@ -1,5 +1,3 @@
 ﻿namespace Regira.Payments.Mollie.Exceptions;
 
-public interface IPaymentException
-{
-}
+public interface IPaymentException;

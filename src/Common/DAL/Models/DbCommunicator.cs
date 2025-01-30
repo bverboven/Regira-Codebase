@@ -1,5 +1,5 @@
-using Regira.DAL.Abstractions;
 using System.Data;
+using Regira.DAL.Abstractions;
 
 namespace Regira.DAL.Models;
 

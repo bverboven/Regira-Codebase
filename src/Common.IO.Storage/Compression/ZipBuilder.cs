@@ -1,7 +1,7 @@
+using System.IO.Compression;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
-using System.IO.Compression;
 
 namespace Regira.IO.Storage.Compression;
 

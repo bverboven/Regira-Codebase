@@ -94,7 +94,8 @@ public static class TreeListExtensions
 
     //TreeList extensions
     public static IEnumerable<TreeNode<T>> GetSelf<T>(this IEnumerable<TreeNode<T>> collection, IEnumerable<T> selectedItems) => collection.Join(selectedItems, c => c.Value, i => i, (c, _) => c);
-    public static IEnumerable<TreeNode<T>> GetSelf<T>(this IEnumerable<TreeNode<T>> collection, T item) => collection.GetSelf(new[] { item });
+    public static IEnumerable<TreeNode<T>> GetSelf<T>(this IEnumerable<TreeNode<T>> collection, T item) => collection.GetSelf(
+        [item]);
     public static IEnumerable<TreeNode<T>> GetParents<T>(this IEnumerable<TreeNode<T>> collection) => collection.Where(i => i.Parent != null).Select(i => i.Parent!).Distinct();
     public static IEnumerable<TreeNode<T>> GetAncestors<T>(this IEnumerable<TreeNode<T>> collection) => collection.SelectMany(i => i.GetAncestors()).Distinct();
     public static IEnumerable<TreeNode<T>> GetRoots<T>(this IEnumerable<TreeNode<T>> collection) => collection.Select(i => i.GetRoot()).Distinct();

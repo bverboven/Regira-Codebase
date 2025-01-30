@@ -11,10 +11,5 @@ public class Person
     public DateTime? BirthDate { get; set; }
 }
 
-public class PersonRepository : MongoDbRepositoryBase<Person>
-{
-    public PersonRepository(MongoCommunicator communicator, ISerializer serializer)
-        : base(communicator, serializer, p => p.Id, (p, id) => p.Id = id, "persons")
-    {
-    }
-}
+public class PersonRepository(MongoCommunicator communicator, ISerializer serializer)
+    : MongoDbRepositoryBase<Person>(communicator, serializer, p => p.Id, (p, id) => p.Id = id, "persons");

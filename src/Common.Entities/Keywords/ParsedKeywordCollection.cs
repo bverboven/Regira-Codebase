@@ -1,11 +1,6 @@
 ﻿namespace Regira.Entities.Keywords;
 
-public class ParsedKeywordCollection : List<QKeyword>
+public class ParsedKeywordCollection(IEnumerable<QKeyword> items, string? input) : List<QKeyword>(items)
 {
-    public string? Input { get; }
-    public ParsedKeywordCollection(IEnumerable<QKeyword> items, string? input)
-        : base(items)
-    {
-        Input = input;
-    }
+    public string? Input { get; } = input;
 }

@@ -8,18 +8,14 @@ using SelectPdf;
 
 namespace Regira.Office.PDF.SelectPdf;
 
-public class PdfManager : IHtmlToPdfService
+public class PdfManager(PdfManager.Options? options = null) : IHtmlToPdfService
 {
     public class Options
     {
         public Action<HtmlInput, string?>? OnPrint { get; set; }
     }
 
-    public event Action<HtmlInput, string?>? OnPrint;
-    public PdfManager(Options? options = null)
-    {
-        OnPrint = options?.OnPrint;
-    }
+    public event Action<HtmlInput, string?>? OnPrint = options?.OnPrint;
 
 
     public IMemoryFile Create(HtmlInput template)

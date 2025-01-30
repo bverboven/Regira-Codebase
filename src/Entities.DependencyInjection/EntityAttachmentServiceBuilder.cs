@@ -11,16 +11,13 @@ using Regira.Entities.Web.Attachments.Models;
 
 namespace Regira.Entities.DependencyInjection;
 
-public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment>
-    : EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, int>, IEntityAttachmentServiceBuilder<TEntity, TEntityAttachment>
+public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment>(IServiceCollection services)
+    : EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, int>(services),
+        IEntityAttachmentServiceBuilder<TEntity, TEntityAttachment>
     where TContext : DbContext
     where TEntity : class, IEntity<int>, IHasAttachments, IHasAttachments<TEntityAttachment>
     where TEntityAttachment : class, IEntityAttachment
 {
-    public EntityAttachmentServiceBuilder(IServiceCollection services) : base(services)
-    {
-    }
-
     public new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment> WithDefaultMapping()
     {
         base.WithDefaultMapping();
@@ -35,18 +32,16 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
         return this;
     }
 }
-public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey>
-    : EntityServiceBuilder<TContext, TObject, TObjectKey>, IEntityAttachmentServiceBuilder<TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey>
+public class
+    EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey,
+        TAttachmentKey>(IServiceCollection services) : EntityServiceBuilder<TContext, TObject, TObjectKey>(services),
+    IEntityAttachmentServiceBuilder<TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey>
     where TContext : DbContext
-    where TObject : class, IEntity<TObjectKey>, IHasAttachments, IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey>
+    where TObject : class, IEntity<TObjectKey>, IHasAttachments,
+    IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey>
     where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey>
 {
     protected internal bool HasEntityAttachmentMapping { get; set; }
-
-    public EntityAttachmentServiceBuilder(IServiceCollection services)
-        : base(services)
-    {
-    }
 
     /// <summary>
     /// Adds AutoMapper maps

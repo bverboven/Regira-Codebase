@@ -1,5 +1,5 @@
-﻿using Regira.System.Abstractions;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using Regira.System.Abstractions;
 
 namespace Regira.System;
 

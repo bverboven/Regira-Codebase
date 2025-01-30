@@ -1,11 +1,11 @@
+using System.Dynamic;
+using NUnit.Framework.Legacy;
 using Regira.Office.Mail.Abstractions;
 using Regira.Office.Mail.Exceptions;
 using Regira.Office.Mail.Models;
 using Regira.Office.Mail.Web;
 using Regira.Serializing.Abstractions;
 using Regira.Serializing.Newtonsoft.Json;
-using System.Dynamic;
-using NUnit.Framework.Legacy;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 
@@ -15,11 +15,7 @@ namespace Office.Mail.Testing;
 [Parallelizable(ParallelScope.All)]
 public class MessageObjectTests
 {
-    private readonly ISerializer _serializer;
-    public MessageObjectTests()
-    {
-        _serializer = new JsonSerializer();
-    }
+    private readonly ISerializer _serializer = new JsonSerializer();
 
 
     [TestCase(null)]

@@ -11,24 +11,14 @@ using Regira.IO.Utilities;
 
 namespace Regira.Entities.EFcore.Attachments;
 
-public class AttachmentRepository<TContext> : AttachmentRepository<TContext, int>, IAttachmentService
+public class AttachmentRepository<TContext>(TContext dbContext, IFileService fileService)
+    : AttachmentRepository<TContext, int>(dbContext, fileService), IAttachmentService
+    where TContext : DbContext;
+public class AttachmentRepository<TContext, TKey>(TContext dbContext, IFileService fileService)
+    : EntityRepository<TContext, Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>(dbContext),
+        IAttachmentService<TKey>
     where TContext : DbContext
 {
-    public AttachmentRepository(TContext dbContext, IFileService fileService)
-        : base(dbContext, fileService)
-    {
-    }
-}
-public class AttachmentRepository<TContext, TKey> : EntityRepository<TContext, Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>, IAttachmentService<TKey>
-    where TContext : DbContext
-{
-    private readonly IFileService _fileService;
-    public AttachmentRepository(TContext dbContext, IFileService fileService)
-        : base(dbContext)
-    {
-        _fileService = fileService;
-    }
-
     public override async Task<Attachment<TKey>?> Details(TKey id)
     {
         var item = await base.Details(id);
@@ -73,7 +63,7 @@ public class AttachmentRepository<TContext, TKey> : EntityRepository<TContext, A
             throw new ArgumentNullException(nameof(item.Identifier));
         }
 
-        return await _fileService.GetBytes(item.Identifier);
+        return await fileService.GetBytes(item.Identifier);
     }
     public async Task SaveFile(Attachment<TKey> item)
     {
@@ -92,7 +82,7 @@ public class AttachmentRepository<TContext, TKey> : EntityRepository<TContext, A
 #endif
         if (IsNew(item))
         {
-            var fileNameHelper = new FileNameHelper(_fileService);
+            var fileNameHelper = new FileNameHelper(fileService);
             // every filename should be unique!
             var identifier = await fileNameHelper.NextAvailableFileName(item.Identifier);
             item.Identifier = identifier;
@@ -107,10 +97,10 @@ public class AttachmentRepository<TContext, TKey> : EntityRepository<TContext, A
             item.ContentType = ContentTypeUtility.GetContentType(item.Identifier);
         }
 
-        var path = await _fileService.Save(item.Identifier, fileStream!, item.ContentType);
+        var path = await fileService.Save(item.Identifier, fileStream!, item.ContentType);
         // don't save full path (increases flexibility for multiple platforms)
-        item.Path = _fileService.GetIdentifier(path);
-        item.Prefix = _fileService.GetRelativeFolder(item.Identifier);
+        item.Path = fileService.GetIdentifier(path);
+        item.Prefix = fileService.GetRelativeFolder(item.Identifier);
         item.FileName ??= Path.GetFileName(item.Identifier);
     }
     public async Task RemoveFile(IAttachment<TKey> item)
@@ -126,7 +116,7 @@ public class AttachmentRepository<TContext, TKey> : EntityRepository<TContext, A
             throw new ArgumentNullException(nameof(item.Path));
         }
 
-        await _fileService.Delete(path);
+        await fileService.Delete(path);
     }
 
     public override IQueryable<Attachment<TKey>> Filter(IQueryable<Attachment<TKey>> query, AttachmentSearchObject<TKey>? so)
@@ -173,8 +163,8 @@ public class AttachmentRepository<TContext, TKey> : EntityRepository<TContext, A
     {
         if (!string.IsNullOrWhiteSpace(item.Path))
         {
-            item.Identifier = _fileService.GetIdentifier(item.Path);
-            item.Prefix = _fileService.GetRelativeFolder(item.Identifier);
+            item.Identifier = fileService.GetIdentifier(item.Path);
+            item.Prefix = fileService.GetRelativeFolder(item.Identifier);
         }
     }
 }

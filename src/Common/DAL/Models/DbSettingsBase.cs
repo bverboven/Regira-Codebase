@@ -2,25 +2,22 @@ using Regira.DAL.Abstractions;
 
 namespace Regira.DAL.Models;
 
-public abstract class DbSettingsBase : IDbSettings
+public abstract class DbSettingsBase(
+    string host,
+    string? databaseName,
+    string port,
+    string? username = null,
+    string? password = null,
+    bool useSecure = true)
+    : IDbSettings
 {
-    public string Host { get; set; }
-    public string? DatabaseName { get; set; }
-    public string Port { get; set; }
-    public string? Username { get; set; }
-    public string? Password { get; set; }
-    public bool UseSecure { get; set; }
+    public string Host { get; set; } = host;
+    public string? DatabaseName { get; set; } = databaseName;
+    public string Port { get; set; } = port;
+    public string? Username { get; set; } = username;
+    public string? Password { get; set; } = password;
+    public bool UseSecure { get; set; } = useSecure;
 
-
-    protected DbSettingsBase(string host, string? databaseName, string port, string? username = null, string? password = null, bool useSecure = true)
-    {
-        Host = host;
-        DatabaseName = databaseName;
-        Port = port;
-        Username = username;
-        Password = password;
-        UseSecure = useSecure;
-    }
 
     public abstract string BuildConnectionString(params KeyValuePair<string, string>[] extraOptions);
     public virtual bool EqualsConnectionString<T>(T other)

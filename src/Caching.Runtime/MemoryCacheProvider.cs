@@ -1,5 +1,5 @@
-using Regira.Caching.Abstractions;
 using System.Runtime.Caching;
+using Regira.Caching.Abstractions;
 
 namespace Regira.Caching.Runtime;
 

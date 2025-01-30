@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using NUnit.Framework.Legacy;
 using Regira.IO.Storage;
 using Regira.IO.Storage.Abstractions;
 using Regira.IO.Storage.GitHub;
 using Regira.Serializing.Newtonsoft.Json;
 using Regira.Utilities;
-using System.Reflection;
 
 namespace IO.Testing.GitHub;
 
@@ -77,7 +77,7 @@ public class GitHubStorageTests
         var so = new FileSearchObject
         {
             Recursive = true,
-            Extensions = new[] { ".png", ".txt", ".sql" }
+            Extensions = [".png", ".txt", ".sql"]
         };
         var fileService = GetFileService();
         var files = (await fileService.List(so)).AsList();

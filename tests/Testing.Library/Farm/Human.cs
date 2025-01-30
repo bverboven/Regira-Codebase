@@ -1,12 +1,7 @@
 ﻿namespace Testing.Library.Farm;
 
-public class Human : Animal
+public class Human(string name) : Animal(name)
 {
-    public Human(string name)
-        : base(name)
-    {
-    }
-
     public override string Species => "Homo sapiens";
 
     public Animal? FavoriteAnimal { get; set; }

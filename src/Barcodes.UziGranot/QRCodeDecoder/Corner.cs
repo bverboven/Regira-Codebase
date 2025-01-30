@@ -41,7 +41,7 @@
 //	For version history please refer to QRDecoder.cs
 /////////////////////////////////////////////////////////////////////
 
-using System;
+
 
 // ReSharper disable once CheckNamespace
 namespace QRCodeDecoderLibrary

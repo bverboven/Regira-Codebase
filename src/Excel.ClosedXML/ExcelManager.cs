@@ -1,8 +1,8 @@
-﻿using ClosedXML.Excel;
+﻿using System.Dynamic;
+using ClosedXML.Excel;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Office.Excel.Abstractions;
-using System.Dynamic;
 
 namespace Regira.Office.Excel.ClosedXML;
 
@@ -35,7 +35,7 @@ public class ExcelManager : IExcelManager
             foreach (var row in rows)
             {
                 var item = new Dictionary<string, object?>();
-                var cellCount = row.CellCount();
+                row.CellCount();
                 for (var c = 0; c < sheetHeaders.Length; c++)
                 {
                     var key = sheetHeaders[c];
@@ -90,7 +90,7 @@ public class ExcelManager : IExcelManager
 
             var data = sheet.Data;
             var firstItem = sheet.Data.Skip(1).FirstOrDefault();
-            if (firstItem is IDictionary<string, object?> dic)
+            if (firstItem is IDictionary<string, object?>)
             {
                 data = sheet.Data.Select(dic => ((IDictionary<string, object?>)dic).Values).ToArray();
             }

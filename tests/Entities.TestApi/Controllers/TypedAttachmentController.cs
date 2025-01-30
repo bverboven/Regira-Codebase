@@ -8,19 +8,12 @@ namespace Entities.TestApi.Controllers;
 
 [ApiController]
 [Route("attachments")]
-public class TypedAttachmentController : ControllerBase
+public class TypedAttachmentController(ITypedAttachmentService service) : ControllerBase
 {
-    private readonly ITypedAttachmentService _service;
-    public TypedAttachmentController(ITypedAttachmentService service)
-    {
-        _service = service;
-    }
-
-
     [HttpGet("typed")]
     public async Task<IActionResult> List([FromQuery] EntityAttachmentSearchObject? so, [FromQuery] PagingInfo? pagingInfo)
     {
-        var items = await _service.List(so, pagingInfo);
+        var items = await service.List(so, pagingInfo);
         return this.ListResult(items);
     }
 }

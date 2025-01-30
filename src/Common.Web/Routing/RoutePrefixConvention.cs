@@ -4,14 +4,10 @@ using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace Regira.Web.Routing;
 
-public class RoutePrefixConvention : IApplicationModelConvention
+public class RoutePrefixConvention(IRouteTemplateProvider routeTemplateProvider) : IApplicationModelConvention
 {
     // https://stackoverflow.com/questions/63343735/asp-net-core-3-adding-route-prefix#63470358
-    private readonly AttributeRouteModel _centralPrefix;
-    public RoutePrefixConvention(IRouteTemplateProvider routeTemplateProvider)
-    {
-        _centralPrefix = new AttributeRouteModel(routeTemplateProvider);
-    }
+    private readonly AttributeRouteModel _centralPrefix = new(routeTemplateProvider);
 
     public void Apply(ApplicationModel application)
     {

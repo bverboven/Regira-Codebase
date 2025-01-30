@@ -452,9 +452,9 @@ public static class DictionaryUtility
     {
         if (dic.ContainsKey(key))
         {
-            if (dic[key] is TResult _value)
+            if (dic[key] is TResult result)
             {
-                value = _value;
+                value = result;
                 return true;
             }
 

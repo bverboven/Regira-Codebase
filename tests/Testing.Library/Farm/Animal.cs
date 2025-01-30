@@ -1,13 +1,8 @@
 ﻿namespace Testing.Library.Farm;
-public abstract class Animal
+public abstract class Animal(string name)
 {
-    protected Animal(string name)
-    {
-        Name = name;
-    }
-
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = name;
     public abstract string Species { get; }
 
     public Food? Food { get; set; }

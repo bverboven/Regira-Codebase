@@ -1,19 +1,15 @@
-﻿using Regira.Office.Mail.Abstractions;
+﻿using System.Net;
+using Regira.Office.Mail.Abstractions;
 using Regira.Office.Mail.Exceptions;
 using Regira.Office.Mail.Models;
 using Regira.Office.Mail.SendGrid.Extensions;
 using SendGrid;
-using System.Net;
 
 namespace Regira.Office.Mail.SendGrid;
 
-public class SendGridMailer : MailerBase
+public class SendGridMailer(SendGridConfig config) : MailerBase
 {
-    private readonly SendGridClient _client;
-    public SendGridMailer(SendGridConfig config)
-    {
-        _client = new SendGridClient(config.Key);
-    }
+    private readonly SendGridClient _client = new(config.Key);
 
     protected override async Task<IMailResponse> OnSend(IMessageObject message)
     {

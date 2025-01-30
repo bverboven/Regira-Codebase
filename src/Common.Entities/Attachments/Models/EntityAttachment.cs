@@ -1,12 +1,10 @@
-﻿using Regira.Entities.Attachments.Abstractions;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Models.Abstractions;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Regira.Entities.Attachments.Models;
 
-public class EntityAttachment : EntityAttachment<int, int, int>, IEntityWithSerial, IEntityAttachment
-{
-}
+public class EntityAttachment : EntityAttachment<int, int, int>, IEntityWithSerial, IEntityAttachment;
 public class EntityAttachment<TKey, TObjectKey, TAttachmentKey> : IEntityAttachment<TKey, TObjectKey, TAttachmentKey>
 {
     public TKey Id { get; set; } = default!;

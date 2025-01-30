@@ -1,7 +1,7 @@
+using System.Text.RegularExpressions;
 using Regira.Serializing.Abstractions;
 using Regira.Utilities;
 using Regira.Web.HTML.Abstractions;
-using System.Text.RegularExpressions;
 
 namespace Regira.Web.HTML;
 
@@ -38,7 +38,7 @@ public class HtmlTemplateParser : IHtmlParser
     protected string ProcessInput(string htmlContent, IDictionary<string, object?>? paramObj)
     {
         var blockMatches = Regex.Matches(htmlContent, @"<!--{{([a-z][a-z|A-Z]*)}}-->[\s\S]+?<!--{{\/([a-z][a-z|A-Z]*)}}-->");
-        var parameters = paramObj?.ToList() ?? new List<KeyValuePair<string, object?>>();
+        var parameters = paramObj?.ToList() ?? [];
 
         foreach (var blockMatch in blockMatches)
         {

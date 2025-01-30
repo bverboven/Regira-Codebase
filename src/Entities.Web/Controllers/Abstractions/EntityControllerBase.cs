@@ -11,9 +11,7 @@ namespace Regira.Entities.Web.Controllers.Abstractions;
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
 public abstract class EntityControllerBase<TEntity> : EntityControllerBase<TEntity, SearchObject, TEntity, TEntity>
-    where TEntity : class, IEntity<int>
-{
-}
+    where TEntity : class, IEntity<int>;
 /// <summary>
 /// Basic EntityController with DTO models
 /// </summary>
@@ -21,9 +19,7 @@ public abstract class EntityControllerBase<TEntity> : EntityControllerBase<TEnti
 /// <typeparam name="TDto"></typeparam>
 /// <typeparam name="TInputDto"></typeparam>
 public abstract class EntityControllerBase<TEntity, TDto, TInputDto> : EntityControllerBase<TEntity, SearchObject, TDto, TInputDto>
-    where TEntity : class, IEntity<int>
-{
-}
+    where TEntity : class, IEntity<int>;
 /// <summary>
 /// Default EntityController with custom <see cref="ISearchObject"/> and DTO models
 /// </summary>
@@ -33,9 +29,7 @@ public abstract class EntityControllerBase<TEntity, TDto, TInputDto> : EntityCon
 /// <typeparam name="TInputDto"></typeparam>
 public abstract class EntityControllerBase<TEntity, TSearchObject, TDto, TInputDto> : EntityControllerBase<TEntity, int, TSearchObject, TDto, TInputDto>
     where TEntity : class, IEntity<int>
-    where TSearchObject : class, ISearchObject<int>
-{
-}
+    where TSearchObject : class, ISearchObject<int>;
 
 /// <summary>
 /// Default EntityController with custom <see cref="ISearchObject{TKey}"/> and DTO models
@@ -90,9 +84,7 @@ public abstract class EntityControllerBase<TEntity, TSo, TSortBy, TIncludes, TDt
     where TEntity : class, IEntity<int>
     where TSo : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum
-    where TIncludes : struct, Enum
-{
-}
+    where TIncludes : struct, Enum;
 /// <summary>
 /// Complex EntityController
 /// </summary>
@@ -118,7 +110,7 @@ public abstract class EntityControllerBase<TEntity, TKey, TSo, TSortBy, TInclude
     [HttpGet]
     public virtual Task<ActionResult<ListResult<TDto>>> List([FromQuery] TSo so,
         [FromQuery] PagingInfo pagingInfo, [FromQuery] TIncludes[] includes, [FromQuery] TSortBy[] sortBy)
-        => List(new[] { so }, pagingInfo, includes, sortBy);
+        => List([so], pagingInfo, includes, sortBy);
 
     [HttpPost("list")]
     public virtual Task<ActionResult<ListResult<TDto>>> List([FromBody] TSo[] so,
@@ -130,7 +122,7 @@ public abstract class EntityControllerBase<TEntity, TKey, TSo, TSortBy, TInclude
     public virtual Task<ActionResult<SearchResult<TDto>>> Search([FromQuery] TSo so,
         [FromQuery] PagingInfo pagingInfo, [FromQuery] TIncludes[] includes,
         [FromQuery] TSortBy[] sortBy)
-        => Search(new[] { so }, pagingInfo, includes, sortBy);
+        => Search([so], pagingInfo, includes, sortBy);
 
     [HttpPost("search")]
     public virtual Task<ActionResult<SearchResult<TDto>>> Search([FromBody] TSo[] so,

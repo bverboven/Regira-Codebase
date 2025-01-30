@@ -12,7 +12,7 @@ namespace Regira.Media.FFMpeg;
 
 public class SnapshotService(IImageService imageService, IProcessHelper? processHelper = null)
 {
-    IProcessHelper _processHelper = processHelper ?? new ProcessHelper();
+    readonly IProcessHelper _processHelper = processHelper ?? new ProcessHelper();
 
     public async Task<IImageFile?> Snapshot(IBinaryFile input, Size2D? size = null, TimeSpan? time = null)
     {

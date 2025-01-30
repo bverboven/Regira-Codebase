@@ -1,12 +1,10 @@
-﻿using Regira.System.Hosting.Background.Abstractions;
+﻿using System.Collections.Concurrent;
+using Regira.System.Hosting.Background.Abstractions;
 using Regira.System.Hosting.Background.Models;
-using System.Collections.Concurrent;
 
 namespace Regira.System.Hosting.Background.Services;
 
-public class BackgroundTaskManager : BackgroundTaskManager<BackgroundTask>, IBackgroundTaskManager
-{
-}
+public class BackgroundTaskManager : BackgroundTaskManager<BackgroundTask>, IBackgroundTaskManager;
 public class BackgroundTaskManager<TTask> : IBackgroundTaskManager<TTask>
     where TTask : class, IBackgroundTask, new()
 {

@@ -1,6 +1,6 @@
+using System.Text;
 using Regira.IO.Storage.Abstractions;
 using Regira.IO.Utilities;
-using System.Text;
 
 namespace Regira.IO.Storage;
 

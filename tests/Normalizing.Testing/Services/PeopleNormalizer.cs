@@ -6,20 +6,17 @@ using Testing.Library.Contoso;
 
 namespace Normalizing.Testing.Services;
 
-public class PeopleNormalizer : IObjectNormalizer
+public class PeopleNormalizer(INormalizer? normalizer) : IObjectNormalizer
 {
     public bool IsExclusive => false;
-    public INormalizer DefaultNormalizer { get; }
+    public INormalizer DefaultNormalizer { get; } = normalizer
+                                                    ?? new DefaultNormalizer(new NormalizeOptions
+                                                    {
+                                                        RemoveDiacritics = true,
+                                                        Transform = TextTransform.ToUpperCase
+                                                    });
+
     public PeopleNormalizer() : this(null) { }
-    public PeopleNormalizer(INormalizer? normalizer)
-    {
-        DefaultNormalizer = normalizer
-                            ?? new DefaultNormalizer(new NormalizeOptions
-                            {
-                                RemoveDiacritics = true,
-                                Transform = TextTransform.ToUpperCase
-                            });
-    }
 
     public void HandleNormalize(object? instance, bool recursive = true)
     {

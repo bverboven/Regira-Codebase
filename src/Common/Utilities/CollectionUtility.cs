@@ -13,7 +13,7 @@ public static class CollectionUtility
     {
         return items switch
         {
-            null => new List<T>(),
+            null => [],
             List<T> list => list,
             _ => items.ToList()
         };

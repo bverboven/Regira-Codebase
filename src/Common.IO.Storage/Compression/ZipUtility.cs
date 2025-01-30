@@ -1,8 +1,8 @@
+using System.IO.Compression;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
 using Regira.IO.Storage.Helpers;
-using System.IO.Compression;
 
 namespace Regira.IO.Storage.Compression;
 
@@ -90,7 +90,7 @@ public static class ZipUtility
 
     public static void RemoveFile(Stream zipArchive, IBinaryFile file)
     {
-        RemoveFiles(zipArchive, new[] { file });
+        RemoveFiles(zipArchive, [file]);
     }
     public static void RemoveFiles(Stream zipArchive, IEnumerable<IBinaryFile> files)
     {

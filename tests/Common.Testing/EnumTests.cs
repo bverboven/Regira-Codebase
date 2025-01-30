@@ -1,5 +1,4 @@
-﻿using NUnit.Framework.Legacy;
-using Regira.Utilities;
+﻿using Regira.Utilities;
 
 namespace Common.Testing;
 
@@ -22,7 +21,8 @@ public enum TestEnum
 [Parallelizable(ParallelScope.Self)]
 public class EnumTests
 {
-    private readonly TestEnum[] _validFlags = { TestEnum.None, TestEnum.One, TestEnum.Two, TestEnum.Four, TestEnum.SixtyFour };
+    private readonly TestEnum[] _validFlags = [TestEnum.None, TestEnum.One, TestEnum.Two, TestEnum.Four, TestEnum.SixtyFour
+    ];
     private readonly TestEnum[] _combos = new[] { 3, 5, 6, 7, 65, 66, 67, 68, 69, 70, 71 }.Cast<TestEnum>().ToArray();
 
     [Test]

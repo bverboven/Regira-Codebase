@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
-using System.Reflection;
+﻿using System.Reflection;
+using Microsoft.Extensions.Hosting;
 
 namespace Regira.System.Hosting.WindowsService;
 

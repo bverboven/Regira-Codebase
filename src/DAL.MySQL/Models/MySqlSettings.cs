@@ -82,9 +82,9 @@ public class MySqlSettings : DbSettingsBase
 
     protected static string? GetConnectionStringValue(IDictionary<string, string> cnDic, string key)
     {
-        if (cnDic.ContainsKey(key))
+        if (cnDic.TryGetValue(key, out var value))
         {
-            return cnDic[key];
+            return value;
         }
 
         return null;

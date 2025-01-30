@@ -2,20 +2,13 @@
 
 namespace Regira.ProjectFilesProcessor.Services;
 
-public class NuGetHelper
+public class NuGetHelper(NuGetHelper.Options options)
 {
 
     public class Options
     {
         public string? ApiKey { get; set; }
         public string PackagesPushUri { get; set; } = null!;
-    }
-
-
-    private readonly Options _options;
-    public NuGetHelper(Options options)
-    {
-        _options = options;
     }
 
 
@@ -51,6 +44,6 @@ public class NuGetHelper
             throw new DirectoryNotFoundException($"Directory {projectDirectory} not found for project {project.Id}");
         }
 
-        return $@"dotnet nuget push -s ""{_options.PackagesPushUri}""{(!string.IsNullOrWhiteSpace(_options.ApiKey) ? $@" -k ""{_options.ApiKey}""" : "")} ""{Path.Combine(projectDirectory, @"bin\Release", $"{project.Id}.{project.Version}.nupkg")}""";
+        return $@"dotnet nuget push -s ""{options.PackagesPushUri}""{(!string.IsNullOrWhiteSpace(options.ApiKey) ? $@" -k ""{options.ApiKey}""" : "")} ""{Path.Combine(projectDirectory, @"bin\Release", $"{project.Id}.{project.Version}.nupkg")}""";
     }
 }

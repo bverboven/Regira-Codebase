@@ -1,4 +1,10 @@
-﻿using Regira.Office.Word.Abstractions;
+﻿using System.Drawing;
+using System.Text.RegularExpressions;
+using Regira.IO.Abstractions;
+using Regira.IO.Extensions;
+using Regira.Media.Drawing.Abstractions;
+using Regira.Office.MimeTypes;
+using Regira.Office.Word.Abstractions;
 using Regira.Office.Word.Models;
 using Regira.Office.Word.Spire.Extensions;
 using Regira.TreeList;
@@ -6,10 +12,6 @@ using Regira.Utilities;
 using Spire.Doc;
 using Spire.Doc.Documents;
 using Spire.Doc.Fields;
-using System.Drawing;
-using System.Text.RegularExpressions;
-using Regira.IO.Abstractions;
-using Regira.IO.Extensions;
 using HeaderFooterType = Regira.Office.Word.Models.HeaderFooterType;
 using Margins = Regira.Office.Models.Margins;
 using RegiraFileFormat = Regira.Office.Models.FileFormat;
@@ -22,13 +24,11 @@ using SpireHorizontalAlignment = Spire.Doc.Documents.HorizontalAlignment;
 using SpirePageOrientation = Spire.Doc.Documents.PageOrientation;
 using SpirePageSize = Spire.Doc.Documents.PageSize;
 using SpireParagraph = Spire.Doc.Documents.Paragraph;
-using Regira.Media.Drawing.Abstractions;
-using Regira.Office.MimeTypes;
 
 
 #if NETSTANDARD2_0
-using SkiaSharp;
 using Regira.Drawing.SkiaSharp.Utilities;
+using SkiaSharp;
 #else
 using System.Drawing.Imaging;
 using Regira.Drawing.GDI.Utilities;

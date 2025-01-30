@@ -1,13 +1,13 @@
-﻿using QRCodeDecoderLibrary;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
+using System.Text;
+using QRCodeDecoderLibrary;
 using QRCodeEncoderLibrary;
 using Regira.Drawing.GDI.Utilities;
 using Regira.Media.Drawing.Abstractions;
 using Regira.Office.Barcodes.Abstractions;
 using Regira.Office.Barcodes.Exceptions;
 using Regira.Office.Barcodes.Models;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Text;
 using ErrorCorrection = QRCodeEncoderLibrary.ErrorCorrection;
 
 namespace Regira.Office.Barcodes.UziGranot;
@@ -65,7 +65,7 @@ public class QRCodeService() : IQRCodeService
         // no QR code
         if (dataByteArray == null)
         {
-            return Array.Empty<string>();
+            return [];
         }
 
         // image has one QR code

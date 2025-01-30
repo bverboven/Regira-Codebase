@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Regira.Utilities;
-using System.ComponentModel.DataAnnotations;
 
 namespace Regira.DAL.EFcore.Extensions;
 

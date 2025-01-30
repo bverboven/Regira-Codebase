@@ -1,8 +1,8 @@
-﻿using Regira.IO.Abstractions;
+﻿using System.Text;
+using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Office.Mail.Abstractions;
 using Regira.Office.Mail.Models;
-using System.Text;
 
 namespace Regira.Office.Mail.MSGReader;
 

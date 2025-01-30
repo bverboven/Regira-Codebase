@@ -13,14 +13,10 @@ public class CourseSearchObject : SearchObject
 {
     public int? DepartmentId { get; set; }
 }
-public class CourseRepository : EntityRepository<ContosoContext, Course, int, CourseSearchObject>, IEntityRepository<Course>
+public class CourseRepository(ContosoContext dbContext)
+    : EntityRepository<ContosoContext, Course, int, CourseSearchObject>(dbContext), IEntityRepository<Course>
 {
-    private readonly ContosoContext _dbContext;
-    public CourseRepository(ContosoContext dbContext)
-        : base(dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly ContosoContext _dbContext = dbContext;
 
 
     public override IQueryable<Course> Filter(IQueryable<Course> query, CourseSearchObject? so)

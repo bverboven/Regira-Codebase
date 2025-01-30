@@ -1,23 +1,17 @@
-﻿using BCrypt.Net;
+﻿using System.Text;
+using BCrypt.Net;
 using Regira.Security.Abstractions;
 using Regira.Security.Core;
 using Regira.Utilities;
-using System.Text;
 
 namespace Regira.Security.Hashing.BCryptNet;
 
-public class Hasher : IHasher
+public class Hasher(CryptoOptions? options = null) : IHasher
 {
     // https://github.com/BcryptNet/bcrypt.net
-    private readonly string _salt;
-    private readonly Encoding _encoding;
-    private readonly string _algorithm;
-    public Hasher(CryptoOptions? options = null)
-    {
-        _salt = options?.Secret ?? DefaultSecuritySettings.SaltKey;
-        _encoding = options?.Encoding ?? DefaultSecuritySettings.Encoding;
-        _algorithm = options?.AlgorithmType ?? DefaultSecuritySettings.HashAlgorithm;
-    }
+    private readonly string _salt = options?.Secret ?? DefaultSecuritySettings.SaltKey;
+    private readonly Encoding _encoding = options?.Encoding ?? DefaultSecuritySettings.Encoding;
+    private readonly string _algorithm = options?.AlgorithmType ?? DefaultSecuritySettings.HashAlgorithm;
 
     public string Hash(string plainText)
     {

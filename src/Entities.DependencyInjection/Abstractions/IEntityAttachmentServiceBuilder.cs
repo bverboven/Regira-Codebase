@@ -6,9 +6,7 @@ namespace Regira.Entities.DependencyInjection.Abstractions;
 
 public interface IEntityAttachmentServiceBuilder<TEntity, TEntityAttachment> : IEntityAttachmentServiceBuilder<TEntity, int, TEntityAttachment, int, int>
     where TEntity : class, IEntity<int>, IHasAttachments, IHasAttachments<TEntityAttachment>
-    where TEntityAttachment : class, IEntityAttachment
-{
-}
+    where TEntityAttachment : class, IEntityAttachment;
 // ReSharper disable once UnusedTypeParameter
 public interface IEntityAttachmentServiceBuilder<TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey>
     where TEntity : class, IEntity<TKey>, IHasAttachments, IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TKey, TAttachmentKey>

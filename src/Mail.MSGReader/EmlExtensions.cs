@@ -1,8 +1,8 @@
-﻿using MsgReader.Mime;
+﻿using System.Collections.ObjectModel;
+using MsgReader.Mime;
 using MsgReader.Mime.Header;
 using Regira.IO.Models;
 using Regira.Office.Mail.Models;
-using System.Collections.ObjectModel;
 
 namespace Regira.Office.Mail.MSGReader;
 

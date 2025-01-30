@@ -6,6 +6,4 @@ namespace Entities.TestApi.Controllers;
 
 [ApiController]
 [Route("departments")]
-public class DepartmentController : EntityControllerBase<Department>
-{
-}
+public class DepartmentController : EntityControllerBase<Department>;

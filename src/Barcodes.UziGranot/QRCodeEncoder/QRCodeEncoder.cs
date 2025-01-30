@@ -49,17 +49,18 @@
 //		Add support for ECI Assignment Value
 /////////////////////////////////////////////////////////////////////
 
-using System;
-using System.IO;
+
 
 // ReSharper disable once CheckNamespace
 namespace QRCodeEncoderLibrary
 {
     public class QRCodeEncoder : QREncoder
     {
-        private static readonly byte[] PngFileSignature = { 137, (byte)'P', (byte)'N', (byte)'G', (byte)'\r', (byte)'\n', 26, (byte)'\n' };
+        private static readonly byte[] PngFileSignature = [137, (byte)'P', (byte)'N', (byte)'G', (byte)'\r', (byte)'\n', 26, (byte)'\n'
+        ];
 
-        private static readonly byte[] PngIendChunk = { 0, 0, 0, 0, (byte)'I', (byte)'E', (byte)'N', (byte)'D', 0xae, 0x42, 0x60, 0x82 };
+        private static readonly byte[] PngIendChunk = [0, 0, 0, 0, (byte)'I', (byte)'E', (byte)'N', (byte)'D', 0xae, 0x42, 0x60, 0x82
+        ];
 
         /// <summary>
         /// Save QRCode image to PNG file

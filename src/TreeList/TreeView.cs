@@ -2,12 +2,8 @@
 
 namespace Regira.TreeList;
 
-public class TreeView<T> : ReadOnlyCollection<T>
+public class TreeView<T>(TreeList<T> tree)
+    : ReadOnlyCollection<T>(tree.OrderByHierarchy().Select(n => n.Value).ToList())
 {
-    public TreeList<T> Tree { get; }
-    public TreeView(TreeList<T> tree)
-        : base(tree.OrderByHierarchy().Select(n => n.Value).ToList())
-    {
-        Tree = tree;
-    }
+    public TreeList<T> Tree { get; } = tree;
 }

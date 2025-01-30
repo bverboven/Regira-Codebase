@@ -9,12 +9,8 @@ namespace Entities.TestApi.Controllers;
 
 [ApiController]
 [Route("persons")]
-public class PersonController : EntityControllerBase<Person, int, PersonSearchObject, PersonSortBy, PersonIncludes, PersonDto, PersonInputDto>
-{
-}
+public class PersonController : EntityControllerBase<Person, int, PersonSearchObject, PersonSortBy, PersonIncludes, PersonDto, PersonInputDto>;
 
 [ApiController]
 [Route("persons")]
-public class PersonAttachmentController : EntityAttachmentControllerBase<PersonAttachment>
-{
-}
+public class PersonAttachmentController : EntityAttachmentControllerBase<PersonAttachment>;

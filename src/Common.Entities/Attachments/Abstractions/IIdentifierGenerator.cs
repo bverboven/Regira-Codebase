@@ -5,6 +5,4 @@ public interface IIdentifierGenerator<TEntityAttachmentKey, TObjectKey, TAttachm
     string Generate(IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey> entity, string? rootFolder = null);
 }
 
-public interface IIdentifierGenerator : IIdentifierGenerator<int, int, int>
-{
-}
+public interface IIdentifierGenerator : IIdentifierGenerator<int, int, int>;

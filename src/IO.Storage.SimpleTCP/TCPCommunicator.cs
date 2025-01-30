@@ -2,22 +2,16 @@
 
 namespace Regira.IO.Storage.SimpleTCP;
 
-public class TCPCommunicator : IDisposable
+public class TCPCommunicator(TCPConfig config) : IDisposable
 {
-    private readonly TCPConfig _config;
-    private readonly SimpleTcpClient _client;
+    private readonly SimpleTcpClient _client = new();
     private bool _isOpen;
-    public TCPCommunicator(TCPConfig config)
-    {
-        _config = config;
-        _client = new SimpleTcpClient();
-    }
 
     protected internal SimpleTcpClient Open()
     {
         if (!_isOpen)
         {
-            _client.Connect(_config.Host, _config.Port);
+            _client.Connect(config.Host, config.Port);
             _isOpen = true;
         }
         return _client;

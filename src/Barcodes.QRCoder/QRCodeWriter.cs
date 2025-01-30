@@ -1,4 +1,6 @@
-﻿using QRCoder;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
+using QRCoder;
 using QRCoder.Exceptions;
 using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Extensions;
@@ -7,8 +9,6 @@ using Regira.Media.Drawing.Utilities;
 using Regira.Office.Barcodes.Abstractions;
 using Regira.Office.Barcodes.Exceptions;
 using Regira.Office.Barcodes.Models;
-using System.Drawing;
-using System.Drawing.Imaging;
 
 namespace Regira.Office.Barcodes.QRCoder;
 

@@ -9,7 +9,4 @@ public interface IHasEndDate
 {
     DateTime? EndDate { get; set; }
 }
-public interface IHasStartEndDate : IHasStartDate, IHasEndDate
-{
-
-}
+public interface IHasStartEndDate : IHasStartDate, IHasEndDate;

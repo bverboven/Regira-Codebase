@@ -12,14 +12,9 @@ using Regira.Web.DependencyInjection;
 
 namespace Regira.Entities.DependencyInjection;
 
-public class EntityServiceCollection<TContext> : ServiceCollectionWrapper
+public class EntityServiceCollection<TContext>(IServiceCollection services) : ServiceCollectionWrapper(services)
     where TContext : DbContext
 {
-    public EntityServiceCollection(IServiceCollection services)
-        : base(services)
-    {
-    }
-
     // Entity service
     public EntityServiceCollection<TContext> For<TEntity, TService>(
         Action<EntityServiceBuilder<TContext, TEntity, int>>? configure = null)

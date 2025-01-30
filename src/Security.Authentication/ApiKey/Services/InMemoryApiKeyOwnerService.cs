@@ -6,13 +6,9 @@ using Regira.Utilities;
 
 namespace Regira.Security.Authentication.ApiKey.Services;
 
-public class InMemoryApiKeyOwnerService : IApiKeyOwnerService
+public class InMemoryApiKeyOwnerService(IEnumerable<ApiKeyOwner> apiKeyOwners) : IApiKeyOwnerService
 {
-    private readonly IList<ApiKeyOwner> _apiKeyOwners;
-    public InMemoryApiKeyOwnerService(IEnumerable<ApiKeyOwner> apiKeyOwners)
-    {
-        _apiKeyOwners = apiKeyOwners.AsList();
-    }
+    private readonly IList<ApiKeyOwner> _apiKeyOwners = apiKeyOwners.AsList();
 
     public Task<ApiKeyOwner?> FindByOwner(string id)
     {

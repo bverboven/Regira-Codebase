@@ -11,7 +11,7 @@ public class NormalizableObject1
 public class NormalizableObject2
 {
     public string? SourceProp { get; set; }
-    [Normalized(SourceProperty = nameof(SourceProp), SourceProperties = new[] { nameof(SourceProp) })]
+    [Normalized(SourceProperty = nameof(SourceProp), SourceProperties = [nameof(SourceProp)])]
     public string? NormalizedProp { get; set; }
 }
 public class NormalizableObject3
@@ -30,7 +30,7 @@ public class NormalizableObject4
     public string? NormalizedProp2 { get; set; }
     [Normalized(Normalizer = typeof(TestNormalizer))]
     public string? NormalizedProp3 { get; set; }
-    [Normalized(SourceProperties = new[] { nameof(SourceProp1), nameof(SourceProp2) })]
+    [Normalized(SourceProperties = [nameof(SourceProp1), nameof(SourceProp2)])]
     public string? NormalizedContent { get; set; }
 }
 

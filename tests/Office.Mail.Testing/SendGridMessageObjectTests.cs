@@ -1,4 +1,3 @@
-using NUnit.Framework.Legacy;
 using Regira.Office.Mail.SendGrid.Extensions;
 using Regira.Office.Mail.Web;
 using Regira.Serializing.Abstractions;
@@ -10,11 +9,7 @@ namespace Office.Mail.Testing;
 [Parallelizable(ParallelScope.Self)]
 public class SendGridMessageObjectTests
 {
-    private readonly ISerializer _serializer;
-    public SendGridMessageObjectTests()
-    {
-        _serializer = new JsonSerializer();
-    }
+    private readonly ISerializer _serializer = new JsonSerializer();
 
     [TestCase(MailConstants.SIMPLE_INPUT)]
     [TestCase(MailConstants.INPUT_NO_SENDER)]

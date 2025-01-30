@@ -3,7 +3,7 @@ using Regira.Utilities;
 
 namespace Regira.Office.PDF.Models;
 
-public class HtmlInput : PdfInputBase
+public class HtmlInput(int dpi = DimensionsUtility.DPI.DEFAULT) : PdfInputBase(dpi)
 {
     public string? HtmlContent { get; set; }
     public string? HeaderHtmlContent { get; set; }
@@ -16,9 +16,4 @@ public class HtmlInput : PdfInputBase
     /// Height of footer in mm
     /// </summary>
     public int? FooterHeight { get; set; }
-
-    public HtmlInput(int dpi = DimensionsUtility.DPI.DEFAULT)
-        : base(dpi)
-    {
-    }
 }

@@ -15,7 +15,6 @@ public class MongoRestoreService(MongoOptions options, IProcessHelper processHel
     {
         var settings = options.DbSettings ?? MongoSettings.FromConnectionString(options.ConnectionString ?? throw new ArgumentException("Connection data missing"));
 
-        var targetDb = settings.DatabaseName!;
         var sourcePath = Path.GetTempFileName();
 
         var fs = File.OpenWrite(sourcePath);

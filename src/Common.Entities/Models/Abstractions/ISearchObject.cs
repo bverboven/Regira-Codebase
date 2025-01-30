@@ -1,8 +1,6 @@
 namespace Regira.Entities.Models.Abstractions;
 
-public interface ISearchObject : ISearchObject<int>
-{
-}
+public interface ISearchObject : ISearchObject<int>;
 
 public interface ISearchObject<TKey>
 {

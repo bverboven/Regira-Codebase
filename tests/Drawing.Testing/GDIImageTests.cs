@@ -4,9 +4,4 @@ using Regira.Drawing.GDI.Services;
 
 namespace Drawing.Testing;
 
-public class GDIImageTests : ImageTestsBase
-{
-    public GDIImageTests() : base(new ImageService())
-    {
-    }
-}
+public class GDIImageTests() : ImageTestsBase(new ImageService());

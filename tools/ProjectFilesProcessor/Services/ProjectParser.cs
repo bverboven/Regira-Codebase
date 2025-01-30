@@ -1,6 +1,6 @@
-﻿using Regira.ProjectFilesProcessor.Models;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using System.Xml.XPath;
+using Regira.ProjectFilesProcessor.Models;
 
 namespace Regira.ProjectFilesProcessor.Services;
 
@@ -15,7 +15,8 @@ public class ProjectParser
         var project = new Project
         {
             Id = propertyGroupEl.Element("PackageId")?.Value,
-            TargetFrameworks = (propertyGroupEl.Elements("TargetFrameworks").FirstOrDefault() ?? propertyGroupEl.Elements("TargetFramework").FirstOrDefault())?.Value.Split(';').ToList() ?? new List<string>(),
+            TargetFrameworks = (propertyGroupEl.Elements("TargetFrameworks").FirstOrDefault() ?? propertyGroupEl.Elements("TargetFramework").FirstOrDefault())?.Value.Split(';').ToList() ??
+                               [],
             RootNamespace = propertyGroupEl.Element("RootNamespace")?.Value,
             AssemblyName = propertyGroupEl.Element("AssemblyName")?.Value,
             Authors = propertyGroupEl.Elements("Authors").Select(el => el.Value).ToArray(),

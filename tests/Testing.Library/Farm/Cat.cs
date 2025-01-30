@@ -1,14 +1,8 @@
 ﻿namespace Testing.Library.Farm;
 
-public class Cat : Pet
+public class Cat(string name, string educationLevel) : Pet(name)
 {
-    public Cat(string name, string educationLevel)
-        : base(name)
-    {
-        EducationLevel = educationLevel;
-    }
-
-    public string EducationLevel { get; set; }
+    public string EducationLevel { get; set; } = educationLevel;
     public override string Species => "Felis catus";
 
     public override string ToString()

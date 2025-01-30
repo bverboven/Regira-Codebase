@@ -14,7 +14,7 @@ public class SftpService(SftpCommunicator communicator) : IFileService
     {
         var client = await communicator.Open();
         var fileUri = FileNameUtility.GetUri(identifier, RootFolder);
-        return client.Exists(fileUri);
+        return await client.ExistsAsync(fileUri);
     }
     public async Task<byte[]?> GetBytes(string identifier)
     {
@@ -115,7 +115,7 @@ public class SftpService(SftpCommunicator communicator) : IFileService
             await CreateDirectory(dirUri);
 
             var client = await communicator.Open();
-            client.CreateDirectory(dirUri);
+            await client.CreateDirectoryAsync(dirUri);
         }
     }
     public async Task Delete(string identifier)
@@ -123,7 +123,7 @@ public class SftpService(SftpCommunicator communicator) : IFileService
         var client = await communicator.Open();
         var fileUri = FileNameUtility.GetUri(identifier, RootFolder);
 
-        if (!client.Exists(fileUri))
+        if (!await client.ExistsAsync(fileUri))
         {
             return;
         }
@@ -137,7 +137,7 @@ public class SftpService(SftpCommunicator communicator) : IFileService
                 await Delete(FileNameUtility.GetUri(file.FullName, RootFolder));
             }
         }
-        sftpFile.Delete();
+        await sftpFile.DeleteAsync();
     }
 
     public string GetAbsoluteUri(string identifier)

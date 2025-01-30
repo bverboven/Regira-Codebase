@@ -1,6 +1,6 @@
-﻿using Regira.System.Projects.Models;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using System.Xml.XPath;
+using Regira.System.Projects.Models;
 
 namespace Regira.System.Projects.Services;
 
@@ -21,12 +21,13 @@ public class ProjectParser
             };
         }
         Version.TryParse(propertyGroupEl.Element("Version")?.Value, out var version);
-        bool.TryParse(propertyGroupEl.Element("GeneratePackageOnBuild")?.Value, out var generatePackage);
+        bool.TryParse(propertyGroupEl.Element("GeneratePackageOnBuild")?.Value, out _);
 
         var project = new Project
         {
             Id = propertyGroupEl.Element("PackageId")?.Value,
-            TargetFrameworks = (propertyGroupEl.Elements("TargetFrameworks").FirstOrDefault() ?? propertyGroupEl.Elements("TargetFramework").FirstOrDefault())?.Value.Split(';').ToList() ?? new List<string>(),
+            TargetFrameworks = (propertyGroupEl.Elements("TargetFrameworks").FirstOrDefault() ?? propertyGroupEl.Elements("TargetFramework").FirstOrDefault())?.Value.Split(';').ToList() ??
+                               [],
             RootNamespace = propertyGroupEl.Element("RootNamespace")?.Value,
             AssemblyName = propertyGroupEl.Element("AssemblyName")?.Value,
             Authors = propertyGroupEl.Elements("Authors").Select(el => el.Value).ToArray(),

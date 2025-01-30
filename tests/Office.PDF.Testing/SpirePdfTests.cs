@@ -7,12 +7,7 @@ namespace Office.PDF.Testing;
 [Parallelizable(ParallelScope.All)]
 public class SpirePdfTests
 {
-    private readonly PdfManager _pdfService;
-
-    public SpirePdfTests()
-    {
-        _pdfService = new PdfManager();
-    }
+    private readonly PdfManager _pdfService = new();
 
     [Test]
     public Task Split_1to10()

@@ -1,5 +1,4 @@
-﻿using NUnit.Framework.Legacy;
-using Regira.IO.Extensions;
+﻿using Regira.IO.Extensions;
 using Regira.Office.Word.Models;
 using Regira.Office.Word.Spire;
 using Regira.Utilities;

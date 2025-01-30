@@ -1,5 +1,4 @@
-﻿using NUnit.Framework.Legacy;
-using Regira.Dimensions;
+﻿using Regira.Dimensions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Abstractions;
 using Regira.Media.Drawing.Enums;
@@ -126,10 +125,10 @@ public abstract class ImageTestsBase
 
         var rectangles = new Dictionary<string, int[]>()
         {
-            ["topleft"] = new[] { 0, 0, halfWidth, halfHeight },
-            ["topright"] = new[] { halfWidth, 0, halfWidth, halfHeight },
-            ["bottomleft"] = new[] { 0, halfHeight, halfWidth, halfHeight },
-            ["bottomright"] = new[] { halfWidth, halfHeight, halfWidth, halfHeight }
+            ["topleft"] = [0, 0, halfWidth, halfHeight],
+            ["topright"] = [halfWidth, 0, halfWidth, halfHeight],
+            ["bottomleft"] = [0, halfHeight, halfWidth, halfHeight],
+            ["bottomright"] = [halfWidth, halfHeight, halfWidth, halfHeight]
         };
 
         foreach (var rectangle in rectangles)
@@ -151,7 +150,7 @@ public abstract class ImageTestsBase
         var src = Path.Combine(_inputDir, filename);
         using var image = await ReadImage(src);
 
-        using var rgbImg = _imageService.MakeTransparent(image, new[] { 200, 200, 200 });
+        using var rgbImg = _imageService.MakeTransparent(image, [200, 200, 200]);
         await WriteOutput($"{Path.GetFileNameWithoutExtension(filename)}-transparent.png", rgbImg);
     }
     

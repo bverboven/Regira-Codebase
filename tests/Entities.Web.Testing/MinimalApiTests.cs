@@ -1,17 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
 using Entities.TestApi;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
 namespace Entities.Web.Testing;
 
 [CollectionDefinition("Non-Parallel Collection", DisableParallelization = true)]
-public class NonParallelCollectionDefinitionClass
-{
-}
+public class NonParallelCollectionDefinitionClass;
 
 [Collection("Non-Parallel Collection")]
 public class MinimalApiTests : IDisposable

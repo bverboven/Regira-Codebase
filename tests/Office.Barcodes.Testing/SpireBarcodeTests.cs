@@ -6,14 +6,8 @@ namespace Office.Barcodes.Testing;
 
 [TestFixture]
 [Parallelizable(ParallelScope.All)]
-public class SpireBarcodeTests : BarcodeTestsBase
+public class SpireBarcodeTests() : BarcodeTestsBase(new BarcodeService(), new BarcodeService(), "Spire")
 {
-    public SpireBarcodeTests()
-        : base(new BarcodeService(), new BarcodeService(), "Spire")
-    {
-    }
-
-
     [TestCase("123456", BarcodeFormat.Code39, "1to6")]
     [TestCase("TEST", BarcodeFormat.Code39, "test")]
     [TestCase("123456789", BarcodeFormat.Code93, "1to6")]

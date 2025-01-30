@@ -7,9 +7,7 @@ public interface IHasAttachments
     public bool? HasAttachment { get; set; }
 }
 public interface IHasAttachments<TEntityAttachment> : IHasAttachments<TEntityAttachment, int, int, int>
-    where TEntityAttachment : IEntityAttachment
-{
-}
+    where TEntityAttachment : IEntityAttachment;
 public interface IHasAttachments<TEntityAttachment, TKey, TObjectKey, TAttachmentKey>
     where TEntityAttachment : IEntityAttachment<TKey, TObjectKey, TAttachmentKey>
 {

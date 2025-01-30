@@ -9,15 +9,11 @@ using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.DependencyInjection;
 
-public class EntityServiceBuilder<TContext, TEntity> : EntityServiceBuilder<TContext, TEntity, int>, IEntityServiceBuilder<TEntity>
+public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services)
+    : EntityServiceBuilder<TContext, TEntity, int>(services), IEntityServiceBuilder<TEntity>
     where TContext : DbContext
     where TEntity : class, IEntity<int>
 {
-    public EntityServiceBuilder(IServiceCollection services)
-        : base(services)
-    {
-    }
-
     public new EntityServiceBuilder<TContext, TEntity, int> AddService<TService>()
         where TService : class, IEntityService<TEntity>
     {
@@ -73,16 +69,11 @@ public class EntityServiceBuilder<TContext, TEntity> : EntityServiceBuilder<TCon
     }
 }
 
-public class EntityServiceBuilder<TContext, TEntity, TKey> : EntityServiceCollection<TContext>, IEntityServiceBuilder<TEntity, TKey>
+public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection services)
+    : EntityServiceCollection<TContext>(services), IEntityServiceBuilder<TEntity, TKey>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
 {
-    public EntityServiceBuilder(IServiceCollection services)
-        : base(services)
-    {
-    }
-
-
     // Entity mapping
     /// <summary>
     /// Adds AutoMapper maps for
@@ -234,16 +225,12 @@ public class EntityServiceBuilder<TContext, TEntity, TKey> : EntityServiceCollec
     }
 }
 
-public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> : EntityServiceBuilder<TContext, TEntity, TKey>
+public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServiceCollection services)
+    : EntityServiceBuilder<TContext, TEntity, TKey>(services)
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
 {
-    public EntityServiceBuilder(IServiceCollection services)
-        : base(services)
-    {
-    }
-
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddService<TService>()
         where TService : class, IEntityService<TEntity, TKey, TSearchObject>
     {

@@ -123,7 +123,7 @@ public static class RegexUtility
                 .ToArray();
         }
 
-        return Array.Empty<string>();
+        return [];
     }
     public static string[] ExtractUrls(string input)
     {
@@ -138,7 +138,7 @@ public static class RegexUtility
                 .ToArray();
         }
 
-        return Array.Empty<string>();
+        return [];
     }
     public static string[] ExtractPhoneNumbers(string input, bool allowShortNumbers = false)
     {
@@ -154,7 +154,7 @@ public static class RegexUtility
                 .ToArray();
         }
 
-        return Array.Empty<string>();
+        return [];
     }
     public static string[] ExtractIPAddresses(string input)
     {
@@ -170,6 +170,6 @@ public static class RegexUtility
                 .ToArray();
         }
 
-        return Array.Empty<string>();
+        return [];
     }
 }

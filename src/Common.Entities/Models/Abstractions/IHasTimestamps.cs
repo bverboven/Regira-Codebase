@@ -9,6 +9,4 @@ public interface IHasLastModified
     public DateTime? LastModified { get; set; }
 }
 
-public interface IHasTimestamps : IHasCreated, IHasLastModified
-{
-}
+public interface IHasTimestamps : IHasCreated, IHasLastModified;

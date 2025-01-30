@@ -1,4 +1,3 @@
-using NUnit.Framework.Legacy;
 using JsonSerializer = Regira.Serializing.Newtonsoft.Json.JsonSerializer;
 
 namespace Serializing.Testing;

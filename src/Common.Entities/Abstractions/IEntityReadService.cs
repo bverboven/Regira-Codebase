@@ -3,27 +3,23 @@ using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.Abstractions;
 
-public interface IEntityReadService<TEntity> : IEntityReadService<TEntity, int>
-{
-}
+public interface IEntityReadService<TEntity> : IEntityReadService<TEntity, int>;
 public interface IEntityReadService<TEntity, in TKey>
 {
     Task<TEntity?> Details(TKey id);
-    Task<IList<TEntity>> List(object? so = default, PagingInfo? pagingInfo = null);
+    Task<IList<TEntity>> List(object? so = null, PagingInfo? pagingInfo = null);
     Task<int> Count(object? so);
 }
 public interface IEntityReadService<TEntity, in TKey, in TSearchObject> : IEntityReadService<TEntity, TKey>
 where TSearchObject : class, ISearchObject<TKey>, new()
 {
-    Task<IList<TEntity>> List(TSearchObject? so = default, PagingInfo? pagingInfo = null);
+    Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null);
 }
 public interface IEntityReadService<TEntity, TSearchObject, TSortBy, TIncludes> : IEntityReadService<TEntity, int, TSearchObject, TSortBy, TIncludes>, IEntityReadService<TEntity>
     where TEntity : class, IEntity<int>
     where TSearchObject : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum
-    where TIncludes : struct, Enum
-{
-}
+    where TIncludes : struct, Enum;
 public interface IEntityReadService<TEntity, in TKey, TSearchObject, TSortBy, TIncludes> : IEntityReadService<TEntity, TKey>
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()

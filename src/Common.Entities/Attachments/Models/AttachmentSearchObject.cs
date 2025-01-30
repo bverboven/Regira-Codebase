@@ -4,9 +4,7 @@ using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.Attachments.Models;
 
-public class AttachmentSearchObject : AttachmentSearchObject<int>, ISearchObject
-{
-}
+public class AttachmentSearchObject : AttachmentSearchObject<int>, ISearchObject;
 public class AttachmentSearchObject<TKey> : SearchObject<TKey>, IAttachmentSearchObject
 {
     public string? FileName { get; set; }

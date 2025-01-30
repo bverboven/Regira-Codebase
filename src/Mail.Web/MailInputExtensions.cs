@@ -11,7 +11,7 @@ public static class MailInputExtensions
         return new MessageObject
         {
             From = input.From.ToMailAddress()!,
-            To = input.To?.Select(ToMailRecipient).ToList() ?? new List<MailRecipient>(),
+            To = input.To?.Select(ToMailRecipient).ToList() ?? [],
             ReplyTo = input.ReplyTo?.ToMailAddress(),
             Subject = input.Subject,
             Body = input.Body,

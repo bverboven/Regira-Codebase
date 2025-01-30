@@ -1,15 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System.Collections;
+﻿using System.Collections;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Regira.Web.DependencyInjection;
 
-public abstract class ServiceCollectionWrapper : IServiceCollection
+public abstract class ServiceCollectionWrapper(IServiceCollection? services = null) : IServiceCollection
 {
-    public IServiceCollection Services { get; }
-    protected ServiceCollectionWrapper(IServiceCollection? services = null)
-    {
-        Services = services ?? new ServiceCollection();
-    }
+    public IServiceCollection Services { get; } = services ?? new ServiceCollection();
 
 
     public IEnumerator<ServiceDescriptor> GetEnumerator() => Services.GetEnumerator();

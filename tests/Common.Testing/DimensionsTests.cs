@@ -1,7 +1,6 @@
-﻿using Regira.Dimensions;
+﻿using System.Text.Json;
+using Regira.Dimensions;
 using Regira.Utilities;
-using System.Text.Json;
-using NUnit.Framework.Legacy;
 
 namespace Common.Testing;
 

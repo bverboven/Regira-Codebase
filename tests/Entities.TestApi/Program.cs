@@ -50,11 +50,11 @@ builder.Services
     //    ConnectionString = builder.Configuration["Storage:Azure:ConnectionString"],
     //    ContainerName = "test-container"
     //})))
-    .ConfigureTypedAttachmentService(db => new[]
-    {
+    .ConfigureTypedAttachmentService(db =>
+    [
         db.CourseAttachments.ToDescriptor<Course>(),
         db.PersonAttachments.ToDescriptor<Person>()
-    })
+    ])
     .For<Department>(e => e.AddMapping<DepartmentDto, DepartmentInputDto>())
     .For<Course, CourseRepository>(e =>
     {
@@ -134,5 +134,5 @@ app.Run();
 // ReSharper disable once PartialTypeWithSinglePart
 namespace Entities.TestApi
 {
-    public partial class Program { }
+    public partial class Program;
 }

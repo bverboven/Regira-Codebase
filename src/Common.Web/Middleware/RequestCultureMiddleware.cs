@@ -1,20 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using System.Globalization;
 
 namespace Regira.Web.Middleware;
 
 // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/write?view=aspnetcore-7.0
-public class RequestCultureMiddleware: IRequestHandler
+public class RequestCultureMiddleware(RequestDelegate next) : IRequestHandler
 {
-    private readonly RequestDelegate _next;
-
-    public RequestCultureMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
-
     public async Task InvokeAsync(HttpContext context)
     {
         var cultureQuery = context.GetRouteValue("culture")?.ToString() ?? context.Request.Query["culture"];
@@ -27,7 +20,7 @@ public class RequestCultureMiddleware: IRequestHandler
         }
 
         // Call the next delegate/middleware in the pipeline.
-        await _next(context);
+        await next(context);
     }
 }
 public static class RequestCultureMiddlewareExtensions

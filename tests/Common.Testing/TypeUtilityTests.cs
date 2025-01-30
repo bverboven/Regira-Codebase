@@ -1,6 +1,6 @@
-﻿using NUnit.Framework.Legacy;
+﻿using System.Collections;
+using NUnit.Framework.Legacy;
 using Regira.Utilities;
-using System.Collections;
 
 namespace Common.Testing;
 
@@ -33,7 +33,7 @@ public class TypeUtilityTests
     }
     public interface ITestWithParent<T>
     {
-        ITestCore<T> Parent { get; set; }
+        ITestCore<T>? Parent { get; set; }
     }
     public abstract class TestClassBase<T> : ITestCore<T>
     {
@@ -94,7 +94,9 @@ public class TypeUtilityTests
     public void Test_IsEnumerable()
     {
         var aStringCollection = "this string is a collection of chars";
+        // ReSharper disable once CollectionNeverQueried.Local
         var aIntCollection = new[] { 1, 2, 3, 4, 5 };
+        // ReSharper disable once UseCollectionExpression (removing TestStruct will make test fail)
         var test1Class = new Test1Class { Structs = new TestStruct[] { new(), new() } };
 
         Assert.That(TypeUtility.IsTypeEnumerable(aStringCollection.GetType()), Is.True);
@@ -124,8 +126,10 @@ public class TypeUtilityTests
     public void Test_IsCollection()
     {
         var aStringCollection = "this string is a collection of chars";
+        // ReSharper disable once CollectionNeverQueried.Local
         var aIntCollection = new[] { 1, 2, 3, 4, 5 };
-        var test1Class = new Test1Class { Structs = new TestStruct[] { new(), new() } };
+        // ReSharper disable once UseCollectionExpression (removing TestStruct will make test fail)
+        var test1Class = new Test1Class { Structs = new TestStruct[] { new (), new() } };
 
         Assert.That(TypeUtility.IsTypeACollection(aStringCollection.GetType()), Is.True);
         ClassicAssert.IsFalse(TypeUtility.IsTypeACollection(aStringCollection.GetType(), typeof(IList<char>)));

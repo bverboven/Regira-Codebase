@@ -1,14 +1,8 @@
 ﻿namespace Testing.Library.Farm;
 
-public class Dog : Pet
+public class Dog(string name, string favoriteToy) : Pet(name)
 {
-    public Dog(string name, string favoriteToy)
-        : base(name)
-    {
-        FavoriteToy = favoriteToy;
-    }
-
-    public string FavoriteToy { get; set; }
+    public string FavoriteToy { get; set; } = favoriteToy;
     public override string Species => "Canis familiaris";
 
     public override string ToString()

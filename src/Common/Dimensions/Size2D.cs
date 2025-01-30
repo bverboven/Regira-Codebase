@@ -3,16 +3,10 @@
 namespace Regira.Dimensions;
 
 [DebuggerDisplay("Size2D = [{Width},{Height}]")]
-public struct Size2D : IEquatable<Size2D>
+public struct Size2D(float width = 0, float height = 0) : IEquatable<Size2D>
 {
-    public float Width { get; set; }
-    public float Height { get; set; }
-
-    public Size2D(float width = 0, float height = 0)
-    {
-        Width = width;
-        Height = height;
-    }
+    public float Width { get; set; } = width;
+    public float Height { get; set; } = height;
 
 
     public Size2D Round(int decimals = 0)
@@ -77,7 +71,7 @@ public struct Size2D : IEquatable<Size2D>
     }
     public static implicit operator float[](Size2D dimension)
     {
-        return new[] { dimension.Width, dimension.Height };
+        return [dimension.Width, dimension.Height];
     }
 
     // comparison

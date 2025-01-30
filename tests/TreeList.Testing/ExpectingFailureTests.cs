@@ -1,5 +1,4 @@
-﻿using NUnit.Framework.Legacy;
-using Regira.TreeList;
+﻿using Regira.TreeList;
 using TreeList.Testing.Infrastructure;
 using Person = TreeList.Testing.Infrastructure.Person;
 

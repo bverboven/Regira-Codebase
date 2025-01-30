@@ -1,9 +1,9 @@
-﻿using Regira.System.Hosting.Background.Abstractions;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
+using Regira.System.Hosting.Background.Abstractions;
 
 namespace Regira.System.Hosting.Background.Core;
 
-public class BackgroundTaskQueue : IBackgroundTaskQueue
+public class BackgroundTaskQueue(BackgroundTaskQueue.Options? options = null) : IBackgroundTaskQueue
 {
     public class Options
     {
@@ -12,13 +12,8 @@ public class BackgroundTaskQueue : IBackgroundTaskQueue
     }
     // https://www.c-sharpcorner.com/article/how-to-call-background-service-from-net-core-web-api/
     // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services
-    private readonly ConcurrentQueue<Func<CancellationToken, Task>> _workItems;
-    private readonly SemaphoreSlim _signal;
-    public BackgroundTaskQueue(Options? options = null)
-    {
-        _workItems = new ConcurrentQueue<Func<CancellationToken, Task>>(options?.InitialQueue ?? new Queue<Func<CancellationToken, Task>>());
-        _signal = new SemaphoreSlim(options?.InitialConcurrentCount ?? 0);
-    }
+    private readonly ConcurrentQueue<Func<CancellationToken, Task>> _workItems = new(options?.InitialQueue ?? new Queue<Func<CancellationToken, Task>>());
+    private readonly SemaphoreSlim _signal = new(options?.InitialConcurrentCount ?? 0);
 
 
     public void QueueBackgroundWorkItem(Func<CancellationToken, Task> workItem)

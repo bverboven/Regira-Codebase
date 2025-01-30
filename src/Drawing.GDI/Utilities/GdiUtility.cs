@@ -1,12 +1,12 @@
-﻿using Regira.Dimensions;
+﻿using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Reflection;
+using Regira.Dimensions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Abstractions;
 using Regira.Media.Drawing.Core;
 using Regira.Media.Drawing.Utilities;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.Reflection;
 using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
 namespace Regira.Drawing.GDI.Utilities;
@@ -14,7 +14,7 @@ namespace Regira.Drawing.GDI.Utilities;
 public static class GdiUtility
 {
     private static readonly KnownImageFormats KnownImageFormats = new();
-    private static ImageEncoders Encoders = new();
+    private static readonly ImageEncoders Encoders = new();
     private const int EXIF_ORIENTATION_ID = 0x112;
 
     public static Size ToSize(this Size2D size)
@@ -148,10 +148,10 @@ public static class GdiUtility
             var codec = GetEncoderInfo(img.RawFormat) ?? GetEncoderInfo(ImageFormat.Png)!;
             var encoderParams = new EncoderParameters
             {
-                Param = new[]
-                {
-                    new EncoderParameter(Encoder.Quality, quality),
-                }
+                Param =
+                [
+                    new EncoderParameter(Encoder.Quality, quality)
+                ]
             };
             var ms = new MemoryStream();
             result.Save(ms, codec, encoderParams);
@@ -300,36 +300,40 @@ public static class GdiUtility
              */
             if (locked_theta >= 0.0 && locked_theta < pi2)
             {
-                points = new[] {
+                points =
+                [
                     new Point( (int) oppositeBottom, 0 ),
                     new Point( nWidth, (int) oppositeTop ),
                     new Point( 0, (int) adjacentBottom )
-                };
+                ];
 
             }
             else if (locked_theta >= pi2 && locked_theta < Math.PI)
             {
-                points = new[] {
+                points =
+                [
                     new Point( nWidth, (int) oppositeTop ),
                     new Point( (int) adjacentTop, nHeight ),
                     new Point( (int) oppositeBottom, 0 )
-                };
+                ];
             }
             else if (locked_theta >= Math.PI && locked_theta < (Math.PI + pi2))
             {
-                points = new[] {
+                points =
+                [
                     new Point( (int) adjacentTop, nHeight ),
                     new Point( 0, (int) adjacentBottom ),
                     new Point( nWidth, (int) oppositeTop )
-                };
+                ];
             }
             else
             {
-                points = new[] {
+                points =
+                [
                     new Point( 0, (int) adjacentBottom ),
                     new Point( (int) oppositeBottom, 0 ),
                     new Point( (int) adjacentTop, nHeight )
-                };
+                ];
             }
 
             g.DrawImage(img, points);
@@ -395,7 +399,7 @@ public static class GdiUtility
 
     public static Image MakeTransparent(Image img, int[]? rgb = null)
     {
-        rgb ??= new[] { 245, 245, 245 };
+        rgb ??= [245, 245, 245];
         if (rgb.Length != 3)
         {
             throw new ArgumentException($"{nameof(rgb)} should have 3 values (red, green, blue)");

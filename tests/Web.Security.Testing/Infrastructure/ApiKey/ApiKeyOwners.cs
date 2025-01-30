@@ -4,8 +4,8 @@ namespace Web.Security.Testing.Infrastructure.ApiKey;
 
 public static class ApiKeyOwners
 {
-    public static IList<ApiKeyOwner> Value => new[]
-    {
+    public static IList<ApiKeyOwner> Value =>
+    [
         new ApiKeyOwner { Key = "TEST", OwnerId = "TestOwnerId" }
-    };
+    ];
 }

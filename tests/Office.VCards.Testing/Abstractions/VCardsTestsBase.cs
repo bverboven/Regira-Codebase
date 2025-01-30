@@ -7,28 +7,22 @@ using Regira.Office.VCards.Models;
 
 namespace Office.VCards.Testing.Abstractions;
 
-public abstract class VCardsTestsBase
+public abstract class VCardsTestsBase(IVCardService manager)
 {
-    private readonly IVCardService _manager;
-    protected VCardsTestsBase(IVCardService manager)
-    {
-        _manager = manager;
-    }
-
     [Test]
     public virtual void Can_Read_Empty()
     {
         var content = @"BEGIN:VCARD
 VERSION:2.1
 END:VCARD";
-        var item = _manager.Read(content);
+        var item = manager.Read(content);
         ClassicAssert.IsNotNull(item);
     }
     [Test]
     public virtual void Read_Invalid_Expect_InvalidCardException()
     {
         var content = "";
-        Assert.Throws<InvalidCardException>(() => _manager.Read(content));
+        Assert.Throws<InvalidCardException>(() => manager.Read(content));
     }
 
     [Test]
@@ -42,7 +36,7 @@ END:VCARD";
     [Test]
     public virtual void Write_Empty()
     {
-        var content = _manager.Write(new VCard());
+        var content = manager.Write(new VCard());
         Assert.That(content, Is.Not.Empty);
     }
     [Test]
@@ -54,7 +48,7 @@ END:VCARD";
 
     public virtual void CanRead(string content, VCardVersion version)
     {
-        var item = _manager.Read(content);
+        var item = manager.Read(content);
         ClassicAssert.IsNotNull(item);
         Assert.That(item.Name!.SurName, Is.EqualTo("Gump"));
         Assert.That(item.Name.GivenName, Is.EqualTo("Forrest"));
@@ -90,7 +84,7 @@ END:VCARD";
     }
     public virtual void CanWrite(VCard vCard, VCardVersion version)
     {
-        var content = _manager.Write(vCard, version);
+        var content = manager.Write(vCard, version);
         Assert.That(!string.IsNullOrWhiteSpace(content), Is.True);
 
         var lines = content.Trim().Split(Environment.NewLine);

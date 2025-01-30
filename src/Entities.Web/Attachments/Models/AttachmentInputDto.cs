@@ -2,9 +2,7 @@
 
 namespace Regira.Entities.Web.Attachments.Models;
 
-public class AttachmentInputDto : AttachmentInputDto<int>
-{
-}
+public class AttachmentInputDto : AttachmentInputDto<int>;
 public class AttachmentInputDto<TKey>
 {
     public TKey Id { get; set; } = default!;

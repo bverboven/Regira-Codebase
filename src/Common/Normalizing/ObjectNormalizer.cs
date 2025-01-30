@@ -1,7 +1,7 @@
-﻿using Regira.Normalizing.Abstractions;
+﻿using System.Collections;
+using Regira.Normalizing.Abstractions;
 using Regira.Normalizing.Models;
 using Regira.Utilities;
-using System.Collections;
 
 namespace Regira.Normalizing;
 
@@ -30,7 +30,7 @@ public class ObjectNormalizer : IObjectNormalizer
         return Task.CompletedTask;
     }
     public virtual void HandleNormalize(object? instance, bool recursive = false)
-        => HandleNormalize(instance, recursive, new HashSet<object>());
+        => HandleNormalize(instance, recursive, []);
 
     protected internal virtual void HandleNormalize(object? instance, bool recursive, HashSet<object> processedInstances)
     {
@@ -40,12 +40,10 @@ public class ObjectNormalizer : IObjectNormalizer
         }
 
         // prevent stack overflow
-        if (processedInstances.Contains(instance))
+        if (!processedInstances.Add(instance))
         {
             return;
         }
-
-        processedInstances.Add(instance);
 
         var type = instance.GetType();
 

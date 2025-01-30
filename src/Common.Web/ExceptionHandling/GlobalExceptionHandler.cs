@@ -4,18 +4,11 @@ using Regira.Web.ExceptionHandling.Abstractions;
 
 namespace Regira.Web.ExceptionHandling;
 
-public class GlobalExceptionHandler : IExceptionHandler
+public class GlobalExceptionHandler(ILoggerFactory loggerFactory) : IExceptionHandler
 {
-    private readonly ILoggerFactory _loggerFactory;
-    public GlobalExceptionHandler(ILoggerFactory loggerFactory)
-    {
-        _loggerFactory = loggerFactory;
-    }
-
-
     public Task HandleException(HttpContext context, Exception ex)
     {
-        var logger = _loggerFactory.CreateLogger(GetType());
+        var logger = loggerFactory.CreateLogger(GetType());
         logger.LogError(ex, ex.Message);
 
         return Task.CompletedTask;

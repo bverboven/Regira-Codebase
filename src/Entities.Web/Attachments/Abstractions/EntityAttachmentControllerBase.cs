@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Diagnostics;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,15 +13,12 @@ using Regira.Entities.Web.Attachments.Models;
 using Regira.Entities.Web.Controllers;
 using Regira.Entities.Web.Models;
 using Regira.Web.IO;
-using System.Diagnostics;
 using static Regira.Web.Extensions.ControllerExtensions;
 
 namespace Regira.Entities.Web.Attachments.Abstractions;
 
 public abstract class EntityAttachmentControllerBase<TEntity> : EntityAttachmentControllerBase<TEntity, EntityAttachmentDto, EntityAttachmentInputDto>
-    where TEntity : class, IEntityAttachment
-{
-}
+    where TEntity : class, IEntityAttachment;
 public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> : ControllerBase
     where TEntity : class, IEntityAttachment
     where TInputDto : class, IEntityAttachmentInput
@@ -36,7 +34,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
     [HttpGet("{objectId}/attachments")]
     public virtual Task<ActionResult<ListResult<TDto>>> List([FromRoute] int objectId, [FromQuery] EntityAttachmentSearchObject so, [FromQuery] PagingInfo? pagingInfo = null)
     {
-        so.ObjectId = new[] { objectId };
+        so.ObjectId = [objectId];
         return List(so, pagingInfo);
     }
 

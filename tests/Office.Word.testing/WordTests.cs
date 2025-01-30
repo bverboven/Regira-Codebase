@@ -1,4 +1,6 @@
-﻿using NUnit.Framework.Legacy;
+﻿using System.Globalization;
+using System.Text.Json;
+using NUnit.Framework.Legacy;
 using Regira.Collections;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
@@ -6,8 +8,6 @@ using Regira.Office.Models;
 using Regira.Office.Word.Models;
 using Regira.Office.Word.Spire;
 using Regira.Utilities;
-using System.Globalization;
-using System.Text.Json;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 
@@ -66,10 +66,9 @@ public class WordTests
         var input = new WordTemplateInput
         {
             Template = inputFile.ToBinaryFile(),
-            GlobalParameters = new Dictionary<string, object> {
-                {"rs_Pi", pi }
-            }
+            GlobalParameters = new Dictionary<string, object>()
         };
+        input.GlobalParameters.Add("rs_Pi", pi);
         var mgr = new WordManager();
         using var outputFile = mgr.Create(input);
 
@@ -104,10 +103,10 @@ public class WordTests
         using var mergedFile = mgr.Merge(mergedInputs);
         var headerFooterInput = new WordTemplateInput
         {
-            Template = mergedFile.ToBinaryFile(),
-            Headers = { new WordHeaderFooterInput { Template = new WordTemplateInput { Template = File.OpenRead(srcHeaderFooter).ToBinaryFile() } } },
-            Footers = { new WordHeaderFooterInput { Template = new WordTemplateInput { Template = File.OpenRead(srcHeaderFooter).ToBinaryFile() } } }
+            Template = mergedFile.ToBinaryFile()
         };
+        headerFooterInput.Footers!.Add(new WordHeaderFooterInput { Template = new WordTemplateInput { Template = File.OpenRead(srcHeaderFooter).ToBinaryFile() } });
+        headerFooterInput.Headers!.Add(new WordHeaderFooterInput { Template = new WordTemplateInput { Template = File.OpenRead(srcHeaderFooter).ToBinaryFile() } });
         using var outputFile = mgr.Create(headerFooterInput)
             .ToBinaryFile();
 
@@ -115,7 +114,7 @@ public class WordTests
 
         // cleaning up
         mergedInputs.Select(x => x.Template).Dispose();
-        headerFooterInput.Headers.Concat(headerFooterInput.Footers).Select(x => x.Template.Template).Dispose();
+        headerFooterInput.Headers?.Concat(headerFooterInput.Footers).Select(x => x.Template.Template).Dispose();
 
         Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
@@ -142,10 +141,10 @@ public class WordTests
         using var footerTemplate = File.OpenRead(footerFile).ToBinaryFile();
         var input = new WordTemplateInput
         {
-            Template = inputFile,
-            Headers = { new WordHeaderFooterInput { Template = new WordTemplateInput { Template = headerTemplate } } },
-            Footers = { new WordHeaderFooterInput { Template = new WordTemplateInput { Template = footerTemplate } } }
+            Template = inputFile
         };
+        input.Footers!.Add(new WordHeaderFooterInput { Template = new WordTemplateInput { Template = footerTemplate } });
+        input.Headers!.Add(new WordHeaderFooterInput { Template = new WordTemplateInput { Template = headerTemplate } });
 
         var mgr = new WordManager();
         using var outputFile = mgr.Create(input)
@@ -182,9 +181,9 @@ public class WordTests
         var input = new WordTemplateInput
         {
             Template = inputFile,
-            Headers = { new WordHeaderFooterInput { Template = new WordTemplateInput { Template = headerTemplate }, Type = HeaderFooterType.FirstPage } },
-            Footers = { new WordHeaderFooterInput { Template = new WordTemplateInput { Template = footerTemplate }, Type = HeaderFooterType.FirstPage } },
         };
+        input.Footers!.Add(new WordHeaderFooterInput { Template = new WordTemplateInput { Template = footerTemplate }, Type = HeaderFooterType.FirstPage });
+        input.Headers!.Add(new WordHeaderFooterInput { Template = new WordTemplateInput { Template = headerTemplate }, Type = HeaderFooterType.FirstPage });
         var mgr = new WordManager();
         using var outputFile = mgr.Create(input)
             .ToBinaryFile();
@@ -211,10 +210,9 @@ public class WordTests
             File.Delete(outputPath);
         }
 
-        var parameters = new Dictionary<string, object> {
-            { "title", "A title for this word document" },
-            { "date", DateTime.Today.ToShortDateString() }
-        };
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("title", "A title for this word document");
+        parameters.Add("date", DateTime.Today.ToShortDateString());
         using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
@@ -251,13 +249,12 @@ public class WordTests
         var input = new WordTemplateInput
         {
             Template = inputFile,
-            Images = new List<WordImage> {
-                new() {
-                    Name = "placeholder",// Alt Text
-                    Bytes = File.ReadAllBytes(imgFile)
-                }
-            }
+            Images = new List<WordImage>()
         };
+        input.Images.Add(new() {
+            Name = "placeholder",// Alt Text
+            Bytes = await File.ReadAllBytesAsync(imgFile)
+        });
         var mgr = new WordManager();
         using var outputFile = mgr.Create(input)
             .ToBinaryFile();
@@ -277,20 +274,19 @@ public class WordTests
             File.Delete(outputPath);
         }
 
-        var data = new List<object> {
-                new {Id = "10", Title = "Item #10", Price = 100},
-                new {Id = "12", Title = "Item #12", Price = 200},
-                new {Id = "31", Title = "Item #31", Price = 350}
-            }.Select(x => DictionaryUtility.ToDictionary(x))
+        var list = new List<object>();
+        list.Add(new {Id = "10", Title = "Item #10", Price = 100});
+        list.Add(new {Id = "12", Title = "Item #12", Price = 200});
+        list.Add(new {Id = "31", Title = "Item #31", Price = 350});
+        var data = list.Select(x => DictionaryUtility.ToDictionary(x))
             .ToList();
         using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
             Template = inputFile,
-            CollectionParameters = new Dictionary<string, ICollection<IDictionary<string, object>>> {
-                {"Template_Table", data!}
-            }
+            CollectionParameters = new Dictionary<string, ICollection<IDictionary<string, object>>>()
         };
+        input.CollectionParameters.Add("Template_Table", data!);
         var mgr = new WordManager();
         using var outputFile = mgr.Create(input)
             .ToBinaryFile();
@@ -491,21 +487,20 @@ public class WordTests
 
         // doc1
         var doc1Src = Path.Combine(_assetsDir, "Input", "template_row.docx");
-        var data = new List<object> {
-                new {Id = "10", Title = "Item #10", Price = 100},
-                new {Id = "12", Title = "Item #12", Price = 200},
-                new {Id = "31", Title = "Item #31", Price = 350}
-            }
+        var list = new List<object>();
+        list.Add(new {Id = "10", Title = "Item #10", Price = 100});
+        list.Add(new {Id = "12", Title = "Item #12", Price = 200});
+        list.Add(new {Id = "31", Title = "Item #31", Price = 350});
+        var data = list
             .Select(x => DictionaryUtility.ToDictionary(x))
             .ToList();
         using var doc1Template = File.OpenRead(doc1Src).ToBinaryFile();
         var doc1Input = new WordTemplateInput
         {
             Template = doc1Template,
-            CollectionParameters = new Dictionary<string, ICollection<IDictionary<string, object>>> {
-                {"Template_Table", data!}
-            }
+            CollectionParameters = new Dictionary<string, ICollection<IDictionary<string, object>>>()
         };
+        doc1Input.CollectionParameters.Add("Template_Table", data!);
         // doc2
         var doc2Src = Path.Combine(_assetsDir, "Input", "template_image.docx");
         using var doc2Template = File.OpenRead(doc2Src).ToBinaryFile();
@@ -513,21 +508,18 @@ public class WordTests
         var doc2Input = new WordTemplateInput
         {
             Template = doc2Template,
-            Images = new List<WordImage> {
-                new () {
-                    Name = "placeholder", // Alt Text
-                    Bytes = File.ReadAllBytes(imgFile)
-                }
-            },
+            Images = new List<WordImage>(),
             Options = new() { InheritFont = true }
         };
+        doc2Input.Images.Add(new () {
+            Name = "placeholder", // Alt Text
+            Bytes = await File.ReadAllBytesAsync(imgFile)
+        });
 
         // create
-        var docParams = new Dictionary<string, WordTemplateInput>
-        {
-            {"doc1", doc1Input},
-            {"doc2", doc2Input}
-        };
+        var docParams = new Dictionary<string, WordTemplateInput>();
+        docParams.Add("doc1", doc1Input);
+        docParams.Add("doc2", doc2Input);
         using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
@@ -567,10 +559,8 @@ public class WordTests
         };
 
         // create
-        var docParams = new Dictionary<string, WordTemplateInput>
-        {
-            {"ExternDoc", doc1Input}
-        };
+        var docParams = new Dictionary<string, WordTemplateInput>();
+        docParams.Add("ExternDoc", doc1Input);
         using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
         var input = new WordTemplateInput
         {
@@ -619,8 +609,8 @@ public class WordTests
 
     class WordDocumentModel
     {
-        public byte[] TemplateBytes { get; set; }
-        public IDictionary<string, object> GlobalParameters { get; set; }
+        public byte[] TemplateBytes { get; init; } = null!;
+        public IDictionary<string, object?> GlobalParameters { get; init; } = null!;
 
     }
     [Test]
@@ -634,7 +624,7 @@ public class WordTests
         var input = new WordTemplateInput
         {
             Template = model.TemplateBytes.ToBinaryFile(),
-            GlobalParameters = model.GlobalParameters
+            GlobalParameters = model.GlobalParameters!
         };
 
         var mgr = new WordManager();
@@ -675,12 +665,12 @@ public class WordTests
             priceInclTotal = "1.902,73",
             taxTotal = "330,23"
         };
-        var invoiceLines = new List<object> {
-                new { quantity = "1", unitCategory = "st.", invoiceLineTitle = "Installatie besturingssystemen: inbegrepen in prijs van server", pricePerUnit = "0", taxTariff = "21,00", priceExcl = "0,00", tax = "0,00" },
-                new { quantity = "11", unitCategory = "u.", invoiceLineTitle = "Overdracht gegevens - opstellen en bijwerken testomgeving", pricePerUnit = "85,00", taxTariff = "21,00", priceExcl = "935,00", tax = "196,35" },
-                new { quantity = "4,5", unitCategory = "u.", invoiceLineTitle = "Effectieve overdracht gegevens en controle", pricePerUnit = "85,00", taxTariff = "21,00", priceExcl = "382,5", tax = "80,33" },
-                new { quantity = "3", unitCategory = "u.", invoiceLineTitle = "Opstellen en testen backupschema's voor de verschillende servers en virtuele computers", pricePerUnit = "85,00", taxTariff = "21,00", priceExcl = "255,00", tax = "53,55" },
-            }.Select(x => DictionaryUtility.ToDictionary(x))
+        var list = new List<object>();
+        list.Add(new { quantity = "1", unitCategory = "st.", invoiceLineTitle = "Installatie besturingssystemen: inbegrepen in prijs van server", pricePerUnit = "0", taxTariff = "21,00", priceExcl = "0,00", tax = "0,00" });
+        list.Add(new { quantity = "11", unitCategory = "u.", invoiceLineTitle = "Overdracht gegevens - opstellen en bijwerken testomgeving", pricePerUnit = "85,00", taxTariff = "21,00", priceExcl = "935,00", tax = "196,35" });
+        list.Add(new { quantity = "4,5", unitCategory = "u.", invoiceLineTitle = "Effectieve overdracht gegevens en controle", pricePerUnit = "85,00", taxTariff = "21,00", priceExcl = "382,5", tax = "80,33" });
+        list.Add(new { quantity = "3", unitCategory = "u.", invoiceLineTitle = "Opstellen en testen backupschema's voor de verschillende servers en virtuele computers", pricePerUnit = "85,00", taxTariff = "21,00", priceExcl = "255,00", tax = "53,55" });
+        var invoiceLines = list.Select(x => DictionaryUtility.ToDictionary(x))
             .ToList();
 
         var json = JsonSerializer.Serialize(new
@@ -690,7 +680,7 @@ public class WordTests
                 {"invoiceLines", invoiceLines!}
             }
         }, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText(Path.Combine(_assetsDir, "Output", "Factuur", "factuur-parameters.json"), json);
+        await File.WriteAllTextAsync(Path.Combine(_assetsDir, "Output", "Factuur", "factuur-parameters.json"), json);
 
         // use a copy so I can keep the original open for editing
         var tmpFile = Path.Combine(Path.GetTempPath(), Path.GetFileName(srcPath));
@@ -700,10 +690,9 @@ public class WordTests
         {
             Template = inputFile,
             GlobalParameters = DictionaryUtility.Flatten(DictionaryUtility.ToDictionary(invoice))!,
-            CollectionParameters = new Dictionary<string, ICollection<IDictionary<string, object>>> {
-                {"invoiceLines", invoiceLines!}
-            }
+            CollectionParameters = new Dictionary<string, ICollection<IDictionary<string, object>>>()
         };
+        input.CollectionParameters.Add("invoiceLines", invoiceLines!);
         var mgr = new WordManager();
         using var outputFile = mgr.Create(input)
             .ToBinaryFile();
@@ -755,12 +744,12 @@ public class WordTests
             priceInclTotal = "1.902,73",
             taxTotal = "330,23"
         };
-        var invoiceLines = new List<object> {
-                new { quantity = "1", unitCategory = "st.", invoiceLineTitle = "Installatie besturingssystemen: inbegrepen in prijs van server", pricePerUnit = "0", taxTariff = "21,00", priceExcl = "0,00", tax = "0,00" },
-                new { quantity = "11", unitCategory = "u.", invoiceLineTitle = "Overdracht gegevens - opstellen en bijwerken testomgeving", pricePerUnit = "85,00", taxTariff = "21,00", priceExcl = "935,00", tax = "196,35" },
-                new { quantity = "4,5", unitCategory = "u.", invoiceLineTitle = "Effectieve overdracht gegevens en controle", pricePerUnit = "85,00", taxTariff = "21,00", priceExcl = "382,5", tax = "80,33" },
-                new { quantity = "3", unitCategory = "u.", invoiceLineTitle = "Opstellen en testen backupschema's voor de verschillende servers en virtuele computers", pricePerUnit = "85,00", taxTariff = "21,00", priceExcl = "255,00", tax = "53,55" },
-            }.Select(x => DictionaryUtility.ToDictionary(x))
+        var list = new List<object>();
+        list.Add(new { quantity = "1", unitCategory = "st.", invoiceLineTitle = "Installatie besturingssystemen: inbegrepen in prijs van server", pricePerUnit = "0", taxTariff = "21,00", priceExcl = "0,00", tax = "0,00" });
+        list.Add(new { quantity = "11", unitCategory = "u.", invoiceLineTitle = "Overdracht gegevens - opstellen en bijwerken testomgeving", pricePerUnit = "85,00", taxTariff = "21,00", priceExcl = "935,00", tax = "196,35" });
+        list.Add(new { quantity = "4,5", unitCategory = "u.", invoiceLineTitle = "Effectieve overdracht gegevens en controle", pricePerUnit = "85,00", taxTariff = "21,00", priceExcl = "382,5", tax = "80,33" });
+        list.Add(new { quantity = "3", unitCategory = "u.", invoiceLineTitle = "Opstellen en testen backupschema's voor de verschillende servers en virtuele computers", pricePerUnit = "85,00", taxTariff = "21,00", priceExcl = "255,00", tax = "53,55" });
+        var invoiceLines = list.Select(x => DictionaryUtility.ToDictionary(x))
             .ToList();
 
         // use a copy so I can keep the original open for editing
@@ -817,20 +806,18 @@ public class WordTests
         {
             Template = inputFile,
             GlobalParameters = DictionaryUtility.Flatten(DictionaryUtility.ToDictionary(invoice))!,
-            CollectionParameters = new Dictionary<string, ICollection<IDictionary<string, object>>> {
-                {"invoiceLines", invoiceLines!}
-            },
-            DocumentParameters = new Dictionary<string, WordTemplateInput> {
-                { "header.dotx", headerInput },
-                { "footer.dotx", footerInput},
-                { "customer.dotx", customerInput },
-                { "invoice-details.dotx", invoiceDetailsInput },
-                { "invoice-lines.dotx", invoiceLinesInput },
-                { "invoice-summary.dotx", invoiceSummaryInput }
-            },
+            CollectionParameters = new Dictionary<string, ICollection<IDictionary<string, object>>>(),
+            DocumentParameters = new Dictionary<string, WordTemplateInput>(),
             //Header = new Header { Template = headerStream },
             //Footer = new Footer { Template = footerStream }
         };
+        input.DocumentParameters.Add("header.dotx", headerInput);
+        input.DocumentParameters.Add("footer.dotx", footerInput);
+        input.DocumentParameters.Add("customer.dotx", customerInput);
+        input.DocumentParameters.Add("invoice-details.dotx", invoiceDetailsInput);
+        input.DocumentParameters.Add("invoice-lines.dotx", invoiceLinesInput);
+        input.DocumentParameters.Add("invoice-summary.dotx", invoiceSummaryInput);
+        input.CollectionParameters.Add("invoiceLines", invoiceLines!);
         var mgr = new WordManager();
         using var outputFile = mgr.Create(input)
             .ToBinaryFile();

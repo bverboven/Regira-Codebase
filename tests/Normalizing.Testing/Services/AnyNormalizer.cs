@@ -2,6 +2,4 @@
 
 namespace Normalizing.Testing.Services;
 
-public class AnyNormalizer : ObjectNormalizer
-{
-}
+public class AnyNormalizer : ObjectNormalizer;

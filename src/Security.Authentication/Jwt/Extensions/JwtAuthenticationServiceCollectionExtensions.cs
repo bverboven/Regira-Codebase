@@ -1,3 +1,6 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
@@ -5,9 +8,6 @@ using Microsoft.IdentityModel.Tokens;
 using Regira.Security.Authentication.Jwt.Abstraction;
 using Regira.Security.Authentication.Jwt.Models;
 using Regira.Security.Authentication.Jwt.Services;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace Regira.Security.Authentication.Jwt.Extensions;
 

@@ -39,7 +39,7 @@ public class BarcodeService : IBarcodeService
             return new BarcodeReadResult
             {
                 Format = Convert(result.BarcodeFormat),
-                Contents = new[] { content! }
+                Contents = [content!]
             };
         }
 
@@ -62,7 +62,7 @@ public class BarcodeService : IBarcodeService
             return new BarcodeReadResult
             {
                 Format = Convert(result.BarcodeFormat),
-                Contents = new[] { content }
+                Contents = [content]
             };
         }
 

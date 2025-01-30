@@ -1,19 +1,15 @@
-﻿using Regira.Normalizing.Abstractions;
+﻿using System.Text.RegularExpressions;
+using Regira.Normalizing.Abstractions;
 using Regira.Normalizing.Models;
 using Regira.Utilities;
-using System.Text.RegularExpressions;
 
 namespace Regira.Normalizing;
 
-public class DefaultNormalizer : INormalizer
+public class DefaultNormalizer(NormalizeOptions? options) : INormalizer
 {
-    private readonly NormalizeOptions _options;
+    private readonly NormalizeOptions _options = options ?? new NormalizeOptions();
     // Parameter-less constructor needed for Activator.CreateInstance
     public DefaultNormalizer() : this(new NormalizeOptions()) { }
-    public DefaultNormalizer(NormalizeOptions? options)
-    {
-        _options = options ?? new NormalizeOptions();
-    }
 
     public string? Normalize(string? input)
     {

@@ -60,7 +60,7 @@ public static class BinaryFileExtensions
         }
 
         var path = Path.GetTempFileName();
-        File.WriteAllBytes(path, GetBytes(file) ?? Array.Empty<byte>());
+        File.WriteAllBytes(path, GetBytes(file) ?? []);
         return path;
     }
 

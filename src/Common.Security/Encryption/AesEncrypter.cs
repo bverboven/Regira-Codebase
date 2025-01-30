@@ -1,20 +1,15 @@
-﻿using Regira.Security.Abstractions;
+﻿using System.Security.Cryptography;
+using System.Text;
+using Regira.Security.Abstractions;
 using Regira.Security.Core;
 using Regira.Security.Utilities;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Regira.Security.Encryption;
 
-public class AesEncrypter : IEncrypter
+public class AesEncrypter(CryptoOptions? options = null) : IEncrypter
 {
-    private readonly string _defaultKey;
-    private readonly Encoding _encoding;
-    public AesEncrypter(CryptoOptions? options = null)
-    {
-        _defaultKey = options?.Secret ?? DefaultSecuritySettings.SaltKey;
-        _encoding = options?.Encoding ?? DefaultSecuritySettings.Encoding;
-    }
+    private readonly string _defaultKey = options?.Secret ?? DefaultSecuritySettings.SaltKey;
+    private readonly Encoding _encoding = options?.Encoding ?? DefaultSecuritySettings.Encoding;
 
 
     public string Encrypt(string plainText, string? key = null)

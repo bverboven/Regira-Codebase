@@ -1,5 +1,5 @@
-using Regira.Media.Drawing.Core;
 using System.Drawing;
+using Regira.Media.Drawing.Core;
 
 namespace Regira.Drawing.GDI.Abstractions;
 

@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net.Mime;
+using Microsoft.AspNetCore.Mvc;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.IO.Utilities;
-using System.Net.Mime;
 
 namespace Regira.Web.Extensions;
 

@@ -8,11 +8,7 @@ namespace Entities.Testing.Infrastructure.Primers;
 
 public class TitlePrimer : EntityPrimerBase<IHasNormalizedTitle>
 {
-    private readonly DefaultNormalizer _normalizer;
-    public TitlePrimer()
-    {
-        _normalizer = new DefaultNormalizer(new NormalizeOptions { RemoveDiacritics = true, Transform = TextTransform.ToUpperCase });
-    }
+    private readonly DefaultNormalizer _normalizer = new(new NormalizeOptions { RemoveDiacritics = true, Transform = TextTransform.ToUpperCase });
 
     public override Task PrepareAsync(IHasNormalizedTitle entity, EntityEntry entry)
     {

@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Regira.Security.Authentication.Jwt.Abstraction;
-using System.Security.Claims;
 
 namespace Web.Security.Testing.Infrastructure.Jwt;
 

@@ -56,8 +56,6 @@
 //		Add support for ECI Assignment Value
 /////////////////////////////////////////////////////////////////////
 
-using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -200,7 +198,7 @@ namespace QRCodeDecoderLibrary
         /// <summary>
         /// Error correction percent (L, M, Q, H)
         /// </summary>
-        public int[] ErrCorrPercent = { 7, 15, 25, 30 };
+        public int[] ErrCorrPercent = [7, 15, 25, 30];
 
         /// <summary>
         /// Get mask code (0 to 7)
@@ -285,7 +283,7 @@ namespace QRCodeDecoderLibrary
             try
             {
                 // empty data string output
-                DataArrayList = new List<byte[]>();
+                DataArrayList = [];
 
                 // save image dimension
                 ImageWidth = inputImage.Width;
@@ -479,7 +477,7 @@ namespace QRCodeDecoderLibrary
         internal bool HorizontalFindersSearch()
         {
             // create empty finders list
-            FinderList = new List<Finder>();
+            FinderList = [];
 
             // look for finder patterns
             var colPos = new int[ImageWidth + 1];
@@ -566,7 +564,7 @@ namespace QRCodeDecoderLibrary
         internal bool HorizontalAlignmentSearch(int areaLeft, int areaTop, int areaWidth, int areaHeight)
         {
             // create empty finders list
-            AlignList = new List<Finder>();
+            AlignList = [];
 
             // look for finder patterns
             var colPos = new int[areaWidth + 1];

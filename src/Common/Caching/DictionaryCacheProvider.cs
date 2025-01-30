@@ -1,22 +1,16 @@
+using System.Collections.Concurrent;
 using Regira.Caching.Abstractions;
 using Regira.Utilities;
-using System.Collections.Concurrent;
 
 namespace Regira.Caching;
 
-public class DictionaryCacheProvider : CacheProvider
+public class DictionaryCacheProvider(string? prefix = null) : CacheProvider
 {
     protected static readonly IDictionary<string, object?> Items = new ConcurrentDictionary<string, object?>();
     public override IList<string> Keys => Items.Keys
-        .Where(k => string.IsNullOrWhiteSpace(_prefix) || k.StartsWith(_prefix!))
+        .Where(k => string.IsNullOrWhiteSpace(prefix) || k.StartsWith(prefix!))
         .Select(GetKeyWithoutPrefix)
         .AsList();
-
-    private readonly string? _prefix;
-    public DictionaryCacheProvider(string? prefix = null)
-    {
-        _prefix = prefix;
-    }
 
     public override T? Get<T>(string key)
         where T : default
@@ -43,7 +37,7 @@ public class DictionaryCacheProvider : CacheProvider
     }
     public override void RemoveAll()
     {
-        if (string.IsNullOrEmpty(_prefix))
+        if (string.IsNullOrEmpty(prefix))
         {
             Items.Clear();
         }
@@ -59,10 +53,10 @@ public class DictionaryCacheProvider : CacheProvider
 
     private string GetKey(string key)
     {
-        return $"{_prefix}{key}";
+        return $"{prefix}{key}";
     }
     private string GetKeyWithoutPrefix(string key)
     {
-        return key.Substring(_prefix?.Length ?? 0);
+        return key.Substring(prefix?.Length ?? 0);
     }
 }

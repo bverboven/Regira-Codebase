@@ -10,8 +10,5 @@ public class Config
     public string? Key { get; set; }
     public object? Value { get; set; }
 }
-public class ConfigRepository : MongoDbRepositoryBase<Config>
-{
-    public ConfigRepository(MongoCommunicator communicator, ISerializer serializer)
-        : base(communicator, serializer, x => x.ConfigId, (x, id) => x.ConfigId = id, "config") { }
-}
+public class ConfigRepository(MongoCommunicator communicator, ISerializer serializer)
+    : MongoDbRepositoryBase<Config>(communicator, serializer, x => x.ConfigId, (x, id) => x.ConfigId = id, "config");

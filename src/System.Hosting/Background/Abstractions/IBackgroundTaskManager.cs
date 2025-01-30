@@ -2,9 +2,7 @@
 
 namespace Regira.System.Hosting.Background.Abstractions;
 
-public interface IBackgroundTaskManager : IBackgroundTaskManager<BackgroundTask>
-{
-}
+public interface IBackgroundTaskManager : IBackgroundTaskManager<BackgroundTask>;
 public interface IBackgroundTaskManager<TTask>
     where TTask : class, IBackgroundTask, new()
 {

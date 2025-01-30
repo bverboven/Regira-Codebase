@@ -7,29 +7,19 @@ using Regira.Utilities;
 
 namespace Regira.DAL.MongoDB.Abstractions;
 
-public abstract class MongoDbRepositoryBase<TEntity>
+public abstract class MongoDbRepositoryBase<TEntity>(
+    MongoCommunicator communicator,
+    ISerializer serializer,
+    Func<TEntity, string?> getIdFunc,
+    Action<TEntity, string> setIdAction,
+    string? collectionName = null)
     where TEntity : class, new()
 {
-    private readonly MongoCommunicator _communicator;
-    protected readonly ISerializer Serializer;
-    private readonly Func<TEntity, string?> _getIdFunc;
-    private readonly Action<TEntity, string> _setIdFunc;
-    private readonly string _collectionName;
-    protected internal IMongoDatabase Database => _communicator.Database;
+    protected readonly ISerializer Serializer = serializer;
+    private readonly string _collectionName = collectionName ?? typeof(TEntity).FullName!;
+    protected internal IMongoDatabase Database => communicator.Database;
     private IMongoCollection<BsonDocument>? _collection;
     protected internal IMongoCollection<BsonDocument> Collection => _collection ??= Database.GetCollection<BsonDocument>(_collectionName);
-
-
-    protected MongoDbRepositoryBase(MongoCommunicator communicator, ISerializer serializer,
-        Func<TEntity, string?> getIdFunc, Action<TEntity, string> setIdAction,
-        string? collectionName = null)
-    {
-        _communicator = communicator;
-        Serializer = serializer;
-        _getIdFunc = getIdFunc;
-        _setIdFunc = setIdAction;
-        _collectionName = collectionName ?? typeof(TEntity).FullName!;
-    }
 
 
     public async Task<TEntity?> Details(object o)
@@ -63,11 +53,11 @@ public abstract class MongoDbRepositoryBase<TEntity>
         var content = Serializer.Serialize(item);
         var bson = BsonDocument.Parse(content);
 
-        var itemId = _getIdFunc(item);
+        var itemId = getIdFunc(item);
         if (itemId == null)
         {
             await Collection.InsertOneAsync(bson, new InsertOneOptions());
-            _setIdFunc(item, bson["_id"].ToString()!);
+            setIdAction(item, bson["_id"].ToString()!);
             return 1;
         }
 
@@ -90,7 +80,7 @@ public abstract class MongoDbRepositoryBase<TEntity>
     }
     public virtual async Task<long> Delete(TEntity item)
     {
-        var itemId = _getIdFunc(item);
+        var itemId = getIdFunc(item);
         var filter = GetFilter(DictionaryUtility.ToDictionary(new { id = itemId }));
         var result = await Collection.DeleteOneAsync(filter, new DeleteOptions());
 
@@ -101,7 +91,7 @@ public abstract class MongoDbRepositoryBase<TEntity>
     {
         var content = bson.ToJson(new JsonWriterSettings { OutputMode = JsonOutputMode.CanonicalExtendedJson });
         var item = Serializer.Deserialize<TEntity>(content)!;
-        _setIdFunc(item, bson["_id"].ToString()!);
+        setIdAction(item, bson["_id"].ToString()!);
         return item;
     }
     protected internal virtual IDictionary<string, object?> GetSearchObject(object? so)

@@ -1,7 +1,7 @@
-﻿using Regira.IO.Storage.FileSystem;
+﻿using System.Diagnostics;
+using Regira.IO.Storage.FileSystem;
 using Regira.System.Projects.Services;
 using Regira.TreeList;
-using System.Diagnostics;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 
@@ -23,11 +23,7 @@ public class CreationTests
         public string ParentDirectory { get; set; } = null!;
     }
 
-    private readonly string _testDirectory;
-    public CreationTests()
-    {
-        _testDirectory = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "../../../../")).FullName;
-    }
+    private readonly string _testDirectory = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "../../../../")).FullName;
 
     [Test]
     public void Create_Directories_Tree()

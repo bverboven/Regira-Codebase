@@ -1,5 +1,5 @@
-﻿using Regira.Utilities;
-using System.Text;
+﻿using System.Text;
+using Regira.Utilities;
 
 namespace Regira.IO.Utilities;
 

@@ -20,8 +20,8 @@ public class OcrManager : IOcrService
         public string DataDirectory { get; set; } = "./tessdata";
     }
 
-    private string _lang;
-    private string _dataDirectory;
+    private readonly string _lang;
+    private readonly string _dataDirectory;
     public OcrManager(Options? options = null)
     {
         options ??= new Options();

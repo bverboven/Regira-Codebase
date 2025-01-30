@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Diagnostics;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.DAL.Paging;
@@ -8,7 +9,6 @@ using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Models;
 using Regira.Utilities;
-using System.Diagnostics;
 
 namespace Regira.Entities.Web.Controllers;
 

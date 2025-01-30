@@ -8,20 +8,16 @@ using Regira.Utilities;
 
 namespace Regira.Entities.EFcore.Abstractions;
 
-public abstract class EntityRepositoryBase<TContext, TEntity, TSearchObject, TSortBy, TIncludes>
-    : EntityRepositoryBase<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>, IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>
+public abstract class EntityRepositoryBase<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(TContext dbContext)
+    : EntityRepositoryBase<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>(dbContext),
+        IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>
     where TContext : DbContext
     where TEntity : class, IEntity<int>
     where TSearchObject : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum
-    where TIncludes : struct, Enum
-{
-    protected EntityRepositoryBase(TContext dbContext)
-        : base(dbContext)
-    {
-    }
-}
-public abstract class EntityRepositoryBase<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> : IEntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
+    where TIncludes : struct, Enum;
+public abstract class EntityRepositoryBase<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
+    TContext dbContext) : IEntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
@@ -30,11 +26,7 @@ public abstract class EntityRepositoryBase<TContext, TEntity, TKey, TSearchObjec
 {
     public virtual DbSet<TEntity> DbSet => DbContext.Set<TEntity>();
 
-    protected readonly TContext DbContext;
-    protected EntityRepositoryBase(TContext dbContext)
-    {
-        DbContext = dbContext;
-    }
+    protected readonly TContext DbContext = dbContext;
 
 
     Task<IList<TEntity>> IEntityReadService<TEntity, TKey>.List(object? so, PagingInfo? pagingInfo)
@@ -63,8 +55,8 @@ public abstract class EntityRepositoryBase<TContext, TEntity, TKey, TSearchObjec
                 .AsNoTrackingWithIdentityResolution()
 #endif
             .ToListAsync();
-    public virtual async Task<IList<TEntity>> List(TSearchObject? so = default, PagingInfo? pagingInfo = null)
-        => await Query(DbSet, new[] { so! }, Array.Empty<TSortBy>(), null, pagingInfo)
+    public virtual async Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
+        => await Query(DbSet, [so!], Array.Empty<TSortBy>(), null, pagingInfo)
 #if NETSTANDARD2_0
             .AsNoTracking()
 #else
@@ -74,7 +66,7 @@ public abstract class EntityRepositoryBase<TContext, TEntity, TKey, TSearchObjec
 
     public virtual Task<int> Count(IList<TSearchObject?> searchObjects)
         => Filter(DbContext.Set<TEntity>(), searchObjects).CountAsync();
-    public virtual Task<int> Count(TSearchObject? so = default)
+    public virtual Task<int> Count(TSearchObject? so = null)
         => Filter(DbSet, so).CountAsync();
 
 
@@ -145,7 +137,7 @@ public abstract class EntityRepositoryBase<TContext, TEntity, TKey, TSearchObjec
         => DbContext.SaveChangesAsync(token);
 
     protected TSearchObject? Convert(object? so)
-        => so == default ? default
+        => so == null ? null
             : so is TSearchObject tso ? tso
             : ObjectUtility.Create<TSearchObject>(so);
     protected bool IsNew(TEntity item)

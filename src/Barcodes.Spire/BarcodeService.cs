@@ -1,12 +1,12 @@
-﻿using Regira.Drawing.GDI.Utilities;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
+using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Abstractions;
 using Regira.Office.Barcodes.Abstractions;
 using Regira.Office.Barcodes.Models;
 using Regira.Utilities;
 using Spire.Barcode;
-using System.Drawing;
-using System.Drawing.Imaging;
 using SpireBarcodeType = Spire.Barcode.BarCodeType;
 
 namespace Regira.Office.Barcodes.Spire;

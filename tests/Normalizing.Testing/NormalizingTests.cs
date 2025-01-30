@@ -60,7 +60,7 @@ public class NormalizingTests
         {
             GivenName = "BÎG",
             LastName = "bôss",
-            Subordinates = new[] { item }
+            Subordinates = [item]
         };
         item.Supervisor = supervisor;
 

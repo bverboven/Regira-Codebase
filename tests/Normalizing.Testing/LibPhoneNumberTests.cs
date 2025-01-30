@@ -1,6 +1,5 @@
-﻿using NUnit.Framework.Legacy;
+﻿using System.Globalization;
 using Regira.Globalization.LibPhoneNumber;
-using System.Globalization;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 namespace Normalizing.Testing;
@@ -9,11 +8,7 @@ namespace Normalizing.Testing;
 [Parallelizable(ParallelScope.All)]
 public class LibPhoneNumberTests
 {
-    private readonly PhoneNumberFormatter _formatter;
-    public LibPhoneNumberTests()
-    {
-        _formatter = new PhoneNumberFormatter(new CultureInfo("nl-BE"));
-    }
+    private readonly PhoneNumberFormatter _formatter = new(new CultureInfo("nl-BE"));
 
     [TestCase("+32 486 99 99 99", "+32486999999")]
     [TestCase("0486999999", "+32486999999")]

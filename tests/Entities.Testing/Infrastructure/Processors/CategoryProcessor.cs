@@ -5,14 +5,8 @@ using Regira.Utilities;
 
 namespace Entities.Testing.Infrastructure.Processors;
 
-public class CategoryProcessor : EntityProcessorBase<Category>
+public class CategoryProcessor(ProductContext dbContext) : EntityProcessorBase<Category>
 {
-    private readonly ProductContext _dbContext;
-    public CategoryProcessor(ProductContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
     public override async IAsyncEnumerable<Category> ProcessManyAsync(IEnumerable<Category> items)
     {
         var list = items.AsList();
@@ -20,7 +14,7 @@ public class CategoryProcessor : EntityProcessorBase<Category>
             .Select(x => x.Id)
             .Distinct()
             .ToArray();
-        var countPerCategory = await _dbContext.Products
+        var countPerCategory = await dbContext.Products
             .Where(p => categoryIds.Contains(p.CategoryId!.Value))
             .GroupBy(p => p.CategoryId!.Value)
             .ToDictionaryAsync(k => k.Key, v => v.Count());

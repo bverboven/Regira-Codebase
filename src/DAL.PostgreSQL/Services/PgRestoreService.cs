@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using Regira.DAL.Abstractions;
@@ -8,7 +9,6 @@ using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.System.Abstractions;
 using Regira.Utilities;
-using System.Data;
 
 namespace Regira.DAL.PostgreSQL.Services;
 

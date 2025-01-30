@@ -1,23 +1,17 @@
+using System.Drawing;
 using Regira.Dimensions;
 using Regira.Drawing.GDI.Utilities;
 using Regira.Media.Drawing.Core;
-using System.Drawing;
 
 namespace Regira.Drawing.GDI.Helpers;
 
 public class ImageBuilder
 {
-    private readonly ICollection<ImageToAdd> _images;
+    private readonly ICollection<ImageToAdd> _images = new List<ImageToAdd>();
     private int? _dpi;
     private Image? _target;
-    private readonly DrawHelper _helper;
+    private readonly DrawHelper _helper = new();
     private Size2D? _targetSize;
-
-    public ImageBuilder()
-    {
-        _images = new List<ImageToAdd>();
-        _helper = new DrawHelper();
-    }
 
 
     public ImageBuilder SetDpi(int dpi)

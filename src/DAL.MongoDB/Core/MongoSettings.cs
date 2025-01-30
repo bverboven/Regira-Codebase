@@ -4,14 +4,18 @@ using MongoDefaults = Regira.DAL.MongoDB.Constants.MongoDefaults;
 
 namespace Regira.DAL.MongoDB.Core;
 
-public class MongoSettings : DbSettingsBase
+public class MongoSettings(
+    string? host,
+    string? database,
+    string? port = null,
+    string? username = null,
+    string? password = null,
+    bool? useTls = null)
+    : DbSettingsBase(host ?? MongoDefaults.Host, database, port ?? MongoDefaults.Port, username, password,
+        useTls ?? MongoDefaults.UseTls)
 {
     public MongoSettings()
         : this(null, null)
-    {
-    }
-    public MongoSettings(string? host, string? database, string? port = null, string? username = null, string? password = null, bool? useTls = null)
-        : base(host ?? MongoDefaults.Host, database, port ?? MongoDefaults.Port, username, password, useTls ?? MongoDefaults.UseTls)
     {
     }
 

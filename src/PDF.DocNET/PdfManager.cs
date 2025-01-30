@@ -1,4 +1,7 @@
-﻿using Docnet.Core;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
+using Docnet.Core;
 using Docnet.Core.Editors;
 using Docnet.Core.Models;
 using Regira.Collections;
@@ -9,9 +12,6 @@ using Regira.Media.Drawing.Abstractions;
 using Regira.Office.MimeTypes;
 using Regira.Office.PDF.Abstractions;
 using Regira.Office.PDF.Models;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
 
 namespace Regira.Office.PDF.DocNET;
 

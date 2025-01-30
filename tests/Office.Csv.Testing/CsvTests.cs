@@ -1,3 +1,4 @@
+using System.Globalization;
 using Bogus;
 using NUnit.Framework.Legacy;
 using Office.Csv.Testing.Infrastructure;
@@ -5,7 +6,6 @@ using Regira.IO.Extensions;
 using Regira.IO.Models;
 using Regira.Office.Csv.CsvHelper;
 using Regira.Utilities;
-using System.Globalization;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 

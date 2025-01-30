@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Regira.ProjectFilesProcessor;
 using Regira.ProjectFilesProcessor.Services;
 using Serilog;
 using Serilog.Events;
-using System.Reflection;
 
 // basic logger (configuration and services not loaded yet)
 Log.Logger = new LoggerConfiguration()

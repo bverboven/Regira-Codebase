@@ -9,12 +9,8 @@ namespace Entities.TestApi.Controllers;
 
 [ApiController]
 [Route("courses")]
-public class CourseController : EntityControllerBase<Course, CourseSearchObject, CourseDto, CourseInputDto>
-{
-}
+public class CourseController : EntityControllerBase<Course, CourseSearchObject, CourseDto, CourseInputDto>;
 
 [ApiController]
 [Route("courses")]
-public class CourseAttachmentController : EntityAttachmentControllerBase<CourseAttachment, CourseAttachmentDto, CourseAttachmentInputDto>
-{
-}
+public class CourseAttachmentController : EntityAttachmentControllerBase<CourseAttachment, CourseAttachmentDto, CourseAttachmentInputDto>;

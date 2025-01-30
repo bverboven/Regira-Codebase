@@ -1,5 +1,3 @@
 ﻿namespace Regira.IO.Abstractions;
 
-public interface IBinaryFile : IStorageFile
-{
-}
+public interface IBinaryFile : IStorageFile;

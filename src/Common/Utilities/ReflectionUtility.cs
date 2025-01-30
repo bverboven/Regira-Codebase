@@ -11,7 +11,7 @@ public static class ReflectionUtility
         var methodInfo = typeof(ReflectionUtility).GetMethod(nameof(CastToHelper), BindingFlags.Static | BindingFlags.Public);
         var genericArguments = new[] { type };
         var genericMethodInfo = methodInfo?.MakeGenericMethod(genericArguments);
-        return genericMethodInfo?.Invoke(null, new[] { o });
+        return genericMethodInfo?.Invoke(null, [o]);
     }
         
     public static Task<object?> InvokeAsync(this MethodInfo methodInfo, object obj, params object[] parameters)

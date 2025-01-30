@@ -1,10 +1,10 @@
-﻿using OfficeOpenXml;
+﻿using System.Data;
+using OfficeOpenXml;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Office.Excel.Abstractions;
 using Regira.Office.MimeTypes;
 using Regira.Utilities;
-using System.Data;
 
 namespace Regira.Office.Excel.EPPlus;
 

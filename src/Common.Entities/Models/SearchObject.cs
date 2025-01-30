@@ -2,10 +2,7 @@
 
 namespace Regira.Entities.Models;
 
-public class SearchObject : SearchObject<int>, ISearchObject
-{
-
-}
+public class SearchObject : SearchObject<int>, ISearchObject;
 public class SearchObject<TKey> : ISearchObject<TKey>
 {
     public TKey? Id { get; set; } = default!;

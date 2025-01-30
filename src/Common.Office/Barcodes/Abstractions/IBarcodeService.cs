@@ -1,6 +1,3 @@
 ﻿namespace Regira.Office.Barcodes.Abstractions;
 
-public interface IBarcodeService : IBarcodeReader, IBarcodeWriter
-{
-
-}
+public interface IBarcodeService : IBarcodeReader, IBarcodeWriter;

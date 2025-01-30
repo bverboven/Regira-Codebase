@@ -2,8 +2,8 @@
 
 public static class PersonNames
 {
-    public static (string GivenName, string FamilyName)[] NL => new[]
-    {
+    public static (string GivenName, string FamilyName)[] NL =>
+    [
         ("Klaar", "Kome"),
         ("Connie", "Comen"),
         ("Connie", "Plassen"),
@@ -30,10 +30,10 @@ public static class PersonNames
         ("Dino", "Saris"),
         ("Ferry", "Kok"),
         ("Peter", "Selis"),
-        ("Elke", "Kant"),
-    };
-    public static (string GivenName, string FamilyName)[] EN => new[]
-    {
+        ("Elke", "Kant")
+    ];
+    public static (string GivenName, string FamilyName)[] EN =>
+    [
         ("Zoowee", "Blubberworth"),
         ("Flufffy", "Gloomkins"),
         ("Buritt", "Noseface"),
@@ -134,7 +134,7 @@ public static class PersonNames
         ("Peawee", "Tootwhistle"),
         ("Eggbo", "Roachshine"),
         ("Bincan", "Moongold")
-    };
+    ];
 
     public static IEnumerable<string> GivenNames => EN.Select(x => x.GivenName);
     public static IEnumerable<string> FamilyNames => EN.Select(x => x.FamilyName);

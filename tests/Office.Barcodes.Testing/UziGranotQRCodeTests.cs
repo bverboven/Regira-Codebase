@@ -1,5 +1,4 @@
-﻿using NUnit.Framework.Internal;
-using Office.Barcodes.Testing.Extensions;
+﻿using Office.Barcodes.Testing.Extensions;
 using Regira.Office.Barcodes.Abstractions;
 using Regira.Office.Barcodes.UziGranot;
 using Regira.Utilities;

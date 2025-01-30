@@ -7,14 +7,8 @@ namespace Office.Barcodes.Testing;
 
 [TestFixture]
 [Parallelizable(ParallelScope.Default)]
-public class QRCoderTests : QRCodeTestsBase
+public class QRCoderTests() : QRCodeTestsBase(new QRCodeWriter(), null, "QR-Coder")
 {
-    public QRCoderTests()
-        : base(new QRCodeWriter(), null, "QR-Coder")
-    {
-    }
-
-
     [TestCase("test", "test-lowercase")]
     [TestCase("TEST", "test-uppercase")]
     [TestCase("https://github.com/micjahn/ZXing.Net", "zxing")]

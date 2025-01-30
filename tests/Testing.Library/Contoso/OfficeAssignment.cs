@@ -1,6 +1,6 @@
-﻿using Regira.Entities.Models.Abstractions;
+﻿using System.ComponentModel.DataAnnotations;
+using Regira.Entities.Models.Abstractions;
 using Regira.Normalizing;
-using System.ComponentModel.DataAnnotations;
 
 namespace Testing.Library.Contoso;
 

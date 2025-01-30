@@ -1,8 +1,8 @@
-﻿using Regira.Entities.Attachments.Abstractions;
+﻿using System.ComponentModel.DataAnnotations;
+using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Normalizing;
-using System.ComponentModel.DataAnnotations;
 
 namespace Testing.Library.Contoso;
 
@@ -53,7 +53,8 @@ public class Person : IEntityWithSerial, IHasNormalizedTitle, IHasAttachments, I
         set => Attachments = value?.Cast<PersonAttachment>().ToArray();
     }
 
-    [Normalized(SourceProperties = new[] { nameof(GivenName), nameof(LastName), nameof(Description), nameof(Phone), nameof(Email) })]
+    [Normalized(SourceProperties = [nameof(GivenName), nameof(LastName), nameof(Description), nameof(Phone), nameof(Email)
+    ])]
     public string? NormalizedContent { get; set; }
 }
 

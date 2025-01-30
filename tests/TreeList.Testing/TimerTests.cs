@@ -1,5 +1,4 @@
 ﻿using Bogus;
-using NUnit.Framework.Legacy;
 using Regira.TreeList;
 using Regira.Utilities;
 using TreeList.Testing.Infrastructure;
@@ -19,11 +18,7 @@ public class TimerTests
         public TreeList<T> Tree { get; set; } = null!;
     }
 
-    private readonly Randomizer _randomizer;
-    public TimerTests()
-    {
-        _randomizer = new Randomizer();
-    }
+    private readonly Randomizer _randomizer = new();
 
     [SetUp]
     public void SetUp()
@@ -65,11 +60,9 @@ public class TimerTests
         var shuffledNodes = addSelfAvg.Tree
             .OrderBy(_ => Guid.NewGuid())
             .ToArray();
-        var start = DateTime.Now;
         var sortedNodes = shuffledNodes
             .OrderByHierarchy()
             .ToArray();
-        var end = (DateTime.Now - start).TotalMilliseconds;
 
         TreeNode<SimplePerson> prevNode = null!;
         foreach (var sortedNode in sortedNodes)

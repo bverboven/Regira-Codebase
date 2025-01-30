@@ -1,13 +1,13 @@
-﻿using Entities.TestApi.Infrastructure;
+﻿using System.Net;
+using System.Net.Http.Json;
+using Entities.TestApi;
+using Entities.TestApi.Infrastructure;
 using Entities.TestApi.Models;
 using Entities.Web.Testing.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Web.Models;
 using Regira.Utilities;
-using System.Net;
-using System.Net.Http.Json;
-using Entities.TestApi;
 using Testing.Library.Data;
 
 namespace Entities.Web.Testing;
@@ -36,7 +36,7 @@ public class PersonControllerTests : IDisposable
 
         var result = await response.Content.ReadFromJsonAsync<ListResult<PersonDto>>();
         Assert.NotNull(result!.Items);
-        Assert.Equal(0, result.Items.Count);
+        Assert.Empty(result.Items);
     }
     [Fact]
     public async Task Get_404()

@@ -1,11 +1,7 @@
 ﻿namespace Regira.Office.Mail.Exceptions;
 
-public class EmailFormatException : FormatException
+public class EmailFormatException(string? input, string? message = null, Exception? inner = null)
+    : FormatException(message, inner)
 {
-    public string? EmailInput { get; set; }
-    public EmailFormatException(string? input, string? message = null, Exception? inner = null)
-        : base(message, inner)
-    {
-        EmailInput = input;
-    }
+    public string? EmailInput { get; set; } = input;
 }

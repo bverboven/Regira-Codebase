@@ -2,15 +2,8 @@
 
 namespace Regira.IO.Storage.Helpers;
 
-public class FileProcessor : IFileProcessor
+public class FileProcessor(IFileService fileService) : IFileProcessor
 {
-    private readonly IFileService _fileService;
-    public FileProcessor(IFileService fileService)
-    {
-        _fileService = fileService;
-    }
-
-
     /// <summary>
     /// 
     /// </summary>
@@ -32,13 +25,13 @@ public class FileProcessor : IFileProcessor
             Recursive = recursive,
             Type = FileEntryTypes.Files
         };
-        var fileUris = await _fileService.List(filesSo);
+        var fileUris = await fileService.List(filesSo);
         // handle file
         var handleFilesFuncs = fileUris
             .Select(fileUri =>
             {
-                var absoluteUri = _fileService.GetAbsoluteUri(fileUri);
-                return handleFile(absoluteUri, _fileService);
+                var absoluteUri = fileService.GetAbsoluteUri(fileUri);
+                return handleFile(absoluteUri, fileService);
             })
             .ToArray();
         Task.WaitAll(handleFilesFuncs);
@@ -53,7 +46,7 @@ public class FileProcessor : IFileProcessor
                 Type = FileEntryTypes.Directories,
                 Recursive = recursive
             };
-            var directoryUris = await _fileService.List(dirSo);
+            var directoryUris = await fileService.List(dirSo);
             var dirTasks = directoryUris
                 .Select(dirUri => ProcessFiles(new FileSearchObject { FolderUri = dirUri, Extensions = so.Extensions, Recursive = so.Recursive }, handleFile, processRecursively))
                 .ToArray();

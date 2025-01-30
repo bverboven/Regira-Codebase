@@ -12,44 +12,36 @@ public enum VersionType
     Minor,
     Major
 }
-public class ProjectManager
+public class ProjectManager(
+    ProjectService projectService,
+    BaGetService baGetService,
+    NuGetHelper nuGetHelper,
+    IProcessHelper processHelper,
+    ILogger<ProjectManager> logger)
 {
-    private readonly ProjectService _projectService;
-    private readonly BaGetService _baGetService;
-    private readonly NuGetHelper _nuGetHelper;
-    private readonly IProcessHelper _processHelper;
-    private readonly ILogger<ProjectManager> _logger;
     public IList<Project>? Projects { get; private set; }
     /// <summary>
     /// A tree-list where a parent-Project is a dependency for other project(s)
     /// </summary>
     public ProjectTree? ProjectTree { get; private set; }
-    public ProjectManager(ProjectService projectService, BaGetService baGetService, NuGetHelper nuGetHelper, IProcessHelper processHelper, ILogger<ProjectManager> logger)
-    {
-        _projectService = projectService;
-        _baGetService = baGetService;
-        _nuGetHelper = nuGetHelper;
-        _processHelper = processHelper;
-        _logger = logger;
-    }
 
     public void PushPending()
     {
         var pendingProjects = GetPendingProjects();
         foreach (var project in pendingProjects)
         {
-            _logger.LogInformation($"Pushing {project.Id} (v{project.PublishedVersion} -> v{project.Version})");
-            var cmd = _nuGetHelper.CreateNuGetCommand(project);
-            var response = _processHelper.ExecuteCommand(cmd, true);
+            logger.LogInformation($"Pushing {project.Id} (v{project.PublishedVersion} -> v{project.Version})");
+            var cmd = nuGetHelper.CreateNuGetCommand(project);
+            var response = processHelper.ExecuteCommand(cmd, true);
             if (response.ExitCode == 0)
             {
                 var output = response.Output?.Trim().Split(Environment.NewLine).LastOrDefault()?.Trim();
                 var isSkipped = output?.StartsWith("--skip-duplicate") == true;
-                _logger.LogInformation(isSkipped ? "(skipped: duplicate)" : $"{output}");
+                logger.LogInformation(isSkipped ? "(skipped: duplicate)" : $"{output}");
             }
             else
             {
-                _logger.LogWarning($"Pushing {project.Id} failed:{Environment.NewLine}{response.Output}");
+                logger.LogWarning($"Pushing {project.Id} failed:{Environment.NewLine}{response.Output}");
             }
         }
     }
@@ -57,16 +49,16 @@ public class ProjectManager
     // legacy
     public IList<string> GetBatchCommand()
     {
-        return Projects!.Select(_nuGetHelper.CreateNuGetCommand).ToArray();
+        return Projects!.Select(nuGetHelper.CreateNuGetCommand).ToArray();
     }
 
     public async Task Init()
     {
-        var projects = (await _projectService.List())
+        var projects = (await projectService.List())
             .Where(x => x.IsClassLibrary == true)
             .ToArray();
 
-        var publishedProjects = (await _baGetService.List()).AsList();
+        var publishedProjects = (await baGetService.List()).AsList();
         SetPublishedVersions(projects, publishedProjects);
 
         // Projects
@@ -86,8 +78,8 @@ public class ProjectManager
     {
         foreach (var project in Projects!)
         {
-            await _projectService.Save(project);
-            _logger.LogInformation($"Saved {project.Id ?? project.ProjectFile} (v{project.Version})");
+            await projectService.Save(project);
+            logger.LogInformation($"Saved {project.Id ?? project.ProjectFile} (v{project.Version})");
         }
     }
     public IList<Project> GetPendingProjects()

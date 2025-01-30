@@ -4,14 +4,8 @@ using Testing.Library.Contoso;
 
 namespace Testing.Library.Data;
 
-public class ContosoContext : DbContext
+public class ContosoContext(DbContextOptions<ContosoContext> options) : DbContext(options)
 {
-    public ContosoContext(DbContextOptions<ContosoContext> options)
-        : base(options)
-    {
-    }
-
-
     public DbSet<Attachment> Attachments { get; set; } = null!;
     public DbSet<Course> Courses { get; set; } = null!;
     public DbSet<CourseAttachment> CourseAttachments { get; set; } = null!;

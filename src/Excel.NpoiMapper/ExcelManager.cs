@@ -29,7 +29,6 @@ public class ExcelManager : IExcelManager
         using var ms = input.GetStream();
         var mapper = new Mapper(ms);
         var sheetCount = mapper.Workbook.NumberOfSheets;
-        var sheets = new List<ExcelSheet>();
         for (var i = 0; i < sheetCount; i++)
         {
             var sheetName = mapper.Workbook.GetSheetName(i);

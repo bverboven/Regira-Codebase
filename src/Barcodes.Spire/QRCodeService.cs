@@ -6,11 +6,7 @@ namespace Regira.Office.Barcodes.Spire;
 
 public class QRCodeService : IQRCodeService
 {
-    private readonly BarcodeService _service;
-    public QRCodeService()
-    {
-        _service = new BarcodeService();
-    }
+    private readonly BarcodeService _service = new();
 
     public IImageFile Create(QRCodeInput input) => _service.Create(input);
     public BarcodeReadResult Read(IImageFile qrCode) => _service.Read(qrCode);

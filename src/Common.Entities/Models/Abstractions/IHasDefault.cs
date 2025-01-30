@@ -4,6 +4,4 @@ public interface IHasDefault
 {
     bool IsDefault { get; set; }
 }
-public interface IHasDefault<TKey> : IEntity<TKey>, IHasDefault
-{
-}
+public interface IHasDefault<TKey> : IEntity<TKey>, IHasDefault;

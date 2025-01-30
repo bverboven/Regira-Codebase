@@ -3,14 +3,9 @@ using Regira.System.Hosting.Background.Abstractions;
 
 namespace Regira.System.Hosting.Background.Core;
 
-public class QueuedHostedService : BackgroundService
+public class QueuedHostedService(IBackgroundTaskQueue taskQueue) : BackgroundService
 {
-    public QueuedHostedService(IBackgroundTaskQueue taskQueue)
-    {
-        TaskQueue = taskQueue;
-    }
-
-    public IBackgroundTaskQueue TaskQueue { get; }
+    public IBackgroundTaskQueue TaskQueue { get; } = taskQueue;
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {

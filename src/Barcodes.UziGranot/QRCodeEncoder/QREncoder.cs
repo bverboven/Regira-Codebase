@@ -33,7 +33,6 @@
 //
 /////////////////////////////////////////////////////////////////////
 
-using System;
 using System.Text;
 
 // ReSharper disable once CheckNamespace
@@ -293,7 +292,7 @@ namespace QRCodeEncoderLibrary
             var binaryData = Encoding.UTF8.GetBytes(stringDataSegment);
 
             // encode data
-            Encode(new[] { binaryData });
+            Encode([binaryData]);
         }
 
         /// <summary>
@@ -346,7 +345,7 @@ namespace QRCodeEncoderLibrary
             }
 
             // encode data
-            Encode(new[] { singleDataSeg });
+            Encode([singleDataSeg]);
         }
 
         /// <summary>
@@ -376,7 +375,7 @@ namespace QRCodeEncoderLibrary
                 var dataSeg = dataSegArray[segIndex];
                 if (dataSeg == null)
                 {
-                    dataSegArray[segIndex] = Array.Empty<byte>();
+                    dataSegArray[segIndex] = [];
                 }
                 else
                 {

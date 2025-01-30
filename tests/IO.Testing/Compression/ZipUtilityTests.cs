@@ -1,9 +1,8 @@
+using System.IO.Compression;
 using IO.Testing.Helpers;
-using NUnit.Framework.Legacy;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
 using Regira.IO.Storage.Compression;
-using System.IO.Compression;
 
 namespace IO.Testing.Compression;
 

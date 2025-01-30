@@ -33,9 +33,7 @@
 //
 /////////////////////////////////////////////////////////////////////
 
-using System;
-using System.Collections.Generic;
-using System.IO;
+
 
 // ReSharper disable once CheckNamespace
 namespace QRCodeEncoderLibrary
@@ -69,7 +67,7 @@ namespace QRCodeEncoderLibrary
             // command line has no quote characters
             if (commandLine.IndexOf('"') < 0)
             {
-                Encode(commandLine.Split(new[] { ' ' }));
+                Encode(commandLine.Split([' ']));
                 return;
             }
 

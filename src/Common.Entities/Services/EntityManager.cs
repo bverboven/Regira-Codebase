@@ -4,23 +4,17 @@ using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.Services;
 
-public class EntityManager<TEntity> : EntityManager<TEntity, int>, IEntityManager<TEntity>
-    where TEntity : class, IEntity<int>
-{
-    public EntityManager(IEntityRepository<TEntity> repo)
-        : base(repo)
-    {
-    }
-}
-public class EntityManager<TEntity, TKey> : IEntityManager<TEntity, TKey>
+public class EntityManager<TEntity>(IEntityRepository<TEntity> repo)
+    : EntityManager<TEntity, int>(repo), IEntityManager<TEntity>
+    where TEntity : class, IEntity<int>;
+public class EntityManager<TEntity, TKey>(IEntityRepository<TEntity, TKey> repo) : IEntityManager<TEntity, TKey>
     where TEntity : class, IEntity<TKey>
 {
-    protected readonly IEntityRepository<TEntity, TKey> Repo;
-    public EntityManager(IEntityRepository<TEntity, TKey> repo) => Repo = repo;
+    protected readonly IEntityRepository<TEntity, TKey> Repo = repo;
 
 
     public virtual Task<TEntity?> Details(TKey id) => Repo.Details(id);
-    public virtual Task<IList<TEntity>> List(object? so = default, PagingInfo? pagingInfo = null) => Repo.List(so, pagingInfo);
+    public virtual Task<IList<TEntity>> List(object? so = null, PagingInfo? pagingInfo = null) => Repo.List(so, pagingInfo);
     public virtual Task<int> Count(object? so) => Repo.Count(so);
 
     public virtual Task Add(TEntity item) => Repo.Add(item);

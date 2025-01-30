@@ -1,10 +1,10 @@
+using System.Text.Json;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
 using Regira.Office.Excel;
 using Regira.Office.Excel.Abstractions;
 using Regira.Utilities;
-using System.Text.Json;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 
@@ -136,7 +136,7 @@ public abstract class ExcelTestsBase
             File.Delete(outputPath);
         }
 
-        var countriesJSON = File.ReadAllText(Path.Combine(AssetsDir, "Input", "countries.json"));
+        var countriesJSON = await File.ReadAllTextAsync(Path.Combine(AssetsDir, "Input", "countries.json"));
         var countries = JsonSerializer.Deserialize<IList<Dictionary<string, object>>>(countriesJSON)!;
         using var excelFile = CreateExcel(countries);
         Assert.Multiple(() =>
@@ -156,14 +156,14 @@ public abstract class ExcelTestsBase
             File.Delete(outputFile);
         }
 
-        var countriesJSON = File.ReadAllText(Path.Combine(AssetsDir, "Input", "countries-2.json"));
+        var countriesJSON = await File.ReadAllTextAsync(Path.Combine(AssetsDir, "Input", "countries-2.json"));
         var countries = JsonSerializer.Deserialize<IList<Dictionary<string, object>>>(countriesJSON)!;
         var sheet = new ExcelSheet
         {
             Name = "Countries",
             Data = countries.Cast<object>().ToList()
         };
-        using var excelFile = ExcelManager.Create(new[] { sheet });
+        using var excelFile = ExcelManager.Create([sheet]);
         Assert.Multiple(() =>
         {
             Assert.That(excelFile.GetBytes(), Is.Not.Null);
@@ -176,7 +176,7 @@ public abstract class ExcelTestsBase
 
     protected async Task Run_From_Json()
     {
-        var countriesJSON = File.ReadAllText(Path.Combine(AssetsDir, "Input", "countries.json"));
+        var countriesJSON = await File.ReadAllTextAsync(Path.Combine(AssetsDir, "Input", "countries.json"));
         var outputFile = Path.Combine(AssetsDir, "Output", "from_json.xlsx");
 
         var data = JsonSerializer.Deserialize<IList<Dictionary<string, object>>>(countriesJSON)!

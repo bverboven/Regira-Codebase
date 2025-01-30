@@ -6,14 +6,8 @@ namespace Office.Barcodes.Testing;
 
 [TestFixture]
 [Parallelizable(ParallelScope.All)]
-public class ZXingBarcodeTests : BarcodeTestsBase
+public class ZXingBarcodeTests() : BarcodeTestsBase(new BarcodeService(), new BarcodeService(), "ZXing")
 {
-    public ZXingBarcodeTests()
-        : base(new BarcodeService(), new BarcodeService(), "ZXing")
-    {
-    }
-
-
     [TestCase("123456", BarcodeFormat.Code39, "1to6")]
     [TestCase("TEST", BarcodeFormat.Code39, "test")]
     [TestCase("123456789", BarcodeFormat.Code93, "1to6")]

@@ -12,20 +12,12 @@ namespace Regira.Entities.Web.Attachments;
 
 [ApiController]
 [Route("attachments")]
-public class AttachmentController : ControllerBase
+public class AttachmentController(IAttachmentService service, IMapper mapper) : ControllerBase
 {
-    private readonly IAttachmentService _service;
-    private readonly IMapper _mapper;
-    public AttachmentController(IAttachmentService service, IMapper mapper)
-    {
-        _service = service;
-        _mapper = mapper;
-    }
-
     [HttpGet("{id}")]
     public virtual async Task<IActionResult> GetFile([FromRoute] int id, bool inline = true)
     {
-        var item = await _service.Details(id);
+        var item = await service.Details(id);
 
         if (item == null)
         {
@@ -38,9 +30,9 @@ public class AttachmentController : ControllerBase
     public virtual async Task<ActionResult<SaveResult<AttachmentDto>>> Save(IFormFile file)
     {
         var item = file.ToNamedFile().ToAttachment<int>();
-        await _service.Save(item);
-        await _service.SaveChanges();
-        var savedModel = _mapper.Map<AttachmentDto>(item);
+        await service.Save(item);
+        await service.SaveChanges();
+        var savedModel = mapper.Map<AttachmentDto>(item);
         return Ok(savedModel);
     }
     [HttpPut("{id}")]
@@ -48,9 +40,9 @@ public class AttachmentController : ControllerBase
     {
         var item = file.ToNamedFile().ToAttachment<int>();
         item.Id = id;
-        await _service.Save(item);
-        await _service.SaveChanges();
-        var savedModel = _mapper.Map<AttachmentDto>(item);
+        await service.Save(item);
+        await service.SaveChanges();
+        var savedModel = mapper.Map<AttachmentDto>(item);
         return Ok(savedModel);
     }
 }

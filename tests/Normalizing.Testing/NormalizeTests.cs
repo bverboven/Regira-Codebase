@@ -1,5 +1,4 @@
 ﻿using Normalizing.Testing.Models;
-using NUnit.Framework.Legacy;
 using Regira.Normalizing;
 
 namespace Normalizing.Testing;
@@ -8,13 +7,8 @@ namespace Normalizing.Testing;
 [Parallelizable(ParallelScope.All)]
 public class NormalizeTests
 {
-    private readonly DefaultNormalizer _normalizer;
-    private readonly ObjectNormalizer _objectNormalizer;
-    public NormalizeTests()
-    {
-        _normalizer = new DefaultNormalizer();
-        _objectNormalizer = new ObjectNormalizer();
-    }
+    private readonly DefaultNormalizer _normalizer = new();
+    private readonly ObjectNormalizer _objectNormalizer = new();
 
     [Test]
     public void Test_Without_Attribute()

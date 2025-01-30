@@ -1,3 +1,4 @@
+using System.Drawing;
 using Regira.Dimensions;
 using Regira.Drawing.GDI.Abstractions;
 using Regira.Drawing.GDI.Utilities;
@@ -6,7 +7,6 @@ using Regira.Media.Drawing.Core;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Utilities;
 using Regira.Utilities;
-using System.Drawing;
 
 namespace Regira.Drawing.GDI.Helpers;
 

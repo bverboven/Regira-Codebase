@@ -7,18 +7,10 @@ using Regira.IO.Storage.FileSystem;
 
 namespace Regira.ProjectBackupConsole;
 
-public class BackupManager
+public class BackupManager(IFileService fileService, ZipBuilder zipBuilder)
 {
-    private readonly IFileService _fileService;
-    private readonly ZipBuilder _zipBuilder;
-    private readonly string _executingFilename;
+    private readonly string _executingFilename = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName!;
     private string? _outputDir;
-    public BackupManager(IFileService fileService, ZipBuilder zipBuilder)
-    {
-        _fileService = fileService;
-        _zipBuilder = zipBuilder;
-        _executingFilename = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName!;
-    }
 
 
     public async Task Process()
@@ -40,15 +32,15 @@ public class BackupManager
         var zipFilename = outputFilename
             .Replace("{DateStamp}", DateTime.Now.ToString("yyyyMMdd"));
 
-        var files = (await _fileService.List(fso))
+        var files = (await fileService.List(fso))
             .Where(file => !IgnoreFile(file))
             .Select(file => new BinaryFileItem
             {
                 FileName = file.Replace('\\', '/').Trim('/'),
-                Path = Path.Combine(_fileService.RootFolder, file)
+                Path = Path.Combine(fileService.RootFolder, file)
             });
 
-        using var zipFile = await _zipBuilder
+        using var zipFile = await zipBuilder
             .For(files)
             .Build();
         await using var zipStream = zipFile.GetStream();

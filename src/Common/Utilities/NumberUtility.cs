@@ -5,12 +5,8 @@ public static class NumberUtility
     private static IDictionary<char, int> RomanMap => new Dictionary<char, int> {
         { 'I', 1 }, { 'V', 5 }, { 'X', 10 }, { 'L', 50 }, { 'C', 100 }, { 'D', 500 }, { 'M', 1000 }
     };
-    private static List<string> Romans => new() {
-        "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"
-    };
-    private static List<int> Numerals => new() {
-        1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1
-    };
+    private static List<string> Romans => ["M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"];
+    private static List<int> Numerals => [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
 
     public static int FromRomanNumeral(string roman) {
         // https://stackoverflow.com/questions/14900228/roman-numerals-to-integers/27976977#answer-26667855

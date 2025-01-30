@@ -7,11 +7,7 @@ namespace Entities.Testing.Infrastructure.Primers;
 
 public class NormalizingPrimer : EntityPrimerBase<IEntity>
 {
-    private readonly ObjectNormalizer _objNormalizer;
-    public NormalizingPrimer()
-    {
-        _objNormalizer = new ObjectNormalizer();
-    }
+    private readonly ObjectNormalizer _objNormalizer = new();
 
     public override Task PrepareAsync(IEntity entity, EntityEntry entry)
     {

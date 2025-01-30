@@ -1,24 +1,18 @@
+using System.Net;
+using Regira.IO.Extensions;
 using Regira.IO.Utilities;
 using Regira.Office.Mail.Abstractions;
 using Regira.Office.Mail.Models;
 using RestSharp;
 using RestSharp.Authenticators;
-using System.Net;
-using Regira.IO.Extensions;
 
 namespace Regira.Office.Mail.MailGun;
 
-public class MailGunMailer : MailerBase
+public class MailGunMailer(MailgunConfig config) : MailerBase
 {
-    private readonly string _mailgunApi;
-    private readonly string _mailgunKey;
-    private readonly string _domain;
-    public MailGunMailer(MailgunConfig config)
-    {
-        _mailgunApi = config.Api;
-        _mailgunKey = config.Key;
-        _domain = config.Domain;
-    }
+    private readonly string _mailgunApi = config.Api;
+    private readonly string _mailgunKey = config.Key;
+    private readonly string _domain = config.Domain;
 
 
     protected override async Task<IMailResponse> OnSend(IMessageObject message)

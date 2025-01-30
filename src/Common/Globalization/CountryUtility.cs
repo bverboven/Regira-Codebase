@@ -1,5 +1,5 @@
-﻿using Regira.Normalizing;
-using System.Globalization;
+﻿using System.Globalization;
+using Regira.Normalizing;
 
 namespace Regira.Globalization;
 
@@ -68,7 +68,7 @@ public static class CountryUtility
             .ToCountries();
         foreach (var c in countries)
         {
-            var names = c.NamesByLanguage!.Values.Concat(new[] { c.Title })
+            var names = c.NamesByLanguage!.Values.Concat([c.Title])
                 .Select(n => n.Trim("-?".ToCharArray()))
                 .Select(normalizer.Normalize)
                 .Where(n => !string.IsNullOrWhiteSpace(n))

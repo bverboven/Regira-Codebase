@@ -1,8 +1,8 @@
-﻿using Regira.IO.Storage.Abstractions;
+﻿using System.Net.Http.Headers;
+using System.Reflection;
+using Regira.IO.Storage.Abstractions;
 using Regira.IO.Utilities;
 using Regira.Serializing.Abstractions;
-using System.Net.Http.Headers;
-using System.Reflection;
 
 namespace Regira.IO.Storage.GitHub;
 

@@ -7,30 +7,21 @@ public interface IExportHelper
     Task Export(FileSearchObject so);
 }
 
-public class ExportHelper : IExportHelper
+public class ExportHelper(IFileService sourceService, IFileService targetService) : IExportHelper
 {
-    private readonly IFileService _sourceService;
-    private readonly IFileService _targetService;
-    public ExportHelper(IFileService sourceService, IFileService targetService)
-    {
-        _sourceService = sourceService;
-        _targetService = targetService;
-    }
-
-
     public async Task Export(FileSearchObject so)
     {
-        var fileUris = await _sourceService.List(so);
+        var fileUris = await sourceService.List(so);
         foreach (var fileUri in fileUris)
         {
 #if NETSTANDARD2_0
-                using var stream = await _sourceService.GetStream(fileUri);
+                using var stream = await sourceService.GetStream(fileUri);
 #else
-            await using var stream = await _sourceService.GetStream(fileUri);
+            await using var stream = await sourceService.GetStream(fileUri);
 #endif
             if (stream != null)
             {
-                await _targetService.Save(fileUri, stream);
+                await targetService.Save(fileUri, stream);
             }
         }
     }

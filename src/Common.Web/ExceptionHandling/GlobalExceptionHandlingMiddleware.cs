@@ -5,27 +5,19 @@ using Regira.Web.Middleware;
 
 namespace Regira.Web.ExceptionHandling;
 
-public class GlobalExceptionHandlingMiddleware : IRequestHandler
+public class GlobalExceptionHandlingMiddleware(RequestDelegate next, IExceptionHandler exceptionHandler)
+    : IRequestHandler
 {
-    private readonly RequestDelegate _next;
-    private readonly IExceptionHandler _exceptionHandler;
-    public GlobalExceptionHandlingMiddleware(RequestDelegate next, IExceptionHandler exceptionHandler)
-    {
-        _next = next;
-        _exceptionHandler = exceptionHandler;
-    }
-
-
     public async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
-            await _next.Invoke(httpContext);
+            await next.Invoke(httpContext);
         }
         catch (Exception ex)
         {
             httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await _exceptionHandler.HandleException(httpContext, ex);
+            await exceptionHandler.HandleException(httpContext, ex);
         }
     }
 }

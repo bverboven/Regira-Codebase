@@ -1,5 +1,3 @@
 ﻿namespace Regira.Office.PDF.Abstractions;
 
-public interface IPdfImageService : IPdfToImageService, IImagesToPdfService
-{
-}
+public interface IPdfImageService : IPdfToImageService, IImagesToPdfService;

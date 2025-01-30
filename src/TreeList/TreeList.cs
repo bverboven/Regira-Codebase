@@ -14,7 +14,7 @@ public class TreeList<T> : List<TreeNode<T>>
 
     public bool EnableAutoCheck { get; set; }
     public bool ThrowOnError { get; set; }
-    public TreeNode<T>[] Roots { get; private set; } = Array.Empty<TreeNode<T>>();
+    public TreeNode<T>[] Roots { get; private set; } = [];
 
 
     public TreeList(TreeOptions? options = null)
@@ -51,7 +51,7 @@ public class TreeList<T> : List<TreeNode<T>>
 
     public TreeNode<T>? AddValue(T value, TreeNode<T>? parent = null)
     {
-        return AddValues(new[] { value }, parent).FirstOrDefault();
+        return AddValues([value], parent).FirstOrDefault();
     }
     public IEnumerable<TreeNode<T>> AddValues(IEnumerable<T> values, TreeNode<T>? parent = null)
     {

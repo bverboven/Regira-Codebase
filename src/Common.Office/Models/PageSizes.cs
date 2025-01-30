@@ -58,7 +58,7 @@ public class PageSizes
                 var dim = new[] { 841f, 1189 };
                 for (var i = 0; i < index; i++)
                 {
-                    dim = new[] { (float)Math.Floor(dim[1] / 2), dim[0] };
+                    dim = [(float)Math.Floor(dim[1] / 2), dim[0]];
                 }
                 sizes[pageSize] = dim;
                 return sizes;

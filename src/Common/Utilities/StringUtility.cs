@@ -136,7 +136,7 @@ public static class StringUtility
 
         return string.Concat(
             input.ToSnakeCase()!
-                .Split(new[] { '_' }, StringSplitOptions.RemoveEmptyEntries)
+                .Split(['_'], StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => char.ToUpper(x[0]) + x.Substring(1).ToLower(CultureInfo.InvariantCulture))
         );
     }

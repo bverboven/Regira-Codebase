@@ -6,19 +6,15 @@ using Regira.Entities.Attachments.Extensions;
 
 namespace Regira.Entities.EFcore.Attachments;
 
-public interface ITypedAttachmentService : IEntityReadService<IEntityAttachment>
-{
-}
-public class TypedAttachmentService<TContext> : ITypedAttachmentService
+public interface ITypedAttachmentService : IEntityReadService<IEntityAttachment>;
+public class TypedAttachmentService<TContext>(
+    TContext dbContext,
+    Func<TContext, IList<IAttachmentQuerySetDescriptor>>? querySetFactory = null)
+    : ITypedAttachmentService
     where TContext : DbContext
 {
-    protected readonly TContext DbContext;
-    private readonly IList<IAttachmentQuerySetDescriptor>? _querySets;
-    public TypedAttachmentService(TContext dbContext, Func<TContext, IList<IAttachmentQuerySetDescriptor>>? querySetFactory = null)
-    {
-        DbContext = dbContext;
-        _querySets = querySetFactory?.Invoke(dbContext);
-    }
+    protected readonly TContext DbContext = dbContext;
+    private readonly IList<IAttachmentQuerySetDescriptor>? _querySets = querySetFactory?.Invoke(dbContext);
 
     /// <summary>
     /// Example:
@@ -33,7 +29,7 @@ public class TypedAttachmentService<TContext> : ITypedAttachmentService
 
     public async Task<IEntityAttachment?> Details(int id)
         => (await List(new { id }, new PagingInfo { PageSize = 1 })).SingleOrDefault();
-    public async Task<IList<IEntityAttachment>> List(object? so = default, PagingInfo? pagingInfo = null)
+    public async Task<IList<IEntityAttachment>> List(object? so = null, PagingInfo? pagingInfo = null)
     {
         var query = Query
             .Filter(so?.ToSearchObject())

@@ -5,7 +5,7 @@ namespace Regira.TreeList;
 public class TreeNode<T> : TreeNodeBase<T>
 {
     private TreeNode<T>[]? _children;
-    public override ICollection<TreeNode<T>> Children => _children ??= Array.Empty<TreeNode<T>>();
+    public override ICollection<TreeNode<T>> Children => _children ??= [];
     public TreeList<T> Tree { get; }
 
     internal TreeNode(T value, TreeList<T> tree)
@@ -25,7 +25,7 @@ public class TreeNode<T> : TreeNodeBase<T>
 
     public TreeNode<T> AddChild(T value)
     {
-        return AddChildren(new[] { value }).First();
+        return AddChildren([value]).First();
     }
     public IEnumerable<TreeNode<T>> AddChildren(IEnumerable<T> values)
     {

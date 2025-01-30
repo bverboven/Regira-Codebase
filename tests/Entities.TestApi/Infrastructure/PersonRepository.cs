@@ -34,13 +34,9 @@ public class PersonSearchObject : SearchObject
     public string? Phone { get; set; }
 }
 
-public class PersonRepository : EntityRepositoryBase<ContosoContext, Person, PersonSearchObject, PersonSortBy, PersonIncludes>
+public class PersonRepository(ContosoContext dbContext)
+    : EntityRepositoryBase<ContosoContext, Person, PersonSearchObject, PersonSortBy, PersonIncludes>(dbContext)
 {
-    public PersonRepository(ContosoContext dbContext)
-        : base(dbContext)
-    {
-    }
-
     public override IQueryable<Person> Filter(IQueryable<Person> query, PersonSearchObject? so)
     {
         query = base.Filter(query, so);
@@ -168,10 +164,5 @@ public class PersonRepository : EntityRepositoryBase<ContosoContext, Person, Per
     }
 }
 
-public class PersonManager : EntityManagerBase<Person, PersonSearchObject, PersonSortBy, PersonIncludes>
-{
-    public PersonManager(IEntityRepository<Person, int, PersonSearchObject, PersonSortBy, PersonIncludes> repo)
-        : base(repo)
-    {
-    }
-}
+public class PersonManager(IEntityRepository<Person, int, PersonSearchObject, PersonSortBy, PersonIncludes> repo)
+    : EntityManagerBase<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(repo);

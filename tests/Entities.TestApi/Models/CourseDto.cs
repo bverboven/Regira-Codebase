@@ -1,5 +1,5 @@
-﻿using Regira.Entities.Web.Attachments.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Regira.Entities.Web.Attachments.Models;
 
 namespace Entities.TestApi.Models;
 
