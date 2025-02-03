@@ -3,8 +3,8 @@ using Regira.DAL.Paging;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
-using Regira.Entities.Keywords;
 using Regira.Entities.Models.Abstractions;
 using Regira.IO.Extensions;
 
@@ -13,13 +13,26 @@ namespace Regira.Entities.EFcore.Attachments;
 public class EntityAttachmentRepository<TContext, TEntity, TEntityAttachment>(
     TContext dbContext,
     IAttachmentService attachmentService,
+    IQueryBuilder<TEntityAttachment, EntityAttachmentSearchObject> queryBuilder,
     IIdentifierGenerator? identifierGenerator = null)
-    : EntityAttachmentRepository<TContext, TEntity, int, TEntityAttachment, int, EntityAttachmentSearchObject, int>(
-            dbContext, attachmentService, identifierGenerator),
-        IEntityService<TEntityAttachment>
+    : EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>
+        (dbContext, attachmentService, queryBuilder, identifierGenerator)
     where TContext : DbContext
     where TEntity : class, IEntity<int>, IHasAttachments, IHasAttachments<TEntityAttachment>
     where TEntityAttachment : class, IEntityAttachment, IEntity<int>;
+
+public class EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, TSearchObject>(
+    TContext dbContext,
+    IAttachmentService attachmentService,
+    IQueryBuilder<TEntityAttachment, TSearchObject> queryBuilder,
+    IIdentifierGenerator? identifierGenerator = null)
+    : EntityAttachmentRepository<TContext, TEntity, int, TEntityAttachment, int, TSearchObject, int>
+        (dbContext, attachmentService, queryBuilder, identifierGenerator),
+        IEntityService<TEntityAttachment>
+    where TContext : DbContext
+    where TEntity : class, IEntity<int>, IHasAttachments, IHasAttachments<TEntityAttachment>
+    where TEntityAttachment : class, IEntityAttachment, IEntity<int>
+    where TSearchObject : class, IEntityAttachmentSearchObject, new();
 
 /// <summary>
 /// Default implementation for <see cref="IEntityService{TEntityAttachment}"/>
@@ -32,20 +45,15 @@ public class EntityAttachmentRepository<TContext, TEntity, TEntityAttachment>(
 /// <typeparam name="TSearchObject"></typeparam>
 /// <typeparam name="TAttachmentKey"></typeparam>
 public class EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey,
-    TSearchObject, TAttachmentKey>(
-    TContext dbContext,
-    IAttachmentService<TAttachmentKey> attachmentService,
+    TSearchObject, TAttachmentKey>(TContext dbContext, IAttachmentService<TAttachmentKey> attachmentService,
+    IQueryBuilder<TEntityAttachment, TEntityAttachmentKey, TSearchObject> queryBuilder,
     IIdentifierGenerator<TEntityAttachmentKey, TObjectKey, TAttachmentKey>? identifierGenerator = null)
-    : EntityRepository<TContext, TEntityAttachment, TEntityAttachmentKey, TSearchObject>(dbContext)
+    : EntityRepository<TContext, TEntityAttachment, TEntityAttachmentKey, TSearchObject>(dbContext, queryBuilder)
     where TContext : DbContext
-    where TObject : class, IEntity<TObjectKey>, IHasAttachments,
-    IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey>
-    where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey>,
-    IEntity<TEntityAttachmentKey>
+    where TObject : class, IEntity<TObjectKey>, IHasAttachments, IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey>
+    where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey>, IEntity<TEntityAttachmentKey>
     where TSearchObject : class, IEntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, new()
 {
-    public override IQueryable<TEntityAttachment> Query => DbSet.Include(x => x.Attachment);
-
     private readonly IIdentifierGenerator<TEntityAttachmentKey, TObjectKey, TAttachmentKey> _identifierGenerator = identifierGenerator ?? new DefaultIdentifierGenerator<TEntityAttachmentKey, TObjectKey, TAttachmentKey>();
 
     public override async Task<TEntityAttachment?> Details(TEntityAttachmentKey id)
@@ -59,7 +67,8 @@ public class EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAt
     }
     public override async Task<IList<TEntityAttachment>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
     {
-        var items = await base.List(so, pagingInfo);
+        var query = base.Query(DbSet.Include(x => x.Attachment), so, pagingInfo);
+        var items = await query.ToListAsync();
         foreach (var item in items)
         {
             attachmentService.ProcessItem(item.Attachment!);
@@ -112,28 +121,6 @@ public class EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAt
         {
             original.Attachment = item.Attachment;
         }
-    }
-
-    public override IQueryable<TEntityAttachment> Filter(IQueryable<TEntityAttachment> query, TSearchObject? so)
-    {
-        var qHelper = QKeywordHelper.Create();
-
-        query = base.Filter(query, so);
-
-        if (so?.ObjectId?.Any() == true)
-        {
-            query = query.Where(x => so.ObjectId.Contains(x.ObjectId));
-        }
-
-        if (!string.IsNullOrWhiteSpace(so?.FileName))
-        {
-            var kw = qHelper.ParseKeyword(so.FileName);
-            query = kw.HasWildcard
-                ? query.Where(x => EF.Functions.Like(x.Attachment!.FileName!, kw.Q!))
-                : query.Where(x => x.Attachment!.FileName == so.FileName);
-        }
-
-        return query;
     }
 
     public virtual string CreateIdentifier(TEntityAttachment entity)

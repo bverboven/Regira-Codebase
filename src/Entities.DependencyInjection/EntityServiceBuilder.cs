@@ -4,7 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.Abstractions;
+using Regira.Entities.EFcore.QueryBuilders;
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
+using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.DependencyInjection;
@@ -14,44 +17,61 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
     where TContext : DbContext
     where TEntity : class, IEntity<int>
 {
-    public new EntityServiceBuilder<TContext, TEntity, int> AddService<TService>()
+    public new EntityServiceBuilder<TContext, TEntity> AddService<TService>()
         where TService : class, IEntityService<TEntity>
     {
         base.AddService<TService>();
         Services.AddTransient<IEntityService<TEntity>, TService>();
         return this;
     }
-    public new EntityServiceBuilder<TContext, TEntity, int> AddDefaultService()
-        => AddService<EntityRepository<TContext, TEntity>>();
+    public new EntityServiceBuilder<TContext, TEntity> AddDefaultService()
+    {
+        // Query Builders
+        AddDefaultQueryBuilders();
+        // Repository
+        return AddService<EntityRepository<TContext, TEntity>>();
+    }
 
-    public new EntityServiceBuilder<TContext, TEntity, int> HasRepository<TService>()
+    public new EntityServiceBuilder<TContext, TEntity> HasRepository<TService>()
         where TService : class, IEntityRepository<TEntity>
     {
         base.HasRepository<TService>();
         Services.AddTransient<IEntityRepository<TEntity>, TService>();
         return this;
     }
-    public EntityServiceBuilder<TContext, TEntity, int> HasRepository(Func<IServiceProvider, IEntityRepository<TEntity>> factory)
+    public EntityServiceBuilder<TContext, TEntity> HasRepository(Func<IServiceProvider, IEntityRepository<TEntity>> factory)
     {
         base.HasRepository(factory);
         Services.AddTransient(factory);
         return this;
     }
 
-    public new EntityServiceBuilder<TContext, TEntity, int> HasManager<TService>()
+    public new EntityServiceBuilder<TContext, TEntity> HasManager<TService>()
         where TService : class, IEntityManager<TEntity>
     {
         base.HasManager<TService>();
         Services.AddTransient<IEntityManager<TEntity>, TService>();
         return this;
     }
-    public EntityServiceBuilder<TContext, TEntity, int> HasManager(Func<IServiceProvider, IEntityManager<TEntity>> factory)
+    public EntityServiceBuilder<TContext, TEntity> HasManager(Func<IServiceProvider, IEntityManager<TEntity>> factory)
     {
         base.HasManager(factory);
         Services.AddTransient(factory);
         return this;
     }
 
+    // Query Builders
+    public new EntityServiceBuilder<TContext, TEntity> AddDefaultQueryBuilders()
+    {
+        // Query Filter
+        Services.AddTransient<IFilteredQueryBuilder<TEntity, SearchObject>,
+            DefaultFilteredQueryBuilder<TEntity, SearchObject>>();
+        // Query Builder
+        Services.AddTransient<IQueryBuilder<TEntity, SearchObject>,
+            QueryBuilder<TEntity, SearchObject>>();
+
+        return this;
+    }
 
     public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddComplexService<TService, TSearchObject, TSortBy, TIncludes>()
         where TService : class, IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>, IEntityService<TEntity>
@@ -130,7 +150,12 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     /// </summary>
     /// <returns></returns>
     public virtual EntityServiceBuilder<TContext, TEntity, TKey> AddDefaultService()
-        => AddService<EntityRepository<TContext, TEntity, TKey>>();
+    {
+        // Query Builders
+        AddDefaultQueryBuilders();
+        // Repository
+        return AddService<EntityRepository<TContext, TEntity, TKey>>();
+    }
 
     // Entity Repository
     /// <summary>
@@ -195,6 +220,19 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
         return this;
     }
 
+    // Query Builders
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddDefaultQueryBuilders()
+    {
+        // Query Filter
+        Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>,
+            DefaultFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>>();
+        // Query Builder
+        Services.AddTransient<IQueryBuilder<TEntity, TKey, SearchObject<TKey>>,
+            QueryBuilder<TEntity, TKey, SearchObject<TKey>>>();
+
+        return this;
+    }
+
     // Complex Entity service
     /// <summary>
     /// Adds <typeparamref name="TService"/> implementation for
@@ -239,7 +277,12 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
         return this;
     }
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddDefaultService()
-        => AddService<EntityRepository<TContext, TEntity, TKey, TSearchObject>>();
+    {
+        // Query Builders
+        AddDefaultQueryBuilders();
+        // Repository
+        return AddService<EntityRepository<TContext, TEntity, TKey, TSearchObject>>();
+    }
 
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasRepository<TService>()
         where TService : class, IEntityRepository<TEntity, TKey, TSearchObject>
@@ -269,6 +312,18 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
         return this;
     }
 
+    // Query Builders
+    public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddDefaultQueryBuilders()
+    {
+        // Query Filter
+        Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>,
+            DefaultFilteredQueryBuilder<TEntity, TKey, TSearchObject>>();
+        // Query Builder
+        Services.AddTransient<IQueryBuilder<TEntity, TKey, TSearchObject>,
+            QueryBuilder<TEntity, TKey, TSearchObject>>();
+
+        return this;
+    }
 
     public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddComplexService<TService, TSortBy, TIncludes>()
         where TService : class, IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, IEntityService<TEntity, TKey, TSearchObject>

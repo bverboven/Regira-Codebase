@@ -5,6 +5,9 @@ using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.EFcore.Attachments;
+using Regira.Entities.EFcore.QueryBuilders;
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
+using Regira.Entities.Keywords.Abstractions;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Attachments.Models;
 using Regira.IO.Storage.Abstractions;
@@ -17,7 +20,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
 {
     // Entity service
     public EntityServiceCollection<TContext> For<TEntity, TService>(
-        Action<EntityServiceBuilder<TContext, TEntity, int>>? configure = null)
+        Action<EntityServiceBuilder<TContext, TEntity>>? configure = null)
         where TEntity : class, IEntity<int>
         where TService : class, IEntityService<TEntity>
     {
@@ -231,8 +234,18 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     // Complex service with attachments
     public EntityServiceCollection<TContext> ConfigureAttachmentService(Func<IServiceProvider, IFileService> factory)
     {
+        Services.AddTransient<IQueryBuilder<Attachment, AttachmentSearchObject>>(p =>
+            new QueryBuilder<Attachment, AttachmentSearchObject>([
+                new AttachmentFilteredQueryBuilder(p.GetRequiredService<IQKeywordHelper>())
+            ])
+        );
         Services.AddTransient<IAttachmentService>(p
-            => new AttachmentRepository<TContext>(p.GetRequiredService<TContext>(), factory(p)));
+            => new AttachmentRepository<TContext>(
+                p.GetRequiredService<TContext>(),
+                factory(p),
+                p.GetRequiredService<IQueryBuilder<Attachment<int>, int, AttachmentSearchObject<int>>>()
+                )
+            );
         return ConfigureAttachmentService<int>(factory);
     }
 
@@ -244,9 +257,17 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     /// <returns></returns>
     public EntityServiceCollection<TContext> ConfigureAttachmentService<TKey>(Func<IServiceProvider, IFileService> factory)
     {
+        Services.AddTransient<IQueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>>(p =>
+            new QueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>([new AttachmentFilteredQueryBuilder<TKey>(p.GetRequiredService<IQKeywordHelper>())])
+        );
         Services
             .AddTransient<IAttachmentService<TKey>>(p
-                => new AttachmentRepository<TContext, TKey>(p.GetRequiredService<TContext>(), factory(p)))
+                => new AttachmentRepository<TContext, TKey>(
+                    p.GetRequiredService<TContext>(),
+                    factory(p),
+                    p.GetRequiredService<IQueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>>()
+                )
+            )
             .AddAutoMapper(cfg =>
             {
                 cfg.CreateMap<Attachment<TKey>, AttachmentDto<TKey>>()

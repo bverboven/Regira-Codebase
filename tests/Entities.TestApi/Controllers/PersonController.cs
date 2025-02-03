@@ -1,4 +1,4 @@
-﻿using Entities.TestApi.Infrastructure;
+﻿using Entities.TestApi.Infrastructure.Persons;
 using Entities.TestApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Regira.Entities.Web.Attachments.Abstractions;

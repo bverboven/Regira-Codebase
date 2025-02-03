@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using Entities.TestApi.Infrastructure;
+using Entities.TestApi.Infrastructure.Persons;
 using Entities.TestApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,8 @@ using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Extensions;
 using Regira.Entities.EFcore.Attachments;
+using Regira.Entities.Keywords;
+using Regira.Entities.Keywords.Abstractions;
 using Regira.IO.Storage.FileSystem;
 using Regira.Utilities;
 using Testing.Library.Contoso;
@@ -39,6 +42,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddProblemDetails();
 
+builder.Services.AddTransient<IQKeywordHelper>(_ => new QKeywordHelper());
+
 builder.Services
     .AddHttpContextAccessor()
     .AddDbContext<ContosoContext>((_, db) => db.UseSqlite(ApiConfiguration.ConnectionString))
@@ -56,8 +61,9 @@ builder.Services
         db.PersonAttachments.ToDescriptor<Person>()
     ])
     .For<Department>(e => e.AddMapping<DepartmentDto, DepartmentInputDto>())
-    .For<Course, CourseRepository>(e =>
+    .For<Course, int, CourseSearchObject, CourseRepository>(e =>
     {
+        e.AddDefaultQueryBuilders();
         e.AddMapping<CourseDto, CourseInputDto>();
         e.HasAttachments<ContosoContext, Course, CourseAttachment>(a =>
         {
@@ -66,6 +72,8 @@ builder.Services
     })
     .For<Person, PersonManager, PersonSearchObject, PersonSortBy, PersonIncludes>(e =>
     {
+        e.AddQueryFilter<PersonQueryFilter>();
+        e.AddQueryBuilder<PersonQueryBuilder>();
         e.AddMapping<PersonDto, PersonInputDto>();
         e.HasRepository<PersonRepository>();
         e.HasManager<PersonManager>();

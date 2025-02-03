@@ -17,16 +17,15 @@ public static class QueryExtensions
             return query;
         }
 
-        var qHelper = QKeywordHelper.Create(normalizer);
-
         query = query.FilterId(so.Id);
         query = query.FilterIds(so.Ids);
         query = query.FilterExclude(so.Exclude);
 
-        if (TypeUtility.ImplementsInterface<IHasNormalizedContent>(typeof(T)))
-        {
-            query = query.Cast<IHasNormalizedContent>().FilterQ(qHelper.Parse(so.Q)).Cast<T>();
-        }
+        //var qHelper = QKeywordHelper.Create(normalizer);
+        //if (TypeUtility.ImplementsInterface<IHasNormalizedContent>(typeof(T)))
+        //{
+        //    query = query.Cast<IHasNormalizedContent>().FilterQ(qHelper.Parse(so.Q)).Cast<T>();
+        //}
 
         if (TypeUtility.ImplementsInterface<IHasCreated>(typeof(T)))
         {

@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Regira.DAL.Paging;
 using Regira.Entities.Abstractions;
 using Regira.Entities.EFcore.Attachments;
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Extensions;
 using Regira.Entities.Models;
@@ -13,15 +15,21 @@ public class CourseSearchObject : SearchObject
 {
     public int? DepartmentId { get; set; }
 }
-public class CourseRepository(ContosoContext dbContext)
-    : EntityRepository<ContosoContext, Course, int, CourseSearchObject>(dbContext), IEntityRepository<Course>
+public class CourseRepository(ContosoContext dbContext, IQueryBuilder<Course, int, CourseSearchObject> queryBuilder)
+    : EntityRepository<ContosoContext, Course, int, CourseSearchObject>(dbContext, queryBuilder), IEntityRepository<Course>
 {
     private readonly ContosoContext _dbContext = dbContext;
 
-
-    public override IQueryable<Course> Filter(IQueryable<Course> query, CourseSearchObject? so)
+    public override IQueryable<Course> Query(IQueryable<Course> query, CourseSearchObject? so, PagingInfo? pagingInfo = null)
     {
-        query = base.Filter(query, so);
+        query = base.Query(
+            query
+                .Include(c => c.Attachments!)
+                .ThenInclude(x => x.Attachment),
+            so,
+            pagingInfo
+        );
+
         if (so?.DepartmentId.HasValue == true)
         {
             query = query.Where(x => x.DepartmentId == so.DepartmentId);
@@ -41,9 +49,4 @@ public class CourseRepository(ContosoContext dbContext)
     {
         item.Attachments?.SetSortOrder();
     }
-
-    // Always include Attachments
-    public override IQueryable<Course> Query => DbSet
-        .Include(c => c.Attachments!)
-        .ThenInclude(x => x.Attachment);
 }

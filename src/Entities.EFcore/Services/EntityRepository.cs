@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Regira.DAL.Paging;
 using Regira.Entities.Abstractions;
-using Regira.Entities.EFcore.Extensions;
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.Extensions;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
@@ -9,24 +9,24 @@ using Regira.Utilities;
 
 namespace Regira.Entities.EFcore.Services;
 
-public class EntityRepository<TContext, TEntity>(TContext dbContext)
-    : EntityRepository<TContext, TEntity, int>(dbContext), IEntityRepository<TEntity>
+public class EntityRepository<TContext, TEntity>
+    (TContext dbContext, IQueryBuilder<TEntity, SearchObject> queryBuilder)
+    : EntityRepository<TContext, TEntity, int, SearchObject>(dbContext, queryBuilder), IEntityRepository<TEntity>
     where TContext : DbContext
     where TEntity : class, IEntity<int>;
-public abstract class EntityRepository<TContext, TEntity, TKey>(TContext dbContext)
-    : EntityRepository<TContext, TEntity, TKey, SearchObject<TKey>>(dbContext)
+public abstract class EntityRepository<TContext, TEntity, TKey>
+    (TContext dbContext, IQueryBuilder<TEntity, TKey, SearchObject<TKey>> queryBuilder)
+    : EntityRepository<TContext, TEntity, TKey, SearchObject<TKey>>(dbContext, queryBuilder)
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>;
-public class EntityRepository<TContext, TEntity, TKey, TSearchObject>(TContext dbContext)
+public class EntityRepository<TContext, TEntity, TKey, TSearchObject>
+    (TContext dbContext, IQueryBuilder<TEntity, TKey, TSearchObject> queryBuilder)
     : IEntityService<TEntity, TKey, TSearchObject>, IEntityRepository<TEntity, TKey>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
 {
-    public virtual DbSet<TEntity> DbSet => DbContext.Set<TEntity>();
-    public virtual IQueryable<TEntity> Query => DbSet;
-
-    protected readonly TContext DbContext = dbContext;
+    public virtual DbSet<TEntity> DbSet => dbContext.Set<TEntity>();
 
 
     public virtual async Task<TEntity?> Details(TKey id)
@@ -35,9 +35,7 @@ public class EntityRepository<TContext, TEntity, TKey, TSearchObject>(TContext d
             : null;
     public virtual async Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
     {
-        var query = Filter(Query, so);
-        query = Sort(query);
-        query = query.PageQuery(pagingInfo);
+        var query = Query(DbSet, so, pagingInfo);
         return await query
 #if NETSTANDARD2_0
             .AsNoTracking()
@@ -48,13 +46,15 @@ public class EntityRepository<TContext, TEntity, TKey, TSearchObject>(TContext d
     }
 
     public virtual Task<int> Count(TSearchObject? so)
-        => Filter(Query, so)
-            .CountAsync();
+        => queryBuilder.Filter(DbSet, so).CountAsync();
 
     Task<IList<TEntity>> IEntityReadService<TEntity, TKey>.List(object? so, PagingInfo? pagingInfo)
         => List(Convert(so), pagingInfo);
     Task<int> IEntityReadService<TEntity, TKey>.Count(object? so)
         => Count(Convert(so));
+
+    public virtual IQueryable<TEntity> Query(IQueryable<TEntity> query, TSearchObject? so, PagingInfo? pagingInfo = null)
+        => queryBuilder.Query(query, so != null ? [so] : [], pagingInfo);
 
     public virtual Task Add(TEntity item)
     {
@@ -73,9 +73,9 @@ public class EntityRepository<TContext, TEntity, TKey, TSearchObject>(TContext d
             return;
         }
 
-        DbContext.Attach(original);
-        DbContext.Entry(original).CurrentValues.SetValues(item);
-        DbContext.Entry(original).State = EntityState.Modified;
+        dbContext.Attach(original);
+        dbContext.Entry(original).CurrentValues.SetValues(item);
+        dbContext.Entry(original).State = EntityState.Modified;
 
         Modify(item, original);
     }
@@ -88,13 +88,7 @@ public class EntityRepository<TContext, TEntity, TKey, TSearchObject>(TContext d
     }
 
     public virtual Task<int> SaveChanges(CancellationToken token = default)
-        => DbContext.SaveChangesAsync(token);
-
-
-    public virtual IQueryable<TEntity> Filter(IQueryable<TEntity> query, TSearchObject? so)
-        => query.Filter(so);
-    public virtual IQueryable<TEntity> Sort(IQueryable<TEntity> query)
-        => query.SortQuery<TEntity, TKey>();
+        => dbContext.SaveChangesAsync(token);
 
     public virtual void PrepareItem(TEntity item)
     {

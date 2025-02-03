@@ -2,8 +2,8 @@
 using Regira.DAL.Paging;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
-using Regira.Entities.Keywords;
 using Regira.IO.Extensions;
 using Regira.IO.Storage.Abstractions;
 using Regira.IO.Storage.Helpers;
@@ -11,14 +11,17 @@ using Regira.IO.Utilities;
 
 namespace Regira.Entities.EFcore.Attachments;
 
-public class AttachmentRepository<TContext>(TContext dbContext, IFileService fileService)
-    : AttachmentRepository<TContext, int>(dbContext, fileService), IAttachmentService
+public class AttachmentRepository<TContext>
+    (TContext dbContext, IFileService fileService, IQueryBuilder<Attachment<int>, int, AttachmentSearchObject<int>> queryBuilder)
+    : AttachmentRepository<TContext, int>(dbContext, fileService, queryBuilder), IAttachmentService
     where TContext : DbContext;
-public class AttachmentRepository<TContext, TKey>(TContext dbContext, IFileService fileService)
-    : EntityRepository<TContext, Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>(dbContext),
+public class AttachmentRepository<TContext, TKey>(TContext dbContext, IFileService fileService, IQueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>> queryBuilder)
+    : EntityRepository<TContext, Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>(dbContext, queryBuilder),
         IAttachmentService<TKey>
     where TContext : DbContext
 {
+    private readonly IQueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>> _queryBuilder = queryBuilder;
+
     public override async Task<Attachment<TKey>?> Details(TKey id)
     {
         var item = await base.Details(id);
@@ -32,13 +35,15 @@ public class AttachmentRepository<TContext, TKey>(TContext dbContext, IFileServi
     }
     public override async Task<IList<Attachment<TKey>>> List(AttachmentSearchObject<TKey>? so = null, PagingInfo? pagingInfo = null)
     {
-        var items = await base.List(so, pagingInfo);
+        var query = _queryBuilder.Query(DbSet, so != null ? [so] : [], pagingInfo);
+        var items = await query.ToListAsync();
         foreach (var item in items)
         {
             ProcessItem(item);
         }
         return items;
     }
+
 
     public override async Task Add(Attachment<TKey> item)
     {
@@ -117,38 +122,6 @@ public class AttachmentRepository<TContext, TKey>(TContext dbContext, IFileServi
         }
 
         await fileService.Delete(path);
-    }
-
-    public override IQueryable<Attachment<TKey>> Filter(IQueryable<Attachment<TKey>> query, AttachmentSearchObject<TKey>? so)
-    {
-        var qHelper = QKeywordHelper.Create();
-
-        query = base.Filter(query, so);
-
-
-        if (!string.IsNullOrWhiteSpace(so?.FileName))
-        {
-            var kw = qHelper.ParseKeyword(so.FileName);
-            query = kw.HasWildcard
-                ? query.Where(x => EF.Functions.Like(x.FileName!, kw.Q!))
-                : query.Where(x => x.FileName == so.FileName);
-        }
-
-        if (!string.IsNullOrWhiteSpace(so?.Extension))
-        {
-            query = query.Where(x => EF.Functions.Like(x.FileName!, $"*{so.Extension}"));
-        }
-
-        if (so?.MinSize.HasValue == true)
-        {
-            query = query.Where(x => x.Length >= so.MinSize);
-        }
-        if (so?.MaxSize.HasValue == true)
-        {
-            query = query.Where(x => x.Length <= so.MaxSize);
-        }
-
-        return query;
     }
 
     public override void PrepareItem(Attachment<TKey> item)
