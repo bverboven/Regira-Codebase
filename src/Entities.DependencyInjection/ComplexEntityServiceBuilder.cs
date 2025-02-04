@@ -50,7 +50,7 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
 
         return this;
     }
-    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TSearchObject>> factory)
+    public ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TSearchObject>> factory)
     {
         base.AddQueryFilter(factory);
         Services.AddTransient(factory);
@@ -66,7 +66,7 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
 
         return this;
     }
-    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>> factory)
+    public ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>> factory)
     {
         base.AddQueryBuilder(factory);
         Services.AddTransient(factory);

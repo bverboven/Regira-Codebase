@@ -1,4 +1,7 @@
-﻿namespace Entities.TestApi.Models;
+﻿using Entities.TestApi.Infrastructure.Courses;
+using Entities.TestApi.Infrastructure.Persons;
+
+namespace Entities.TestApi.Infrastructure.Departments;
 
 public class DepartmentDto
 {

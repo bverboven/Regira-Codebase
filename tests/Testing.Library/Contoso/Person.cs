@@ -11,9 +11,9 @@ public class Person : IEntityWithSerial, IHasNormalizedTitle, IHasAttachments, I
     public int Id { get; set; }
 
     [Required]
-    [StringLength(32)]
+    [MaxLength(32)]
     public string? GivenName { get; set; }
-    [StringLength(32)]
+    [MaxLength(32)]
     [Normalized(SourceProperty = nameof(GivenName))]
     public string? NormalizedGivenName { get; set; }
 
@@ -25,9 +25,11 @@ public class Person : IEntityWithSerial, IHasNormalizedTitle, IHasAttachments, I
     public string? NormalizedLastName { get; set; }
 
     public string Title => $"{GivenName} {LastName}".Trim();
+    [MaxLength(64)]
     [Normalized(SourceProperties = [nameof(LastName), nameof(GivenName)])]
     public string? NormalizedTitle { get; set; }
 
+    [MaxLength(256)]
     public string? Description { get; set; }
 
 
@@ -53,8 +55,8 @@ public class Person : IEntityWithSerial, IHasNormalizedTitle, IHasAttachments, I
         set => Attachments = value?.Cast<PersonAttachment>().ToArray();
     }
 
-    [Normalized(SourceProperties = [nameof(GivenName), nameof(LastName), nameof(Description), nameof(Phone), nameof(Email)
-    ])]
+    [MaxLength(256)]
+    [Normalized(SourceProperties = [nameof(GivenName), nameof(LastName), nameof(Description), nameof(Phone), nameof(Email)])]
     public string? NormalizedContent { get; set; }
 }
 

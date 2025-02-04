@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Entities.TestApi.Infrastructure.Departments;
 using Regira.Entities.Web.Attachments.Models;
 
-namespace Entities.TestApi.Models;
+namespace Entities.TestApi.Infrastructure.Courses;
 
 public class CourseDto
 {

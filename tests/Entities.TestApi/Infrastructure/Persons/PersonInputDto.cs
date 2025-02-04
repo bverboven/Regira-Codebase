@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Entities.TestApi.Infrastructure.Departments;
 
-namespace Entities.TestApi.Models;
+namespace Entities.TestApi.Infrastructure.Persons;
 
 public class PersonInputDto
 {

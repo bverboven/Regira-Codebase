@@ -2,12 +2,15 @@
 using System.Net.Http.Json;
 using Entities.TestApi;
 using Entities.TestApi.Infrastructure;
-using Entities.TestApi.Models;
+using Entities.TestApi.Infrastructure.Courses;
+using Entities.TestApi.Infrastructure.Departments;
+using Entities.TestApi.Infrastructure.Persons;
 using Entities.Web.Testing.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Web.Models;
 using Regira.Utilities;
+using Testing.Library.Contoso;
 using Testing.Library.Data;
 
 namespace Entities.Web.Testing;
@@ -168,6 +171,75 @@ public class PersonControllerTests : IDisposable
 
         var detailsResponse = await client.GetAsync($"/persons/{personInput.Id}");
         Assert.Equal(HttpStatusCode.NotFound, detailsResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task Filter_Partial_SearchObject()
+    {
+        var app = new WebApplicationFactory<Program>();
+        using var client = app.CreateClient();
+
+        await client.PostAsync("/test-data", new StringContent(""));
+
+        var coursesResponse = await client.GetAsync("/courses");
+        var coursesResult = await coursesResponse.Content.ReadFromJsonAsync<ListResult<CourseDto>>();
+
+        var course1 = coursesResult!.Items[0];
+        var course2 = coursesResult.Items[1];
+        var course3 = coursesResult.Items[2];
+        var course4 = coursesResult.Items[3];
+
+        var persons = new[]
+        {
+            new Student
+            {
+                GivenName = "Student1",
+                LastName = "One",
+                Enrollments =
+                [
+                    new Enrollment { CourseId = course1.Id },
+                    new Enrollment { CourseId = course2.Id }
+                ],
+            },
+            new Student
+            {
+                GivenName = "Student2",
+                LastName = "Two",
+                Enrollments =
+                [
+                    new Enrollment { CourseId = course2.Id },
+                    new Enrollment { CourseId = course4.Id }
+                ],
+            },
+            new Person
+            {
+                GivenName = "Person1",
+                LastName = "One",
+            },
+            new Student
+            {
+                GivenName = "Student3",
+                LastName = "Three",
+                Enrollments =
+                [
+                    new Enrollment { CourseId = course1.Id },
+                    new Enrollment { CourseId = course3.Id }
+                ],
+            }
+        };
+        _dbContext.Persons.AddRange(persons);
+        await _dbContext.SaveChangesAsync();
+
+        var so = new PersonSearchObject
+        {
+            StudentCourseIds = [1, 3]
+        };
+
+        var query = string.Join('&', so.StudentCourseIds.Select(id => $"StudentCourseIds={id}"));
+        var listResponse = await client.GetAsync($"/persons/?{query}");
+        var listResult = await listResponse.Content.ReadFromJsonAsync<ListResult<PersonDto>>();
+        Assert.Equal(2, listResult!.Items.Count);
+        Assert.Contains(listResult.Items, p => new[] { "Student1", "Student3" }.Contains(p.GivenName));
     }
 
     [Fact]

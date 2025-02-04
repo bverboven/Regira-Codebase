@@ -2,7 +2,7 @@
 using System.Net.Http.Json;
 using Entities.TestApi;
 using Entities.TestApi.Infrastructure;
-using Entities.TestApi.Models;
+using Entities.TestApi.Infrastructure.Courses;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Web.Models;

@@ -1,8 +1,9 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using Entities.TestApi.Infrastructure;
+using Entities.TestApi.Infrastructure.Courses;
+using Entities.TestApi.Infrastructure.Departments;
 using Entities.TestApi.Infrastructure.Persons;
-using Entities.TestApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -11,6 +12,7 @@ using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Extensions;
 using Regira.Entities.EFcore.Attachments;
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.Keywords;
 using Regira.Entities.Keywords.Abstractions;
 using Regira.IO.Storage.FileSystem;
@@ -69,6 +71,8 @@ builder.Services
         {
             a.AddMapping<CourseAttachmentDto, CourseAttachmentInputDto>();
         });
+        // extra person filter
+        e.AddTransient<IFilteredQueryBuilder<Person, PersonSearchObject>, CoursePersonQueryFilter>();
     })
     .For<Person, PersonManager, PersonSearchObject, PersonSortBy, PersonIncludes>(e =>
     {

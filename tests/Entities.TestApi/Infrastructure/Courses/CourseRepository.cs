@@ -5,16 +5,11 @@ using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Extensions;
-using Regira.Entities.Models;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
-namespace Entities.TestApi.Infrastructure;
+namespace Entities.TestApi.Infrastructure.Courses;
 
-public class CourseSearchObject : SearchObject
-{
-    public int? DepartmentId { get; set; }
-}
 public class CourseRepository(ContosoContext dbContext, IQueryBuilder<Course, int, CourseSearchObject> queryBuilder)
     : EntityRepository<ContosoContext, Course, int, CourseSearchObject>(dbContext, queryBuilder), IEntityRepository<Course>
 {

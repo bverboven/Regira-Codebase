@@ -324,6 +324,17 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
 
         return this;
     }
+    public void AddQueryFilter<TImplementation>()
+        where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>
+        => Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
+    public void AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>> factory)
+        => Services.AddTransient(factory);
+
+    public void AddQueryBuilder<TImplementation>()
+        where TImplementation : class, IQueryBuilder<TEntity, TKey, TSearchObject>
+        => Services.AddTransient<IQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
+    public void AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TKey, TSearchObject>> factory)
+        => Services.AddTransient(factory);
 
     public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddComplexService<TService, TSortBy, TIncludes>()
         where TService : class, IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, IEntityService<TEntity, TKey, TSearchObject>

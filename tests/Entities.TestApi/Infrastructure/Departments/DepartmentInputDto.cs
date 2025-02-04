@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Entities.TestApi.Models;
+namespace Entities.TestApi.Infrastructure.Departments;
 
 public class DepartmentInputDto
 {
