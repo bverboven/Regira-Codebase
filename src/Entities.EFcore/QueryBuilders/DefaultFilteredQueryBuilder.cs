@@ -14,7 +14,8 @@ public class DefaultFilteredQueryBuilder<TEntity, TKey, TSearchObject> : Filtere
         if (so != null)
         {
             query = FilterIds(query, so);
-            query = FilterImplementations(query, so);
+            query = FilterTimestamps(query, so);
+            query = FilterArchivable(query, so);
         }
 
         return query;
@@ -28,7 +29,7 @@ public class DefaultFilteredQueryBuilder<TEntity, TKey, TSearchObject> : Filtere
 
         return query;
     }
-    public virtual IQueryable<TEntity> FilterImplementations(IQueryable<TEntity> query, TSearchObject so)
+    public virtual IQueryable<TEntity> FilterTimestamps(IQueryable<TEntity> query, TSearchObject so)
     {
         if (TypeUtility.ImplementsInterface<IHasCreated>(typeof(TEntity)))
         {
@@ -38,6 +39,11 @@ public class DefaultFilteredQueryBuilder<TEntity, TKey, TSearchObject> : Filtere
         {
             query = query.Cast<IHasLastModified>().FilterLastModified(so.MinLastModified, so.MaxLastModified).Cast<TEntity>();
         }
+
+        return query;
+    }
+    public virtual IQueryable<TEntity> FilterArchivable(IQueryable<TEntity> query, TSearchObject so)
+    {
         if (TypeUtility.ImplementsInterface<IArchivable>(typeof(TEntity)))
         {
             query = query.Cast<IArchivable>().FilterArchivable(so.IsArchived).Cast<TEntity>();
