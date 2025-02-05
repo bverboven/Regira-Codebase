@@ -1,16 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Regira.Entities.EFcore.QueryBuilders;
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.Keywords.Abstractions;
 using Testing.Library.Contoso;
 
 namespace Entities.TestApi.Infrastructure.Persons;
 
-public class PersonQueryFilter(IQKeywordHelper queryHelper) : DefaultFilteredQueryBuilder<Person, PersonSearchObject>
+public class PersonQueryFilter(IQKeywordHelper queryHelper) : FilteredQueryBuilderBase<Person, PersonSearchObject>
 {
     public override IQueryable<Person> Build(IQueryable<Person> query, PersonSearchObject? so)
     {
-        query = base.Build(query, so);
-
         if (so == null)
         {
             return query;

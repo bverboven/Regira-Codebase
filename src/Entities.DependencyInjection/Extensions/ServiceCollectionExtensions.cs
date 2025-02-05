@@ -2,6 +2,8 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Regira.Entities.EFcore.QueryBuilders;
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 
 namespace Regira.Entities.DependencyInjection.Extensions;
 
@@ -43,6 +45,11 @@ public static class ServiceCollectionExtensions
                     cfg.AddMaps(options.ProfileAssemblies);
                 }
             });
+
+        services.AddTransient<IGlobalFilteredQueryBuilder, DefaultFilteredQueryBuilder>();
+        services.AddTransient<IGlobalFilteredQueryBuilder, FilterArchivablesQueryBuilder>();
+        services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasCreatedQueryBuilder>();
+        services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasLastModifiedQueryBuilder>();
 
         return services;
     }

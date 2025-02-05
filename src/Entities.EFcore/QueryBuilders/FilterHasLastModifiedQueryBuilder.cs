@@ -1,0 +1,14 @@
+﻿using Regira.Entities.EFcore.Extensions;
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
+using Regira.Entities.Models.Abstractions;
+
+namespace Regira.Entities.EFcore.QueryBuilders;
+
+public class FilterHasLastModifiedQueryBuilder : FilterHasLastModifiedQueryBuilder<int>;
+public class FilterHasLastModifiedQueryBuilder<TKey> : GlobalFilteredQueryBuilderBase<IHasLastModified, TKey>
+{
+    public override IQueryable<IHasLastModified> Build(IQueryable<IHasLastModified> query, ISearchObject<TKey>? so)
+    {
+        return query.FilterLastModified(so?.MinLastModified, so?.MaxLastModified);
+    }
+}

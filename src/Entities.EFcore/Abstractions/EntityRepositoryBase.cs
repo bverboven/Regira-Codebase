@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Regira.DAL.Paging;
 using Regira.Entities.Abstractions;
-using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.Extensions;
 using Regira.Entities.Models.Abstractions;
@@ -10,7 +9,7 @@ using Regira.Utilities;
 namespace Regira.Entities.EFcore.Abstractions;
 
 public abstract class EntityRepositoryBase<TContext, TEntity, TSearchObject, TSortBy, TIncludes>
-    (TContext dbContext, IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>? queryBuilder = null)
+    (TContext dbContext, IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes> queryBuilder)
     : EntityRepositoryBase<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>(dbContext, queryBuilder),
         IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>
     where TContext : DbContext
@@ -19,7 +18,7 @@ public abstract class EntityRepositoryBase<TContext, TEntity, TSearchObject, TSo
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum;
 public abstract class EntityRepositoryBase<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>
-    (TContext dbContext, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>? queryBuilder = null)
+    (TContext dbContext, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes> queryBuilder)
     : IEntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
@@ -27,9 +26,6 @@ public abstract class EntityRepositoryBase<TContext, TEntity, TKey, TSearchObjec
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
-    protected IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes> QueryBuilder =
-        queryBuilder ?? new QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>();
-
     public virtual DbSet<TEntity> DbSet => dbContext.Set<TEntity>();
 
     Task<IList<TEntity>> IEntityReadService<TEntity, TKey>.List(object? so, PagingInfo? pagingInfo)
@@ -38,7 +34,7 @@ public abstract class EntityRepositoryBase<TContext, TEntity, TKey, TSearchObjec
         => Count(Convert(so));
 
     public virtual async Task<TEntity?> Details(TKey id)
-        => await QueryBuilder.AddIncludes(
+        => await queryBuilder.AddIncludes(
                 DbSet.Where(x => x.Id!.Equals(id)),
                 null,
                 null,
@@ -70,12 +66,12 @@ public abstract class EntityRepositoryBase<TContext, TEntity, TKey, TSearchObjec
             .ToListAsync();
 
     public virtual Task<int> Count(IList<TSearchObject?> searchObjects)
-        => QueryBuilder.Filter(dbContext.Set<TEntity>(), searchObjects).CountAsync();
+        => queryBuilder.Filter(dbContext.Set<TEntity>(), searchObjects).CountAsync();
     public virtual Task<int> Count(TSearchObject? so = null)
-        => QueryBuilder.Filter(DbSet, so).CountAsync();
+        => queryBuilder.Filter(DbSet, so).CountAsync();
 
     public virtual IQueryable<TEntity> Query(IQueryable<TEntity> query, IList<TSearchObject?> searchObjects, IList<TSortBy> sortBy, TIncludes? includes, PagingInfo? pagingInfo)
-        => QueryBuilder.Query(query, searchObjects, sortBy, includes, pagingInfo);
+        => queryBuilder.Query(query, searchObjects, sortBy, includes, pagingInfo);
 
 
     public virtual Task Add(TEntity item)

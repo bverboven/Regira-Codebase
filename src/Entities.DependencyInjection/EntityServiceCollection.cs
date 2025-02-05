@@ -235,7 +235,9 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     public EntityServiceCollection<TContext> ConfigureAttachmentService(Func<IServiceProvider, IFileService> factory)
     {
         Services.AddTransient<IQueryBuilder<Attachment, AttachmentSearchObject>>(p =>
-            new QueryBuilder<Attachment, AttachmentSearchObject>([
+            new QueryBuilder<Attachment, AttachmentSearchObject>(
+                p.GetServices<IGlobalFilteredQueryBuilder>(),
+            [
                 new AttachmentFilteredQueryBuilder(p.GetRequiredService<IQKeywordHelper>())
             ])
         );
@@ -258,7 +260,12 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     public EntityServiceCollection<TContext> ConfigureAttachmentService<TKey>(Func<IServiceProvider, IFileService> factory)
     {
         Services.AddTransient<IQueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>>(p =>
-            new QueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>([new AttachmentFilteredQueryBuilder<TKey>(p.GetRequiredService<IQKeywordHelper>())])
+            new QueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>(
+                p.GetServices<IGlobalFilteredQueryBuilder>(),
+                [
+                    new AttachmentFilteredQueryBuilder<TKey>(p.GetRequiredService<IQKeywordHelper>())
+                ]
+            )
         );
         Services
             .AddTransient<IAttachmentService<TKey>>(p

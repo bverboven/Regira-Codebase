@@ -63,10 +63,6 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
     // Query Builders
     public new EntityServiceBuilder<TContext, TEntity> AddDefaultQueryBuilders()
     {
-        // Query Filter
-        Services.AddTransient<IFilteredQueryBuilder<TEntity, SearchObject>,
-            DefaultFilteredQueryBuilder<TEntity, SearchObject>>();
-        // Query Builder
         Services.AddTransient<IQueryBuilder<TEntity, SearchObject>,
             QueryBuilder<TEntity, SearchObject>>();
 
@@ -223,10 +219,6 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     // Query Builders
     public EntityServiceBuilder<TContext, TEntity, TKey> AddDefaultQueryBuilders()
     {
-        // Query Filter
-        Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>,
-            DefaultFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>>();
-        // Query Builder
         Services.AddTransient<IQueryBuilder<TEntity, TKey, SearchObject<TKey>>,
             QueryBuilder<TEntity, TKey, SearchObject<TKey>>>();
 
@@ -315,10 +307,6 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
     // Query Builders
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddDefaultQueryBuilders()
     {
-        // Query Filter
-        Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>,
-            DefaultFilteredQueryBuilder<TEntity, TKey, TSearchObject>>();
-        // Query Builder
         Services.AddTransient<IQueryBuilder<TEntity, TKey, TSearchObject>,
             QueryBuilder<TEntity, TKey, TSearchObject>>();
 

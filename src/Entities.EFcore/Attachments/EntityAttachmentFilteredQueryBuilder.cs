@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Attachments.Abstractions;
-using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.Keywords.Abstractions;
 using Regira.Entities.Models.Abstractions;
@@ -11,16 +10,14 @@ public class EntityAttachmentFilteredQueryBuilder<TEntityAttachment, TSearchObje
     : EntityAttachmentFilteredQueryBuilder<int, TEntityAttachment, int, TSearchObject, int>(qHelper),
         IFilteredQueryBuilder<TEntityAttachment, TSearchObject>
     where TEntityAttachment : IEntityAttachment, IEntity
-    where TSearchObject : IEntityAttachmentSearchObject;
+    where TSearchObject : class, IEntityAttachmentSearchObject;
 public class EntityAttachmentFilteredQueryBuilder<TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey>(IQKeywordHelper qHelper)
-    : DefaultFilteredQueryBuilder<TEntityAttachment, TEntityAttachmentKey, TSearchObject>
+    : FilteredQueryBuilderBase<TEntityAttachment, TEntityAttachmentKey, TSearchObject>
     where TEntityAttachment : IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey>, IEntity<TEntityAttachmentKey>
-    where TSearchObject : IEntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>
+    where TSearchObject : class, IEntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>
 {
     public override IQueryable<TEntityAttachment> Build(IQueryable<TEntityAttachment> query, TSearchObject? so)
     {
-        query = base.Build(query, so);
-
         if (so != null)
         {
             if (so.ObjectId?.Any() == true)

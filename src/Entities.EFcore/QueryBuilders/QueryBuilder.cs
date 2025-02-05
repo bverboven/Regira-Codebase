@@ -2,28 +2,34 @@
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
+using Regira.Utilities;
 
 namespace Regira.Entities.EFcore.QueryBuilders;
 
 public class QueryBuilder<TEntity, TSearchObject>(
+    IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
     IEnumerable<IFilteredQueryBuilder<TEntity, TSearchObject>>? filters = null
-) : QueryBuilder<TEntity, int, TSearchObject>(filters), IQueryBuilder<TEntity, TSearchObject>
+) : QueryBuilder<TEntity, int, TSearchObject>(globalFilters, filters), IQueryBuilder<TEntity, TSearchObject>
     where TEntity : IEntity<int>
     where TSearchObject : ISearchObject;
 
 public class QueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>(
+    IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
     IEnumerable<IFilteredQueryBuilder<TEntity, TSearchObject>>? filters = null
 )
-    : QueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>(filters), IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>
+    : QueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>(globalFilters, filters),
+        IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>
     where TEntity : IEntity<int>
     where TSearchObject : ISearchObject<int>
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum;
 
 public class QueryBuilder<TEntity, TKey, TSearchObject>(
+    IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
     IEnumerable<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>>? filters = null
 )
-    : QueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>(filters), IQueryBuilder<TEntity, TKey, TSearchObject>
+    : QueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>(globalFilters, filters),
+        IQueryBuilder<TEntity, TKey, TSearchObject>
     where TEntity : IEntity<TKey>
     where TSearchObject : ISearchObject<TKey>
 {
@@ -32,6 +38,7 @@ public class QueryBuilder<TEntity, TKey, TSearchObject>(
 }
 
 public class QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
+        IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
         IEnumerable<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>>? filters = null
     )
     : IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
@@ -41,11 +48,28 @@ public class QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
     where TIncludes : struct, Enum
 {
     public virtual IQueryable<TEntity> Filter(IQueryable<TEntity> query, TSearchObject? so)
-        => filters
-            ?.Aggregate(
+    {
+        var globallyFilteredQuery = globalFilters
+            .Aggregate(
                 query,
-                (r, filter) => filter.Build(r, so)
-            ) ?? query;
+                (filteredQuery, filter) =>
+                {
+                    var entityTypes = filter.GetType().GetGenericArguments();
+                    if (TypeUtility.GetBaseTypes(typeof(TEntity)).Any(t => entityTypes.Contains(t)))
+                    {
+                        return filter.Build(filteredQuery, so);
+                    }
+
+                    return filteredQuery;
+                }
+            );
+        return filters
+            ?.Aggregate(
+                globallyFilteredQuery,
+                (filteredQuery, filter) => filter.Build(filteredQuery, so)
+            ) ?? globallyFilteredQuery;
+    }
+
     public virtual IQueryable<TEntity> Filter(IQueryable<TEntity> query, IList<TSearchObject?>? searchObjects)
         => searchObjects
             ?.Aggregate(
