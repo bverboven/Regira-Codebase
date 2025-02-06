@@ -41,6 +41,7 @@ public class DepartmentControllerTests : IDisposable
     {
         var app = new WebApplicationFactory<Program>();
         using var client = app.CreateClient();
+
         var departmentInput = new Department
         {
             Title = "Department (test)",
@@ -61,6 +62,9 @@ public class DepartmentControllerTests : IDisposable
     {
         var app = new WebApplicationFactory<Program>();
         using var client = app.CreateClient();
+
+        await CreateTestItems(_dbContext);
+
         var departmentInput = new Department
         {
             Title = "Department (test)",
@@ -116,6 +120,28 @@ public class DepartmentControllerTests : IDisposable
         }
     }
     [Fact]
+    public async Task Insert_And_Force_404()
+    {
+        var app = new WebApplicationFactory<Program>();
+        using var client = app.CreateClient();
+
+        var departmentInput = new Department
+        {
+            Title = "Department (test)",
+            Budget = 2000
+        };
+        var inputResponse = await client.PostAsJsonAsync("/departments", departmentInput);
+        Assert.Equal(HttpStatusCode.OK, inputResponse.StatusCode);
+
+        var detailsResponse99 = await client.GetAsync("/departments/99");
+        Assert.False(detailsResponse99.IsSuccessStatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, detailsResponse99.StatusCode);
+
+        var detailsResponse0 = await client.GetAsync("/departments/0");
+        Assert.False(detailsResponse0.IsSuccessStatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, detailsResponse0.StatusCode);
+    }
+    [Fact]
     public async Task Update()
     {
         var app = new WebApplicationFactory<Program>();
@@ -168,6 +194,21 @@ public class DepartmentControllerTests : IDisposable
         Assert.Equal(HttpStatusCode.NotFound, detailsResponse.StatusCode);
     }
 
+    static async Task<IList<Department>> CreateTestItems(ContosoContext dbContext)
+    {
+        var items = new Department[]
+        {
+            new () { Title = "Department #1", Budget = 1000 },
+            new () { Title = "Department #2", Budget = 2000 },
+            new () { Title = "Department #3", Budget = 3000 },
+            new () { Title = "Department #4", Budget = 4000 },
+            new () { Title = "Department #5", Budget = 5000 },
+        };
+        dbContext.Departments.AddRange(items);
+        await dbContext.SaveChangesAsync();
+
+        return items;
+    }
 
     public void Dispose()
     {

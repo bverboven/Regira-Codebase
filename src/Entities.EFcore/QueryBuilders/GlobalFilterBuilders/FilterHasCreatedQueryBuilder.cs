@@ -2,13 +2,11 @@
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.Models.Abstractions;
 
-namespace Regira.Entities.EFcore.QueryBuilders;
+namespace Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 
 public class FilterHasCreatedQueryBuilder : FilterHasCreatedQueryBuilder<int>;
 public class FilterHasCreatedQueryBuilder<TKey> : GlobalFilteredQueryBuilderBase<IHasCreated, TKey>
 {
-    public override IQueryable<IHasCreated> Build(IQueryable<IHasCreated> query, ISearchObject<TKey>? so)
-    {
-        return query.FilterCreated(so?.MinCreated, so?.MaxCreated);
-    }
+    public override IQueryable<IHasCreated> Build(IQueryable<IHasCreated> query, ISearchObject<TKey>? so) 
+        => query.FilterCreated(so?.MinCreated, so?.MaxCreated);
 }

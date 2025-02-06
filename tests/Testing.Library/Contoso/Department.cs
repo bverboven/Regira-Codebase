@@ -29,5 +29,6 @@ public class Department : IEntityWithSerial, IHasNormalizedTitle, IHasNormalized
     public Person? Administrator { get; set; }
     public ICollection<Course>? Courses { get; set; }
 
+    [MaxLength(256)]
     public string? NormalizedContent { get; set; }
 }

@@ -66,10 +66,13 @@ public class PersonControllerTests : IDisposable
     {
         var app = new WebApplicationFactory<Program>();
         using var client = app.CreateClient();
+
+        await CreateTestItems(_dbContext);
+
         var personInput = new PersonInputDto
         {
-            GivenName = "John",
-            LastName = "Doe"
+            GivenName = "Homer",
+            LastName = "Simpson"
         };
         var inputResponse = await client.PostAsJsonAsync("/persons", personInput);
 
@@ -88,6 +91,7 @@ public class PersonControllerTests : IDisposable
         Assert.NotNull(detailsResult!.Item);
         Assert.NotEqual(0, detailsResult.Item.Id);
         Assert.Equal(saveResult.Item.Id, detailsResult.Item.Id);
+        Assert.Equal(personInput.GivenName, detailsResult.Item.GivenName);
     }
     [Fact]
     public async Task Insert_And_Get_List()
@@ -121,55 +125,65 @@ public class PersonControllerTests : IDisposable
         }
     }
     [Fact]
-    public async Task Update()
+    public async Task Insert_And_Force_404()
     {
         var app = new WebApplicationFactory<Program>();
         using var client = app.CreateClient();
-        var personInput = new PersonInputDto
+
+        var personInput = new Person
         {
             GivenName = "John",
             LastName = "Doe"
         };
-        var insertResponse = await client.PostAsJsonAsync("/persons", personInput);
-        Assert.Equal(HttpStatusCode.OK, insertResponse.StatusCode);
+        var inputResponse = await client.PostAsJsonAsync("/persons", personInput);
+        Assert.Equal(HttpStatusCode.OK, inputResponse.StatusCode);
 
-        var insertResult = await insertResponse.Content.ReadFromJsonAsync<SaveResult<PersonDto>>();
-        personInput.Id = insertResult!.Item.Id;
+        var detailsResponse99 = await client.GetAsync("/persons/99");
+        Assert.False(detailsResponse99.IsSuccessStatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, detailsResponse99.StatusCode);
 
-        personInput.GivenName = "Jane";
-        personInput.Description = "Testing an update";
-        var updateResponse = await client.PutAsJsonAsync($"/persons/{personInput.Id}", personInput);
+        var detailsResponse0 = await client.GetAsync("/persons/0");
+        Assert.False(detailsResponse0.IsSuccessStatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, detailsResponse0.StatusCode);
+    }
+    [Fact]
+    public async Task Update()
+    {
+        var app = new WebApplicationFactory<Program>();
+        using var client = app.CreateClient();
+
+        var persons = await CreateTestItems(_dbContext);
+        var personToUpdate = persons[1];
+
+        var originalName = personToUpdate.GivenName;
+        personToUpdate.GivenName = "Jeanne";
+        personToUpdate.Description = "Testing an update";
+        var updateResponse = await client.PutAsJsonAsync($"/persons/{personToUpdate.Id}", personToUpdate);
 
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
         var updateResult = await updateResponse.Content.ReadFromJsonAsync<SaveResult<PersonDto>>();
 
-        Assert.NotEqual(insertResult.Item.GivenName, updateResult!.Item.GivenName);
-        Assert.Equal(personInput.Description, updateResult.Item.Description);
+        Assert.NotEqual(originalName, updateResult!.Item.GivenName);
+        Assert.Equal(personToUpdate.GivenName, updateResult.Item.GivenName);
+        Assert.Equal(personToUpdate.Description, updateResult.Item.Description);
     }
     [Fact]
     public async Task Delete()
     {
         var app = new WebApplicationFactory<Program>();
         using var client = app.CreateClient();
-        var personInput = new PersonInputDto
-        {
-            GivenName = "John",
-            LastName = "Doe"
-        };
-        var insertResponse = await client.PostAsJsonAsync("/persons", personInput);
-        Assert.Equal(HttpStatusCode.OK, insertResponse.StatusCode);
 
-        var insertResult = await insertResponse.Content.ReadFromJsonAsync<SaveResult<PersonDto>>();
-        personInput.Id = insertResult!.Item.Id;
+        var persons = await CreateTestItems(_dbContext);
+        var personToDelete = persons[2];
 
-        var deleteResponse = await client.DeleteAsync($"/persons/{personInput.Id}");
+        var deleteResponse = await client.DeleteAsync($"/persons/{personToDelete.Id}");
 
         Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
         var deleteResult = await deleteResponse.Content.ReadFromJsonAsync<DeleteResult<PersonDto>>();
 
-        Assert.Equal(personInput.Id, deleteResult!.Item.Id);
+        Assert.Equal(personToDelete.Id, deleteResult!.Item.Id);
 
-        var detailsResponse = await client.GetAsync($"/persons/{personInput.Id}");
+        var detailsResponse = await client.GetAsync($"/persons/{personToDelete.Id}");
         Assert.Equal(HttpStatusCode.NotFound, detailsResponse.StatusCode);
     }
 
@@ -247,6 +261,7 @@ public class PersonControllerTests : IDisposable
     {
         var app = new WebApplicationFactory<Program>();
         using var client = app.CreateClient();
+
         var personInput = new PersonInputDto
         {
             GivenName = "John",
@@ -330,6 +345,19 @@ public class PersonControllerTests : IDisposable
         }
     }
 
+    static async Task<IList<Person>> CreateTestItems(ContosoContext dbContext)
+    {
+        var items = new Person[]
+        {
+            new () { GivenName = "John", LastName = "Doe" },
+            new () { GivenName = "Jane", LastName = "Doe" },
+            new () { GivenName = "Bart", LastName = "Simpson" }
+        };
+        dbContext.Persons.AddRange(items);
+        await dbContext.SaveChangesAsync();
+
+        return items;
+    }
 
     public void Dispose()
     {

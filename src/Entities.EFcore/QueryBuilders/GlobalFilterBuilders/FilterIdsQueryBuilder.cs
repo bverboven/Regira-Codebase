@@ -2,10 +2,10 @@
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.Models.Abstractions;
 
-namespace Regira.Entities.EFcore.QueryBuilders;
+namespace Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 
-public class DefaultFilteredQueryBuilder : DefaultFilteredQueryBuilder<int>;
-public class DefaultFilteredQueryBuilder<TKey> : GlobalFilteredQueryBuilderBase<IEntity<TKey>, TKey>
+public class FilterIdsQueryBuilder : FilterIdsQueryBuilder<int>;
+public class FilterIdsQueryBuilder<TKey> : GlobalFilteredQueryBuilderBase<IEntity<TKey>, TKey>
 {
     public override IQueryable<IEntity<TKey>> Build(IQueryable<IEntity<TKey>> query, ISearchObject<TKey>? so)
     {

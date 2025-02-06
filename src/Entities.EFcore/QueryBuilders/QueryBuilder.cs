@@ -49,13 +49,16 @@ public class QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
 {
     public virtual IQueryable<TEntity> Filter(IQueryable<TEntity> query, TSearchObject? so)
     {
+        var entityBaseTypes = TypeUtility.GetBaseTypes(typeof(TEntity)).ToArray();
+
         var globallyFilteredQuery = globalFilters
             .Aggregate(
                 query,
                 (filteredQuery, filter) =>
                 {
-                    var entityTypes = filter.GetType().GetGenericArguments();
-                    if (TypeUtility.GetBaseTypes(typeof(TEntity)).Any(t => entityTypes.Contains(t)))
+                    var filterTypes = TypeUtility.GetBaseTypes(filter.GetType()).Concat([filter.GetType()]).Distinct();
+                    var canFilter = filterTypes.Any(ft => entityBaseTypes.Any(bt => TypeUtility.HasGenericArgument(ft, bt)));
+                    if (canFilter)
                     {
                         return filter.Build(filteredQuery, so);
                     }

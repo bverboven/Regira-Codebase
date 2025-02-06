@@ -64,6 +64,9 @@ public class CourseControllerTests : IDisposable
     {
         var app = new WebApplicationFactory<Program>();
         using var client = app.CreateClient();
+
+        await CreateTestItems(_dbContext);
+
         var courseInput = new CourseInputDto
         {
             Title = "Course (test)",
@@ -120,6 +123,28 @@ public class CourseControllerTests : IDisposable
             Assert.Equal(courseInput.DepartmentId, course.DepartmentId);
             Assert.Equal(courseInput.Credits, course.Credits);
         }
+    }
+    [Fact]
+    public async Task Insert_And_Force_404()
+    {
+        var app = new WebApplicationFactory<Program>();
+        using var client = app.CreateClient();
+
+        var courseInput = new Course
+        {
+            Title = "Course (test)",
+            DepartmentId = 1,
+        };
+        var inputResponse = await client.PostAsJsonAsync("/courses", courseInput);
+        Assert.Equal(HttpStatusCode.OK, inputResponse.StatusCode);
+
+        var detailsResponse99 = await client.GetAsync("/courses/99");
+        Assert.False(detailsResponse99.IsSuccessStatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, detailsResponse99.StatusCode);
+
+        var detailsResponse0 = await client.GetAsync("/courses/0");
+        Assert.False(detailsResponse0.IsSuccessStatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, detailsResponse0.StatusCode);
     }
     [Fact]
     public async Task Update()
@@ -211,6 +236,21 @@ public class CourseControllerTests : IDisposable
         Assert.Empty(excludedItems);
     }
 
+    static async Task<IList<Course>> CreateTestItems(ContosoContext dbContext)
+    {
+        var items = new Course[]
+        {
+            new () { Title = "Course #1", DepartmentId = 1 },
+            new () { Title = "Course #2", DepartmentId = 2 },
+            new () { Title = "Course #3", DepartmentId = 3 },
+            new () { Title = "Course #4", DepartmentId = 4 },
+            new () { Title = "Course #5", DepartmentId = 5 },
+        };
+        dbContext.Courses.AddRange(items);
+        await dbContext.SaveChangesAsync();
+
+        return items;
+    }
 
     public void Dispose()
     {

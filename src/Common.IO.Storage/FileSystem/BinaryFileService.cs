@@ -12,13 +12,13 @@ public class BinaryFileService(FileSystemOptions options) : IFileService
 
     public Task<bool> Exists(string identifier)
     {
-        var uri = FileNameUtility.GetAbsoluteUri(identifier, RootFolder);
+        var uri = FileNameUtility.GetAbsoluteUri(identifier, Root);
         var exists = File.Exists(uri) || Directory.Exists(uri);
         return Task.FromResult(exists);
     }
     public Task<byte[]?> GetBytes(string identifier)
     {
-        var uri = FileNameUtility.GetAbsoluteUri(identifier, RootFolder);
+        var uri = FileNameUtility.GetAbsoluteUri(identifier, Root);
         if (!File.Exists(uri))
         {
             return Task.FromResult((byte[]?)null);
@@ -28,7 +28,7 @@ public class BinaryFileService(FileSystemOptions options) : IFileService
     }
     public Task<Stream?> GetStream(string identifier)
     {
-        var uri = FileNameUtility.GetAbsoluteUri(identifier, RootFolder);
+        var uri = FileNameUtility.GetAbsoluteUri(identifier, Root);
         if (!File.Exists(uri))
         {
             return Task.FromResult((Stream?)null);
@@ -48,7 +48,7 @@ public class BinaryFileService(FileSystemOptions options) : IFileService
         var listDirectories = so.Type == FileEntryTypes.All || so.Type == FileEntryTypes.Directories;
 
         var searchOptions = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-        var absoluteFolderUri = FileNameUtility.GetAbsoluteUri(folderUri, RootFolder);
+        var absoluteFolderUri = FileNameUtility.GetAbsoluteUri(folderUri, Root);
         
         IEnumerable<string> result = Array.Empty<string>();
 
@@ -56,7 +56,7 @@ public class BinaryFileService(FileSystemOptions options) : IFileService
         {
             // files
             var files = Directory.EnumerateFiles(absoluteFolderUri, extensions, searchOptions)
-                .Select(fileUri => FileNameUtility.GetRelativeUri(fileUri, RootFolder))
+                .Select(fileUri => FileNameUtility.GetRelativeUri(fileUri, Root))
                 .Where(f => so.Extensions == null || so.Extensions.Any(e => e.TrimStart('*') == Path.GetExtension(f)));
             string[]? fileList = null;
             if (listDirectories && so.Extensions != null)
@@ -71,7 +71,7 @@ public class BinaryFileService(FileSystemOptions options) : IFileService
             if (listDirectories)
             {
                 var folders = Directory.EnumerateDirectories(absoluteFolderUri, "", searchOptions)
-                    .Select(dirUri => FileNameUtility.GetRelativeUri(dirUri, RootFolder));
+                    .Select(dirUri => FileNameUtility.GetRelativeUri(dirUri, Root));
                 if (so.Extensions != null)
                 {
                     folders = folders.Where(d => fileList?.Any(f => f.StartsWith(d)) == true);
@@ -88,21 +88,21 @@ public class BinaryFileService(FileSystemOptions options) : IFileService
 
     public Task Move(string sourceIdentifier, string targetIdentifier)
     {
-        var sourceUri = FileNameUtility.GetAbsoluteUri(sourceIdentifier, RootFolder);
-        var targetUri = FileNameUtility.GetAbsoluteUri(targetIdentifier, RootFolder);
+        var sourceUri = FileNameUtility.GetAbsoluteUri(sourceIdentifier, Root);
+        var targetUri = FileNameUtility.GetAbsoluteUri(targetIdentifier, Root);
         File.Move(sourceUri, targetUri);
         return Task.CompletedTask;
     }
     public Task<string> Save(string identifier, byte[] bytes, string? contentType = null)
     {
-        var uri = FileNameUtility.GetAbsoluteUri(identifier, RootFolder);
+        var uri = FileNameUtility.GetAbsoluteUri(identifier, Root);
         CreateDirectory(uri);
         File.WriteAllBytes(uri, bytes);
         return Task.FromResult(uri);
     }
     public Task<string> Save(string identifier, Stream stream, string? contentType = null)
     {
-        var uri = FileNameUtility.GetAbsoluteUri(identifier, RootFolder);
+        var uri = FileNameUtility.GetAbsoluteUri(identifier, Root);
         CreateDirectory(uri);
         using (var fileStream = File.Create(uri))
         {
@@ -114,7 +114,7 @@ public class BinaryFileService(FileSystemOptions options) : IFileService
     }
     public Task Delete(string identifier)
     {
-        var uri = FileNameUtility.GetAbsoluteUri(identifier, RootFolder);
+        var uri = FileNameUtility.GetAbsoluteUri(identifier, Root);
         if (File.Exists(uri))
         {
             File.Delete(uri);
@@ -129,12 +129,12 @@ public class BinaryFileService(FileSystemOptions options) : IFileService
     }
 
     public string GetAbsoluteUri(string identifier)
-        => FileNameUtility.GetAbsoluteUri(identifier, RootFolder);
+        => FileNameUtility.GetAbsoluteUri(identifier, Root);
     public string GetIdentifier(string uri)
         // use forward slashes to keep identifier uniform with other IFileService implementations (e.g. Azure)
-        => FileNameUtility.GetRelativeUri(uri, RootFolder).Replace('\\', '/');
+        => FileNameUtility.GetRelativeUri(uri, Root).Replace('\\', '/');
     public string? GetRelativeFolder(string identifier)
-        => FileNameUtility.GetRelativeFolder(identifier, RootFolder);
+        => FileNameUtility.GetRelativeFolder(identifier, Root);
 
 
     public void CreateDirectory(string uri)

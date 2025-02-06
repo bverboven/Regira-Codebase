@@ -2,16 +2,32 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
+using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
+using Regira.Utilities;
 
 namespace Regira.Entities.DependencyInjection.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public class Options
+    public class Options(IServiceCollection services)
     {
         public ICollection<Assembly> ProfileAssemblies { get; set; } = new List<Assembly>();
+        /// <summary>
+        /// Adds default filtered query builders
+        /// <list type="bullet">
+        /// <item>Id(s)</item>
+        /// <item>Timestamps</item>
+        /// <item>Archivable</item>
+        /// </list>
+        /// </summary>
+        public void AddDefaultGlobalQueryFilters()
+        {
+            services.AddTransient<IGlobalFilteredQueryBuilder, FilterIdsQueryBuilder>();
+            services.AddTransient<IGlobalFilteredQueryBuilder, FilterArchivablesQueryBuilder>();
+            services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasCreatedQueryBuilder>();
+            services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasLastModifiedQueryBuilder>();
+        }
     }
 
     /// <summary>
@@ -32,7 +48,7 @@ public static class ServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection UseEntities(this IServiceCollection services, Action<Options>? configure = null)
     {
-        var options = new Options();
+        var options = new Options(services);
         configure?.Invoke(options);
 
         services
@@ -46,10 +62,22 @@ public static class ServiceCollectionExtensions
                 }
             });
 
-        services.AddTransient<IGlobalFilteredQueryBuilder, DefaultFilteredQueryBuilder>();
-        services.AddTransient<IGlobalFilteredQueryBuilder, FilterArchivablesQueryBuilder>();
-        services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasCreatedQueryBuilder>();
-        services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasLastModifiedQueryBuilder>();
+        return services;
+    }
+
+    public static TServiceCollection RemoveGlobalQueryFilters<TServiceCollection>(this TServiceCollection services)
+        where TServiceCollection : IServiceCollection
+    {
+        var globalFilters = services
+            .Where(d =>
+                d.ImplementationType != null
+                && TypeUtility.ImplementsInterface<IGlobalFilteredQueryBuilder>(d.ImplementationType)
+            );
+
+        foreach (var descriptor in globalFilters)
+        {
+            services.Remove(descriptor);
+        }
 
         return services;
     }

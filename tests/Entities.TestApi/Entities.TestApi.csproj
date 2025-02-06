@@ -14,9 +14,9 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
     </ItemGroup>
     <ItemGroup>
+        <ProjectReference Include="..\Testing.Library\_Testing.Library.csproj" />
         <ProjectReference Include="..\..\src\Entities.DependencyInjection\Entities.DependencyInjection.csproj" />
         <ProjectReference Include="..\..\src\IO.Storage.Azure\IO.Storage.Azure.csproj" />
         <ProjectReference Include="..\..\src\Serializing.Newtonsoft\Serializing.Newtonsoft.csproj" />
-        <ProjectReference Include="..\Testing.Library\_Testing.Library.csproj" />
     </ItemGroup>
 </Project>

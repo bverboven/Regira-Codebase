@@ -50,8 +50,13 @@ builder.Services
     .AddHttpContextAccessor()
     .AddDbContext<ContosoContext>((_, db) => db.UseSqlite(ApiConfiguration.ConnectionString))
     .AddAutoMapper(c => c.AllowNullCollections = true)
-    .UseEntities<ContosoContext>()
+    .UseEntities<ContosoContext>(o =>
+    {
+        o.AddDefaultGlobalQueryFilters();
+    })
+    // FileSystem storage
     .ConfigureAttachmentService(_ => new BinaryFileService(new FileSystemOptions { RootFolder = ApiConfiguration.AttachmentsDirectory }))
+    // Azure storage
     //.ConfigureAttachmentService(_ => new BinaryBlobService(new AzureCommunicator(new AzureConfig
     //{
     //    ConnectionString = builder.Configuration["Storage:Azure:ConnectionString"],

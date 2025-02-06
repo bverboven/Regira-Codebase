@@ -34,19 +34,27 @@ public abstract class EntityRepositoryBase<TContext, TEntity, TKey, TSearchObjec
         => Count(Convert(so));
 
     public virtual async Task<TEntity?> Details(TKey id)
-        => await queryBuilder.AddIncludes(
-                DbSet.Where(x => x.Id!.Equals(id)),
-                null,
-                null,
-                // Get TIncludes.All
-                Enum.GetValues(typeof(TIncludes)).Cast<TIncludes>().Last()
-            )
+    {
+        if (id?.Equals(default(TKey)) == true)
+        {
+            return null;
+        }
+
+        var query = Query(
+            DbSet,
+            [Convert(new { Id = id })],
+            [],
+            Enum.GetValues(typeof(TIncludes)).Cast<TIncludes>().Last(),
+            null
+        );
+        return await query
 #if NETSTANDARD2_0
             .AsNoTracking()
 #else
-                .AsNoTrackingWithIdentityResolution()
+            .AsNoTrackingWithIdentityResolution()
 #endif
             .SingleOrDefaultAsync();
+    }
 
     public virtual async Task<IList<TEntity>> List(IList<TSearchObject?> searchObjects, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null)
         => await Query(DbSet, searchObjects, sortBy, includes, pagingInfo)

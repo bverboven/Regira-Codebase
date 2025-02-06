@@ -41,5 +41,6 @@ public class CourseAttachment : EntityAttachment
         ObjectType = nameof(Course);
     }
 
+    [MaxLength(256)]
     public string? Description { get; set; }
 }

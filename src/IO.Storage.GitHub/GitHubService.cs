@@ -60,7 +60,7 @@ public class GitHubService(GitHubOptions options, ISerializer serializer) : IFil
                     {
                         var folder = string.Join(
                             "/",
-                            new[] { RootFolder, so?.FolderUri, item.Path }
+                            new[] { Root, so?.FolderUri, item.Path }
                                 .Where(x => x != null)
                                 .Select(x => x!.TrimEnd(@"\/".ToCharArray()))
                         ) + '/';
@@ -100,15 +100,15 @@ public class GitHubService(GitHubOptions options, ISerializer serializer) : IFil
 
     public string GetAbsoluteUri(string identifier)
     {
-        return FileNameUtility.GetUri(identifier, RootFolder);
+        return FileNameUtility.GetUri(identifier, Root);
     }
     public string GetIdentifier(string uri)
     {
-        return FileNameUtility.GetRelativeUri(uri, RootFolder);
+        return FileNameUtility.GetRelativeUri(uri, Root);
     }
     public string? GetRelativeFolder(string identifier)
     {
-        return FileNameUtility.GetRelativeFolder(identifier, RootFolder);
+        return FileNameUtility.GetRelativeFolder(identifier, Root);
     }
 
 
@@ -116,7 +116,7 @@ public class GitHubService(GitHubOptions options, ISerializer serializer) : IFil
     {
         var httpClient = new HttpClient
         {
-            BaseAddress = new Uri(RootFolder)
+            BaseAddress = new Uri(Root)
         };
 
         httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(options.UserAgent ?? Assembly.GetExecutingAssembly().GetName().Name);

@@ -145,6 +145,30 @@ public class CourseAttachmentsControllerTests : IDisposable
         //Assert.Equal(count, Directory.GetFiles(ApiConfiguration.AttachmentsDirectory, "", SearchOption.AllDirectories).Length);
     }
     [Fact]
+    public async Task Insert_And_Force_404()
+    {
+        var app = new WebApplicationFactory<Program>();
+        using var client = app.CreateClient();
+
+        var courseId = 3;
+        var attachmentFileName = "test-attachment.txt";
+        var fileTextContent = "This is a testmessage for an attachment";
+        await using var fileStream = FileUtility.GetStreamFromString(fileTextContent);
+        var inputContent = new MultipartFormDataContent{
+            { new StreamContent(fileStream), "file", attachmentFileName }
+        };
+        var inputResponse = await client.PostAsync($"/courses/{courseId}/files", inputContent);
+        Assert.Equal(HttpStatusCode.OK, inputResponse.StatusCode);
+
+        var detailsResponse99 = await client.GetAsync("/courses/attachments/999");
+        Assert.False(detailsResponse99.IsSuccessStatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, detailsResponse99.StatusCode);
+
+        var detailsResponse0 = await client.GetAsync("/courses/attachments/0");
+        Assert.False(detailsResponse0.IsSuccessStatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, detailsResponse0.StatusCode);
+    }
+    [Fact]
     public async Task Delete()
     {
         var app = new WebApplicationFactory<Program>();

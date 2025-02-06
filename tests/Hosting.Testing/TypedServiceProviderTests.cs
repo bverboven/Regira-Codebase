@@ -21,9 +21,9 @@ public class TypedServiceProviderTests
     public void Test_TypedServiceProvider()
     {
         var services = new ServiceCollection()
-            .AddTypedProvider<TypeA, ITestImplementation>(p => new ServiceA())
-            .AddTypedProvider<TypeB, ITestImplementation>(p => new ServiceB())
-            .AddTypedProvider<TypeC, IDummy>(p => new ServiceC());
+            .AddTypedProvider<TypeA, ITestImplementation>(_ => new ServiceA())
+            .AddTypedProvider<TypeB, ITestImplementation>(_ => new ServiceB())
+            .AddTypedProvider<TypeC, IDummy>(_ => new ServiceC());
 
         var sp = services.BuildServiceProvider();
         var serviceA = sp.GetTypedImplementation<TypeA, ITestImplementation>();
@@ -42,11 +42,12 @@ public class TypedServiceProviderTests
     public void Test_TypedServiceProviders()
     {
         var services = new ServiceCollection()
-            .AddTypedProvider<TypeA, ITestImplementation>(p => new ServiceA())
-            .AddTypedProvider<TypeA, ITestImplementation>(p => new ServiceB())
-            .AddTypedProvider<TypeC, IDummy>(p => new ServiceC());
+            .AddTypedProvider<TypeA, ITestImplementation>(_ => new ServiceA())
+            .AddTypedProvider<TypeA, ITestImplementation>(_ => new ServiceB())
+            .AddTypedProvider<TypeC, IDummy>(_ => new ServiceC());
         var sp = services.BuildServiceProvider();
-        var servicesA = sp.GetTypedImplementations<TypeA, ITestImplementation>();
+        var servicesA = sp.GetTypedImplementations<TypeA, ITestImplementation>()
+            .ToArray();
 
         Assert.That(servicesA.Count(), Is.EqualTo(2));
         Assert.That(servicesA, Is.All.AssignableTo<ITestImplementation>());

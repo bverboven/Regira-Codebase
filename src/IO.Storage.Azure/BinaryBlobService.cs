@@ -50,15 +50,15 @@ public class BinaryBlobService(AzureCommunicator communicator) : IFileService
         await foreach (var blob in ListBlobs(so))
         {
             var blobUri = blob.Name;
-            var blobIdentifier = FileNameUtility.GetRelativeUri(blobUri, RootFolder);
+            var blobIdentifier = FileNameUtility.GetRelativeUri(blobUri, Root);
             identifiers.Add(blobIdentifier);
         }
 
         var recursive = so.Recursive;
-        var relativeFolderUri = FileNameUtility.GetRelativeUri(so.FolderUri, RootFolder);
+        var relativeFolderUri = FileNameUtility.GetRelativeUri(so.FolderUri, Root);
         var foldersToExclude = GetFolders(relativeFolderUri).Concat([relativeFolderUri]).ToArray();
         var filteredFiles = identifiers
-            .Where(f => recursive || (FileNameUtility.GetRelativeFolder(f, RootFolder) ?? string.Empty) == relativeFolderUri)
+            .Where(f => recursive || (FileNameUtility.GetRelativeFolder(f, Root) ?? string.Empty) == relativeFolderUri)
             .Where(f => so.Extensions == null || so.Extensions.Any(e => e.TrimStart('*') == Path.GetExtension(f)))
             .ToList();
 
@@ -81,7 +81,7 @@ public class BinaryBlobService(AzureCommunicator communicator) : IFileService
                 : filteredFiles;
             var folders = filesForFetchingFolders
                 .SelectMany(GetFolders)
-                .Where(d => recursive || (FileNameUtility.GetRelativeFolder(d, RootFolder) ?? string.Empty) == relativeFolderUri)
+                .Where(d => recursive || (FileNameUtility.GetRelativeFolder(d, Root) ?? string.Empty) == relativeFolderUri)
                 .Except(foldersToExclude)
                 .Distinct()
                 .ToList();
@@ -102,8 +102,8 @@ public class BinaryBlobService(AzureCommunicator communicator) : IFileService
 
     protected IEnumerable<string> GetFolders(string uri)
     {
-        var folder = FileNameUtility.GetRelativeFolder(uri, RootFolder);
-        if (folder != null && folder != RootFolder)
+        var folder = FileNameUtility.GetRelativeFolder(uri, Root);
+        if (folder != null && folder != Root)
         {
             foreach (var parent in GetFolders(folder))
             {
@@ -115,7 +115,7 @@ public class BinaryBlobService(AzureCommunicator communicator) : IFileService
 
     protected async IAsyncEnumerable<BlobItem> ListBlobs(FileSearchObject so)
     {
-        var relativeFolderUri = FileNameUtility.GetRelativeUri(so.FolderUri, RootFolder);
+        var relativeFolderUri = FileNameUtility.GetRelativeUri(so.FolderUri, Root);
         var blobPages = Container.GetBlobsAsync(BlobTraits.None, BlobStates.None, relativeFolderUri);
         await foreach (var blob in blobPages)
         {
@@ -182,26 +182,26 @@ public class BinaryBlobService(AzureCommunicator communicator) : IFileService
     public string GetAbsoluteUri(string identifier)
     {
         communicator.Open().Wait();
-        return FileNameUtility.GetUri(identifier, RootFolder);
+        return FileNameUtility.GetUri(identifier, Root);
     }
 
     public string GetIdentifier(string uri)
     {
         communicator.Open().Wait();
-        return FileNameUtility.GetRelativeUri(uri, RootFolder);
+        return FileNameUtility.GetRelativeUri(uri, Root);
     }
 
     public string? GetRelativeFolder(string identifier)
     {
         communicator.Open().Wait();
-        return FileNameUtility.GetRelativeFolder(identifier, RootFolder);
+        return FileNameUtility.GetRelativeFolder(identifier, Root);
     }
 
     public Uri GetBlobUri(string identifier)
         => new(GetAbsoluteUri(identifier));
     protected internal BlobClient GetBlobReference(string identifier, string? contentType = null)
     {
-        var prefixedFilename = FileNameUtility.GetRelativeUri(identifier, RootFolder);
+        var prefixedFilename = FileNameUtility.GetRelativeUri(identifier, Root);
         var blob = Container.GetBlobClient(prefixedFilename);
         //blob.Properties.ContentType = contentType;
         return blob;

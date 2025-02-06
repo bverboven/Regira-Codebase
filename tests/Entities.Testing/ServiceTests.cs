@@ -36,7 +36,10 @@ public class ServiceTests
     {
         var services = new ServiceCollection()
             .AddDbContext<ContosoContext>((_, db) => db.UseSqlite("Filename=:memory:"))
-            .UseEntities<ContosoContext>()
+            .UseEntities<ContosoContext>(o =>
+            {
+                o.AddDefaultGlobalQueryFilters();
+            })
             .For<Course>()
             .For<Department>();
 
