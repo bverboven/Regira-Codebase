@@ -257,6 +257,73 @@ public class PersonControllerTests : IDisposable
     }
 
     [Fact]
+    public async Task Filter_NormalizedContent()
+    {
+        var app = new WebApplicationFactory<Program>();
+        using var client = app.CreateClient();
+
+        await client.PostAsync("/test-data", new StringContent(""));
+
+        var coursesResponse = await client.GetAsync("/courses");
+        var coursesResult = await coursesResponse.Content.ReadFromJsonAsync<ListResult<CourseDto>>();
+
+        var course1 = coursesResult!.Items[0];
+        var course2 = coursesResult.Items[1];
+        var course3 = coursesResult.Items[2];
+        var course4 = coursesResult.Items[3];
+
+        var persons = new[]
+        {
+            new Student
+            {
+                GivenName = "Student1",
+                LastName = "One",
+                NormalizedContent = "A fool thinks himself to be wise, but a wise man knows himself to be a fool".ToUpper(),
+                Enrollments =
+                [
+                    new Enrollment { CourseId = course1.Id },
+                    new Enrollment { CourseId = course2.Id }
+                ],
+            },
+            new Student
+            {
+                GivenName = "Student2",
+                LastName = "Two",
+                NormalizedContent = null,
+                Enrollments =
+                [
+                    new Enrollment { CourseId = course2.Id },
+                    new Enrollment { CourseId = course4.Id }
+                ],
+            },
+            new Person
+            {
+                GivenName = "Person1",
+                LastName = "One",
+                NormalizedContent = "A smart man makes a mistake, learns from it, and never makes that mistake again. But a wise man finds a smart man and learns from him how to avoid the mistake altogether.".ToUpper()
+            },
+            new Student
+            {
+                GivenName = "Student3",
+                LastName = "Three",
+                NormalizedContent = "A wise man can learn more from a foolish question than a fool can learn from a wise answer".ToUpper(),
+                Enrollments =
+                [
+                    new Enrollment { CourseId = course1.Id },
+                    new Enrollment { CourseId = course3.Id }
+                ],
+            }
+        };
+        _dbContext.Persons.AddRange(persons);
+        await _dbContext.SaveChangesAsync();
+        
+        var listResponse = await client.GetAsync("/persons/?q=wise fool");
+        var listResult = await listResponse.Content.ReadFromJsonAsync<ListResult<PersonDto>>();
+        Assert.Equal(2, listResult!.Items.Count);
+        Assert.Contains(listResult.Items, p => new[] { "Student1", "Student3" }.Contains(p.GivenName));
+    }
+
+    [Fact]
     public async Task ModifyDepartmentCollection()
     {
         var app = new WebApplicationFactory<Program>();

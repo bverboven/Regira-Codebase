@@ -31,9 +31,10 @@ public class QKeywordHelper(INormalizer? normalizer = null, QKeywordHelperOption
 #if NETSTANDARD2_0
             ?.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
 #else
-                ?.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            ?.Split(' ', StringSplitOptions.RemoveEmptyEntries)
 #endif
-            .Select(ParseKeyword) ?? Array.Empty<QKeyword>();
+            .Select(ParseKeyword) 
+            ?? [];
         return new ParsedKeywordCollection(parsedKeywords, Options.ApplyNormalize ? Normalizer.Normalize(input) : input);
     }
     public QKeyword ParseKeyword(string? input)

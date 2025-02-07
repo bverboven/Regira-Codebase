@@ -40,6 +40,16 @@ public static class ServiceCollectionExtensions
 
             return services;
         }
+
+        public IServiceCollection AddGlobalFilterQueryBuilder<TImplementation>()
+            where TImplementation : class, IGlobalFilteredQueryBuilder
+            => services
+                .AddTransient<IGlobalFilteredQueryBuilder, TImplementation>();
+        public IServiceCollection AddGlobalFilterQueryBuilder<TImplementation, TKey>()
+            where TImplementation : class, IGlobalFilteredQueryBuilder<TKey>
+            => services
+                .AddGlobalFilterQueryBuilder<TImplementation>()
+                .AddTransient<IGlobalFilteredQueryBuilder<TKey>, TImplementation>();
     }
 
     /// <summary>
@@ -77,6 +87,15 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection AddGlobalFilterQueryBuilder<TImplementation>(this IServiceCollection services)
+        where TImplementation : class, IGlobalFilteredQueryBuilder
+        => services
+            .AddTransient<IGlobalFilteredQueryBuilder, TImplementation>();
+    public static IServiceCollection AddGlobalFilterQueryBuilder<TImplementation, TKey>(this IServiceCollection services)
+        where TImplementation : class, IGlobalFilteredQueryBuilder<TKey>
+        => services
+            .AddGlobalFilterQueryBuilder<TImplementation>()
+            .AddTransient<IGlobalFilteredQueryBuilder<TKey>, TImplementation>();
     public static TServiceCollection RemoveGlobalQueryFilters<TServiceCollection>(this TServiceCollection services)
         where TServiceCollection : IServiceCollection
     {

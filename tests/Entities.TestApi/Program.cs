@@ -9,6 +9,7 @@ using Newtonsoft.Json.Converters;
 using Regira.Entities.DependencyInjection.Extensions;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
+using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 using Regira.IO.Storage.FileSystem;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
@@ -43,8 +44,9 @@ builder.Services
     .AddAutoMapper(c => c.AllowNullCollections = true)
     .UseEntities<ContosoContext>(o =>
     {
-        o.AddDefaultGlobalQueryFilters();
         o.AddDefaultQKeywordHelper();
+        o.AddDefaultGlobalQueryFilters();
+        o.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
     })
     // FileSystem storage
     .ConfigureAttachmentService(_ => new BinaryFileService(new FileSystemOptions { RootFolder = ApiConfiguration.AttachmentsDirectory }))
