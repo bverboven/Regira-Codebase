@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
+using Regira.Entities.Keywords;
+using Regira.Entities.Keywords.Abstractions;
+using Regira.Normalizing.Abstractions;
 using Regira.Utilities;
 
 namespace Regira.Entities.DependencyInjection.Extensions;
@@ -21,12 +24,21 @@ public static class ServiceCollectionExtensions
         /// <item>Archivable</item>
         /// </list>
         /// </summary>
-        public void AddDefaultGlobalQueryFilters()
+        public IServiceCollection AddDefaultGlobalQueryFilters()
         {
             services.AddTransient<IGlobalFilteredQueryBuilder, FilterIdsQueryBuilder>();
             services.AddTransient<IGlobalFilteredQueryBuilder, FilterArchivablesQueryBuilder>();
             services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasCreatedQueryBuilder>();
             services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasLastModifiedQueryBuilder>();
+
+            return services;
+        }
+
+        public IServiceCollection AddDefaultQKeywordHelper(Func<IServiceProvider, INormalizer>? normalizerFactory = null, QKeywordHelperOptions? options = null)
+        {
+            services.AddTransient<IQKeywordHelper>(p => new QKeywordHelper(normalizerFactory?.Invoke(p), options));
+
+            return services;
         }
     }
 

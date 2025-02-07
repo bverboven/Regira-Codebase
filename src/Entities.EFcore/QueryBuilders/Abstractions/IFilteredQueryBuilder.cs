@@ -17,6 +17,5 @@ public interface IGlobalFilteredQueryBuilder<TEntity, TKey> : IGlobalFilteredQue
 }
 public interface IGlobalFilteredQueryBuilder
 {
-    IQueryable<TEntity> Build<TEntity, TKey>(IQueryable<TEntity> query, ISearchObject<TKey>? so)
-        where TEntity : IEntity<TKey>;
+    IQueryable<TEntity> Build<TEntity, TKey>(IQueryable<TEntity> query, ISearchObject<TKey>? so);
 }

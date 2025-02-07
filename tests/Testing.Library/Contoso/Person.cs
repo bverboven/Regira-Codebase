@@ -29,7 +29,7 @@ public class Person : IEntityWithSerial, IHasNormalizedTitle, IHasAttachments, I
     [Normalized(SourceProperties = [nameof(LastName), nameof(GivenName)])]
     public string? NormalizedTitle { get; set; }
 
-    [MaxLength(256)]
+    [MaxLength(1024)]
     public string? Description { get; set; }
 
 

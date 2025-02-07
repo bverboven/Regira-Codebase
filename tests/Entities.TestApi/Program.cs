@@ -1,22 +1,15 @@
-using System.Text;
 using System.Text.Json.Serialization;
 using Entities.TestApi.Infrastructure;
 using Entities.TestApi.Infrastructure.Courses;
 using Entities.TestApi.Infrastructure.Departments;
 using Entities.TestApi.Infrastructure.Persons;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Regira.Entities.Abstractions;
-using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Extensions;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
-using Regira.Entities.Keywords;
-using Regira.Entities.Keywords.Abstractions;
 using Regira.IO.Storage.FileSystem;
-using Regira.Utilities;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
@@ -44,8 +37,6 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddProblemDetails();
 
-builder.Services.AddTransient<IQKeywordHelper>(_ => new QKeywordHelper());
-
 builder.Services
     .AddHttpContextAccessor()
     .AddDbContext<ContosoContext>((_, db) => db.UseSqlite(ApiConfiguration.ConnectionString))
@@ -53,21 +44,29 @@ builder.Services
     .UseEntities<ContosoContext>(o =>
     {
         o.AddDefaultGlobalQueryFilters();
+        o.AddDefaultQKeywordHelper();
     })
     // FileSystem storage
     .ConfigureAttachmentService(_ => new BinaryFileService(new FileSystemOptions { RootFolder = ApiConfiguration.AttachmentsDirectory }))
     // Azure storage
-    //.ConfigureAttachmentService(_ => new BinaryBlobService(new AzureCommunicator(new AzureConfig
-    //{
-    //    ConnectionString = builder.Configuration["Storage:Azure:ConnectionString"],
-    //    ContainerName = "test-container"
-    //})))
+    /*
+    .ConfigureAttachmentService(_ => new BinaryBlobService(new AzureCommunicator(new AzureConfig
+    {
+        ConnectionString = builder.Configuration["Storage:Azure:ConnectionString"],
+        ContainerName = "test-container"
+    })))
+    */
+    // Attachment services
     .ConfigureTypedAttachmentService(db =>
     [
         db.CourseAttachments.ToDescriptor<Course>(),
         db.PersonAttachments.ToDescriptor<Person>()
     ])
-    .For<Department>(e => e.AddMapping<DepartmentDto, DepartmentInputDto>())
+    .For<Department>(e =>
+    {
+        e.AddMapping<DepartmentDto, DepartmentInputDto>();
+        e.AddQueryFilter<DepartmentMax10YearsOldQueryFilter>();
+    })
     .For<Course, int, CourseSearchObject, CourseRepository>(e =>
     {
         e.AddDefaultQueryBuilders();
@@ -100,48 +99,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/", () => "Hello");
-app.MapPost("/db", (ContosoContext db) => db.Database.EnsureCreatedAsync());
-app.MapDelete("/db", (ContosoContext db) => db.Database.EnsureDeletedAsync());
-app.MapPost("/test-data", async (ContosoContext db, IEntityService<CourseAttachment> courseAttachmentService) =>
-{
-    await db.Database.EnsureCreatedAsync();
-
-    var departments = Enumerable.Range(1, 5).Select((_, i) => new Department { Title = $"Department #{i}", Budget = i * 1000, StartDate = DateTime.Today.AddDays(i * 3) }).ToArray();
-    var courses = Enumerable.Range(1, 50).Select((_, i) => new Course { Title = $"Course #{i}", Credits = Random.Shared.Next(1, 5), Department = departments[Random.Shared.Next(0, 4)] }).ToArray();
-
-    db.Departments.AddRange(departments);
-    db.Courses.AddRange(courses);
-
-    await db.SaveChangesAsync();
-
-    var courseAttachments = courses.Shuffle().Take(10).Select(x => new CourseAttachment
-    {
-        ObjectId = x.Id,
-        Attachment = new Attachment
-        {
-            Bytes = Encoding.UTF8.GetBytes($"This is an attachment of course #{x.Id}"),
-            FileName = $"courses/course-{x.Id}.txt",
-            ContentType = "text/plain"
-        }
-    });
-
-    foreach (var item in courseAttachments)
-    {
-        await courseAttachmentService.Add(item);
-    }
-
-    await courseAttachmentService.SaveChanges();
-});
-var departments = app.MapGroup("/minimal/departments")
-    .WithOpenApi();
-departments.MapGet("", async (ContosoContext db) => await db.Departments.ToListAsync());
-departments.MapPut("", async (ContosoContext db, [FromBody] Department input) =>
-{
-    db.Departments.Add(input);
-    await db.SaveChangesAsync();
-});
-
+// add minimal api endpoints
+app.MapEndPoints();
+// add controller mappings
 app.MapControllers();
 
 app.Run();

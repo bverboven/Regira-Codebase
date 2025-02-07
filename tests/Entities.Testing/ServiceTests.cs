@@ -39,6 +39,7 @@ public class ServiceTests
             .UseEntities<ContosoContext>(o =>
             {
                 o.AddDefaultGlobalQueryFilters();
+                o.AddDefaultQKeywordHelper();
             })
             .For<Course>()
             .For<Department>();

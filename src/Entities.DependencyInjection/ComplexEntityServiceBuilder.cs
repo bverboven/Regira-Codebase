@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
+using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.Models.Abstractions;
 
@@ -39,6 +40,15 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
     {
         base.HasManager(factory);
         Services.AddTransient(factory);
+        return this;
+    }
+
+    // Query Builders
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddDefaultQueryBuilders()
+    {
+        Services.AddTransient<IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>,
+            QueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>>();
+
         return this;
     }
 
@@ -146,13 +156,22 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
     }
 
 
-    public void AddQueryFilter<TImplementation>()
+    // Query Builders
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddDefaultQueryBuilders()
+    {
+        Services.AddTransient<IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>,
+            QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+
+        return this;
+    }
+
+    public new void AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>
         => Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
     public void AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>> factory)
         => Services.AddTransient(factory);
 
-    public void AddQueryBuilder<TImplementation>()
+    public new void AddQueryBuilder<TImplementation>()
         where TImplementation : class, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
         => Services.AddTransient<IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, TImplementation>();
     public void AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>> factory)

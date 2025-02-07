@@ -61,7 +61,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     }
 
     // Default service
-    public EntityServiceCollection<TContext> For<TEntity>(Action<EntityServiceBuilder<TContext, TEntity, int>>? configure = null)
+    public EntityServiceCollection<TContext> For<TEntity>(Action<EntityServiceBuilder<TContext, TEntity>>? configure = null)
         where TEntity : class, IEntity<int>
     {
         var builder = new EntityServiceBuilder<TContext, TEntity>(this)

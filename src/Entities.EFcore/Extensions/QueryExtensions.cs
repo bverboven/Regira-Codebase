@@ -2,48 +2,12 @@
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Keywords;
 using Regira.Entities.Models.Abstractions;
-using Regira.Normalizing.Abstractions;
 using Regira.Utilities;
 
 namespace Regira.Entities.EFcore.Extensions;
 
 public static class QueryExtensions
 {
-    public static IQueryable<T> Filter<T, TKey>(this IQueryable<T> query, ISearchObject<TKey>? so, INormalizer? normalizer = null)
-        where T : IEntity<TKey>
-    {
-        if (so == null)
-        {
-            return query;
-        }
-
-        query = query.FilterId(so.Id);
-        query = query.FilterIds(so.Ids);
-        query = query.FilterExclude(so.Exclude);
-
-        //var qHelper = QKeywordHelper.Create(normalizer);
-        //if (TypeUtility.ImplementsInterface<IHasNormalizedContent>(typeof(T)))
-        //{
-        //    query = query.Cast<IHasNormalizedContent>().FilterQ(qHelper.Parse(so.Q)).Cast<T>();
-        //}
-
-        if (TypeUtility.ImplementsInterface<IHasCreated>(typeof(T)))
-        {
-            query = query.Cast<IHasCreated>().FilterCreated(so.MinCreated, so.MaxCreated).Cast<T>();
-        }
-        if (TypeUtility.ImplementsInterface<IHasLastModified>(typeof(T)))
-        {
-            query = query.Cast<IHasLastModified>().FilterLastModified(so.MinLastModified, so.MaxLastModified).Cast<T>();
-        }
-
-        if (TypeUtility.ImplementsInterface<IArchivable>(typeof(T)))
-        {
-            query = query.Cast<IArchivable>().FilterArchivable(so.IsArchived).Cast<T>();
-        }
-
-        return query;
-    }
-
     public static IQueryable<TEntity> FilterId<TEntity, TKey>(this IQueryable<TEntity> query, TKey? id)
         where TEntity : IEntity<TKey>
     {
