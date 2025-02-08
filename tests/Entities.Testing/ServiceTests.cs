@@ -1,4 +1,5 @@
 ﻿using Entities.Testing.Infrastructure.Data;
+using Entities.Testing.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
@@ -20,11 +21,11 @@ public class ServiceTests
             .For<Category>();
         using var sp = services.BuildServiceProvider();
         var queryBuilder1 = sp.GetService<IQueryBuilder<Category>>();
-        //var queryBuilder2 = sp.GetService<IQueryBuilder<Category, int>>();
+        var queryBuilder2 = sp.GetService<IQueryBuilder<Category, int>>();
         var entityService1 = sp.GetService<IEntityService<Category>>();
         var entityService2 = sp.GetService<IEntityService<Category, int>>();
         Assert.That(queryBuilder1, Is.Not.Null);
-        //Assert.That(queryBuilder2, Is.Not.Null);
+        Assert.That(queryBuilder2, Is.Not.Null);
         Assert.That(entityService1, Is.Not.Null);
         Assert.That(entityService2, Is.Not.Null);
     }
@@ -93,5 +94,44 @@ public class ServiceTests
         Assert.That(entityService1, Is.Not.Null);
         Assert.That(entityService2, Is.Not.Null);
         Assert.That(entityService3, Is.Not.Null);
+    }
+
+    [Test]
+    public void Custom_EntityService()
+    {
+        var services = new ServiceCollection()
+            .AddDbContext<ProductContext>((_, db) => db.UseSqlite("Filename=:memory:"))
+            .UseEntities<ProductContext>()
+            .For<Product>(e => e.UseEntityService<ProductService>());
+        using var sp = services.BuildServiceProvider();
+
+        var queryBuilder1 = sp.GetService<IQueryBuilder<Product>>();
+        var queryBuilder2 = sp.GetService<IQueryBuilder<Product, int>>();
+        var entityService1 = sp.GetService<IEntityService<Product>>();
+        var entityService2 = sp.GetService<IEntityService<Product, int>>();
+
+        Assert.That(queryBuilder1, Is.Not.Null);
+        Assert.That(queryBuilder2, Is.Not.Null);
+        Assert.That(entityService1, Is.TypeOf<ProductService>());
+        Assert.That(entityService2, Is.TypeOf<ProductService>());
+    }
+    [Test]
+    public void Custom_QueryBuilder()
+    {
+        var services = new ServiceCollection()
+            .AddDbContext<ProductContext>((_, db) => db.UseSqlite("Filename=:memory:"))
+            .UseEntities<ProductContext>()
+            .For<Product>(e => e.UseQueryBuilder<ProductQueryBuilder>());
+        using var sp = services.BuildServiceProvider();
+
+        var queryBuilder1 = sp.GetService<IQueryBuilder<Product>>();
+        var queryBuilder2 = sp.GetService<IQueryBuilder<Product, int>>();
+        var entityService1 = sp.GetService<IEntityService<Product>>();
+        var entityService2 = sp.GetService<IEntityService<Product, int>>();
+
+        Assert.That(queryBuilder1, Is.TypeOf<ProductQueryBuilder>());
+        Assert.That(queryBuilder2, Is.TypeOf<ProductQueryBuilder>());
+        Assert.That(entityService1, Is.Not.Null);
+        Assert.That(entityService2, Is.Not.Null);
     }
 }

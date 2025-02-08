@@ -71,7 +71,7 @@ builder.Services
     })
     .For<Course, int, CourseSearchObject>(e =>
     {
-        e.AddService<CourseRepository>();
+        e.UseEntityService<CourseRepository>();
         e.AddMapping<CourseDto, CourseInputDto>();
         e.HasAttachments<ContosoContext, Course, CourseAttachment>(a =>
         {
@@ -82,11 +82,11 @@ builder.Services
     })
     .For<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(e =>
     {
-        e.AddService<PersonManager>();
+        e.UseEntityService<PersonManager>();
         e.HasRepository<PersonRepository>();
         e.HasManager<PersonManager>();
         e.AddQueryFilter<PersonQueryFilter>();
-        e.AddQueryBuilder<PersonQueryBuilder>();
+        e.UseQueryBuilder<PersonQueryBuilder>();
         e.AddMapping<PersonDto, PersonInputDto>();
         e.HasAttachments<ContosoContext, Person, PersonAttachment>();
     });
