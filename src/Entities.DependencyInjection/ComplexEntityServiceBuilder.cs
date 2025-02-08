@@ -160,13 +160,11 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>
     {
         Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
-        HasQueryBuilder = true;
         return this;
     }
     public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>> factory)
     {
         Services.AddTransient(factory);
-        HasQueryBuilder = true;
         return this;
     }
 

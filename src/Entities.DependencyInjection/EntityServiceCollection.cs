@@ -8,6 +8,7 @@ using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.Keywords.Abstractions;
+using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Attachments.Models;
 using Regira.IO.Storage.Abstractions;
@@ -46,7 +47,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             .AddService<TService>();
         configure?.Invoke(builder);
 
-        if (!builder.HasQueryBuilder)
+        if (!builder.HasQueryBuilder<IQueryBuilder<TEntity, TKey, SearchObject<TKey>>>())
         {
             builder.AddDefaultQueryBuilder();
         }
@@ -62,7 +63,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             .AddService<TService>();
         configure?.Invoke(builder);
 
-        if (!builder.HasQueryBuilder)
+        if (!builder.HasQueryBuilder<IQueryBuilder<TEntity, TKey, TSearchObject>>())
         {
             builder.AddDefaultQueryBuilder();
         }
@@ -78,7 +79,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             .AddDefaultService();
         configure?.Invoke(builder);
 
-        if (!builder.HasQueryBuilder)
+        if (!builder.HasQueryBuilder<IQueryBuilder<TEntity, SearchObject>>())
         {
             builder.AddDefaultQueryBuilder();
         }
@@ -99,7 +100,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             .AddDefaultService();
         configure?.Invoke(builder);
 
-        if (!builder.HasQueryBuilder)
+        if (!builder.HasQueryBuilder<IQueryBuilder<TEntity, TKey, SearchObject<TKey>>>())
         {
             builder.AddDefaultQueryBuilder();
         }
@@ -114,7 +115,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             .AddDefaultService();
         configure?.Invoke(builder);
 
-        if (!builder.HasQueryBuilder)
+        if (!builder.HasQueryBuilder<IQueryBuilder<TEntity, TKey, TSearchObject>>())
         {
             builder.AddDefaultQueryBuilder();
         }
@@ -230,7 +231,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             .AddComplexService<TService, TSearchObject, TSortBy, TIncludes>();
         configure?.Invoke(builder);
 
-        if (!builder.HasQueryBuilder)
+        if (!builder.HasQueryBuilder<IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>>())
         {
             builder.AddDefaultQueryBuilder();
         }
@@ -259,7 +260,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             .AddComplexService<TService, TSearchObject, TSortBy, TIncludes>();
         configure?.Invoke(builder);
 
-        if (!builder.HasQueryBuilder)
+        if (!builder.HasQueryBuilder<IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>())
         {
             builder.AddDefaultQueryBuilder();
         }

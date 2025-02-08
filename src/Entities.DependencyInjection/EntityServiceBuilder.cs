@@ -79,13 +79,11 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         where TImplementation : class, IQueryBuilder<TEntity, SearchObject>
     {
         Services.AddTransient<IQueryBuilder<TEntity, SearchObject>, TImplementation>();
-        HasQueryBuilder = true;
         return this;
     }
     public EntityServiceBuilder<TContext, TEntity> AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, SearchObject>> factory)
     {
         Services.AddTransient(factory);
-        HasQueryBuilder = true;
         return this;
     }
 
@@ -123,8 +121,8 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
 {
-    // ToDo: make this a getter only that checks the Services collection?
-    public bool HasQueryBuilder { get; set; }
+    public virtual bool HasQueryBuilder() => HasQueryBuilder<IQueryBuilder<TEntity, TKey, SearchObject<TKey>>>();
+    public bool HasQueryBuilder<TService>() => Services.Any(s => s.ServiceType == typeof(TService));
 
     // Entity mapping
     /// <summary>
@@ -266,13 +264,11 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
         where TImplementation : class, IQueryBuilder<TEntity, TKey, SearchObject<TKey>>
     {
         Services.AddTransient<IQueryBuilder<TEntity, TKey, SearchObject<TKey>>, TImplementation>();
-        HasQueryBuilder = true;
         return this;
     }
     public EntityServiceBuilder<TContext, TEntity, TKey> AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TKey, SearchObject<TKey>>> factory)
     {
         Services.AddTransient(factory);
-        HasQueryBuilder = true;
         return this;
     }
 
@@ -371,13 +367,11 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
         where TImplementation : class, IQueryBuilder<TEntity, TKey, TSearchObject>
     {
         Services.AddTransient<IQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
-        HasQueryBuilder = true;
         return this;
     }
     public EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TKey, TSearchObject>> factory)
     {
         Services.AddTransient(factory);
-        HasQueryBuilder = true;
         return this;
     }
 
