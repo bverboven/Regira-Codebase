@@ -6,7 +6,8 @@ public interface IEntityRepository<TEntity> : IEntityRepository<TEntity, int>, I
     where TEntity : class, IEntity<int>;
 public interface IEntityRepository<TEntity, in TKey> : IEntityService<TEntity, TKey>
     where TEntity : class, IEntity<TKey>;
-public interface IEntityRepository<TEntity, in TKey, in TSearchObject> : IEntityService<TEntity, TKey, TSearchObject>, IEntityRepository<TEntity, TKey>
+public interface IEntityRepository<TEntity, in TKey, in TSearchObject> 
+    : IEntityService<TEntity, TKey, TSearchObject>, IEntityRepository<TEntity, TKey>
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new();
 
@@ -18,7 +19,7 @@ public interface IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes> :
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum;
 public interface IEntityRepository<TEntity, in TKey, TSearchObject, TSortBy, TIncludes> : IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>,
-    IEntityRepository<TEntity, TKey>
+    IEntityRepository<TEntity, TKey, TSearchObject>
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
     where TSortBy : struct, Enum

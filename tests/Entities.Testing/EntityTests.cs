@@ -16,7 +16,7 @@ public class EntityTests
     [Test]
     public void IsNew_For_String()
     {
-        var item = new User();
+        var item = new Customer();
         var isNew = item.IsNew();
         Assert.That(isNew, Is.True);
     }

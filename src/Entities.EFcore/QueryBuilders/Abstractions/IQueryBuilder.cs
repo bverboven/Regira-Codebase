@@ -4,9 +4,11 @@ using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.EFcore.QueryBuilders.Abstractions;
 
-public interface IQueryBuilder<TEntity, TSearchObject> : IQueryBuilder<TEntity, int, TSearchObject>
-    where TEntity : IEntity<int>
-    where TSearchObject : ISearchObject;
+public interface IQueryBuilder<TEntity> : IQueryBuilder<TEntity, int>
+    where TEntity : IEntity<int>;
+
+public interface IQueryBuilder<TEntity, TKey> : IQueryBuilder<TEntity, TKey, SearchObject<TKey>>
+    where TEntity : IEntity<TKey>;
 
 public interface IQueryBuilder<TEntity, TKey, TSearchObject> : IQueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>
     where TEntity : IEntity<TKey>

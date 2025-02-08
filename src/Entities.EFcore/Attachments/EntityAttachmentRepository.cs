@@ -13,7 +13,7 @@ namespace Regira.Entities.EFcore.Attachments;
 public class EntityAttachmentRepository<TContext, TEntity, TEntityAttachment>(
     TContext dbContext,
     IAttachmentService attachmentService,
-    IQueryBuilder<TEntityAttachment, EntityAttachmentSearchObject> queryBuilder,
+    IQueryBuilder<TEntityAttachment, int, EntityAttachmentSearchObject> queryBuilder,
     IIdentifierGenerator? identifierGenerator = null)
     : EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>
         (dbContext, attachmentService, queryBuilder, identifierGenerator)
@@ -24,7 +24,7 @@ public class EntityAttachmentRepository<TContext, TEntity, TEntityAttachment>(
 public class EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, TSearchObject>(
     TContext dbContext,
     IAttachmentService attachmentService,
-    IQueryBuilder<TEntityAttachment, TSearchObject> queryBuilder,
+    IQueryBuilder<TEntityAttachment, int, TSearchObject> queryBuilder,
     IIdentifierGenerator? identifierGenerator = null)
     : EntityAttachmentRepository<TContext, TEntity, int, TEntityAttachment, int, TSearchObject, int>
         (dbContext, attachmentService, queryBuilder, identifierGenerator),

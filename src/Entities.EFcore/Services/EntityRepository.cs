@@ -10,18 +10,18 @@ using Regira.Utilities;
 namespace Regira.Entities.EFcore.Services;
 
 public class EntityRepository<TContext, TEntity>
-    (TContext dbContext, IQueryBuilder<TEntity, SearchObject> queryBuilder)
-    : EntityRepository<TContext, TEntity, int, SearchObject>(dbContext, queryBuilder), IEntityRepository<TEntity>
+    (TContext dbContext, IQueryBuilder<TEntity> queryBuilder)
+    : EntityRepository<TContext, TEntity, int>(dbContext, queryBuilder), IEntityRepository<TEntity>
     where TContext : DbContext
     where TEntity : class, IEntity<int>;
-public abstract class EntityRepository<TContext, TEntity, TKey>
-    (TContext dbContext, IQueryBuilder<TEntity, TKey, SearchObject<TKey>> queryBuilder)
+public class EntityRepository<TContext, TEntity, TKey>
+    (TContext dbContext, IQueryBuilder<TEntity, TKey> queryBuilder)
     : EntityRepository<TContext, TEntity, TKey, SearchObject<TKey>>(dbContext, queryBuilder)
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>;
 public class EntityRepository<TContext, TEntity, TKey, TSearchObject>
     (TContext dbContext, IQueryBuilder<TEntity, TKey, TSearchObject> queryBuilder)
-    : IEntityService<TEntity, TKey, TSearchObject>, IEntityRepository<TEntity, TKey>
+    : IEntityRepository<TEntity, TKey, TSearchObject>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
@@ -104,3 +104,4 @@ public class EntityRepository<TContext, TEntity, TKey, TSearchObject>
     public bool IsNew(TEntity item)
         => item.IsNew();
 }
+

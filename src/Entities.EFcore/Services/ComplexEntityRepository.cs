@@ -6,18 +6,18 @@ using Regira.Entities.Extensions;
 using Regira.Entities.Models.Abstractions;
 using Regira.Utilities;
 
-namespace Regira.Entities.EFcore.Abstractions;
+namespace Regira.Entities.EFcore.Services;
 
-public abstract class EntityRepositoryBase<TContext, TEntity, TSearchObject, TSortBy, TIncludes>
+public class EntityRepository<TContext, TEntity, TSearchObject, TSortBy, TIncludes>
     (TContext dbContext, IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes> queryBuilder)
-    : EntityRepositoryBase<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>(dbContext, queryBuilder),
+    : EntityRepository<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>(dbContext, queryBuilder),
         IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>
     where TContext : DbContext
     where TEntity : class, IEntity<int>
     where TSearchObject : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum;
-public abstract class EntityRepositoryBase<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>
+public class EntityRepository<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>
     (TContext dbContext, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes> queryBuilder)
     : IEntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
     where TContext : DbContext

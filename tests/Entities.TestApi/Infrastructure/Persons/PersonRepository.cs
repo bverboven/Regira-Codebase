@@ -1,13 +1,13 @@
-﻿using Regira.Entities.EFcore.Abstractions;
-using Regira.Entities.EFcore.Extensions;
+﻿using Regira.Entities.EFcore.Extensions;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
+using Regira.Entities.EFcore.Services;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
 namespace Entities.TestApi.Infrastructure.Persons;
 
 public class PersonRepository(ContosoContext dbContext, IQueryBuilder<Person, PersonSearchObject, PersonSortBy, PersonIncludes> queryBuilder)
-    : EntityRepositoryBase<ContosoContext, Person, PersonSearchObject, PersonSortBy, PersonIncludes>(dbContext, queryBuilder)
+    : EntityRepository<ContosoContext, Person, PersonSearchObject, PersonSortBy, PersonIncludes>(dbContext, queryBuilder)
 {
     private readonly ContosoContext _dbContext = dbContext;
 

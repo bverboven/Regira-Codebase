@@ -61,11 +61,13 @@ public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject, TS
         => service.Details(id);
     public virtual Task<IList<TEntity>> List(object? so = null, PagingInfo? pagingInfo = null)
         => service.List(so, pagingInfo);
-    public virtual Task<int> Count(object? so)
-        => service.Count(so);
-
+    public Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
+        => service.List(so, pagingInfo);
     public virtual Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null)
         => service.List(so, sortBy, includes, pagingInfo);
+
+    public virtual Task<int> Count(object? so)
+        => service.Count(so);
     public virtual Task<int> Count(IList<TSearchObject?> so)
         => service.Count(so);
 

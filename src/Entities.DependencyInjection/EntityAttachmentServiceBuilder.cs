@@ -33,8 +33,8 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
         Services.AddTransient<IFilteredQueryBuilder<TEntityAttachment, EntityAttachmentSearchObject>,
             EntityAttachmentFilteredQueryBuilder<TEntityAttachment, EntityAttachmentSearchObject>>();
         // Query builder
-        Services.AddTransient<IQueryBuilder<TEntityAttachment, EntityAttachmentSearchObject>,
-            QueryBuilder<TEntityAttachment, EntityAttachmentSearchObject>>();
+        Services.AddTransient<IQueryBuilder<TEntityAttachment, int, EntityAttachmentSearchObject>,
+            QueryBuilder<TEntityAttachment, int, EntityAttachmentSearchObject>>();
         // Repository
         Services.AddTransient<IEntityService<TEntityAttachment>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment>>();
 

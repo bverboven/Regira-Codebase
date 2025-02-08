@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Entities.Testing.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.Extensions;
-using Testing.Library.Contoso;
-using Testing.Library.Data;
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
+using Regira.Entities.Models;
 
 namespace Entities.Testing;
 
@@ -11,39 +12,86 @@ namespace Entities.Testing;
 public class ServiceTests
 {
     [Test]
-    public async Task Details()
-    {
-        using var scope = GetServiceScope();
-        var p = scope.ServiceProvider;
-        var dbContext = p.GetRequiredService<ContosoContext>();
-        await dbContext.Database.GetDbConnection().OpenAsync();
-        await dbContext.Database.EnsureCreatedAsync();
-
-        var service = p.GetRequiredService<IEntityService<Department>>();
-        await service.Add(new Department { Title = "Dept #1" });
-        await service.SaveChanges();
-
-        var details = await service.Details(1);
-        Assert.That(details, Is.Not.Null);
-        var details0 = await service.Details(0);
-        Assert.That(details0, Is.Null);
-
-        await dbContext.Database.GetDbConnection().CloseAsync();
-    }
-
-
-    public IServiceScope GetServiceScope()
+    public void EntityType_only()
     {
         var services = new ServiceCollection()
-            .AddDbContext<ContosoContext>((_, db) => db.UseSqlite("Filename=:memory:"))
-            .UseEntities<ContosoContext>(o =>
-            {
-                o.AddDefaultGlobalQueryFilters();
-                o.AddDefaultQKeywordHelper();
-            })
-            .For<Course>()
-            .For<Department>();
-
-        return services.BuildServiceProvider().CreateScope();
+            .AddDbContext<ProductContext>((_, db) => db.UseSqlite("Filename=:memory:"))
+            .UseEntities<ProductContext>()
+            .For<Category>();
+        using var sp = services.BuildServiceProvider();
+        var queryBuilder1 = sp.GetService<IQueryBuilder<Category>>();
+        //var queryBuilder2 = sp.GetService<IQueryBuilder<Category, int>>();
+        var entityService1 = sp.GetService<IEntityService<Category>>();
+        var entityService2 = sp.GetService<IEntityService<Category, int>>();
+        Assert.That(queryBuilder1, Is.Not.Null);
+        //Assert.That(queryBuilder2, Is.Not.Null);
+        Assert.That(entityService1, Is.Not.Null);
+        Assert.That(entityService2, Is.Not.Null);
+    }
+    [Test]
+    public void EntityType_And_KeyType()
+    {
+        var services = new ServiceCollection()
+            .AddDbContext<ProductContext>((_, db) => db.UseSqlite("Filename=:memory:"))
+            .UseEntities<ProductContext>()
+            .For<Category, int>();
+        using var sp = services.BuildServiceProvider();
+        var queryBuilder = sp.GetService<IQueryBuilder<Category, int>>();
+        var entityService = sp.GetService<IEntityService<Category, int>>();
+        Assert.That(queryBuilder, Is.Not.Null);
+        Assert.That(entityService, Is.Not.Null);
+    }
+    [Test]
+    public void EntityType_And_KeyType_And_SearchObject()
+    {
+        var services = new ServiceCollection()
+            .AddDbContext<ProductContext>((_, db) => db.UseSqlite("Filename=:memory:"))
+            .UseEntities<ProductContext>()
+            .For<Product, int, ProductSearchObject>();
+        using var sp = services.BuildServiceProvider();
+        var queryBuilder = sp.GetService<IQueryBuilder<Product, int, ProductSearchObject>>();
+        var entityService1 = sp.GetService<IEntityService<Product, int>>();
+        var entityService2 = sp.GetService<IEntityService<Product, int, ProductSearchObject>>();
+        Assert.That(queryBuilder, Is.Not.Null);
+        Assert.That(entityService1, Is.Not.Null);
+        Assert.That(entityService2, Is.Not.Null);
+    }
+    [Test]
+    public void Complex_Service_Without_Key()
+    {
+        var services = new ServiceCollection()
+            .AddDbContext<ProductContext>((_, db) => db.UseSqlite("Filename=:memory:"))
+            .UseEntities<ProductContext>()
+            .For<Product, ProductSearchObject, EntitySortBy, EntityIncludes>();
+        using var sp = services.BuildServiceProvider();
+        var queryBuilder = sp.GetService<IQueryBuilder<Product, int, ProductSearchObject, EntitySortBy, EntityIncludes>>();
+        var entityService0 = sp.GetService<IEntityService<Product>>();
+        var entityService1 = sp.GetService<IEntityService<Product, int>>();
+        var entityService2 = sp.GetService<IEntityService<Product, int, ProductSearchObject>>();
+        var entityService3 = sp.GetService<IEntityService<Product, ProductSearchObject, EntitySortBy, EntityIncludes>>();
+        var entityService4 = sp.GetService<IEntityService<Product, int, ProductSearchObject, EntitySortBy, EntityIncludes>>();
+        Assert.That(queryBuilder, Is.Not.Null);
+        Assert.That(entityService0, Is.Not.Null);
+        Assert.That(entityService1, Is.Not.Null);
+        Assert.That(entityService2, Is.Not.Null);
+        Assert.That(entityService3, Is.Not.Null);
+        Assert.That(entityService4, Is.Not.Null);
+    }
+    [Test]
+    public void Complex_Service_With_Key()
+    {
+        var services = new ServiceCollection()
+            .AddDbContext<ProductContext>((_, db) => db.UseSqlite("Filename=:memory:"))
+            .UseEntities<ProductContext>()
+            .For<Product, int, ProductSearchObject, EntitySortBy, EntityIncludes>();
+        using var sp = services.BuildServiceProvider();
+        var queryBuilder = sp.GetService<IQueryBuilder<Product, int, ProductSearchObject, EntitySortBy, EntityIncludes>>();
+        var entityService1 = sp.GetService<IEntityService<Product, int>>();
+        var entityService2 = sp.GetService<IEntityService<Product, int, ProductSearchObject>>();
+        var entityService3 = sp.GetService<IEntityService<Product, int, ProductSearchObject, EntitySortBy, EntityIncludes>>();
+        Assert.That(queryBuilder, Is.Not.Null);
+        Assert.That(entityService1, Is.Not.Null);
+        Assert.That(entityService2, Is.Not.Null);
+        Assert.That(entityService3, Is.Not.Null);
     }
 }

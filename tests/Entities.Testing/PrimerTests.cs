@@ -64,13 +64,14 @@ public class PrimerTests
         var dbContext = sp.GetRequiredService<ProductContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
-        var account = new UserAccount
+        var account = new User
         {
+            Id = Guid.NewGuid().ToString(),
             Username = "TestUser",
             Password = "Testing Primer"
         };
 
-        dbContext.UserAccounts.Add(account);
+        dbContext.Users.Add(account);
 
         await dbContext.ApplyPrimers();
 

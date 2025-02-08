@@ -6,23 +6,17 @@ using Regira.Utilities;
 
 namespace Regira.Entities.EFcore.QueryBuilders;
 
-public class QueryBuilder<TEntity, TSearchObject>(
+public class QueryBuilder<TEntity>(
     IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
-    IEnumerable<IFilteredQueryBuilder<TEntity, TSearchObject>>? filters = null
-) : QueryBuilder<TEntity, int, TSearchObject>(globalFilters, filters), IQueryBuilder<TEntity, TSearchObject>
-    where TEntity : IEntity<int>
-    where TSearchObject : ISearchObject;
+    IEnumerable<IFilteredQueryBuilder<TEntity, SearchObject<int>>>? filters = null
+) : QueryBuilder<TEntity, int>(globalFilters, filters), IQueryBuilder<TEntity>
+    where TEntity : IEntity<int>;
 
-public class QueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>(
+public class QueryBuilder<TEntity, TKey>(
     IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
-    IEnumerable<IFilteredQueryBuilder<TEntity, TSearchObject>>? filters = null
-)
-    : QueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>(globalFilters, filters),
-        IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>
-    where TEntity : IEntity<int>
-    where TSearchObject : ISearchObject<int>
-    where TSortBy : struct, Enum
-    where TIncludes : struct, Enum;
+    IEnumerable<IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>>? filters = null
+) : QueryBuilder<TEntity, TKey, SearchObject<TKey>>(globalFilters, filters), IQueryBuilder<TEntity, TKey>
+    where TEntity : IEntity<TKey>;
 
 public class QueryBuilder<TEntity, TKey, TSearchObject>(
     IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
@@ -36,6 +30,18 @@ public class QueryBuilder<TEntity, TKey, TSearchObject>(
     public IQueryable<TEntity> Query(IQueryable<TEntity> query, IList<TSearchObject?>? searchObjects, PagingInfo? pagingInfo)
         => Query(query, searchObjects, [EntitySortBy.Default], EntityIncludes.None, pagingInfo);
 }
+
+public class QueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>(
+    IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
+    IEnumerable<IFilteredQueryBuilder<TEntity, TSearchObject>>? filters = null
+)
+    : QueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>(globalFilters, filters),
+        IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>
+    where TEntity : IEntity<int>
+    where TSearchObject : ISearchObject<int>
+    where TSortBy : struct, Enum
+    where TIncludes : struct, Enum;
+
 
 public class QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
         IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,

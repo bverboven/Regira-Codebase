@@ -3,12 +3,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
+using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.DependencyInjection;
 
 public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(
-    EntityServiceBuilder<TContext, TEntity, int> services)
+    EntityServiceBuilder<TContext, TEntity, int, TSearchObject> services)
     : ComplexEntityServiceBuilder<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>(services)
     where TContext : DbContext
     where TEntity : class, IEntity<int>
@@ -39,6 +40,40 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
     public ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> HasManager(Func<IServiceProvider, IEntityManager<TEntity, TSearchObject, TSortBy, TIncludes>> factory)
     {
         base.HasManager(factory);
+        Services.AddTransient(factory);
+        return this;
+    }
+
+    // Entity service
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddDefaultService()
+        => AddService<EntityRepository<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>();
+
+    /// <summary>
+    /// Adds <typeparamref name="TService"/> implementation for
+    /// <list type="bullet">
+    ///     <item><see cref="IEntityService{TEntity, TKey, TSearchObject, TSortBy, TIncludes}"/></item>
+    /// </list>
+    /// </summary>
+    /// <typeparam name="TService"></typeparam>
+    /// <returns></returns>
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddService<TService>()
+        where TService : class, IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>
+    {
+        base.AddService<TService>();
+        Services.AddTransient<IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>, TService>();
+        Services.AddTransient<IEntityService<TEntity>, TService>();
+        return this;
+    }
+    /// <summary>
+    /// Adds an implementation for
+    /// <list type="bullet">
+    ///     <item><see cref="IEntityService{TEntity, TSearchObject, TSortBy, TIncludes}"/></item>
+    /// </list>
+    /// </summary>
+    /// <returns></returns>
+    public virtual ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddService(Func<IServiceProvider, IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>> factory)
+    {
+        base.AddService(factory);
         Services.AddTransient(factory);
         return this;
     }
@@ -81,7 +116,8 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
 
 }
 public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
-    EntityServiceBuilder<TContext, TEntity, TKey> services) : EntityServiceBuilder<TContext, TEntity, TKey>(services)
+    EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> services)
+    : EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(services)
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
@@ -151,6 +187,38 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
         return this;
     }
 
+    // Entity service
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddDefaultService()
+        => AddService<EntityRepository<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+
+    /// <summary>
+    /// Adds <typeparamref name="TService"/> implementation for
+    /// <list type="bullet">
+    ///     <item><see cref="IEntityService{TEntity, TKey, TSearchObject, TSortBy, TIncludes}"/></item>
+    /// </list>
+    /// </summary>
+    /// <typeparam name="TService"></typeparam>
+    /// <returns></returns>
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddService<TService>()
+        where TService : class, IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
+    {
+        base.AddService<TService>();
+        Services.AddTransient<IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, TService>();
+        return this;
+    }
+    /// <summary>
+    /// Adds an implementation for
+    /// <list type="bullet">
+    ///     <item><see cref="IEntityService{TEntity, TKey, TSearchObject, TSortBy, TIncludes}"/></item>
+    /// </list>
+    /// </summary>
+    /// <returns></returns>
+    public virtual ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddService(Func<IServiceProvider, IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>> factory)
+    {
+        base.AddService(factory);
+        Services.AddTransient(factory);
+        return this;
+    }
 
     // Query Builders
     public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddDefaultQueryBuilder()
@@ -162,7 +230,7 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
         Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
         return this;
     }
-    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>> factory)
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>> factory)
     {
         Services.AddTransient(factory);
         return this;

@@ -69,8 +69,9 @@ builder.Services
         e.AddMapping<DepartmentDto, DepartmentInputDto>();
         e.AddQueryFilter<DepartmentMax10YearsOldQueryFilter>();
     })
-    .For<Course, int, CourseSearchObject, CourseRepository>(e =>
+    .For<Course, int, CourseSearchObject>(e =>
     {
+        e.AddService<CourseRepository>();
         e.AddMapping<CourseDto, CourseInputDto>();
         e.HasAttachments<ContosoContext, Course, CourseAttachment>(a =>
         {
@@ -79,13 +80,14 @@ builder.Services
         // extra person filter
         e.AddTransient<IFilteredQueryBuilder<Person, PersonSearchObject>, CoursePersonQueryFilter>();
     })
-    .For<Person, PersonManager, PersonSearchObject, PersonSortBy, PersonIncludes>(e =>
+    .For<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(e =>
     {
+        e.AddService<PersonManager>();
+        e.HasRepository<PersonRepository>();
+        e.HasManager<PersonManager>();
         e.AddQueryFilter<PersonQueryFilter>();
         e.AddQueryBuilder<PersonQueryBuilder>();
         e.AddMapping<PersonDto, PersonInputDto>();
-        e.HasRepository<PersonRepository>();
-        e.HasManager<PersonManager>();
         e.HasAttachments<ContosoContext, Person, PersonAttachment>();
     });
 

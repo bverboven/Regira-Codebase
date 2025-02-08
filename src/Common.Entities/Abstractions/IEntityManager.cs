@@ -6,7 +6,8 @@ public interface IEntityManager<TEntity> : IEntityManager<TEntity, int>, IEntity
     where TEntity : class, IEntity<int>;
 public interface IEntityManager<TEntity, in TKey> : IEntityService<TEntity, TKey>
     where TEntity : class, IEntity<TKey>;
-public interface IEntityManager<TEntity, in TKey, in TSearchObject> : IEntityService<TEntity, TKey, TSearchObject>, IEntityManager<TEntity, TKey>
+public interface IEntityManager<TEntity, in TKey, in TSearchObject> 
+    : IEntityService<TEntity, TKey, TSearchObject>, IEntityManager<TEntity, TKey>
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new();
 
@@ -17,8 +18,8 @@ public interface IEntityManager<TEntity, TSearchObject, TSortBy, TIncludes> : IE
     where TSearchObject : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum;
-public interface IEntityManager<TEntity, in TKey, TSearchObject, TSortBy, TIncludes> : IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>,
-    IEntityManager<TEntity, TKey>
+public interface IEntityManager<TEntity, in TKey, TSearchObject, TSortBy, TIncludes>
+    : IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, IEntityManager<TEntity, TKey, TSearchObject>
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
     where TSortBy : struct, Enum
