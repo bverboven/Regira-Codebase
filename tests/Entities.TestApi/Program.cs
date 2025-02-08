@@ -71,7 +71,6 @@ builder.Services
     })
     .For<Course, int, CourseSearchObject, CourseRepository>(e =>
     {
-        e.AddDefaultQueryBuilders();
         e.AddMapping<CourseDto, CourseInputDto>();
         e.HasAttachments<ContosoContext, Course, CourseAttachment>(a =>
         {

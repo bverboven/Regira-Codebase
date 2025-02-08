@@ -44,10 +44,21 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
     }
 
     // Query Builders
-    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddDefaultQueryBuilders()
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddDefaultQueryBuilder()
+        => AddQueryBuilder<QueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>>();
+
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddQueryBuilder<TImplementation>()
+        where TImplementation : class, IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>
     {
-        Services.AddTransient<IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>,
-            QueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>>();
+        base.AddQueryBuilder<TImplementation>();
+        Services.AddTransient<IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>, TImplementation>();
+
+        return this;
+    }
+    public ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>> factory)
+    {
+        base.AddQueryBuilder(factory);
+        Services.AddTransient(factory);
 
         return this;
     }
@@ -68,21 +79,6 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
         return this;
     }
 
-    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddQueryBuilder<TImplementation>()
-        where TImplementation : class, IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>
-    {
-        base.AddQueryBuilder<TImplementation>();
-        Services.AddTransient<IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>, TImplementation>();
-
-        return this;
-    }
-    public ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>> factory)
-    {
-        base.AddQueryBuilder(factory);
-        Services.AddTransient(factory);
-
-        return this;
-    }
 }
 public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
     EntityServiceBuilder<TContext, TEntity, TKey> services) : EntityServiceBuilder<TContext, TEntity, TKey>(services)
@@ -157,23 +153,32 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
 
 
     // Query Builders
-    public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddDefaultQueryBuilders()
-    {
-        Services.AddTransient<IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>,
-            QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddDefaultQueryBuilder()
+        => AddQueryBuilder<QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
 
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddQueryFilter<TImplementation>()
+        where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>
+    {
+        Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
+        HasQueryBuilder = true;
+        return this;
+    }
+    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>> factory)
+    {
+        Services.AddTransient(factory);
+        HasQueryBuilder = true;
         return this;
     }
 
-    public new void AddQueryFilter<TImplementation>()
-        where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>
-        => Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
-    public void AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>> factory)
-        => Services.AddTransient(factory);
-
-    public new void AddQueryBuilder<TImplementation>()
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddQueryBuilder<TImplementation>()
         where TImplementation : class, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
-        => Services.AddTransient<IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, TImplementation>();
-    public void AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>> factory)
-        => Services.AddTransient(factory);
+    {
+        Services.AddTransient<IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, TImplementation>();
+        return this;
+    }
+    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>> factory)
+    {
+        Services.AddTransient(factory);
+        return this;
+    }
 }

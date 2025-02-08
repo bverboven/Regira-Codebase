@@ -46,6 +46,11 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             .AddService<TService>();
         configure?.Invoke(builder);
 
+        if (!builder.HasQueryBuilder)
+        {
+            builder.AddDefaultQueryBuilder();
+        }
+
         return this;
     }
     public EntityServiceCollection<TContext> For<TEntity, TKey, TSearchObject, TService>(Action<EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>>? configure = null)
@@ -57,6 +62,11 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             .AddService<TService>();
         configure?.Invoke(builder);
 
+        if (!builder.HasQueryBuilder)
+        {
+            builder.AddDefaultQueryBuilder();
+        }
+
         return this;
     }
 
@@ -67,6 +77,11 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         var builder = new EntityServiceBuilder<TContext, TEntity>(this)
             .AddDefaultService();
         configure?.Invoke(builder);
+
+        if (!builder.HasQueryBuilder)
+        {
+            builder.AddDefaultQueryBuilder();
+        }
 
         return this;
     }
@@ -84,6 +99,11 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             .AddDefaultService();
         configure?.Invoke(builder);
 
+        if (!builder.HasQueryBuilder)
+        {
+            builder.AddDefaultQueryBuilder();
+        }
+
         return this;
     }
     public EntityServiceCollection<TContext> For<TEntity, TKey, TSearchObject>(Action<EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>>? configure = null)
@@ -93,6 +113,11 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         var builder = new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(this)
             .AddDefaultService();
         configure?.Invoke(builder);
+
+        if (!builder.HasQueryBuilder)
+        {
+            builder.AddDefaultQueryBuilder();
+        }
 
         return this;
     }
@@ -204,6 +229,12 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         var builder = new EntityServiceBuilder<TContext, TEntity>(this)
             .AddComplexService<TService, TSearchObject, TSortBy, TIncludes>();
         configure?.Invoke(builder);
+
+        if (!builder.HasQueryBuilder)
+        {
+            builder.AddDefaultQueryBuilder();
+        }
+
         return this;
     }
     /// <summary>
@@ -227,6 +258,11 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         var builder = new EntityServiceBuilder<TContext, TEntity, TKey>(this)
             .AddComplexService<TService, TSearchObject, TSortBy, TIncludes>();
         configure?.Invoke(builder);
+
+        if (!builder.HasQueryBuilder)
+        {
+            builder.AddDefaultQueryBuilder();
+        }
 
         return this;
     }

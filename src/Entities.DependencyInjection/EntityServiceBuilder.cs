@@ -17,6 +17,7 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
     where TContext : DbContext
     where TEntity : class, IEntity<int>
 {
+    // Entity service
     public new EntityServiceBuilder<TContext, TEntity> AddService<TService>()
         where TService : class, IEntityService<TEntity>
     {
@@ -24,13 +25,23 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         Services.AddTransient<IEntityService<TEntity>, TService>();
         return this;
     }
-    public new EntityServiceBuilder<TContext, TEntity> AddDefaultService()
+    /// <summary>
+    /// Adds an implementation for
+    /// <list type="bullet">
+    ///     <item><see cref="IEntityService{TEntity}"/></item>
+    /// </list>
+    /// </summary>
+    /// <returns></returns>
+    public virtual EntityServiceBuilder<TContext, TEntity> AddService(Func<IServiceProvider, IEntityService<TEntity>> factory)
     {
-        // Query Builders
-        AddDefaultQueryBuilders();
-        // Repository
-        return AddService<EntityRepository<TContext, TEntity>>();
+        base.AddService(factory);
+        Services.AddTransient(factory);
+        return this;
     }
+
+    // Default Entity service
+    public new EntityServiceBuilder<TContext, TEntity> AddDefaultService()
+        => AddService<EntityRepository<TContext, TEntity>>();
 
     public new EntityServiceBuilder<TContext, TEntity> HasRepository<TService>()
         where TService : class, IEntityRepository<TEntity>
@@ -61,25 +72,36 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
     }
 
     // Query Builders
-    public new EntityServiceBuilder<TContext, TEntity> AddDefaultQueryBuilders()
-    {
-        Services.AddTransient<IQueryBuilder<TEntity, SearchObject>,
-            QueryBuilder<TEntity, SearchObject>>();
+    public new EntityServiceBuilder<TContext, TEntity> AddDefaultQueryBuilder()
+        => AddQueryBuilder<QueryBuilder<TEntity, SearchObject>>();
 
+    public new EntityServiceBuilder<TContext, TEntity> AddQueryBuilder<TImplementation>()
+        where TImplementation : class, IQueryBuilder<TEntity, SearchObject>
+    {
+        Services.AddTransient<IQueryBuilder<TEntity, SearchObject>, TImplementation>();
+        HasQueryBuilder = true;
         return this;
     }
-    public new void AddQueryFilter<TImplementation>()
-        where TImplementation : class, IFilteredQueryBuilder<TEntity, SearchObject> =>
+    public EntityServiceBuilder<TContext, TEntity> AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, SearchObject>> factory)
+    {
+        Services.AddTransient(factory);
+        HasQueryBuilder = true;
+        return this;
+    }
+
+    public new EntityServiceBuilder<TContext, TEntity> AddQueryFilter<TImplementation>()
+        where TImplementation : class, IFilteredQueryBuilder<TEntity, SearchObject>
+    {
         Services.AddTransient<IFilteredQueryBuilder<TEntity, SearchObject>, TImplementation>();
-    public void AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, SearchObject>> factory)
-        => Services.AddTransient(factory);
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity> AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, SearchObject>> factory)
+    {
+        Services.AddTransient(factory);
+        return this;
+    }
 
-    public new void AddQueryBuilder<TImplementation>()
-        where TImplementation : class, IQueryBuilder<TEntity, SearchObject>
-        => Services.AddTransient<IQueryBuilder<TEntity, SearchObject>, TImplementation>();
-    public void AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, SearchObject>> factory)
-        => Services.AddTransient(factory);
-
+    // Complex Entity service
     public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddComplexService<TService, TSearchObject, TSortBy, TIncludes>()
         where TService : class, IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>, IEntityService<TEntity>
         where TSearchObject : class, ISearchObject, new()
@@ -101,6 +123,9 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
 {
+    // ToDo: make this a getter only that checks the Services collection?
+    public bool HasQueryBuilder { get; set; }
+
     // Entity mapping
     /// <summary>
     /// Adds AutoMapper maps for
@@ -134,7 +159,6 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     /// <summary>
     /// Adds <typeparamref name="TService"/> implementation for
     /// <list type="bullet">
-    ///     <item><see cref="IEntityService{TEntity}"/></item>
     ///     <item><see cref="IEntityService{TEntity, TKey}"/></item>
     /// </list>
     /// </summary>
@@ -144,6 +168,18 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
         where TService : class, IEntityService<TEntity, TKey>
     {
         Services.AddTransient<IEntityService<TEntity, TKey>, TService>();
+        return this;
+    }
+    /// <summary>
+    /// Adds an implementation for
+    /// <list type="bullet">
+    ///     <item><see cref="IEntityService{TEntity, TKey}"/></item>
+    /// </list>
+    /// </summary>
+    /// <returns></returns>
+    public virtual EntityServiceBuilder<TContext, TEntity, TKey> AddService(Func<IServiceProvider, IEntityService<TEntity, TKey>> factory)
+    {
+        Services.AddTransient(factory);
         return this;
     }
 
@@ -157,12 +193,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     /// </summary>
     /// <returns></returns>
     public virtual EntityServiceBuilder<TContext, TEntity, TKey> AddDefaultService()
-    {
-        // Query Builders
-        AddDefaultQueryBuilders();
-        // Repository
-        return AddService<EntityRepository<TContext, TEntity, TKey>>();
-    }
+        => AddService<EntityRepository<TContext, TEntity, TKey>>();
 
     // Entity Repository
     /// <summary>
@@ -228,25 +259,35 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     }
 
     // Query Builders
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddDefaultQueryBuilders()
-    {
-        Services.AddTransient<IQueryBuilder<TEntity, TKey, SearchObject<TKey>>,
-            QueryBuilder<TEntity, TKey, SearchObject<TKey>>>();
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddDefaultQueryBuilder()
+        => AddQueryBuilder<QueryBuilder<TEntity, TKey, SearchObject<TKey>>>();
 
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddQueryBuilder<TImplementation>()
+        where TImplementation : class, IQueryBuilder<TEntity, TKey, SearchObject<TKey>>
+    {
+        Services.AddTransient<IQueryBuilder<TEntity, TKey, SearchObject<TKey>>, TImplementation>();
+        HasQueryBuilder = true;
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TKey, SearchObject<TKey>>> factory)
+    {
+        Services.AddTransient(factory);
+        HasQueryBuilder = true;
         return this;
     }
 
-    public void AddQueryFilter<TImplementation>()
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>
-        => Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>, TImplementation>();
-    public void AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>> factory)
-        => Services.AddTransient(factory);
+    {
+        Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>, TImplementation>();
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>> factory)
+    {
+        Services.AddTransient(factory);
+        return this;
+    }
 
-    public void AddQueryBuilder<TImplementation>()
-        where TImplementation : class, IQueryBuilder<TEntity, TKey, SearchObject<TKey>>
-        => Services.AddTransient<IQueryBuilder<TEntity, TKey, SearchObject<TKey>>, TImplementation>();
-    public void AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TKey, SearchObject<TKey>>> factory)
-        => Services.AddTransient(factory);
 
     // Complex Entity service
     /// <summary>
@@ -292,12 +333,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
         return this;
     }
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddDefaultService()
-    {
-        // Query Builders
-        AddDefaultQueryBuilders();
-        // Repository
-        return AddService<EntityRepository<TContext, TEntity, TKey, TSearchObject>>();
-    }
+        => AddService<EntityRepository<TContext, TEntity, TKey, TSearchObject>>();
 
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasRepository<TService>()
         where TService : class, IEntityRepository<TEntity, TKey, TSearchObject>
@@ -328,25 +364,36 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
     }
 
     // Query Builders
-    public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddDefaultQueryBuilders()
-    {
-        Services.AddTransient<IQueryBuilder<TEntity, TKey, TSearchObject>,
-            QueryBuilder<TEntity, TKey, TSearchObject>>();
+    public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddDefaultQueryBuilder()
+        => AddQueryBuilder<QueryBuilder<TEntity, TKey, TSearchObject>>();
 
+    public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddQueryBuilder<TImplementation>()
+        where TImplementation : class, IQueryBuilder<TEntity, TKey, TSearchObject>
+    {
+        Services.AddTransient<IQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
+        HasQueryBuilder = true;
         return this;
     }
-    public new void AddQueryFilter<TImplementation>()
+    public EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TKey, TSearchObject>> factory)
+    {
+        Services.AddTransient(factory);
+        HasQueryBuilder = true;
+        return this;
+    }
+
+    public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>
-        => Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
-    public void AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>> factory)
-        => Services.AddTransient(factory);
+    {
+        Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>> factory)
+    {
+        Services.AddTransient(factory);
+        return this;
+    }
 
-    public new void AddQueryBuilder<TImplementation>()
-        where TImplementation : class, IQueryBuilder<TEntity, TKey, TSearchObject>
-        => Services.AddTransient<IQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
-    public void AddQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TKey, TSearchObject>> factory)
-        => Services.AddTransient(factory);
-
+    // Complex Entity service
     public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddComplexService<TService, TSortBy, TIncludes>()
         where TService : class, IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, IEntityService<TEntity, TKey, TSearchObject>
         where TSortBy : struct, Enum
