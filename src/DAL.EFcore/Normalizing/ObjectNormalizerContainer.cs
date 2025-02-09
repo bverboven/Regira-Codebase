@@ -4,10 +4,8 @@ using Regira.Utilities;
 
 namespace Regira.DAL.EFcore.Normalizing;
 
-
-public class ObjectNormalizerContainer
+public class ObjectNormalizerContainer(IServiceProvider services)
 {
-    private readonly IServiceProvider _services = null!;
 #if NETSTANDARD2_0
     public class NormalizerDescriptor
     {
@@ -16,19 +14,12 @@ public class ObjectNormalizerContainer
     }
 #else
     public record NormalizerDescriptor(Type Type, ServiceDescriptor Descriptor);
-
 #endif
 #if NETSTANDARD2_0
-    public IList<NormalizerDescriptor> Descriptors { get; set; } = null!;
+    public IList<NormalizerDescriptor> Descriptors { get; set; } = new List<NormalizerDescriptor>();
 #else
-    public IList<NormalizerDescriptor> Descriptors { get; init; } = null!;
+    public IList<NormalizerDescriptor> Descriptors { get; init; } = new List<NormalizerDescriptor>();
 #endif
-
-    public ObjectNormalizerContainer(IServiceProvider services)
-    {
-        _services = services;
-        Descriptors = new List<NormalizerDescriptor>();
-    }
 
     public ObjectNormalizerContainer Register<T>(Func<IServiceProvider, IObjectNormalizer> factory)
         => Register(typeof(T), factory);
@@ -76,7 +67,7 @@ public class ObjectNormalizerContainer
         }
 
         return Descriptors.Where(d => d.Type == type || TypeUtility.GetBaseTypes(type).Contains(d.Type))
-                .Select(d => (IObjectNormalizer)(d.Descriptor.ImplementationInstance ?? d.Descriptor.ImplementationFactory!(_services)))
+                .Select(d => (IObjectNormalizer)(d.Descriptor.ImplementationInstance ?? d.Descriptor.ImplementationFactory!(services)))
                 //.Select(d => (IObjectNormalizer)ActivatorUtilities.GetServiceOrCreateInstance(_services, d!.Descriptor.ServiceType))
                 ;
     }
@@ -94,7 +85,7 @@ public class ObjectNormalizerContainer
             }
         }
 
-        return (IObjectNormalizer?)(descriptor?.Descriptor.ImplementationInstance ?? descriptor?.Descriptor.ImplementationFactory!(_services));
+        return (IObjectNormalizer?)(descriptor?.Descriptor.ImplementationInstance ?? descriptor?.Descriptor.ImplementationFactory!(services));
         //return (IObjectNormalizer?)ActivatorUtilities.GetServiceOrCreateInstance(_services, descriptor!.Descriptor.ServiceType);
     }
 }

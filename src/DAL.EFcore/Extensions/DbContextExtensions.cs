@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Regira.DAL.EFcore.Extensions;
 
@@ -58,4 +60,17 @@ public static class DbContextExtension
             throw;
         }
     }
+
+    public static DbContextOptionsBuilder AddRegisteredInterceptors(this DbContextOptionsBuilder optionsBuilder, 
+        IServiceCollection services, IServiceProvider? sp = null)
+    {
+        sp ??= services.BuildServiceProvider();
+        var interceptorDescriptors = services
+            .CollectDescriptors<IInterceptor>();
+        var interceptors = interceptorDescriptors
+            .Select(d => (IInterceptor)sp.GetRequiredService(d.ServiceType));
+        return optionsBuilder.AddInterceptors(interceptors);
+    }
+    public static DbContextOptionsBuilder AddInterceptors(this DbContextOptionsBuilder optionsBuilder, Func<IEnumerable<IInterceptor>> factory)
+        => optionsBuilder.AddInterceptors(factory());
 }

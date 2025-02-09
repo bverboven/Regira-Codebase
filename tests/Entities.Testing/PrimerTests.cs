@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework.Legacy;
 using Regira.Entities.EFcore.Abstractions;
 using Regira.Entities.EFcore.Extensions;
+using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models.Abstractions;
 using Regira.Utilities;
@@ -321,5 +322,48 @@ public class PrimerTests
         {
             Assert.That(items[i - 1].SortOrder, Is.LessThan(items[i].SortOrder));
         }
+    }
+
+
+    [Test]
+    public async Task Test_AutoTruncate_As_Primer_Interceptor()
+    {
+        var services = new ServiceCollection();
+
+        services
+            .AddDbContext<ProductContext>(db =>
+            {
+                db
+                    .UseSqlite($"Filename={Path.Combine(Path.GetTempPath(), "test.db")}") // no memory db
+                    .AddPrimerInterceptors(services);
+            })
+            .AddTransient<IEntityPrimer, AutoTruncatePrimer>();
+        var sp = services.BuildServiceProvider();
+
+        var dbContext = sp.GetRequiredService<ProductContext>();
+        await dbContext.Database.EnsureCreatedAsync();
+
+        var item = new User
+        {
+            Id = Guid.NewGuid().ToString(),
+            Username = "Adolph Blaine Charles David Earl Frederick Gerald Hubert Irvin John Kenneth Lloyd Martin Nero Oliver Paul Quincy Randolph Sherman Thomas Uncas Victor William Xerxes Yancy Zeus",
+            Password = "Wolfeschlegel­steinhausen­bergerdorff­welche­vor­altern­waren­gewissenhaft­schafers­wessen­schafe­waren­wohl­gepflege­und­sorgfaltigkeit­beschutzen­vor­angreifen­durch­ihr­raubgierig­feinde­welche­vor­altern­zwolfhundert­tausend­jahres­voran­die­erscheinen­von­der­erste­erdemensch­der­raumschiff­genacht­mit­tungstein­und­sieben­iridium­elektrisch­motors­gebrauch­licht­als­sein­ursprung­von­kraft­gestart­sein­lange­fahrt­hinzwischen­sternartig­raum­auf­der­suchen­nachbarschaft­der­stern­welche­gehabt­bewohnbar­planeten­kreise­drehen­sich­und­wohin­der­neue­rasse­von­verstandig­menschlichkeit­konnte­fortpflanzen­und­sich­erfreuen­an­lebenslanglich­freude­und­ruhe­mit­nicht­ein­furcht­vor­angreifen­vor­anderer­intelligent­geschopfs­von­hinzwischen­sternartig­raum"
+        };
+        var description = $"The password of {item.Username} will remain a secret.";
+        item.EncryptedPassword = description;
+
+        dbContext.Users.Add(item);
+
+        Assert.That(item.Username.Length > 64, Is.True);
+        Assert.That(item.Password.Length > 256, Is.True);
+        Assert.That(item.EncryptedPassword, Is.EqualTo(description));
+
+        await dbContext.SaveChangesAsync();
+
+        Assert.That(item.Username.Length, Is.EqualTo(64));
+        Assert.That(item.Password.Length, Is.EqualTo(256));
+        Assert.That(item.EncryptedPassword, Is.EqualTo(description));
+
+        await dbContext.Database.EnsureDeletedAsync();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Regira.DAL.EFcore.Extensions;
 using Regira.DAL.EFcore.Services;
 using Testing.Library.Contoso;
@@ -41,12 +42,16 @@ public class AutoTruncateTests
     [Test]
     public async Task Test_AutoTruncate_Interceptor()
     {
-        var dbContext = new ContosoContext(
-            new DbContextOptionsBuilder<ContosoContext>()
-                .UseSqlite($"Filename={Path.Combine(Path.GetTempPath(), "test.db")}")// no memory db
-                .AddAutoTruncateInterceptors()
-                .Options
-        );
+        var services = new ServiceCollection()
+            .AddDbContext<ContosoContext>(db =>
+            {
+                db
+                    .UseSqlite($"Filename={Path.Combine(Path.GetTempPath(), "test.db")}") // no memory db
+                    .AddAutoTruncateInterceptors();
+            });
+        var sp = services.BuildServiceProvider();
+
+        var dbContext = sp.GetRequiredService<ContosoContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
         var item = new Person

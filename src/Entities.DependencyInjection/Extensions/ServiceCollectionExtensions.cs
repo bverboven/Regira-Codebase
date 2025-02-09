@@ -2,6 +2,8 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Regira.Entities.EFcore.Abstractions;
+using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 using Regira.Entities.Keywords;
@@ -35,11 +37,7 @@ public static class ServiceCollectionExtensions
         }
 
         public IServiceCollection AddDefaultQKeywordHelper(Func<IServiceProvider, INormalizer>? normalizerFactory = null, QKeywordHelperOptions? options = null)
-        {
-            services.AddTransient<IQKeywordHelper>(p => new QKeywordHelper(normalizerFactory?.Invoke(p), options));
-
-            return services;
-        }
+            => services.AddTransient<IQKeywordHelper>(p => new QKeywordHelper(normalizerFactory?.Invoke(p), options));
 
         public IServiceCollection AddGlobalFilterQueryBuilder<TImplementation>()
             where TImplementation : class, IGlobalFilteredQueryBuilder
@@ -112,4 +110,12 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
+    
+
+    public static IServiceCollection AddAutoTruncatePrimer<TServiceCollection>(this TServiceCollection services)
+        where TServiceCollection : IServiceCollection
+        => services.AddTransient<IEntityPrimer, AutoTruncatePrimer>();
+    public static IServiceCollection AddDefaultEntityNormalizerPrimer<TServiceCollection>(this TServiceCollection services)
+        where TServiceCollection : IServiceCollection
+        => services.AddTransient<IEntityPrimer, AutoNormalizingPrimer>();
 }

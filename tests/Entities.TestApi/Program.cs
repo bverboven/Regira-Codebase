@@ -10,6 +10,7 @@ using Regira.Entities.DependencyInjection.Extensions;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
+using Regira.Entities.EFcore.Services;
 using Regira.IO.Storage.FileSystem;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
@@ -40,7 +41,11 @@ builder.Services.AddProblemDetails();
 
 builder.Services
     .AddHttpContextAccessor()
-    .AddDbContext<ContosoContext>((_, db) => db.UseSqlite(ApiConfiguration.ConnectionString))
+    .AddDbContext<ContosoContext>(db =>
+    {
+        db.UseSqlite(ApiConfiguration.ConnectionString)
+            .AddPrimerInterceptors(builder.Services);
+    })
     .AddAutoMapper(c => c.AllowNullCollections = true)
     .UseEntities<ContosoContext>(o =>
     {
@@ -90,6 +95,10 @@ builder.Services
         e.AddMapping<PersonDto, PersonInputDto>();
         e.HasAttachments<ContosoContext, Person, PersonAttachment>();
     });
+
+builder.Services
+    .AddAutoTruncatePrimer()
+    .AddDefaultEntityNormalizerPrimer();
 
 var app = builder.Build();
 

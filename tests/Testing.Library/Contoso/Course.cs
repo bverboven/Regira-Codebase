@@ -9,7 +9,7 @@ namespace Testing.Library.Contoso;
 public class Course : IEntityWithSerial, IHasNormalizedTitle, IHasAttachments, IHasAttachments<CourseAttachment>
 {
     public int Id { get; set; }
-    public int DepartmentId { get; set; }
+    public int? DepartmentId { get; set; }
 
     [StringLength(64, MinimumLength = 3)]
     public string? Title { get; set; }

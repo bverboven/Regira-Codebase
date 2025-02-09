@@ -11,12 +11,13 @@ public class DepartmentNormalizer(ContosoContext dbContext, IObjectNormalizer<IH
     public override bool IsExclusive => true;
     public override async Task HandleNormalizeMany(IEnumerable<Department?> items, bool recursive = false)
     {
-        await base.HandleNormalizeMany(items, recursive);
-        await coursesNormalizer.HandleNormalizeMany(items);
+        var itemsList = items.ToArray();
+        await base.HandleNormalizeMany(itemsList, recursive);
+        await coursesNormalizer.HandleNormalizeMany(itemsList);
 
-        var adminIds = items.Select(x => x?.AdministratorId).Where(id => id.HasValue).Distinct().ToArray();
+        var adminIds = itemsList.Select(x => x?.AdministratorId).Where(id => id.HasValue).Distinct().ToArray();
         var admins = await dbContext.Persons.Where(x => adminIds.Contains(x.Id)).ToListAsync();
-        foreach (var item in items)
+        foreach (var item in itemsList)
         {
 
             var admin = admins.FirstOrDefault(x => x.Id == item?.AdministratorId);

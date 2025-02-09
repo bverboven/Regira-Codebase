@@ -37,8 +37,7 @@ public class AutoTruncateDbContextInterceptor : SaveChangesInterceptor
 
 public static class DbContextInterceptorExtensions
 {
-    public static DbContextOptionsBuilder<TContext> AddAutoTruncateInterceptors<TContext>(this DbContextOptionsBuilder<TContext> optionsBuilder)
-        where TContext : DbContext
+    public static DbContextOptionsBuilder AddAutoTruncateInterceptors(this DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.AddInterceptors(new AutoTruncateDbContextInterceptor());
 }
 
