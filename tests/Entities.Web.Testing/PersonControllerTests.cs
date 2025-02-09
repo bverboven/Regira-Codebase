@@ -23,8 +23,6 @@ public class PersonControllerTests : IDisposable
     {
         _dbContext = new ContosoContext(new DbContextOptionsBuilder<ContosoContext>().UseSqlite(ApiConfiguration.ConnectionString).Options);
         _dbContext.Database.EnsureCreated();
-
-        _dbContext.SaveChanges();
     }
 
 

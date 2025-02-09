@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Regira.Utilities;
 
 namespace Regira.DAL.EFcore.Extensions;
 
@@ -19,21 +18,7 @@ public static class DbContextAutoTruncateExtensions
         {
             if (entry.State != EntityState.Deleted)
             {
-                var propertiesWithMaxLength = entry.GetPropertyAttributes()
-                    .Where(d => d.Value.Any(a => a is MaxLengthAttribute || a is StringLengthAttribute))
-                    .ToArray();
-                foreach (var propWithMaxLength in propertiesWithMaxLength)
-                {
-                    var propName = propWithMaxLength.Key.Name;
-                    var value = entry.CurrentValues[propName]?.ToString();
-                    if (value != null)
-                    {
-                        var maxLengthAnnotation = propWithMaxLength.Value.FirstOrDefault(x => x is MaxLengthAttribute) as MaxLengthAttribute;
-                        var stringLengthAnnotation = propWithMaxLength.Value.FirstOrDefault(x => x is StringLengthAttribute) as StringLengthAttribute;
-                        var maxLength = Convert.ToInt32(maxLengthAnnotation?.Length ?? stringLengthAnnotation!.MaximumLength);
-                        entry.CurrentValues[propName] = value.Truncate(maxLength);
-                    }
-                }
+                entry.AutoTruncate();
             }
         }
     }

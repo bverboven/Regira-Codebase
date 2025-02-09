@@ -16,7 +16,8 @@ public static class DbContextExtension
     /// <param name="dbContext"></param>
     /// <returns></returns>
     public static IEnumerable<EntityEntry> GetPendingEntries(this DbContext dbContext)
-        => dbContext.ChangeTracker.Entries().Where(x => x.State is EntityState.Modified or EntityState.Added or EntityState.Deleted);
+        => dbContext.ChangeTracker.Entries()
+            .Where(x => x.State is EntityState.Modified or EntityState.Added or EntityState.Deleted);
 
     /// <summary>
     /// Extends native SaveChangesAsync, by removing modifications on entries that caused errors, to enable recalling SaveChangesAsync for other entries<br />
@@ -27,7 +28,8 @@ public static class DbContextExtension
     /// <param name="acceptAllChangesOnSuccess"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static async Task<int> SaveAndCleanUpOnError<TContext>(this TContext dbContext, bool acceptAllChangesOnSuccess = true, CancellationToken cancellationToken = default)
+    public static async Task<int> SaveAndCleanUpOnError<TContext>(this TContext dbContext,
+        bool acceptAllChangesOnSuccess = true, CancellationToken cancellationToken = default)
         where TContext : DbContext
     {
         try
