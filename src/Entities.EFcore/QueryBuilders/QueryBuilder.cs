@@ -28,7 +28,7 @@ public class QueryBuilder<TEntity, TKey, TSearchObject>(
     where TSearchObject : ISearchObject<TKey>
 {
     public IQueryable<TEntity> Query(IQueryable<TEntity> query, IList<TSearchObject?>? searchObjects, PagingInfo? pagingInfo)
-        => Query(query, searchObjects, [EntitySortBy.Default], EntityIncludes.None, pagingInfo);
+        => Query(query, searchObjects, [], null, pagingInfo);
 }
 
 public class QueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>(
@@ -53,6 +53,16 @@ public class QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
+    public virtual IQueryable<TEntity> Query(IQueryable<TEntity> query, IList<TSearchObject?>? searchObjects, IList<TSortBy> sortBy, TIncludes? includes, PagingInfo? pagingInfo)
+    {
+        var filteredQuery = FilterList(query, searchObjects);
+        var sortedQuery = SortByList(filteredQuery, searchObjects, sortBy, includes);
+        var pagedQuery = sortedQuery.PageQuery(pagingInfo);
+        var includingQuery = AddIncludes(pagedQuery, searchObjects, sortBy, includes);
+
+        return includingQuery;
+    }
+
     public virtual IQueryable<TEntity> Filter(IQueryable<TEntity> query, TSearchObject? so)
     {
         var entityBaseTypes = TypeUtility.GetBaseTypes(typeof(TEntity)).ToArray();
@@ -78,8 +88,7 @@ public class QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
                 (filteredQuery, filter) => filter.Build(filteredQuery, so)
             ) ?? globallyFilteredQuery;
     }
-
-    public virtual IQueryable<TEntity> Filter(IQueryable<TEntity> query, IList<TSearchObject?>? searchObjects)
+    public virtual IQueryable<TEntity> FilterList(IQueryable<TEntity> query, IList<TSearchObject?>? searchObjects)
         => searchObjects
             ?.Aggregate(
                 (IQueryable<TEntity>?)null,
@@ -90,21 +99,17 @@ public class QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
 
     public virtual IQueryable<TEntity> SortBy(IQueryable<TEntity> query, IList<TSearchObject?>? so, TSortBy? sortBy, TIncludes? includes)
         => query;
-    public virtual IQueryable<TEntity> SortBy(IQueryable<TEntity> query, IList<TSearchObject?>? so, IList<TSortBy>? sortByList, TIncludes? includes)
-        => sortByList?.Aggregate(query, (r, sortBy) => SortBy(r, so, sortBy, includes)) ?? query;
+    public virtual IQueryable<TEntity> SortByList(IQueryable<TEntity> query, IList<TSearchObject?>? so, IList<TSortBy>? sortByList, TIncludes? includes)
+    {
+        if (sortByList?.Any() != true)
+        {
+            return SortBy(query, so, null, includes);
+        }
+        return sortByList.Aggregate(query, (current, by) => SortBy(current, so, by, includes));
+    }
 
     public virtual IQueryable<TEntity> AddIncludes(IQueryable<TEntity> query, IList<TSearchObject?>? so, IList<TSortBy>? sortByList, TIncludes? includes)
     {
         return query;
-    }
-
-    public virtual IQueryable<TEntity> Query(IQueryable<TEntity> query, IList<TSearchObject?>? searchObjects, IList<TSortBy> sortBy, TIncludes? includes, PagingInfo? pagingInfo)
-    {
-        var filteredQuery = Filter(query, searchObjects);
-        var sortedQuery = SortBy(filteredQuery, searchObjects, sortBy, includes);
-        var pagedQuery = sortedQuery.PageQuery(pagingInfo);
-        var includingQuery = AddIncludes(pagedQuery, searchObjects, sortBy, includes);
-
-        return includingQuery;
     }
 }

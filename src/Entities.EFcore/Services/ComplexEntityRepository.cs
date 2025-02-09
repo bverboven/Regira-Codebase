@@ -74,7 +74,7 @@ public class EntityRepository<TContext, TEntity, TKey, TSearchObject, TSortBy, T
             .ToListAsync();
 
     public virtual Task<int> Count(IList<TSearchObject?> searchObjects)
-        => queryBuilder.Filter(dbContext.Set<TEntity>(), searchObjects).CountAsync();
+        => queryBuilder.FilterList(dbContext.Set<TEntity>(), searchObjects).CountAsync();
     public virtual Task<int> Count(TSearchObject? so = null)
         => queryBuilder.Filter(DbSet, so).CountAsync();
 
