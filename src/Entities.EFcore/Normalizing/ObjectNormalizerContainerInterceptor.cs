@@ -5,11 +5,13 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.DAL.EFcore.Extensions;
+using Regira.Entities.EFcore.Normalizing.Abstractions;
 using Regira.Normalizing.Abstractions;
+using Regira.Utilities;
 
-namespace Regira.DAL.EFcore.Normalizing;
+namespace Regira.Entities.EFcore.Normalizing;
 
-public class ObjectNormalizerContainerInterceptor(IEnumerable<IObjectNormalizer> normalizers) : SaveChangesInterceptor
+public class EntityNormalizerContainerInterceptor(IEnumerable<IEntityNormalizer> normalizers) : SaveChangesInterceptor
 {
     public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData,
         InterceptionResult<int> result,
@@ -25,15 +27,27 @@ public class ObjectNormalizerContainerInterceptor(IEnumerable<IObjectNormalizer>
             {
                 foreach (var entriesGroup in groupedEntries)
                 {
+                    var genericEntityTypes = new[] { entriesGroup.Key }
+                        .Concat(TypeUtility.GetBaseTypes(entriesGroup.Key))
+                        .Distinct();
+                    var matchingNormalizers = normalizers
+                        .Where(x => genericEntityTypes.Any(entityType =>
+                        {
+                            var normalizerType = typeof(IEntityNormalizer<>).MakeGenericType(entityType);
+                            return TypeUtility.ImplementsInterface(x.GetType(), normalizerType);
+                        }))
+                        .ToArray();
+
                     var entities = entriesGroup.Select(e => e.Entity).ToArray();
-                    var exclusiveNormalizer = normalizers.FirstOrDefault(x => x.IsExclusive);
+
+                    var exclusiveNormalizer = matchingNormalizers.FirstOrDefault(x => x.IsExclusive);
                     if (exclusiveNormalizer != null)
                     {
                         await exclusiveNormalizer.HandleNormalizeMany(entities);
                     }
                     else
                     {
-                        foreach (var normalizer in normalizers)
+                        foreach (var normalizer in matchingNormalizers)
                         {
                             await normalizer.HandleNormalizeMany(entities);
                         }
@@ -45,10 +59,10 @@ public class ObjectNormalizerContainerInterceptor(IEnumerable<IObjectNormalizer>
         return await base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 }
-public static class ObjectNormalizerContainerInterceptorExtensions
+public static class EntityNormalizerContainerInterceptorExtensions
 {
     /// <summary>
-    /// Will find all services that implements <see cref="IObjectNormalizer"/> and execute them when calling SaveChanges on DbContext
+    /// Will find all services that implements <see cref="IEntityNormalizer"/> and execute them when calling SaveChanges on DbContext
     /// </summary>
     /// <param name="optionsBuilder"></param>
     /// <param name="services"></param>
@@ -60,9 +74,9 @@ public static class ObjectNormalizerContainerInterceptorExtensions
                                  .FirstOrDefault()
                                  ?.ApplicationServiceProvider
                              ?? services.BuildServiceProvider();
-        var normalizers = services.CollectDescriptors<IObjectNormalizer>()
-            .Select(d => (IObjectNormalizer)serviceProvider.GetRequiredService(d.ServiceType));
-        var normalizerContainer = new ObjectNormalizerContainerInterceptor(normalizers);
+        var normalizers = services.CollectDescriptors<IEntityNormalizer>()
+            .Select(d => (IEntityNormalizer)serviceProvider.GetRequiredService(d.ServiceType));
+        var normalizerContainer = new EntityNormalizerContainerInterceptor(normalizers);
         return optionsBuilder.AddInterceptors(normalizerContainer);
     }
 }

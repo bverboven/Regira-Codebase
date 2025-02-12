@@ -77,10 +77,10 @@ public class ObjectNormalizer : IObjectNormalizer
     }
 }
 
-public class ObjectNormalizer<T>(NormalizingOptions? options = null) : ObjectNormalizer(options), IObjectNormalizer<T>
-{
-    public virtual void HandleNormalize(T? item, bool recursive = false)
-        => base.HandleNormalize(item, recursive);
-    public virtual Task HandleNormalizeMany(IEnumerable<T?> instances, bool recursive = false)
-        => base.HandleNormalizeMany(instances.Cast<object?>(), recursive);
-}
+//public class ObjectNormalizer<T>(NormalizingOptions? options = null) : ObjectNormalizer(options), IObjectNormalizer<T>
+//{
+//    public virtual void HandleNormalize(T? item, bool recursive = false)
+//        => base.HandleNormalize(item, recursive);
+//    public virtual Task HandleNormalizeMany(IEnumerable<T?> instances, bool recursive = false)
+//        => base.HandleNormalizeMany(instances.Cast<object?>(), recursive);
+//}

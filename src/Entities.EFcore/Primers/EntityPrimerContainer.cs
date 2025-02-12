@@ -4,7 +4,7 @@ using Regira.DAL.EFcore.Extensions;
 using Regira.Entities.EFcore.Abstractions;
 using Regira.Utilities;
 
-namespace Regira.Entities.EFcore.Services;
+namespace Regira.Entities.EFcore.Primers;
 
 public class EntityPrimerContainer
 {
@@ -52,6 +52,11 @@ public class EntityPrimerContainer
             }
         }
     }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T">Type of entity</typeparam>
+    /// <returns></returns>
     public Task ApplyPrimers<T>()
         => ApplyPrimers(typeof(T));
 }

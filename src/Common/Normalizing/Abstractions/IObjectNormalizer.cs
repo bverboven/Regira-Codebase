@@ -8,8 +8,8 @@ public interface IObjectNormalizer
     void HandleNormalize(object? item, bool recursive = false);
 }
 
-public interface IObjectNormalizer<in T> : IObjectNormalizer
-{
-    Task HandleNormalizeMany(IEnumerable<T?> instances, bool recursive = false);
-    void HandleNormalize(T? item, bool recursive = false);
-}
+//public interface IObjectNormalizer<in T> : IObjectNormalizer
+//{
+//    Task HandleNormalizeMany(IEnumerable<T?> instances, bool recursive = false);
+//    void HandleNormalize(T? item, bool recursive = false);
+//}

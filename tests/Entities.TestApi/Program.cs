@@ -6,8 +6,11 @@ using Entities.TestApi.Infrastructure.Persons;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Regira.DAL.EFcore.Services;
 using Regira.Entities.DependencyInjection.Extensions;
 using Regira.Entities.EFcore.Attachments;
+using Regira.Entities.EFcore.Normalizing;
+using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 using Regira.Entities.EFcore.Services;
@@ -44,12 +47,15 @@ builder.Services
     .AddDbContext<ContosoContext>(db =>
     {
         db.UseSqlite(ApiConfiguration.ConnectionString)
-            .AddPrimerInterceptors(builder.Services);
+            .AddPrimerInterceptors(builder.Services)
+            .AddNormalizerInterceptors(builder.Services)
+            .AddAutoTruncateInterceptors();
     })
     .AddAutoMapper(c => c.AllowNullCollections = true)
     .UseEntities<ContosoContext>(o =>
     {
         o.AddDefaultQKeywordHelper();
+        o.AddDefaultEntityNormalizer();
         o.AddDefaultGlobalQueryFilters();
         o.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
     })
@@ -94,11 +100,8 @@ builder.Services
         e.UseQueryBuilder<PersonQueryBuilder>();
         e.AddMapping<PersonDto, PersonInputDto>();
         e.HasAttachments<ContosoContext, Person, PersonAttachment>();
+        e.AddNormalizer<PersonNormalizer>();
     });
-
-builder.Services
-    .AddAutoTruncatePrimer()
-    .AddDefaultEntityNormalizerPrimer();
 
 var app = builder.Build();
 

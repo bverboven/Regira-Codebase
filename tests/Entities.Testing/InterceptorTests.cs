@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework.Legacy;
 using Regira.Entities.EFcore.Abstractions;
 using Regira.Entities.EFcore.Extensions;
+using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models.Abstractions;
 using Regira.Utilities;

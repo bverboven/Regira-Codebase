@@ -55,7 +55,7 @@ public class Person : IEntityWithSerial, IHasNormalizedTitle, IHasAttachments, I
         set => Attachments = value?.Cast<PersonAttachment>().ToArray();
     }
 
-    [MaxLength(256)]
+    [MaxLength(1024)]
     [Normalized(SourceProperties = [nameof(GivenName), nameof(LastName), nameof(Description), nameof(Phone), nameof(Email)])]
     public string? NormalizedContent { get; set; }
 }

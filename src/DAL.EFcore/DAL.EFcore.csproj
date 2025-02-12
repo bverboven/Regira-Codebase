@@ -14,6 +14,11 @@
     <Version>4.1.0</Version>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Normalizing\**" />
+    <EmbeddedResource Remove="Normalizing\**" />
+    <None Remove="Normalizing\**" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">

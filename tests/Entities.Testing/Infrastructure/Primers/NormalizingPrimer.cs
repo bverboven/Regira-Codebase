@@ -1,28 +1,28 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Regira.Entities.EFcore.Abstractions;
+using Regira.Entities.EFcore.Normalizing;
+using Regira.Entities.EFcore.Normalizing.Abstractions;
 using Regira.Entities.Models.Abstractions;
-using Regira.Normalizing;
-using Regira.Normalizing.Abstractions;
 
 namespace Entities.Testing.Infrastructure.Primers;
 
-public class NormalizingPrimer<TEntity>(IObjectNormalizer<TEntity> objectNormalizer) : EntityPrimerBase<TEntity> 
+public class NormalizingPrimer<TEntity>(IEntityNormalizer<TEntity> entityNormalizer) : EntityPrimerBase<TEntity>
     where TEntity : class
 {
     public override Task PrepareAsync(TEntity entity, EntityEntry entry)
     {
-        objectNormalizer.HandleNormalize(entity);
+        entityNormalizer.HandleNormalize(entity);
 
         return Task.CompletedTask;
     }
 }
-public class NormalizingPrimer(IObjectNormalizer? objectNormalizer = null) : EntityPrimerBase<IEntity>
+public class NormalizingPrimer(IEntityNormalizer? entityNormalizer = null) : EntityPrimerBase<IEntity>
 {
-    private readonly IObjectNormalizer _objectNormalizer = objectNormalizer ?? new ObjectNormalizer();
+    private readonly IEntityNormalizer _entityNormalizer = entityNormalizer ?? new DefaultEntityNormalizer();
 
     public override Task PrepareAsync(IEntity entity, EntityEntry entry)
     {
-        _objectNormalizer.HandleNormalize(entity);
+        _entityNormalizer.HandleNormalize(entity);
 
         return Task.CompletedTask;
     }

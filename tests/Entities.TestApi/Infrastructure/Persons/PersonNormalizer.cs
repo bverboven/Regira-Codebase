@@ -2,7 +2,7 @@
 using Regira.Normalizing.Abstractions;
 using Testing.Library.Contoso;
 
-namespace Entities.Testing.Infrastructure.Normalizers;
+namespace Entities.TestApi.Infrastructure.Persons;
 
 public class PersonNormalizer(INormalizer? normalizer) : EntityNormalizerBase<Person>(normalizer)
 {

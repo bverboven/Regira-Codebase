@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using Regira.Normalizing;
+using Regira.Normalizing.Models;
 
 namespace Regira.DAL.EFcore.Extensions;
 
@@ -19,6 +21,10 @@ public static class DbContextExtension
     /// <returns></returns>
     public static IEnumerable<EntityEntry> GetPendingEntries(this DbContext dbContext)
         => dbContext.ChangeTracker.Entries()
+            .Where(x => x.State is EntityState.Modified or EntityState.Added or EntityState.Deleted);
+    public static IEnumerable<EntityEntry<T>> GetPendingEntries<T>(this DbContext dbContext)
+        where T : class
+        => dbContext.ChangeTracker.Entries<T>()
             .Where(x => x.State is EntityState.Modified or EntityState.Added or EntityState.Deleted);
 
     /// <summary>
@@ -61,7 +67,7 @@ public static class DbContextExtension
         }
     }
 
-    public static DbContextOptionsBuilder AddRegisteredInterceptors(this DbContextOptionsBuilder optionsBuilder, 
+    public static DbContextOptionsBuilder AddRegisteredInterceptors(this DbContextOptionsBuilder optionsBuilder,
         IServiceCollection services, IServiceProvider? sp = null)
     {
         sp ??= services.BuildServiceProvider();
@@ -73,4 +79,16 @@ public static class DbContextExtension
     }
     public static DbContextOptionsBuilder AddInterceptors(this DbContextOptionsBuilder optionsBuilder, Func<IEnumerable<IInterceptor>> factory)
         => optionsBuilder.AddInterceptors(factory());
+
+
+    public static void AutoNormalizeStringsForEntries(this DbContext dbContext, NormalizingOptions? options = null)
+    {
+        foreach (var entry in dbContext.GetPendingEntries())
+        {
+            if (entry.State != EntityState.Deleted)
+            {
+                NormalizingUtility.InvokeObjectNormalizer(entry.Entity, options);
+            }
+        }
+    }
 }

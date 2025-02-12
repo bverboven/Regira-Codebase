@@ -3,12 +3,16 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.EFcore.Abstractions;
+using Regira.Entities.EFcore.Normalizing;
+using Regira.Entities.EFcore.Normalizing.Abstractions;
 using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 using Regira.Entities.Keywords;
 using Regira.Entities.Keywords.Abstractions;
+using Regira.Normalizing;
 using Regira.Normalizing.Abstractions;
+using Regira.Normalizing.Models;
 using Regira.Utilities;
 
 namespace Regira.Entities.DependencyInjection.Extensions;
@@ -38,6 +42,29 @@ public static class ServiceCollectionExtensions
 
         public IServiceCollection AddDefaultQKeywordHelper(Func<IServiceProvider, INormalizer>? normalizerFactory = null, QKeywordHelperOptions? options = null)
             => services.AddTransient<IQKeywordHelper>(p => new QKeywordHelper(normalizerFactory?.Invoke(p), options));
+        public IServiceCollection AddDefaultEntityNormalizer(Action<IServiceProvider, NormalizingOptions>? configure = null)
+        {
+            if (configure == null)
+            {
+                services.AddTransient<INormalizer, DefaultNormalizer>();
+                return services.AddTransient<IObjectNormalizer, ObjectNormalizer>();
+            }
+
+            services.AddTransient<INormalizer>(p =>
+            {
+                var options = new NormalizingOptions();
+                configure.Invoke(p, options);
+                return options.DefaultNormalizer ?? new DefaultNormalizer(options);
+            });
+            services.AddTransient<IObjectNormalizer>(p =>
+            {
+                var options = new NormalizingOptions();
+                configure.Invoke(p, options);
+                return options.DefaultObjectNormalizer ?? new ObjectNormalizer(options);
+            });
+
+            return services.AddTransient<IEntityNormalizer, DefaultEntityNormalizer>();
+        }
 
         public IServiceCollection AddGlobalFilterQueryBuilder<TImplementation>()
             where TImplementation : class, IGlobalFilteredQueryBuilder
@@ -110,7 +137,7 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-    
+
 
     public static IServiceCollection AddAutoTruncatePrimer<TServiceCollection>(this TServiceCollection services)
         where TServiceCollection : IServiceCollection

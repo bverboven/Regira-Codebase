@@ -3,24 +3,12 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Regira.DAL.EFcore.Extensions;
 using Regira.Normalizing;
-using Regira.Normalizing.Models;
 using Regira.Utilities;
 
-namespace Regira.DAL.EFcore.Normalizing;
+namespace Regira.Entities.EFcore.Normalizing;
 
 public static class DbContextNormalizingExtensions
 {
-    public static void AutoNormalizeStringsForEntries(this DbContext dbContext, NormalizingOptions? options = null)
-    {
-        foreach (var entry in dbContext.GetPendingEntries())
-        {
-            if (entry.State != EntityState.Deleted)
-            {
-                NormalizingUtility.InvokeObjectNormalizer(entry.Entity, options);
-            }
-        }
-    }
-
     /// <summary>
     /// Normalizes all properties with a <see cref="NormalizedAttribute"/> for <see cref="EntityEntry">Entries</see> that have pending changes
     /// </summary>
@@ -45,12 +33,12 @@ public static class DbContextNormalizingExtensions
     /// <param name="items"></param>
     public static async Task ApplyNormalizers(this DbContext dbContext, IEnumerable<object> items)
     {
-        var normalizingSelector = dbContext.GetService<ObjectNormalizerContainer>();
+        var normalizingSelector = dbContext.GetService<EntityNormalizerContainer>();
 
         var itemsByType = items.GroupBy(item => item.GetType()).ToArray();
         foreach (var typedItems in itemsByType)
         {
-            var normalizers = normalizingSelector.FindAll(typedItems.Key);
+            var normalizers = normalizingSelector.FindAll(typedItems.Key).ToArray();
             var exclusiveNormalizer = normalizers.FirstOrDefault(x => x.IsExclusive);
             if (exclusiveNormalizer != null)
             {

@@ -7,7 +7,7 @@ using Regira.DAL.EFcore.Extensions;
 using Regira.Entities.EFcore.Abstractions;
 using Regira.Utilities;
 
-namespace Regira.Entities.EFcore.Services;
+namespace Regira.Entities.EFcore.Primers;
 
 public class EntityPrimerContainerInterceptor(IEnumerable<IEntityPrimer> primers) : SaveChangesInterceptor
 {
@@ -21,10 +21,10 @@ public class EntityPrimerContainerInterceptor(IEnumerable<IEntityPrimer> primers
                 .GroupBy(e => e.Entity.GetType());
             foreach (var entriesGroup in groupedEntries)
             {
-                var genericPrimerTypes = new[] { entriesGroup.Key }.Concat(TypeUtility.GetBaseTypes(entriesGroup.Key)).Distinct();
-                foreach (var genericPrimerType in genericPrimerTypes)
+                var genericEntityTypes = new[] { entriesGroup.Key }.Concat(TypeUtility.GetBaseTypes(entriesGroup.Key)).Distinct();
+                foreach (var entityType in genericEntityTypes)
                 {
-                    var primerType = typeof(IEntityPrimer<>).MakeGenericType(genericPrimerType);
+                    var primerType = typeof(IEntityPrimer<>).MakeGenericType(entityType);
                     var matchingPrimers = primers.Where(x => TypeUtility.ImplementsInterface(x.GetType(), primerType));
                     foreach (var primer in matchingPrimers)
                     {

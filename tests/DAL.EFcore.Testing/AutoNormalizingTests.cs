@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Regira.DAL.EFcore.Normalizing;
+using Regira.DAL.EFcore.Extensions;
 using Regira.Normalizing;
 using Regira.Normalizing.Models;
 using Testing.Library.Contoso;

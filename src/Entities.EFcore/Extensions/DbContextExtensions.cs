@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.EFcore.Abstractions;
-using Regira.Entities.EFcore.Services;
+using Regira.Entities.EFcore.Primers;
 using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.EFcore.Extensions;

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.Abstractions;
+using Regira.Entities.EFcore.Abstractions;
+using Regira.Entities.EFcore.Normalizing.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
@@ -287,36 +289,22 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
         return this;
     }
 
-    /*
-    // Complex Entity service
-    /// <summary>
-    /// Adds <typeparamref name="TService"/> implementation for
-    /// <list type="bullet">
-    ///     <item><see cref="IEntityService{TEntity}"/></item>
-    ///     <item><see cref="IEntityService{TEntity, TKey}"/></item>
-    ///     <item><see cref="IEntityService{TEntity, TSearchObject, TSortBy, TIncludes}"/></item>
-    ///     <item><see cref="IEntityService{TEntity, TKey, TSearchObject, TSortBy, TIncludes}"/></item>
-    /// </list>
-    /// </summary>
-    /// <typeparam name="TService"></typeparam>
-    /// <typeparam name="TSearchObject"></typeparam>
-    /// <typeparam name="TSortBy"></typeparam>
-    /// <typeparam name="TIncludes"></typeparam>
-    /// <returns></returns>
-    //public virtual ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddComplexService<TService, TSearchObject, TSortBy, TIncludes>()
-    //    where TService : class, IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, IEntityService<TEntity, TKey>
-    //    where TSearchObject : class, ISearchObject<TKey>, new()
-    //    where TSortBy : struct, Enum
-    //    where TIncludes : struct, Enum
-    //{
-    //    // Remove
-    //    Services.RemoveAll<IEntityService<TEntity, TKey>>();
-    //    // Add
-    //    Services.AddTransient<IEntityService<TEntity, TKey>, TService>();
-    //    Services.AddTransient<IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, TService>();
-    //    return new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(this);
-    //}
-    */
+
+    // Primers
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddPrimer<TPrimer>()
+        where TPrimer : class, IEntityPrimer<TEntity>
+    {
+        AddTransient<IEntityPrimer<TEntity>, TPrimer>();
+        return this;
+    }
+
+    // EntityNormalizers
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddNormalizer<TNormalizer>()
+        where TNormalizer : class, IEntityNormalizer<TEntity>
+    {
+        AddTransient<IEntityNormalizer<TEntity>, TNormalizer>();
+        return this;
+    }
 }
 
 public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServiceCollection services)

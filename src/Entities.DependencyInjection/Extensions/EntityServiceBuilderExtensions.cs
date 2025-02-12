@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Attachments.Abstractions;
+using Regira.Entities.EFcore.Abstractions;
 using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.DependencyInjection.Extensions;
@@ -7,7 +8,8 @@ namespace Regira.Entities.DependencyInjection.Extensions;
 public static class EntityServiceBuilderExtensions
 {
     // Attachments
-    public static EntityServiceBuilder<TContext, TEntity, int> HasAttachments<TContext, TEntity, TEntityAttachment>(
+    public static EntityServiceBuilder<TContext, TEntity, int> HasAttachments<TContext, TEntity, TEntityAttachment>
+    (
         this EntityServiceBuilder<TContext, TEntity, int> builder,
         Action<EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, int>>? configure = null
     )
@@ -24,8 +26,8 @@ public static class EntityServiceBuilderExtensions
         attachmentBuilder.AddDefaultAttachmentService();
         return builder;
     }
-
-    public static EntityServiceBuilder<TContext, TEntity, TKey> HasAttachments<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey>(
+    public static EntityServiceBuilder<TContext, TEntity, TKey> HasAttachments<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey>
+    (
         this EntityServiceBuilder<TContext, TEntity, TKey> builder,
         Action<EntityAttachmentServiceBuilder<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey>>? configure = null
     )
