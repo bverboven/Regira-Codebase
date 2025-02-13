@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Entities.TestApi.Infrastructure;
 using Entities.TestApi.Infrastructure.Courses;
 using Entities.TestApi.Infrastructure.Departments;
+using Entities.TestApi.Infrastructure.Enrollments;
 using Entities.TestApi.Infrastructure.Persons;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -11,9 +12,7 @@ using Regira.Entities.DependencyInjection.Extensions;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.EFcore.Primers;
-using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
-using Regira.Entities.EFcore.Services;
 using Regira.IO.Storage.FileSystem;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
@@ -54,11 +53,15 @@ builder.Services
     .AddAutoMapper(c => c.AllowNullCollections = true)
     .UseEntities<ContosoContext>(o =>
     {
-        o.AddDefaultQKeywordHelper();
-        o.AddDefaultEntityNormalizer();
-        o.AddDefaultGlobalQueryFilters();
+        o.UseDefaults();
         o.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
     })
+    // Entity types
+    .AddEnrollments()
+    .AddCourses()
+    .AddDepartments()
+    .AddPersons()
+    // Attachments
     // FileSystem storage
     .ConfigureAttachmentService(_ => new BinaryFileService(new FileSystemOptions { RootFolder = ApiConfiguration.AttachmentsDirectory }))
     // Azure storage
@@ -74,34 +77,7 @@ builder.Services
     [
         db.CourseAttachments.ToDescriptor<Course>(),
         db.PersonAttachments.ToDescriptor<Person>()
-    ])
-    .For<Department>(e =>
-    {
-        e.AddMapping<DepartmentDto, DepartmentInputDto>();
-        e.AddQueryFilter<DepartmentMax10YearsOldQueryFilter>();
-    })
-    .For<Course, int, CourseSearchObject>(e =>
-    {
-        e.UseEntityService<CourseRepository>();
-        e.AddMapping<CourseDto, CourseInputDto>();
-        e.HasAttachments<ContosoContext, Course, CourseAttachment>(a =>
-        {
-            a.AddMapping<CourseAttachmentDto, CourseAttachmentInputDto>();
-        });
-        // extra person filter
-        e.AddTransient<IFilteredQueryBuilder<Person, PersonSearchObject>, CoursePersonQueryFilter>();
-    })
-    .For<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(e =>
-    {
-        e.UseEntityService<PersonManager>();
-        e.HasRepository<PersonRepository>();
-        e.HasManager<PersonManager>();
-        e.AddQueryFilter<PersonQueryFilter>();
-        e.UseQueryBuilder<PersonQueryBuilder>();
-        e.AddMapping<PersonDto, PersonInputDto>();
-        e.HasAttachments<ContosoContext, Person, PersonAttachment>();
-        e.AddNormalizer<PersonNormalizer>();
-    });
+    ]);
 
 var app = builder.Build();
 

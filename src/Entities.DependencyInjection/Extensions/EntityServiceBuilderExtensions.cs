@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Attachments.Abstractions;
-using Regira.Entities.EFcore.Abstractions;
 using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.DependencyInjection.Extensions;

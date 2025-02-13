@@ -22,23 +22,16 @@ public static class ServiceCollectionExtensions
     public class Options(IServiceCollection services)
     {
         public ICollection<Assembly> ProfileAssemblies { get; set; } = new List<Assembly>();
-        /// <summary>
-        /// Adds default filtered query builders
-        /// <list type="bullet">
-        /// <item>Id(s)</item>
-        /// <item>Timestamps</item>
-        /// <item>Archivable</item>
-        /// </list>
-        /// </summary>
-        public IServiceCollection AddDefaultGlobalQueryFilters()
+
+        public IServiceCollection UseDefaults()
         {
-            services.AddTransient<IGlobalFilteredQueryBuilder, FilterIdsQueryBuilder>();
-            services.AddTransient<IGlobalFilteredQueryBuilder, FilterArchivablesQueryBuilder>();
-            services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasCreatedQueryBuilder>();
-            services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasLastModifiedQueryBuilder>();
+            AddDefaultQKeywordHelper();
+            AddDefaultEntityNormalizer();
+            AddDefaultGlobalQueryFilters();
 
             return services;
         }
+
 
         public IServiceCollection AddDefaultQKeywordHelper(Func<IServiceProvider, INormalizer>? normalizerFactory = null, QKeywordHelperOptions? options = null)
             => services.AddTransient<IQKeywordHelper>(p => new QKeywordHelper(normalizerFactory?.Invoke(p), options));
@@ -66,6 +59,23 @@ public static class ServiceCollectionExtensions
             return services.AddTransient<IEntityNormalizer, DefaultEntityNormalizer>();
         }
 
+        /// <summary>
+        /// Adds default filtered query builders
+        /// <list type="bullet">
+        /// <item>Id(s)</item>
+        /// <item>Timestamps</item>
+        /// <item>Archivable</item>
+        /// </list>
+        /// </summary>
+        public IServiceCollection AddDefaultGlobalQueryFilters()
+        {
+            services.AddTransient<IGlobalFilteredQueryBuilder, FilterIdsQueryBuilder>();
+            services.AddTransient<IGlobalFilteredQueryBuilder, FilterArchivablesQueryBuilder>();
+            services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasCreatedQueryBuilder>();
+            services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasLastModifiedQueryBuilder>();
+
+            return services;
+        }
         public IServiceCollection AddGlobalFilterQueryBuilder<TImplementation>()
             where TImplementation : class, IGlobalFilteredQueryBuilder
             => services
@@ -98,20 +108,10 @@ public static class ServiceCollectionExtensions
         var options = new Options(services);
         configure?.Invoke(options);
 
-        services
-            .AddAutoMapper(cfg =>
-            {
-                cfg.AllowNullCollections = true;
-
-                if (options.ProfileAssemblies.Any())
-                {
-                    cfg.AddMaps(options.ProfileAssemblies);
-                }
-            });
-
         return services;
     }
 
+    // QueryFilters
     public static IServiceCollection AddGlobalFilterQueryBuilder<TImplementation>(this IServiceCollection services)
         where TImplementation : class, IGlobalFilteredQueryBuilder
         => services
@@ -139,9 +139,11 @@ public static class ServiceCollectionExtensions
     }
 
 
+    // AutoTruncate
     public static IServiceCollection AddAutoTruncatePrimer<TServiceCollection>(this TServiceCollection services)
         where TServiceCollection : IServiceCollection
         => services.AddTransient<IEntityPrimer, AutoTruncatePrimer>();
+    // Default normalizer
     public static IServiceCollection AddDefaultEntityNormalizerPrimer<TServiceCollection>(this TServiceCollection services)
         where TServiceCollection : IServiceCollection
         => services.AddTransient<IEntityPrimer, AutoNormalizingPrimer>();

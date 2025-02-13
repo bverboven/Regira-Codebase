@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
-using Regira.Entities.EFcore.Abstractions;
-using Regira.Entities.EFcore.Normalizing.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
@@ -247,22 +245,6 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
     public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>> factory)
     {
         Services.AddTransient(factory);
-        return this;
-    }
-
-    // Primers
-    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddPrimer<TPrimer>()
-        where TPrimer : class, IEntityPrimer<TEntity>
-    {
-        AddTransient<IEntityPrimer<TEntity>, TPrimer>();
-        return this;
-    }
-
-    // EntityNormalizer
-    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddNormalizer<TNormalizer>()
-        where TNormalizer : class, IEntityNormalizer<TEntity>
-    {
-        AddTransient<IEntityNormalizer<TEntity>, TNormalizer>();
         return this;
     }
 }

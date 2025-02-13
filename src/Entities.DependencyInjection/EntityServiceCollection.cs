@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
+using Regira.Entities.DependencyInjection.Abstractions;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
@@ -14,8 +15,7 @@ using Regira.Web.DependencyInjection;
 
 namespace Regira.Entities.DependencyInjection;
 
-public class EntityServiceCollection<TContext>(IServiceCollection services) : ServiceCollectionWrapper(services)
-    where TContext : DbContext
+public class EntityServiceCollection<TContext>(IServiceCollection services) : ServiceCollectionWrapper(services), IEntityServiceCollection<TContext> where TContext : DbContext
 {
     // Default service
     public EntityServiceCollection<TContext> For<TEntity>(Action<EntityServiceBuilder<TContext, TEntity>>? configure = null)
@@ -100,7 +100,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         return this;
     }
     /// <summary>
-    /// <inheritdoc cref="EntityServiceBuilder{TContext, TEntity}.AddComplexService{TService, TSearchObject, TSortBy, TIncludes}"/>
+    /// 
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TKey"></typeparam>
