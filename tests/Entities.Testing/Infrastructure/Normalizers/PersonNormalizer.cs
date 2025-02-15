@@ -10,7 +10,7 @@ public class PersonNormalizer(INormalizer? normalizer) : EntityNormalizerBase<Pe
     {
         foreach (var item in items)
         {
-            item.NormalizedContent = $"PERSON {item.NormalizedContent}";
+            item.NormalizedContent = $"PERSON {item.NormalizedContent}".Trim();
         }
 
         return Task.CompletedTask;

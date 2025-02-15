@@ -3,7 +3,6 @@
 namespace Regira.Entities.EFcore.Abstractions;
 
 public interface IEntityPrimer<in T> : IEntityPrimer
-    where T : class
 {
     Task PrepareAsync(T entity, EntityEntry entry);
     bool CanPrepare(T entity);

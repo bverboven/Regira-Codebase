@@ -33,12 +33,12 @@ public static class DbContextNormalizingExtensions
     /// <param name="items"></param>
     public static async Task ApplyNormalizers(this DbContext dbContext, IEnumerable<object> items)
     {
-        var normalizingSelector = dbContext.GetService<EntityNormalizerContainer>();
+        var normalizingContainer = dbContext.GetService<EntityNormalizerContainer>();
 
         var itemsByType = items.GroupBy(item => item.GetType()).ToArray();
         foreach (var typedItems in itemsByType)
         {
-            var normalizers = normalizingSelector.FindAll(typedItems.Key).ToArray();
+            var normalizers = normalizingContainer.FindAll(typedItems.Key).ToArray();
             var exclusiveNormalizer = normalizers.FirstOrDefault(x => x.IsExclusive);
             if (exclusiveNormalizer != null)
             {

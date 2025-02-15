@@ -6,9 +6,10 @@ using Regira.Normalizing;
 
 namespace Testing.Library.Contoso;
 
-public class Person : IEntityWithSerial, IHasNormalizedTitle, IHasAttachments, IHasAttachments<PersonAttachment>, IHasNormalizedContent
+public class Person : IEntityWithSerial, IHasAggregateKey, IHasNormalizedTitle, IHasAttachments, IHasAttachments<PersonAttachment>, IHasNormalizedContent
 {
     public int Id { get; set; }
+    public Guid? AggregateKey { get; set; } = Guid.NewGuid();
 
     [Required]
     [MaxLength(32)]

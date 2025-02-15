@@ -74,8 +74,17 @@ public static class EntityNormalizerContainerInterceptorExtensions
                                  .FirstOrDefault()
                                  ?.ApplicationServiceProvider
                              ?? services.BuildServiceProvider();
-        var normalizers = services.CollectDescriptors<IEntityNormalizer>()
-            .Select(d => (IEntityNormalizer)serviceProvider.GetRequiredService(d.ServiceType));
+
+        var descriptors = services.CollectDescriptors<IEntityNormalizer>();
+        var normalizers = descriptors
+            .DistinctBy(x => x.ServiceType)
+            .SelectMany(d =>
+            {
+                return serviceProvider.GetServices(d.ServiceType).OfType<IEntityNormalizer>();
+            })
+            .DistinctBy(x => x.GetType())
+            .ToArray();
+
         var normalizerContainer = new EntityNormalizerContainerInterceptor(normalizers);
         return optionsBuilder.AddInterceptors(normalizerContainer);
     }

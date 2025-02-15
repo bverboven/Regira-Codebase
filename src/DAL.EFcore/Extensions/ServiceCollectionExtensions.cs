@@ -7,4 +7,4 @@ public static class ServiceCollectionExtensions
 {
     public static IEnumerable<ServiceDescriptor> CollectDescriptors<TService>(this IServiceCollection services)
         => services.Where(s => TypeUtility.ImplementsInterface<TService>(s.ServiceType));
-}
+}   

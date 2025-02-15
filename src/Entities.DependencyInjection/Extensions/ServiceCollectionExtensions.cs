@@ -23,24 +23,49 @@ public static class ServiceCollectionExtensions
     {
         public ICollection<Assembly> ProfileAssemblies { get; set; } = new List<Assembly>();
 
-        public IServiceCollection UseDefaults()
+        public Options UseDefaults()
         {
             AddDefaultQKeywordHelper();
+            AddDefaultPrimers();
             AddDefaultEntityNormalizer();
             AddDefaultGlobalQueryFilters();
 
-            return services;
+            return this;
         }
 
 
-        public IServiceCollection AddDefaultQKeywordHelper(Func<IServiceProvider, INormalizer>? normalizerFactory = null, QKeywordHelperOptions? options = null)
-            => services.AddTransient<IQKeywordHelper>(p => new QKeywordHelper(normalizerFactory?.Invoke(p), options));
-        public IServiceCollection AddDefaultEntityNormalizer(Action<IServiceProvider, NormalizingOptions>? configure = null)
+        public Options AddDefaultQKeywordHelper(Func<IServiceProvider, INormalizer>? normalizerFactory = null, QKeywordHelperOptions? options = null)
+        {
+            services.AddTransient<IQKeywordHelper>(p => new QKeywordHelper(normalizerFactory?.Invoke(p), options));
+            return this;
+        }
+
+        public Options AddDefaultPrimers()
+        {
+            AddPrimer<HasCreatedDbPrimer>();
+            AddPrimer<HasLastModifiedDbPrimer>();
+            return this;
+        }
+        public Options AddPrimer<TPrimer>()
+            where TPrimer : class, IEntityPrimer
+        {
+            services.AddTransient<IEntityPrimer, TPrimer>();
+            return this;
+        }
+        public Options AddPrimer<TPrimer, TKey>()
+            where TPrimer : class, IEntityPrimer<TKey>
+        {
+            services.AddTransient<IEntityPrimer<TKey>, TPrimer>();
+            return this;
+        }
+        public Options AddDefaultEntityNormalizer(Action<IServiceProvider, NormalizingOptions>? configure = null)
         {
             if (configure == null)
             {
                 services.AddTransient<INormalizer, DefaultNormalizer>();
-                return services.AddTransient<IObjectNormalizer, ObjectNormalizer>();
+                services.AddTransient<IObjectNormalizer, ObjectNormalizer>();
+                services.AddTransient<IEntityNormalizer, DefaultEntityNormalizer>();
+                return this;
             }
 
             services.AddTransient<INormalizer>(p =>
@@ -56,8 +81,22 @@ public static class ServiceCollectionExtensions
                 return options.DefaultObjectNormalizer ?? new ObjectNormalizer(options);
             });
 
-            return services.AddTransient<IEntityNormalizer, DefaultEntityNormalizer>();
+            services.AddTransient<IEntityNormalizer, DefaultEntityNormalizer>();
+            return this;
         }
+        public Options AddNormalizer<TNormalizer>()
+            where TNormalizer : class, IEntityNormalizer
+        {
+            services.AddTransient<IEntityNormalizer, TNormalizer>();
+            return this;
+        }
+        public Options AddNormalizer<TNormalizer, TEntity>()
+            where TNormalizer : class, IEntityNormalizer<TEntity>
+        {
+            services.AddTransient<IEntityNormalizer<TEntity>, TNormalizer>();
+            return this;
+        }
+
 
         /// <summary>
         /// Adds default filtered query builders
@@ -67,24 +106,29 @@ public static class ServiceCollectionExtensions
         /// <item>Archivable</item>
         /// </list>
         /// </summary>
-        public IServiceCollection AddDefaultGlobalQueryFilters()
+        public Options AddDefaultGlobalQueryFilters()
         {
             services.AddTransient<IGlobalFilteredQueryBuilder, FilterIdsQueryBuilder>();
             services.AddTransient<IGlobalFilteredQueryBuilder, FilterArchivablesQueryBuilder>();
             services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasCreatedQueryBuilder>();
             services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasLastModifiedQueryBuilder>();
 
-            return services;
+            return this;
         }
-        public IServiceCollection AddGlobalFilterQueryBuilder<TImplementation>()
+        public Options AddGlobalFilterQueryBuilder<TImplementation>()
             where TImplementation : class, IGlobalFilteredQueryBuilder
-            => services
-                .AddTransient<IGlobalFilteredQueryBuilder, TImplementation>();
-        public IServiceCollection AddGlobalFilterQueryBuilder<TImplementation, TKey>()
+        {
+            services.AddTransient<IGlobalFilteredQueryBuilder, TImplementation>();
+            return this;
+        }
+        public Options AddGlobalFilterQueryBuilder<TImplementation, TKey>()
             where TImplementation : class, IGlobalFilteredQueryBuilder<TKey>
-            => services
+        {
+            services
                 .AddGlobalFilterQueryBuilder<TImplementation>()
                 .AddTransient<IGlobalFilteredQueryBuilder<TKey>, TImplementation>();
+            return this;
+        }
     }
 
     /// <summary>
@@ -103,7 +147,7 @@ public static class ServiceCollectionExtensions
     /// <param name="services"></param>
     /// <param name="configure"></param>
     /// <returns></returns>
-    public static IServiceCollection UseEntities(this IServiceCollection services, Action<Options>? configure = null)
+    static IServiceCollection UseEntities(this IServiceCollection services, Action<Options>? configure = null)
     {
         var options = new Options(services);
         configure?.Invoke(options);
@@ -138,6 +182,20 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    // Primers
+    public static IServiceCollection AddPrimer<TPrimer>(this IServiceCollection services)
+        where TPrimer : class, IEntityPrimer
+    {
+        services.AddTransient<IEntityPrimer, TPrimer>();
+        return services;
+    }
+    // Normalizer
+    public static IServiceCollection AddNormalizer<TNormalizer>(this IServiceCollection services)
+        where TNormalizer : class, IEntityNormalizer
+    {
+        services.AddTransient<IEntityNormalizer, TNormalizer>();
+        return services;
+    }
 
     // AutoTruncate
     public static IServiceCollection AddAutoTruncatePrimer<TServiceCollection>(this TServiceCollection services)

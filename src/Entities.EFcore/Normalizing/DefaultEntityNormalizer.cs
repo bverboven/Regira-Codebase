@@ -18,7 +18,7 @@ public class DefaultEntityNormalizer<T>(IObjectNormalizer? objectNormalizer = nu
                                                                             ?? NormalizingDefaults.DefaultObjectNormalizer
                                                                             ?? new ObjectNormalizer();
 
-    public DefaultEntityNormalizer(INormalizer normalizer)
+    public DefaultEntityNormalizer(INormalizer? normalizer)
         : this(new ObjectNormalizer(new NormalizingOptions { DefaultNormalizer = normalizer }))
     { }
 

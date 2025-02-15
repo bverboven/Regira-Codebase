@@ -1,10 +1,14 @@
 ﻿#if NETCOREAPP3_1_OR_GREATER
 using Microsoft.EntityFrameworkCore;
+using Regira.Entities.EFcore.Abstractions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.DAL.EFcore.Extensions;
 using Regira.Entities.EFcore.Abstractions;
+using Regira.Entities.Models.Abstractions;
 using Regira.Utilities;
 
 namespace Regira.Entities.EFcore.Primers;
