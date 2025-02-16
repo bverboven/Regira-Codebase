@@ -104,7 +104,11 @@ public static class ServiceCollectionQueryFilterExtensions
         options.AddGlobalFilterQueryBuilder<FilterArchivablesQueryBuilder>();
         options.AddGlobalFilterQueryBuilder<FilterHasCreatedQueryBuilder>();
         options.AddGlobalFilterQueryBuilder<FilterHasLastModifiedQueryBuilder>();
-        options.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
+
+        options.AddGlobalFilterQueryBuilder<FilterIdsQueryBuilder<string>>();
+        options.AddGlobalFilterQueryBuilder<FilterArchivablesQueryBuilder<string>>();
+        options.AddGlobalFilterQueryBuilder<FilterHasCreatedQueryBuilder<string>>();
+        options.AddGlobalFilterQueryBuilder<FilterHasLastModifiedQueryBuilder<string>>();
 
         return options;
     }
