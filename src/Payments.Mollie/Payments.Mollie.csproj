@@ -11,7 +11,7 @@
     <AssemblyName>Regira.Payments.Mollie</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.2.0</Version>
+    <Version>4.2.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Abstractions\**" />
@@ -28,7 +28,7 @@
     <ProjectReference Include="..\Common.Payments\Common.Payments.csproj" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
-    <PackageReference Include="System.Text.Json" Version="9.0.1" />
+    <PackageReference Include="System.Text.Json" Version="9.0.2" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Mollie.Api" Version="3.6.0" />
