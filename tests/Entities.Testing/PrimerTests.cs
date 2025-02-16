@@ -4,10 +4,9 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework.Legacy;
-using Regira.Entities.EFcore.Abstractions;
 using Regira.Entities.EFcore.Extensions;
 using Regira.Entities.EFcore.Primers;
-using Regira.Entities.EFcore.Services;
+using Regira.Entities.EFcore.Primers.Abstractions;
 using Regira.Entities.Models.Abstractions;
 using Regira.Utilities;
 
@@ -331,11 +330,11 @@ public class PrimerTests
         var services = new ServiceCollection();
 
         services
-            .AddDbContext<ProductContext>(db =>
+            .AddDbContext<ProductContext>((sp, db) =>
             {
                 db
                     .UseSqlite($"Filename={Path.Combine(Path.GetTempPath(), "test.db")}") // no memory db
-                    .AddPrimerInterceptors(services);
+                    .AddPrimerInterceptors(sp);
             })
             .AddTransient<IEntityPrimer, AutoTruncatePrimer>();
         var sp = services.BuildServiceProvider();

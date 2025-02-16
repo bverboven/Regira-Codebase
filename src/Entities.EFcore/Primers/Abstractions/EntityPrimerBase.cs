@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace Regira.Entities.EFcore.Abstractions;
+namespace Regira.Entities.EFcore.Primers.Abstractions;
 
 public abstract class EntityPrimerBase<T> : IEntityPrimer<T>
     where T : class

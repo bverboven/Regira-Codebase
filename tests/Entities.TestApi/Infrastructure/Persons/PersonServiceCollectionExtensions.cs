@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Regira.Entities.DependencyInjection.Abstractions;
-using Regira.Entities.DependencyInjection.Extensions;
+using Regira.Entities.DependencyInjection.Attachments;
 using Testing.Library.Contoso;
 
 namespace Entities.TestApi.Infrastructure.Persons;

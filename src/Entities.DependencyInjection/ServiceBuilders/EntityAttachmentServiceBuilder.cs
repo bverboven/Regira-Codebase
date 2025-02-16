@@ -11,7 +11,7 @@ using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Attachments.Mappings;
 using Regira.Entities.Web.Attachments.Models;
 
-namespace Regira.Entities.DependencyInjection;
+namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 
 public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment>(IServiceCollection services)
     : EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, int>(services),

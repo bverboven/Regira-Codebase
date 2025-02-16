@@ -6,23 +6,26 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.DAL.EFcore.Extensions;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
-using Regira.Normalizing.Abstractions;
 using Regira.Utilities;
 
 namespace Regira.Entities.EFcore.Normalizing;
 
-public class EntityNormalizerContainerInterceptor(IEnumerable<IEntityNormalizer> normalizers) : SaveChangesInterceptor
+public class EntityNormalizerContainerInterceptor(IServiceProvider serviceProvider) : SaveChangesInterceptor
 {
     public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData,
-        InterceptionResult<int> result,
-        CancellationToken cancellationToken = default)
+        InterceptionResult<int> result, CancellationToken cancellationToken = default)
     {
         if (eventData.Context is not null)
         {
+            var normalizers = serviceProvider.GetServices<IEntityNormalizer>()
+                .Distinct()
+                .ToArray();
+
             var groupedEntries = eventData.Context
                 .GetPendingEntries()
                 .GroupBy(e => e.Entity.GetType())
                 .ToArray();
+
             if (normalizers.Any() && groupedEntries.Any())
             {
                 foreach (var entriesGroup in groupedEntries)
@@ -59,33 +62,24 @@ public class EntityNormalizerContainerInterceptor(IEnumerable<IEntityNormalizer>
         return await base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 }
+
 public static class EntityNormalizerContainerInterceptorExtensions
 {
     /// <summary>
     /// Will find all services that implements <see cref="IEntityNormalizer"/> and execute them when calling SaveChanges on DbContext
     /// </summary>
     /// <param name="optionsBuilder"></param>
-    /// <param name="services"></param>
+    /// <param name="serviceProvider"></param>
     /// <returns></returns>
-    public static DbContextOptionsBuilder AddNormalizerInterceptors(this DbContextOptionsBuilder optionsBuilder, IServiceCollection services)
+    public static DbContextOptionsBuilder AddNormalizerInterceptors(this DbContextOptionsBuilder optionsBuilder, IServiceProvider? serviceProvider = null)
     {
-        var serviceProvider = optionsBuilder.Options
+        serviceProvider ??= optionsBuilder.Options
                                  .Extensions.OfType<CoreOptionsExtension>()
                                  .FirstOrDefault()
                                  ?.ApplicationServiceProvider
-                             ?? services.BuildServiceProvider();
+            ?? throw new NotImplementedException("Could not create a ServiceProvider instance");
 
-        var descriptors = services.CollectDescriptors<IEntityNormalizer>();
-        var normalizers = descriptors
-            .DistinctBy(x => x.ServiceType)
-            .SelectMany(d =>
-            {
-                return serviceProvider.GetServices(d.ServiceType).OfType<IEntityNormalizer>();
-            })
-            .DistinctBy(x => x.GetType())
-            .ToArray();
-
-        var normalizerContainer = new EntityNormalizerContainerInterceptor(normalizers);
+        var normalizerContainer = new EntityNormalizerContainerInterceptor(serviceProvider);
         return optionsBuilder.AddInterceptors(normalizerContainer);
     }
 }

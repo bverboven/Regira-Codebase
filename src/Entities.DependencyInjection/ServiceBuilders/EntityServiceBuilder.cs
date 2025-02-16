@@ -3,15 +3,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.Abstractions;
-using Regira.Entities.EFcore.Abstractions;
+using Regira.Entities.DependencyInjection.Normalizers;
+using Regira.Entities.DependencyInjection.Primers;
+using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
+using Regira.Entities.EFcore.Primers.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 
-namespace Regira.Entities.DependencyInjection;
+namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 
 public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services)
     : EntityServiceBuilder<TContext, TEntity, int>(services), IEntityServiceBuilder<TEntity>
@@ -263,29 +266,31 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
 
     // Query Builders
     public EntityServiceBuilder<TContext, TEntity, TKey> AddDefaultQueryBuilder()
-        => UseQueryBuilder<QueryBuilder<TEntity, TKey>>();
-
+    {
+        Services.AddDefaultQueryBuilder<TEntity, TKey>();
+        return this;
+    }
     public EntityServiceBuilder<TContext, TEntity, TKey> UseQueryBuilder<TImplementation>()
         where TImplementation : class, IQueryBuilder<TEntity, TKey>
     {
-        Services.AddTransient<IQueryBuilder<TEntity, TKey>, TImplementation>();
+        Services.UseQueryBuilder<TEntity, TKey, TImplementation>();
         return this;
     }
     public EntityServiceBuilder<TContext, TEntity, TKey> UseQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TKey>> factory)
     {
-        Services.AddTransient(factory);
+        Services.UseQueryBuilder(factory);
         return this;
     }
 
     public EntityServiceBuilder<TContext, TEntity, TKey> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>
     {
-        Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>, TImplementation>();
+        Services.AddQueryFilter<TEntity, TKey, SearchObject<TKey>, TImplementation>();
         return this;
     }
     public EntityServiceBuilder<TContext, TEntity, TKey> AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>> factory)
     {
-        Services.AddTransient(factory);
+        Services.AddQueryFilter(factory);
         return this;
     }
 
@@ -294,7 +299,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     public EntityServiceBuilder<TContext, TEntity, TKey> AddPrimer<TPrimer>()
         where TPrimer : class, IEntityPrimer<TEntity>
     {
-        AddTransient<IEntityPrimer<TEntity>, TPrimer>();
+        Services.AddPrimer<TEntity, TPrimer>();
         return this;
     }
 
@@ -302,7 +307,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     public EntityServiceBuilder<TContext, TEntity, TKey> AddNormalizer<TNormalizer>()
         where TNormalizer : class, IEntityNormalizer<TEntity>
     {
-        AddTransient<IEntityNormalizer<TEntity>, TNormalizer>();
+        Services.AddNormalizer<TEntity, TNormalizer>();
         return this;
     }
 }
@@ -375,29 +380,31 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
 
     // Query Builders
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddDefaultQueryBuilder()
-        => UseQueryBuilder<QueryBuilder<TEntity, TKey, TSearchObject>>();
-
+    {
+        Services.AddDefaultQueryBuilder<TEntity, TKey, TSearchObject>();
+        return this;
+    }
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> UseQueryBuilder<TImplementation>()
         where TImplementation : class, IQueryBuilder<TEntity, TKey, TSearchObject>
     {
-        Services.AddTransient<IQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
+        Services.UseQueryBuilder<TEntity, TKey, TSearchObject, TImplementation>();
         return this;
     }
     public EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> UseQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TKey, TSearchObject>> factory)
     {
-        Services.AddTransient(factory);
+        Services.UseQueryBuilder(factory);
         return this;
     }
 
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>
     {
-        Services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
+        Services.AddQueryFilter<TEntity, TKey, TSearchObject, TImplementation>();
         return this;
     }
     public EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>> factory)
     {
-        Services.AddTransient(factory);
+        Services.AddQueryFilter(factory);
         return this;
     }
 

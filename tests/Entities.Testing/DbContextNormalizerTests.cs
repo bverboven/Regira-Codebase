@@ -1,8 +1,8 @@
 ﻿using Entities.Testing.Infrastructure.Normalizers;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection.Extensions;
+using Regira.Entities.DependencyInjection.Normalizers;
 using Regira.Entities.EFcore.Normalizing;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
@@ -10,31 +10,18 @@ using Testing.Library.Data;
 namespace Entities.Testing;
 
 [TestFixture]
-[Parallelizable(ParallelScope.Self)]
+[Parallelizable(ParallelScope.None)]
 internal class DbContextNormalizerTests
 {
-    private SqliteConnection _connection = null!;
-    [SetUp]
-    public void Setup()
-    {
-        _connection = new SqliteConnection("Filename=:memory:");
-        _connection.Open();
-    }
-    [TearDown]
-    public void TearDown()
-    {
-        _connection.Close();
-    }
-
     [Test]
     public async Task Test_Order_Of_Registration()
     {
         IServiceCollection services = new ServiceCollection();
         var sp = services
-             .AddDbContext<ContosoContext>(db =>
+             .AddDbContext<ContosoContext>((sp, db) =>
              {
-                 db.UseSqlite(_connection);
-                 db.AddNormalizerInterceptors(services);
+                 db.UseSqlite("DataSource=:memory:");
+                 db.AddNormalizerInterceptors(sp);
              })
              .UseEntities<ContosoContext>()
              .For<Department>(e =>
@@ -44,14 +31,17 @@ internal class DbContextNormalizerTests
              })
              .BuildServiceProvider();
 
-        var item = Departments.Biology;
+        var (_, departments, _) = TestData.Generate();
+        var item = departments.Biology;
 
         var dbContext = sp.GetRequiredService<ContosoContext>();
+        await dbContext.Database.OpenConnectionAsync();
         await dbContext.Database.EnsureCreatedAsync();
 
         dbContext.Departments.Add(item);
         dbContext.ChangeTracker.DetectChanges();
         await dbContext.SaveChangesAsync();
+        await dbContext.Database.CloseConnectionAsync();
 
         Assert.That(item.NormalizedContent, Is.EqualTo("DEPARTMENT_2 DEPARTMENT_1"));
     }
@@ -61,34 +51,37 @@ internal class DbContextNormalizerTests
     {
         IServiceCollection services = new ServiceCollection();
         var sp = services
-            .AddDbContext<ContosoContext>(db =>
+            .AddDbContext<ContosoContext>((sp, db) =>
             {
-                db.UseSqlite(_connection);
-                db.AddNormalizerInterceptors(services);
+                db.UseSqlite("DataSource=:memory:");
+                db.AddNormalizerInterceptors(sp);
             })
             .UseEntities<ContosoContext>(e =>
             {
                 e.AddDefaultEntityNormalizer();
-                e.AddNormalizer<PersonNormalizer, Person>();
-                e.AddNormalizer<InstructorNormalizer, Instructor>();
+                e.AddNormalizer<Person, PersonNormalizer>();
+                e.AddNormalizer<Instructor, InstructorNormalizer>();
             })
             .BuildServiceProvider();
 
         var dbContext = sp.GetRequiredService<ContosoContext>();
+        await dbContext.Database.OpenConnectionAsync();
         await dbContext.Database.EnsureCreatedAsync();
 
-        var john = People.John;
-        var jane = People.Jane;
-        var francois = People.Francois;
-        var bob = People.Bob;
-        var bill = People.Bill;
+        var (people, _, courses) = TestData.Generate();
+        var john = people.John;
+        var jane = people.Jane;
+        var francois = people.Francois;
+        var bob = people.Bob;
+        var bill = people.Bill;
 
-        bob.Courses = Courses.All.Where(x => x.Instructors!.Contains(People.Bob)).ToList();
-        bill.Courses = Courses.All.Where(x => x.Instructors!.Contains(People.Bill)).ToList();
+        bob.Courses = courses.All.Where(x => x.Instructors!.Contains(people.Bob)).ToList();
+        bill.Courses = courses.All.Where(x => x.Instructors!.Contains(people.Bill)).ToList();
 
         dbContext.AddRange(john, jane, francois, bob, bill);
 
         await dbContext.SaveChangesAsync();
+        await dbContext.Database.CloseConnectionAsync();
 
         Assert.That(john.NormalizedTitle, Is.EqualTo("Doe John"));
         Assert.That(john.NormalizedContent, Is.EqualTo("PERSON John Doe This is a male test person johndoeemailcom"));

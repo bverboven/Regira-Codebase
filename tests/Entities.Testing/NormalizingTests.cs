@@ -4,10 +4,11 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection.Extensions;
-using Regira.Entities.EFcore.Abstractions;
+using Regira.Entities.DependencyInjection.Normalizers;
 using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
 using Regira.Entities.EFcore.Primers;
+using Regira.Entities.EFcore.Primers.Abstractions;
 using Regira.Entities.Models.Abstractions;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
@@ -90,16 +91,17 @@ internal class NormalizingTests
 
         var container = sp.GetRequiredService<EntityNormalizerContainer>();
 
-        var personNormalizers = container.FindAll<Person>();
+        var personNormalizers = container.FindAll<Person>().ToArray();
         Assert.That(personNormalizers, Is.Not.Empty);
-        Assert.That(personNormalizers.Count, Is.EqualTo(1));
+        Assert.That(personNormalizers.Count, Is.EqualTo(2));
 
-        var instructorNormalizers = container.FindAll<Instructor>();
+        var instructorNormalizers = container.FindAll<Instructor>().ToArray();
         Assert.That(instructorNormalizers, Is.Not.Empty);
-        Assert.That(instructorNormalizers.Count, Is.EqualTo(2));
+        Assert.That(instructorNormalizers.Count, Is.EqualTo(3));
 
-        var departmentNormalizer = container.FindAll<Department>();
+        var departmentNormalizer = container.FindAll<Department>().ToArray();
         Assert.That(departmentNormalizer, Is.Not.Empty);
+        // exclusive
         Assert.That(departmentNormalizer.Count, Is.EqualTo(1));
     }
 
@@ -119,11 +121,12 @@ internal class NormalizingTests
         var dbContext = sp.GetRequiredService<ContosoContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
-        var john = People.John;
-        var jane = People.Jane;
-        var francois = People.Francois;
-        var bob = People.Bob;
-        var bill = People.Bill;
+        var (people, _, _) = TestData.Generate();
+        var john = people.John;
+        var jane = people.Jane;
+        var francois = people.Francois;
+        var bob = people.Bob;
+        var bill = people.Bill;
 
         dbContext.AddRange(john, jane, francois, bob, bill);
 
@@ -149,10 +152,10 @@ internal class NormalizingTests
     {
         IServiceCollection services = new ServiceCollection();
         services
-            .AddDbContext<ContosoContext>(db =>
+            .AddDbContext<ContosoContext>((sp, db) =>
             {
                 db.UseSqlite(_connection);
-                db.AddPrimerInterceptors(services);
+                db.AddPrimerInterceptors(sp);
             })
             .AddTransient<IEntityPrimer, NormalizingPrimer>();
         var serviceProvider = services.BuildServiceProvider();
@@ -163,11 +166,12 @@ internal class NormalizingTests
         var dbContext = sp.GetRequiredService<ContosoContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
-        var john = People.John;
-        var jane = People.Jane;
-        var francois = People.Francois;
-        var bob = People.Bob;
-        var bill = People.Bill;
+        var (people, _, _) = TestData.Generate();
+        var john = people.John;
+        var jane = people.Jane;
+        var francois = people.Francois;
+        var bob = people.Bob;
+        var bill = people.Bill;
 
         dbContext.AddRange(john, jane, francois, bob, bill);
 

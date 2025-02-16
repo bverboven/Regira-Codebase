@@ -2,61 +2,19 @@
 
 namespace Testing.Library.Data;
 
-public static class Courses
+public class Courses(params Course[] items)
 {
-    public static Course GoingToTheMoon = new()
-    {
-        Title = "Going to the moon",
-        Instructors = [People.Bob]
-    };
-    public static readonly Course BefriendingChina = new()
-    {
-        Title = "Befriending China",
-        Instructors = [People.Bill]
-    };
-    public static readonly Course Cheating = new()
-    {
-        Title = "How to cheat",
-        Instructors = [People.Bill]
-    };
+    public Course GoingToTheMoon { get; set; } = items.First(x => x.Title!.Replace(" ", string.Empty).Equals(nameof(GoingToTheMoon), StringComparison.InvariantCultureIgnoreCase));
+    public Course BefriendingChina { get; set; } = items.First(x => x.Title!.Replace(" ", string.Empty).Equals(nameof(BefriendingChina), StringComparison.InvariantCultureIgnoreCase));
+    public Course Cheating { get; set; } = items.First(x => x.Title == "How to cheat");
 
-    public static readonly Course ArtificialIntelligence = new()
-    {
-        Title = "Artificial Intelligence",
-        Department = Departments.ComputerScience,
-        Instructors = [People.Bob],
-        Credits = 2
-    };
-    public static readonly Course DataStructures = new()
-    {
-        Title = "Data Structures and Algorithms",
-        Department = Departments.ComputerScience,
-        Instructors = [People.Bob],
-        Credits = 3
-    };
-    public static readonly Course Genetics = new()
-    {
-        Title = "Genetics",
-        Department = Departments.Biology,
-        Instructors = [People.David],
-        Credits = 3
-    };
-    public static readonly Course Ecology = new()
-    {
-        Title = "Ecology",
-        Department = Departments.Biology,
-        Instructors = [People.David],
-        Credits = 5
-    };
-    public static readonly Course MentalDisorders = new()
-    {
-        Title = "Mental disorders",
-        Department = Departments.Psychology,
-        Instructors = [People.Bill, People.Bob],
-        Credits = 4
-    };
+    public Course ArtificialIntelligence { get; set; } = items.First(x => x.Title!.Replace(" ", string.Empty).Equals(nameof(ArtificialIntelligence), StringComparison.InvariantCultureIgnoreCase));
+    public Course DataStructures { get; set; } = items.First(x => x.Title == "Data Structures and Algorithms");
+    public Course Genetics { get; set; } = items.First(x => x.Title!.Replace(" ", string.Empty).Equals(nameof(Genetics), StringComparison.InvariantCultureIgnoreCase));
+    public Course Ecology { get; set; } = items.First(x => x.Title!.Replace(" ", string.Empty).Equals(nameof(Ecology), StringComparison.InvariantCultureIgnoreCase));
+    public Course MentalDisorders { get; set; } = items.First(x => x.Title!.Replace(" ", string.Empty).Equals(nameof(MentalDisorders), StringComparison.InvariantCultureIgnoreCase));
 
-    public static IList<Course> All =>
+    public IList<Course> All =>
     [
         GoingToTheMoon, BefriendingChina, Cheating,
         ArtificialIntelligence, DataStructures,

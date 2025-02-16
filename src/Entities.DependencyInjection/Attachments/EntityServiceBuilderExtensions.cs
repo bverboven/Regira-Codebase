@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Attachments.Abstractions;
+using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.Models.Abstractions;
 
-namespace Regira.Entities.DependencyInjection.Extensions;
+namespace Regira.Entities.DependencyInjection.Attachments;
 
 public static class EntityServiceBuilderExtensions
 {
