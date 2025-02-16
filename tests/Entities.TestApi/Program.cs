@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Entities.TestApi.Infrastructure;
 using Entities.TestApi.Infrastructure.Courses;
 using Entities.TestApi.Infrastructure.Departments;
@@ -8,13 +9,13 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Regira.DAL.EFcore.Services;
 using Regira.Entities.DependencyInjection.Extensions;
+using Regira.Entities.DependencyInjection.Mapping;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 using Regira.IO.Storage.FileSystem;
-using System.Text.Json.Serialization;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
@@ -44,18 +45,18 @@ builder.Services.AddProblemDetails();
 
 builder.Services
     .AddHttpContextAccessor()
-    .AddDbContext<ContosoContext>((sp,db) =>
+    .AddDbContext<ContosoContext>((sp, db) =>
     {
         db.UseSqlite(ApiConfiguration.ConnectionString)
             .AddPrimerInterceptors(sp)
             .AddNormalizerInterceptors(sp)
             .AddAutoTruncateInterceptors();
     })
-    .AddAutoMapper(c => c.AllowNullCollections = true)
     .UseEntities<ContosoContext>(o =>
     {
         o.UseDefaults();
         o.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
+        o.UseAutoMapper(typeof(Person).Assembly);
     })
     // Entity types
     .AddEnrollments()

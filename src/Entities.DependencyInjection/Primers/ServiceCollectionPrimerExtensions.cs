@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.DependencyInjection.Extensions;
+using Regira.Entities.DependencyInjection.Models;
 using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.Primers.Abstractions;
 

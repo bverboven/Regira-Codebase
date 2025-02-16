@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Regira.Entities.DependencyInjection.Models;
 
 namespace Regira.Entities.DependencyInjection.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-
     /// <summary>
     /// <inheritdoc cref="UseEntities"/>
     /// </summary>
