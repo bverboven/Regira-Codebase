@@ -16,7 +16,7 @@ public class QKeywordHelperOptions
     public string WildcardOutput { get; set; } = "%";
     public bool ApplyNormalize { get; set; } = true;
 }
-public class QKeywordHelper(INormalizer? normalizer = null, QKeywordHelperOptions? options = null) : IQKeywordHelper
+public class QKeywordHelper(QKeywordHelperOptions? options = null, INormalizer? normalizer = null) : IQKeywordHelper
 {
     QKeywordHelperOptions Options => options ?? new QKeywordHelperOptions();
     private INormalizer Normalizer => Options.ApplyNormalize
@@ -33,7 +33,7 @@ public class QKeywordHelper(INormalizer? normalizer = null, QKeywordHelperOption
 #else
             ?.Split(' ', StringSplitOptions.RemoveEmptyEntries)
 #endif
-            .Select(ParseKeyword) 
+            .Select(ParseKeyword)
             ?? [];
         return new ParsedKeywordCollection(parsedKeywords, Options.ApplyNormalize ? Normalizer.Normalize(input) : input);
     }

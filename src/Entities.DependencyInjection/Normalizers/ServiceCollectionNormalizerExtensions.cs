@@ -2,6 +2,8 @@
 using Regira.Entities.DependencyInjection.Models;
 using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
+using Regira.Entities.Keywords;
+using Regira.Entities.Keywords.Abstractions;
 using Regira.Normalizing;
 using Regira.Normalizing.Abstractions;
 using Regira.Normalizing.Models;
@@ -36,15 +38,18 @@ public static class ServiceCollectionNormalizerExtensions
         return services;
     }
 
-    
+
     // EntityServiceCollectionOptions
-    public static EntityServiceCollectionOptions AddDefaultEntityNormalizer(this EntityServiceCollectionOptions options, Action<IServiceProvider, NormalizingOptions>? configure = null)
+    public static EntityServiceCollectionOptions AddDefaultEntityNormalizer(this EntityServiceCollectionOptions options, Action<NormalizeOptions> configure)
+        => options.AddDefaultEntityNormalizer((_, o) => configure.Invoke(o));
+    public static EntityServiceCollectionOptions AddDefaultEntityNormalizer(this EntityServiceCollectionOptions options, Action<IServiceProvider, NormalizeOptions>? configure = null)
     {
         if (configure == null)
         {
             options.Services.AddTransient<INormalizer, DefaultNormalizer>();
             options.Services.AddTransient<IObjectNormalizer, ObjectNormalizer>();
-            options.Services.AddTransient<IEntityNormalizer, DefaultEntityNormalizer>();
+            options.AddNormalizer<DefaultEntityNormalizer>();
+            options.AddDefaultQKeywordHelper();
             return options;
         }
 
@@ -62,6 +67,8 @@ public static class ServiceCollectionNormalizerExtensions
         });
 
         options.Services.AddTransient<IEntityNormalizer, DefaultEntityNormalizer>();
+        options.AddDefaultQKeywordHelper();
+
         return options;
     }
     public static EntityServiceCollectionOptions AddNormalizer<TNormalizer>(this EntityServiceCollectionOptions options)
@@ -74,6 +81,16 @@ public static class ServiceCollectionNormalizerExtensions
         where TNormalizer : class, IEntityNormalizer<TEntity>
     {
         options.Services.AddNormalizer<TEntity, TNormalizer>();
+        return options;
+    }
+
+    public static EntityServiceCollectionOptions AddDefaultQKeywordHelper(this EntityServiceCollectionOptions options, QKeywordHelperOptions? qOptions = null)
+    {
+        options.Services.AddTransient<IQKeywordHelper>(p =>
+        {
+            var normalizer = qOptions?.ApplyNormalize ?? true ? p.GetService<INormalizer>() ?? new DefaultNormalizer() : null;
+            return new QKeywordHelper(qOptions, normalizer);
+        });
         return options;
     }
 }

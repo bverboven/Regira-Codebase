@@ -100,10 +100,11 @@ public static class ServiceCollectionQueryFilterExtensions
     /// </summary>
     public static EntityServiceCollectionOptions AddDefaultGlobalQueryFilters(this EntityServiceCollectionOptions options)
     {
-        options.Services.AddTransient<IGlobalFilteredQueryBuilder, FilterIdsQueryBuilder>();
-        options.Services.AddTransient<IGlobalFilteredQueryBuilder, FilterArchivablesQueryBuilder>();
-        options.Services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasCreatedQueryBuilder>();
-        options.Services.AddTransient<IGlobalFilteredQueryBuilder, FilterHasLastModifiedQueryBuilder>();
+        options.AddGlobalFilterQueryBuilder<FilterIdsQueryBuilder>();
+        options.AddGlobalFilterQueryBuilder<FilterArchivablesQueryBuilder>();
+        options.AddGlobalFilterQueryBuilder<FilterHasCreatedQueryBuilder>();
+        options.AddGlobalFilterQueryBuilder<FilterHasLastModifiedQueryBuilder>();
+        options.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
 
         return options;
     }

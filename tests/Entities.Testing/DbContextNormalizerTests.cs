@@ -1,9 +1,12 @@
 ﻿using Entities.Testing.Infrastructure.Normalizers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.Extensions;
 using Regira.Entities.DependencyInjection.Normalizers;
 using Regira.Entities.EFcore.Normalizing;
+using Regira.Entities.Models;
+using Regira.Normalizing.Models;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
@@ -14,10 +17,52 @@ namespace Entities.Testing;
 internal class DbContextNormalizerTests
 {
     [Test]
+    public async Task Test_Normalizer_Options()
+    {
+        var sp = new ServiceCollection()
+            .AddDbContext<ContosoContext>((sp, db) =>
+            {
+                db.UseSqlite("DataSource=:memory:");
+                db.AddNormalizerInterceptors(sp);
+            })
+            .UseEntities<ContosoContext>(e =>
+            {
+                e.UseDefaults(d =>
+                {
+                    d.ConfigureNormalizing(o => o.Transform = TextTransform.ToUpperCase);
+                });
+            })
+            .For<Person>(e =>
+            {
+                e.AddNormalizer<PersonNormalizer>();
+            })
+            .BuildServiceProvider();
+
+        var (people, _, _) = TestData.Generate();
+
+        var dbContext = sp.GetRequiredService<ContosoContext>();
+        await dbContext.Database.OpenConnectionAsync();
+        await dbContext.Database.EnsureCreatedAsync();
+
+        dbContext.Persons.AddRange(people.All);
+
+        await dbContext.SaveChangesAsync();
+
+        var personService = sp.GetRequiredService<IEntityService<Person>>();
+        foreach (var person in people.All)
+        {
+            var personsFound = await personService.List(new SearchObject { Q = $"{person.GivenName} {person.LastName}".ToLower() });
+            Assert.That(personsFound.First().Id, Is.EqualTo(person.Id));
+            Assert.That(person.NormalizedContent, Is.EqualTo(person.NormalizedContent?.ToUpper()));
+        }
+
+        await dbContext.Database.CloseConnectionAsync();
+    }
+
+    [Test]
     public async Task Test_Order_Of_Registration()
     {
-        IServiceCollection services = new ServiceCollection();
-        var sp = services
+        var sp = new ServiceCollection()
              .AddDbContext<ContosoContext>((sp, db) =>
              {
                  db.UseSqlite("DataSource=:memory:");
@@ -39,7 +84,6 @@ internal class DbContextNormalizerTests
         await dbContext.Database.EnsureCreatedAsync();
 
         dbContext.Departments.Add(item);
-        dbContext.ChangeTracker.DetectChanges();
         await dbContext.SaveChangesAsync();
         await dbContext.Database.CloseConnectionAsync();
 
