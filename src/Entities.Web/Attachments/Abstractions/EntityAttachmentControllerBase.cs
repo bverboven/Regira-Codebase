@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Regira.DAL.Paging;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
@@ -13,6 +13,7 @@ using Regira.Entities.Web.Attachments.Models;
 using Regira.Entities.Web.Controllers;
 using Regira.Entities.Web.Models;
 using Regira.Web.IO;
+using System.Diagnostics;
 using static Regira.Web.Extensions.ControllerExtensions;
 
 namespace Regira.Entities.Web.Attachments.Abstractions;
@@ -23,6 +24,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
     where TEntity : class, IEntityAttachment
     where TInputDto : class, IEntityAttachmentInput
 {
+
     // Details
     [HttpGet("attachments/{id}")]
     public virtual async Task<ActionResult<DetailsResult<TDto>>> Details([FromRoute] int id)
@@ -78,6 +80,8 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
         }
         catch (Exception ex)
         {
+            var logger = HttpContext.RequestServices.GetRequiredService<ILogger<EntityAttachmentControllerBase<TEntity>>>();
+            logger.LogError(ex, "Updating entity failed");
             throw;
         }
     }

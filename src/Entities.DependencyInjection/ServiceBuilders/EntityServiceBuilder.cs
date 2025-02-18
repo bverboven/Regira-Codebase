@@ -92,7 +92,8 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         Services.AddTransient(factory);
         return this;
     }
-
+    
+    // Query Filters
     public new EntityServiceBuilder<TContext, TEntity> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, SearchObject>
     {
@@ -104,7 +105,21 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         Services.AddTransient(factory);
         return this;
     }
-
+    
+    // Default SortBy
+    public new EntityServiceBuilder<TContext, TEntity> UseDefaultSortBy(Func<IQueryable<TEntity>, IQueryable<TEntity>> sortBy)
+    {
+        base.UseDefaultSortBy(sortBy);
+        Services.AddTransient<ISortedQueryBuilder<TEntity>>(_ => new SortedQueryBuilder<TEntity>(sortBy));
+        return this;
+    }
+    // Default Includes
+    public new EntityServiceBuilder<TContext, TEntity> UseDefaultIncludes(Func<IQueryable<TEntity>, IQueryable<TEntity>> addIncludes)
+    {
+        base.UseDefaultIncludes(addIncludes);
+        Services.AddTransient<IIncludableQueryBuilder<TEntity>>(_ => new IncludableQueryBuilder<TEntity>(addIncludes));
+        return this;
+    }
     /*
     // Complex Entity service
     //public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddComplexService<TService, TSearchObject, TSortBy, TIncludes>()
@@ -281,7 +296,8 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
         Services.UseQueryBuilder(factory);
         return this;
     }
-
+    
+    // Query Filters
     public EntityServiceBuilder<TContext, TEntity, TKey> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>
     {
@@ -293,7 +309,19 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
         Services.AddQueryFilter(factory);
         return this;
     }
-
+    
+    // Default SortBy
+    public EntityServiceBuilder<TContext, TEntity, TKey> UseDefaultSortBy(Func<IQueryable<TEntity>, IQueryable<TEntity>> sortBy)
+    {
+        Services.AddTransient<ISortedQueryBuilder<TEntity, TKey>>(_ => new SortedQueryBuilder<TEntity, TKey>(sortBy));
+        return this;
+    }
+    // Default Includes
+    public EntityServiceBuilder<TContext, TEntity, TKey> UseDefaultIncludes(Func<IQueryable<TEntity>, IQueryable<TEntity>> addIncludes)
+    {
+        Services.AddTransient<IIncludableQueryBuilder<TEntity, TKey>>(_ => new IncludableQueryBuilder<TEntity, TKey>(addIncludes));
+        return this;
+    }
 
     // Primers
     public EntityServiceBuilder<TContext, TEntity, TKey> AddPrimer<TPrimer>()
@@ -395,7 +423,8 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
         Services.UseQueryBuilder(factory);
         return this;
     }
-
+    
+    // Query Filters
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>
     {

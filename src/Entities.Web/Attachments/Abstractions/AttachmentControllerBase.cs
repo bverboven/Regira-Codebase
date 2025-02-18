@@ -8,11 +8,11 @@ using Regira.Entities.Web.Models;
 using Regira.Web.Extensions;
 using Regira.Web.IO;
 
-namespace Regira.Entities.Web.Attachments;
+namespace Regira.Entities.Web.Attachments.Abstractions;
 
 [ApiController]
 [Route("attachments")]
-public class AttachmentController(IAttachmentService service, IMapper mapper) : ControllerBase
+public abstract class AttachmentControllerBase(IAttachmentService service, IMapper mapper) : ControllerBase
 {
     [HttpGet("{id}")]
     public virtual async Task<IActionResult> GetFile([FromRoute] int id, bool inline = true)

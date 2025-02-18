@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.QueryBuilders;
+using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models.Abstractions;
@@ -95,7 +96,8 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
         Services.UseQueryBuilder(factory);
         return this;
     }
-
+    
+    // Query Filters
     public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TSearchObject>
     {
@@ -105,6 +107,21 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
     public ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TSearchObject>> factory)
     {
         Services.AddQueryFilter(factory);
+        return this;
+    }
+    
+    // Default SortBy
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> UseDefaultSortBy(Func<IQueryable<TEntity>, IQueryable<TEntity>> sortBy)
+    {
+        base.UseDefaultSortBy(sortBy);
+        Services.AddTransient<ISortedQueryBuilder<TEntity>>(_ => new SortedQueryBuilder<TEntity>(sortBy));
+        return this;
+    }
+    // Default Includes
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> UseDefaultIncludes(Func<IQueryable<TEntity>, IQueryable<TEntity>> addIncludes)
+    {
+        base.UseDefaultIncludes(addIncludes);
+        Services.AddTransient<IIncludableQueryBuilder<TEntity>>(_ => new IncludableQueryBuilder<TEntity>(addIncludes));
         return this;
     }
 }
@@ -231,7 +248,8 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
         Services.UseQueryBuilder(factory);
         return this;
     }
-
+    
+    // Query Filters
     public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>
     {

@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Entities.TestApi.Infrastructure;
 using Entities.TestApi.Infrastructure.Courses;
 using Entities.TestApi.Infrastructure.Departments;
@@ -16,6 +15,7 @@ using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 using Regira.IO.Storage.FileSystem;
+using System.Text.Json.Serialization;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
@@ -56,7 +56,7 @@ builder.Services
     {
         o.UseDefaults();
         o.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
-        o.UseAutoMapper(typeof(Person).Assembly);
+        o.UseAutoMapper([typeof(Person).Assembly]);
     })
     // Entity types
     .AddEnrollments()

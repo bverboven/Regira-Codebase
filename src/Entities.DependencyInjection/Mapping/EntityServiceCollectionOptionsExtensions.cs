@@ -1,20 +1,21 @@
-﻿using System.Reflection;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection.Models;
+using System.Reflection;
 
 namespace Regira.Entities.DependencyInjection.Mapping;
 
 public static class EntityServiceCollectionOptionsExtensions
 {
-    public static EntityServiceCollectionOptions UseAutoMapper(this EntityServiceCollectionOptions options, params Assembly[] assemblies)
-        => options.UseAutoMapper(o => o.AllowNullCollections = true, assemblies);
-
-    public static EntityServiceCollectionOptions UseAutoMapper(this EntityServiceCollectionOptions options, Action<IMapperConfigurationExpression> configure, params Assembly[] assemblies)
+    public static EntityServiceCollectionOptions UseAutoMapper(this EntityServiceCollectionOptions options, IList<Assembly>? assemblies = null, Action<IMapperConfigurationExpression>? configure = null)
     {
-        options.Services.AddAutoMapper(configure);
+        options.Services.AddAutoMapper(o =>
+        {
+            o.AllowNullCollections = true;
+            configure?.Invoke(o);
+        });
 
-        if (assemblies.Any())
+        if (assemblies?.Any() == true)
         {
             options.Services.AddAutoMapper(assemblies);
         }

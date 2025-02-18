@@ -10,6 +10,7 @@ namespace Regira.Entities.Web.Controllers.Abstractions;
 /// Basic EntityController without extra models
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
+/// 
 public abstract class EntityControllerBase<TEntity> : EntityControllerBase<TEntity, SearchObject, TEntity, TEntity>
     where TEntity : class, IEntity<int>;
 /// <summary>
@@ -39,6 +40,8 @@ public abstract class EntityControllerBase<TEntity, TSearchObject, TDto, TInputD
 /// <typeparam name="TDto"></typeparam>
 /// <typeparam name="TInputDto"></typeparam>
 /// <typeparam name="TSearchObject"></typeparam>
+
+[ApiController]
 public abstract class EntityControllerBase<TEntity, TKey, TSearchObject, TDto, TInputDto> : ControllerBase
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>
@@ -95,6 +98,8 @@ public abstract class EntityControllerBase<TEntity, TSo, TSortBy, TIncludes, TDt
 /// <typeparam name="TIncludes"></typeparam>
 /// <typeparam name="TDto"></typeparam>
 /// <typeparam name="TInputDto"></typeparam>
+
+[ApiController]
 public abstract class EntityControllerBase<TEntity, TKey, TSo, TSortBy, TIncludes, TDto, TInputDto> : ControllerBase
     where TEntity : class, IEntity<TKey>
     where TSo : class, ISearchObject<TKey>, new()

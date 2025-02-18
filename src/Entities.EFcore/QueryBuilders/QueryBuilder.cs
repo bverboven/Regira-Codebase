@@ -10,23 +10,29 @@ namespace Regira.Entities.EFcore.QueryBuilders;
 public class QueryBuilder<TEntity>(
     IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
     IEnumerable<IFilteredQueryBuilder<TEntity, SearchObject<int>>>? filters = null,
+    ISortedQueryBuilder<TEntity>? sortedQueryBuilder = null,
+    IIncludableQueryBuilder<TEntity>? includableQueryBuilder = null,
     ILoggerFactory? loggerFactory = null
-) : QueryBuilder<TEntity, int>(globalFilters, filters, loggerFactory), IQueryBuilder<TEntity>
+) : QueryBuilder<TEntity, int>(globalFilters, filters, sortedQueryBuilder, includableQueryBuilder, loggerFactory), IQueryBuilder<TEntity>
     where TEntity : IEntity<int>;
 
 public class QueryBuilder<TEntity, TKey>(
     IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
     IEnumerable<IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>>? filters = null,
+    ISortedQueryBuilder<TEntity, TKey>? sortedQueryBuilder = null,
+    IIncludableQueryBuilder<TEntity, TKey>? includableQueryBuilder = null,
     ILoggerFactory? loggerFactory = null
-) : QueryBuilder<TEntity, TKey, SearchObject<TKey>>(globalFilters, filters, loggerFactory), IQueryBuilder<TEntity, TKey>
+) : QueryBuilder<TEntity, TKey, SearchObject<TKey>>(globalFilters, filters, sortedQueryBuilder, includableQueryBuilder, loggerFactory), IQueryBuilder<TEntity, TKey>
     where TEntity : IEntity<TKey>;
 
 public class QueryBuilder<TEntity, TKey, TSearchObject>(
     IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
     IEnumerable<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>>? filters = null,
+    ISortedQueryBuilder<TEntity, TKey>? sortedQueryBuilder = null,
+    IIncludableQueryBuilder<TEntity, TKey>? includableQueryBuilder = null,
     ILoggerFactory? loggerFactory = null
 )
-    : QueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>(globalFilters, filters, loggerFactory),
+    : QueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>(globalFilters, filters, sortedQueryBuilder, includableQueryBuilder, loggerFactory),
         IQueryBuilder<TEntity, TKey, TSearchObject>
     where TEntity : IEntity<TKey>
     where TSearchObject : ISearchObject<TKey>
@@ -38,9 +44,10 @@ public class QueryBuilder<TEntity, TKey, TSearchObject>(
 public class QueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>(
     IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
     IEnumerable<IFilteredQueryBuilder<TEntity, TSearchObject>>? filters = null,
-    ILoggerFactory? loggerFactory = null
-)
-    : QueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>(globalFilters, filters, loggerFactory),
+    ISortedQueryBuilder<TEntity>? sortedQueryBuilder = null,
+    IIncludableQueryBuilder<TEntity>? includableQueryBuilder = null,
+    ILoggerFactory? loggerFactory = null)
+    : QueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>(globalFilters, filters, sortedQueryBuilder, includableQueryBuilder, loggerFactory),
         IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>
     where TEntity : IEntity<int>
     where TSearchObject : ISearchObject<int>
@@ -51,6 +58,8 @@ public class QueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>(
 public class QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
         IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
         IEnumerable<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>>? filters = null,
+        ISortedQueryBuilder<TEntity, TKey>? sortedQueryBuilder = null,
+        IIncludableQueryBuilder<TEntity, TKey>? includableQueryBuilder = null,
         ILoggerFactory? loggerFactory = null
     )
     : IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
@@ -110,7 +119,7 @@ public class QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
             ) ?? query;
 
     public virtual IQueryable<TEntity> SortBy(IQueryable<TEntity> query, IList<TSearchObject?>? so, TSortBy? sortBy, TIncludes? includes)
-        => query;
+        => sortedQueryBuilder?.SortBy(query) ?? query;
     public virtual IQueryable<TEntity> SortByList(IQueryable<TEntity> query, IList<TSearchObject?>? so, IList<TSortBy>? sortByList, TIncludes? includes)
     {
         if (sortByList?.Any() != true)
@@ -121,7 +130,5 @@ public class QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
     }
 
     public virtual IQueryable<TEntity> AddIncludes(IQueryable<TEntity> query, IList<TSearchObject?>? so, IList<TSortBy>? sortByList, TIncludes? includes)
-    {
-        return query;
-    }
+        => includableQueryBuilder?.AddIncludes(query) ?? query;
 }
