@@ -4,9 +4,9 @@ using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.EFcore.Services;
 
-public class EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>(
-    IEntityReadService<TEntity, int, TSearchObject, TSortBy, TIncludes> readService, IEntityWriteService<TEntity, int> writeService)
-    : EntityRepository<TEntity, int, TSearchObject, TSortBy, TIncludes>(readService, writeService), IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>
+public class EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>
+    (IEntityReadService<TEntity, int, TSearchObject, TSortBy, TIncludes> readService, IEntityWriteService<TEntity, int> writeService)
+    : EntityRepository<TEntity, int, TSearchObject, TSortBy, TIncludes>(readService, writeService), IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>
     where TEntity : class, IEntity<int>
     where TSearchObject : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum
@@ -23,19 +23,20 @@ public class EntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
 {
     public virtual Task<TEntity?> Details(TKey id)
         => readService.Details(id);
-
-
     public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
         => readService.List(so, pagingInfo);
+    public Task<long> Count(TSearchObject? so)
+        => readService.Count(so);
+
     public virtual Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null)
         => readService.List(so, sortBy, includes, pagingInfo);
 
-    public virtual Task<int> Count(IList<TSearchObject?> so)
+    public virtual Task<long> Count(IList<TSearchObject?> so)
         => readService.Count(so);
 
     Task<IList<TEntity>> IEntityReadService<TEntity, TKey>.List(object? so, PagingInfo? pagingInfo)
         => readService.List(so, pagingInfo);
-    Task<int> IEntityReadService<TEntity, TKey>.Count(object? so)
+    Task<long> IEntityReadService<TEntity, TKey>.Count(object? so)
         => readService.Count(so);
 
     public virtual Task Add(TEntity item)

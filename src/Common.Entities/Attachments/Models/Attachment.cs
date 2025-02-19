@@ -1,7 +1,7 @@
-﻿using Regira.Entities.Attachments.Abstractions;
-using Regira.Entities.Models.Abstractions;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Regira.Entities.Attachments.Abstractions;
+using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.Attachments.Models;
 

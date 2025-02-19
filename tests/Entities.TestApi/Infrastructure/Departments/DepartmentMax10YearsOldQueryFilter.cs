@@ -4,9 +4,9 @@ using Testing.Library.Contoso;
 
 namespace Entities.TestApi.Infrastructure.Departments;
 
-public class DepartmentMax10YearsOldQueryFilter : FilteredQueryBuilderBase<Department, SearchObject>
+public class DepartmentMax10YearsOldQueryFilter : FilteredQueryBuilderBase<Department>
 {
-    public override IQueryable<Department> Build(IQueryable<Department> query, SearchObject? so)
+    public override IQueryable<Department> Build(IQueryable<Department> query, SearchObject<int>? so)
     {
         if (so != null)
         {

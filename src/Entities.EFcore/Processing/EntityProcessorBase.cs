@@ -1,4 +1,6 @@
-﻿namespace Regira.Entities.EFcore.Abstractions;
+﻿using Regira.Entities.EFcore.Processing.Abstractions;
+
+namespace Regira.Entities.EFcore.Processing;
 
 public abstract class EntityProcessorBase<T> : IEntityProcessor<T>
     where T : class

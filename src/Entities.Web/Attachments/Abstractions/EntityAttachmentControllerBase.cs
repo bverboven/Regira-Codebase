@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Diagnostics;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +14,6 @@ using Regira.Entities.Web.Attachments.Models;
 using Regira.Entities.Web.Controllers;
 using Regira.Entities.Web.Models;
 using Regira.Web.IO;
-using System.Diagnostics;
 using static Regira.Web.Extensions.ControllerExtensions;
 
 namespace Regira.Entities.Web.Attachments.Abstractions;

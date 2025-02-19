@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.DAL.EFcore.Extensions;
-using Regira.Entities.EFcore.Abstractions;
 using Regira.Entities.EFcore.Primers.Abstractions;
 using Regira.Utilities;
 

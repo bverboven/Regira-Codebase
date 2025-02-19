@@ -84,7 +84,6 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
         where TService : class, IEntityReadService<TEntity, TSearchObject, TSortBy, TIncludes>
     {
         base.UseReadService<TService>();
-        Services.AddTransient<IEntityReadService<TEntity, TSearchObject, TSortBy, TIncludes>, TService>();
         return this;
     }
 
@@ -244,7 +243,7 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
     public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> UseReadService<TService>()
         where TService : class, IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
     {
-        base.UseReadService<TService>();
+        Services.AddTransient<IEntityReadService<TEntity, TKey>, TService>();
         Services.AddTransient<IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, TService>();
         return this;
     }

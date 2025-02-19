@@ -9,7 +9,7 @@ using Regira.Utilities;
 namespace Regira.Entities.EFcore.Services;
 
 public class EntityReadService<TContext, TEntity>(TContext dbContext, IQueryBuilder<TEntity, int, SearchObject<int>, EntitySortBy, EntityIncludes> queryBuilder)
-    : EntityReadService<TContext, TEntity, int>(dbContext, queryBuilder), IEntityReadService<TEntity>
+    : EntityReadService<TContext, TEntity, int>(dbContext, queryBuilder)//, IEntityReadService<TEntity>
     where TContext : DbContext
     where TEntity : class, IEntity<int>;
 
@@ -73,11 +73,11 @@ public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, 
         => List(Convert(so), pagingInfo);
 
     // Count
-    public virtual Task<int> Count(IList<TSearchObject?> searchObjects)
-        => queryBuilder.FilterList(dbContext.Set<TEntity>(), searchObjects).CountAsync();
-    public virtual Task<int> Count(TSearchObject? so = null)
-        => queryBuilder.Filter(DbSet, so).CountAsync();
-    Task<int> IEntityReadService<TEntity, TKey>.Count(object? so)
+    public virtual Task<long> Count(IList<TSearchObject?> searchObjects)
+        => queryBuilder.FilterList(dbContext.Set<TEntity>(), searchObjects).LongCountAsync();
+    public virtual Task<long> Count(TSearchObject? so = null)
+        => queryBuilder.Filter(DbSet, so).LongCountAsync();
+    Task<long> IEntityReadService<TEntity, TKey>.Count(object? so)
         => Count(Convert(so));
 
     // Helpers

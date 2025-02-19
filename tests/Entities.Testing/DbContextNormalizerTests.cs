@@ -52,6 +52,7 @@ internal class DbContextNormalizerTests
         await dbContext.SaveChangesAsync();
 
         var personService = sp.GetRequiredService<IEntityService<Person>>();
+
         foreach (var person in people.All)
         {
             var personsFound = await personService.List(new SearchObject { Q = $"{person.GivenName} {person.LastName}".ToLower() });

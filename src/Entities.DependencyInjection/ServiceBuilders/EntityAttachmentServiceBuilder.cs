@@ -4,9 +4,10 @@ using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Abstractions;
+using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.EFcore.Attachments;
-using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
+using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Attachments.Mappings;
 using Regira.Entities.Web.Attachments.Models;
@@ -17,7 +18,7 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
     : EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, int>(services),
         IEntityAttachmentServiceBuilder<TEntity, TEntityAttachment>
     where TContext : DbContext
-    where TEntityAttachment : class, IEntityAttachment<int, int, int>
+    where TEntityAttachment : class, IEntityAttachment<int, int, int>, new()
     where TEntity : class, IEntity<int>, IHasAttachments, IHasAttachments<TEntityAttachment>
 {
     public new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment> WithDefaultMapping()
@@ -33,10 +34,11 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
         Services.AddTransient<IFilteredQueryBuilder<TEntityAttachment, EntityAttachmentSearchObject>,
             EntityAttachmentFilteredQueryBuilder<TEntityAttachment, EntityAttachmentSearchObject>>();
         // Query builder
-        Services.AddTransient<IQueryBuilder<TEntityAttachment, int, EntityAttachmentSearchObject>,
-            QueryBuilder<TEntityAttachment, int, EntityAttachmentSearchObject>>();
+        Services.AddDefaultQueryBuilder<TEntityAttachment, int, EntityAttachmentSearchObject<int, int>>();
+        // Read service
+        Services.AddTransient<IEntityReadService<TEntityAttachment, int, EntityAttachmentSearchObject>, EntityReadService<TContext, TEntityAttachment, int, EntityAttachmentSearchObject>>();
         // Repository
-        Services.AddTransient<IEntityService<TEntityAttachment>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment>>();
+        Services.AddTransient<IEntityService<TEntityAttachment, int, EntityAttachmentSearchObject>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
 
         return this;
     }
@@ -112,8 +114,9 @@ public class
         Services.AddTransient<IFilteredQueryBuilder<TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>>,
             EntityAttachmentFilteredQueryBuilder<TObjectKey, TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, TAttachmentKey>>();
         // Query builder
-        Services.AddTransient<IQueryBuilder<TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>>,
-            QueryBuilder<TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>>>();
+        Services.AddDefaultQueryBuilder<TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>>();
+        // Read service
+        Services.AddTransient<IEntityReadService<TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>>, EntityReadService<TContext, TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>>>();
         // Repository
         Services.AddTransient<IEntityService<TEntityAttachment, TEntityAttachmentKey>,
             EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, TAttachmentKey>>();

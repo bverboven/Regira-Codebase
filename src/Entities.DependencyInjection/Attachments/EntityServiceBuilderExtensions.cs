@@ -3,7 +3,6 @@ using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.Models.Abstractions;
-using Regira.IO.Storage.Abstractions;
 
 namespace Regira.Entities.DependencyInjection.Attachments;
 
@@ -17,7 +16,7 @@ public static class EntityServiceBuilderExtensions
     )
         where TContext : DbContext
         where TEntity : class, IEntity<int>, IHasAttachments, IHasAttachments<TEntityAttachment>
-        where TEntityAttachment : class, IEntityAttachment<int, int, int>
+        where TEntityAttachment : class, IEntityAttachment<int, int, int>, new()
     {
         HasAttachments<TContext, TEntity, int, TEntityAttachment, int, int>(builder, configure);
 

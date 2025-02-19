@@ -1,4 +1,4 @@
-﻿namespace Regira.Entities.EFcore.Abstractions;
+﻿namespace Regira.Entities.EFcore.Processing.Abstractions;
 
 public interface IEntityProcessor<T> : IEntityProcessor<T, T>
     where T : class;

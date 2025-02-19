@@ -7,6 +7,7 @@ namespace Regira.Entities.Services;
 public class EntityManager<TEntity>(IEntityRepository<TEntity> repo)
     : EntityManager<TEntity, int>(repo), IEntityManager<TEntity>
     where TEntity : class, IEntity<int>;
+
 public class EntityManager<TEntity, TKey>(IEntityRepository<TEntity, TKey> repo) : IEntityManager<TEntity, TKey>
     where TEntity : class, IEntity<TKey>
 {
@@ -15,7 +16,7 @@ public class EntityManager<TEntity, TKey>(IEntityRepository<TEntity, TKey> repo)
 
     public virtual Task<TEntity?> Details(TKey id) => Repo.Details(id);
     public virtual Task<IList<TEntity>> List(object? so = null, PagingInfo? pagingInfo = null) => Repo.List(so, pagingInfo);
-    public virtual Task<int> Count(object? so) => Repo.Count(so);
+    public virtual Task<long> Count(object? so) => Repo.Count(so);
 
     public virtual Task Add(TEntity item) => Repo.Add(item);
     public virtual Task<TEntity?> Modify(TEntity item) => Repo.Modify(item);
@@ -24,4 +25,13 @@ public class EntityManager<TEntity, TKey>(IEntityRepository<TEntity, TKey> repo)
     public virtual Task Remove(TEntity item) => Repo.Remove(item);
 
     public virtual Task<int> SaveChanges(CancellationToken token = default) => Repo.SaveChanges(token);
+}
+
+public class EntityManager<TEntity, TKey, TSearchObject>(IEntityRepository<TEntity, TKey, TSearchObject> repo)
+    : EntityManager<TEntity, TKey>(repo), IEntityManager<TEntity, TKey, TSearchObject>
+    where TEntity : class, IEntity<TKey>
+    where TSearchObject : class, ISearchObject<TKey>, new()
+{
+    public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null) => Repo.List(so, pagingInfo);
+    public Task<long> Count(TSearchObject? so) => Repo.Count(so);
 }

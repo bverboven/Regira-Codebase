@@ -14,52 +14,31 @@ public static class ServiceCollectionQueryFilterExtensions
     public static IServiceCollection AddQueryFilter<TEntity, TImplementation>(this IServiceCollection services)
         where TEntity : IEntity<int>
         where TImplementation : class, IFilteredQueryBuilder<TEntity, SearchObject<int>>
-    {
-        services.AddQueryFilter<TEntity, SearchObject<int>, TImplementation>();
-        services.AddTransient<IFilteredQueryBuilder<TEntity, SearchObject<int>>, TImplementation>();
-        return services;
-    }
+        => services.AddQueryFilter<TEntity, SearchObject<int>, TImplementation>();
     public static IServiceCollection AddQueryFilter<TEntity>(this IServiceCollection services, Func<IServiceProvider, IFilteredQueryBuilder<TEntity, SearchObject<int>>> factory)
         where TEntity : IEntity<int>
-    {
-        services.AddQueryFilter<TEntity, SearchObject<int>>(factory);
-        services.AddTransient(factory);
-        return services;
-    }
+        => services.AddQueryFilter<TEntity, SearchObject<int>>(factory);
 
     public static IServiceCollection AddQueryFilter<TEntity, TSearchObject, TImplementation>(this IServiceCollection services)
         where TEntity : IEntity<int>
         where TSearchObject : ISearchObject<int>
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TSearchObject>
-    {
-        services.AddQueryFilter<TEntity, int, TSearchObject, TImplementation>();
-        services.AddTransient<IFilteredQueryBuilder<TEntity, TSearchObject>, TImplementation>();
-        return services;
-    }
+        => services.AddQueryFilter<TEntity, int, TSearchObject, TImplementation>();
     public static IServiceCollection AddQueryFilter<TEntity, TSearchObject>(this IServiceCollection services, Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TSearchObject>> factory)
         where TEntity : IEntity<int>
         where TSearchObject : ISearchObject<int>
-    {
-        services.AddQueryFilter<TEntity, int, TSearchObject>(factory);
-        services.AddTransient(factory);
-        return services;
-    }
+        => services.AddQueryFilter<TEntity, int, TSearchObject>(factory);
 
     public static IServiceCollection AddQueryFilter<TEntity, TKey, TSearchObject, TImplementation>(this IServiceCollection services)
         where TEntity : IEntity<TKey>
         where TSearchObject : ISearchObject<TKey>
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>
-    {
-        services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
-        return services;
-    }
+        => services.AddTransient<IFilteredQueryBuilder<TEntity, TKey, TSearchObject>, TImplementation>();
+
     public static IServiceCollection AddQueryFilter<TEntity, TKey, TSearchObject>(this IServiceCollection services, Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>> factory)
         where TEntity : IEntity<TKey>
         where TSearchObject : ISearchObject<TKey>
-    {
-        services.AddTransient(factory);
-        return services;
-    }
+        => services.AddTransient(factory);
 
 
     // Global QueryFilters

@@ -6,7 +6,7 @@ using Regira.Entities.Attachments.Extensions;
 
 namespace Regira.Entities.EFcore.Attachments;
 
-public interface ITypedAttachmentService : IEntityReadService<IEntityAttachment<int, int, int>>;
+public interface ITypedAttachmentService : IEntityReadService<IEntityAttachment<int, int, int>, int>;
 public class TypedAttachmentService<TContext>(
     TContext dbContext,
     Func<TContext, IList<IAttachmentQuerySetDescriptor>>? querySetFactory = null)
@@ -44,6 +44,6 @@ public class TypedAttachmentService<TContext>(
 
         return items;
     }
-    public Task<int> Count(object? so)
-        => Query.Filter(so?.ToSearchObject()).CountAsync();
+    public Task<long> Count(object? so)
+        => Query.Filter(so?.ToSearchObject()).LongCountAsync();
 }

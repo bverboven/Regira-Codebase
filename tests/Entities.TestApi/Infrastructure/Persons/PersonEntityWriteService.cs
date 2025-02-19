@@ -6,7 +6,7 @@ using Testing.Library.Data;
 
 namespace Entities.TestApi.Infrastructure.Persons;
 
-public class PersonEntityWriteService(ContosoContext dbContext, IEntityReadService<Person> readService)
+public class PersonEntityWriteService(ContosoContext dbContext, IEntityReadService<Person, int> readService)
     : EntityWriteService<ContosoContext, Person>(dbContext, readService)
 {
     public override async Task<Person?> Modify(Person item)

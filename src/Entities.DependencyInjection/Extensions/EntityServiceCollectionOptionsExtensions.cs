@@ -5,9 +5,9 @@ using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Normalizing.Models;
 
 #if NETCOREAPP3_1_OR_GREATER
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using System.Text.Json.Serialization;
 #endif
 
 namespace Regira.Entities.DependencyInjection.Extensions;

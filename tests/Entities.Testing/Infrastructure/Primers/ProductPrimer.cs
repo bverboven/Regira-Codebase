@@ -1,6 +1,5 @@
 ﻿using Entities.Testing.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Regira.Entities.EFcore.Abstractions;
 using Regira.Entities.EFcore.Primers.Abstractions;
 
 namespace Entities.Testing.Infrastructure.Primers;

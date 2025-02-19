@@ -20,12 +20,10 @@ public class ServiceTests
             .UseEntities<ProductContext>()
             .For<Category>();
         using var sp = services.BuildServiceProvider();
-        var queryBuilder1 = sp.GetService<IQueryBuilder<Category>>();
-        var queryBuilder2 = sp.GetService<IQueryBuilder<Category, int>>();
+        var queryBuilder = sp.GetService<IQueryBuilder<Category, int, SearchObject<int>, EntitySortBy, EntityIncludes>>();
         var entityService1 = sp.GetService<IEntityService<Category>>();
         var entityService2 = sp.GetService<IEntityService<Category, int>>();
-        Assert.That(queryBuilder1, Is.Not.Null);
-        Assert.That(queryBuilder2, Is.Not.Null);
+        Assert.That(queryBuilder, Is.Not.Null);
         Assert.That(entityService1, Is.Not.Null);
         Assert.That(entityService2, Is.Not.Null);
     }
@@ -37,7 +35,7 @@ public class ServiceTests
             .UseEntities<ProductContext>()
             .For<Category, int>();
         using var sp = services.BuildServiceProvider();
-        var queryBuilder = sp.GetService<IQueryBuilder<Category, int>>();
+        var queryBuilder = sp.GetService<IQueryBuilder<Category, int, SearchObject<int>, EntitySortBy, EntityIncludes>>();
         var entityService = sp.GetService<IEntityService<Category, int>>();
         Assert.That(queryBuilder, Is.Not.Null);
         Assert.That(entityService, Is.Not.Null);
@@ -50,7 +48,7 @@ public class ServiceTests
             .UseEntities<ProductContext>()
             .For<Product, int, ProductSearchObject>();
         using var sp = services.BuildServiceProvider();
-        var queryBuilder = sp.GetService<IQueryBuilder<Product, int, ProductSearchObject>>();
+        var queryBuilder = sp.GetService<IQueryBuilder<Product, int, ProductSearchObject, EntitySortBy, EntityIncludes>>();
         var entityService1 = sp.GetService<IEntityService<Product, int>>();
         var entityService2 = sp.GetService<IEntityService<Product, int, ProductSearchObject>>();
         Assert.That(queryBuilder, Is.Not.Null);
@@ -87,10 +85,16 @@ public class ServiceTests
             .For<Product, int, ProductSearchObject, EntitySortBy, EntityIncludes>();
         using var sp = services.BuildServiceProvider();
         var queryBuilder = sp.GetService<IQueryBuilder<Product, int, ProductSearchObject, EntitySortBy, EntityIncludes>>();
+        var readService2 = sp.GetService<IEntityReadService<Product, int>>();
+        var readService5 = sp.GetService<IEntityReadService<Product, int, ProductSearchObject, EntitySortBy, EntityIncludes>>();
+        var writeService3 = sp.GetService<IEntityWriteService<Product, int>>();
         var entityService1 = sp.GetService<IEntityService<Product, int>>();
         var entityService2 = sp.GetService<IEntityService<Product, int, ProductSearchObject>>();
         var entityService3 = sp.GetService<IEntityService<Product, int, ProductSearchObject, EntitySortBy, EntityIncludes>>();
         Assert.That(queryBuilder, Is.Not.Null);
+        Assert.That(readService2, Is.Not.Null);
+        Assert.That(readService5, Is.Not.Null);
+        Assert.That(writeService3, Is.Not.Null);
         Assert.That(entityService1, Is.Not.Null);
         Assert.That(entityService2, Is.Not.Null);
         Assert.That(entityService3, Is.Not.Null);
@@ -105,13 +109,11 @@ public class ServiceTests
             .For<Product>(e => e.UseEntityService<ProductService>());
         using var sp = services.BuildServiceProvider();
 
-        var queryBuilder1 = sp.GetService<IQueryBuilder<Product>>();
-        var queryBuilder2 = sp.GetService<IQueryBuilder<Product, int>>();
+        var queryBuilder5 = sp.GetService<IQueryBuilder<Product, int, SearchObject<int>, EntitySortBy, EntityIncludes>>();
         var entityService1 = sp.GetService<IEntityService<Product>>();
         var entityService2 = sp.GetService<IEntityService<Product, int>>();
 
-        Assert.That(queryBuilder1, Is.Not.Null);
-        Assert.That(queryBuilder2, Is.Not.Null);
+        Assert.That(queryBuilder5, Is.Not.Null);
         Assert.That(entityService1, Is.TypeOf<ProductService>());
         Assert.That(entityService2, Is.TypeOf<ProductService>());
     }
@@ -124,13 +126,11 @@ public class ServiceTests
             .For<Product>(e => e.UseQueryBuilder<ProductQueryBuilder>());
         using var sp = services.BuildServiceProvider();
 
-        var queryBuilder1 = sp.GetService<IQueryBuilder<Product>>();
-        var queryBuilder2 = sp.GetService<IQueryBuilder<Product, int>>();
+        var queryBuilder5 = sp.GetService<IQueryBuilder<Product, int, SearchObject<int>, EntitySortBy, EntityIncludes>>();
         var entityService1 = sp.GetService<IEntityService<Product>>();
         var entityService2 = sp.GetService<IEntityService<Product, int>>();
 
-        Assert.That(queryBuilder1, Is.TypeOf<ProductQueryBuilder>());
-        Assert.That(queryBuilder2, Is.TypeOf<ProductQueryBuilder>());
+        Assert.That(queryBuilder5, Is.TypeOf<ProductQueryBuilder>());
         Assert.That(entityService1, Is.Not.Null);
         Assert.That(entityService2, Is.Not.Null);
     }

@@ -1,6 +1,6 @@
 ﻿using Entities.Testing.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Regira.Entities.EFcore.Abstractions;
+using Regira.Entities.EFcore.Processing;
 using Regira.Utilities;
 
 namespace Entities.Testing.Infrastructure.Processors;
