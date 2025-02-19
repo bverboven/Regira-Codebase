@@ -21,7 +21,7 @@ public abstract class EntityWrappingServiceBase<TEntity, TKey>(IEntityService<TE
 
     public virtual Task Add(TEntity item)
         => service.Add(item);
-    public virtual Task Modify(TEntity item)
+    public virtual Task<TEntity?> Modify(TEntity item)
         => service.Modify(item);
     public virtual Task Save(TEntity item)
         => service.Save(item);
@@ -73,7 +73,7 @@ public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject, TS
 
     public virtual Task Add(TEntity item)
         => service.Add(item);
-    public virtual Task Modify(TEntity item)
+    public virtual Task<TEntity?> Modify(TEntity item)
         => service.Modify(item);
     public virtual Task Save(TEntity item)
         => service.Save(item);

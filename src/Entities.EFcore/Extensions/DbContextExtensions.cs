@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.EFcore.Abstractions;
 using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.Primers.Abstractions;
 using Regira.Entities.Models.Abstractions;
@@ -38,8 +37,8 @@ public static class DbContextExtensions
         where TChild : class, IEntity<TKey>
         => UpdateEntityChildCollection<TEntity, TKey, TChild, TKey>(dbContext, original, modified, childrenGetter, childrenSetter, processExtra);
     public static void UpdateEntityChildCollection<TEntity, TEntityKey, TChild, TChildKey>(this DbContext dbContext, TEntity original, TEntity modified, Func<TEntity, ICollection<TChild>?> childrenGetter, Action<TEntity, ICollection<TChild>> childrenSetter, Action<TChild, TChild>? processExtra = null)
-    //where TEntity : class, IEntity<TEntityKey>
-    where TChild : class, IEntity<TChildKey>
+        where TEntity : class, IEntity<TEntityKey>
+        where TChild : class, IEntity<TChildKey>
     {
         // ignore when no child collection is passed for either original OR modified entity
         if (childrenGetter(original) == null || childrenGetter(modified) == null)
@@ -79,6 +78,7 @@ public static class DbContextExtensions
     }
 
     #region PrepareUpdate
+
     public class UpdateEntityChildrenWrapper<TEntity, TChild>
         where TEntity : class, IEntity
         where TChild : class, IEntity

@@ -4,7 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.Extensions;
 using Regira.Entities.DependencyInjection.Normalizers;
+using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.EFcore.Normalizing;
+using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 using Regira.Entities.Models;
 using Regira.Normalizing.Models;
 using Testing.Library.Contoso;
@@ -31,6 +33,7 @@ internal class DbContextNormalizerTests
                 {
                     d.ConfigureNormalizing(o => o.Transform = TextTransform.ToUpperCase);
                 });
+                e.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
             })
             .For<Person>(e =>
             {

@@ -15,7 +15,13 @@ public static class CourseServiceCollectionExtensions
         services
             .For<Course, int, CourseSearchObject>(e =>
             {
-                e.UseEntityService<CourseRepository>();
+                e.UseDefaultIncludes(query => query
+                    .Include(c => c.Attachments!)
+                    .ThenInclude(x => x.Attachment)
+                );
+                e.AddQueryFilter<CourseQueryFilter>();
+                e.UseWriteService<CourseEntityWriteService>();
+                //e.UseEntityService<CourseRepository>();
                 e.AddMapping<CourseDto, CourseInputDto>();
                 e.HasAttachments<TContext, Course, CourseAttachment>(a =>
                 {

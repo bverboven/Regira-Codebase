@@ -11,7 +11,7 @@ using Regira.IO.Storage.Abstractions;
 
 namespace Regira.Entities.DependencyInjection.Abstractions;
 
-public interface IEntityServiceCollection<TContext> 
+public interface IEntityServiceCollection<TContext>
     where TContext : DbContext
 {
     EntityServiceCollection<TContext> For<TEntity>(Action<EntityServiceBuilder<TContext, TEntity>>? configure = null)
@@ -34,7 +34,7 @@ public interface IEntityServiceCollection<TContext>
     EntityServiceCollection<TContext> For<TEntity, TSearchObject, TSortBy, TIncludes>
         (Action<ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>? configure = null)
         where TEntity : class, IEntity<int>
-        where TSearchObject : class, ISearchObject, new()
+        where TSearchObject : class, ISearchObject<int>, new()
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum;
 

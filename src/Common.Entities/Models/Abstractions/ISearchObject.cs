@@ -1,15 +1,6 @@
 namespace Regira.Entities.Models.Abstractions;
 
-public interface ISearchObject : ISearchObject<int>;
-
-public interface ISearchObject<TKey> : ISearchObjectCore
-{
-    TKey? Id { get; set; }
-    ICollection<TKey>? Ids { get; set; }
-    ICollection<TKey>? Exclude { get; set; }
-}
-
-public interface ISearchObjectCore
+public interface ISearchObject
 {
     string? Q { get; set; }
 
@@ -19,4 +10,11 @@ public interface ISearchObjectCore
     DateTime? MaxLastModified { get; set; }
 
     bool? IsArchived { get; set; }
+}
+
+public interface ISearchObject<TKey> : ISearchObject
+{
+    TKey? Id { get; set; }
+    ICollection<TKey>? Ids { get; set; }
+    ICollection<TKey>? Exclude { get; set; }
 }

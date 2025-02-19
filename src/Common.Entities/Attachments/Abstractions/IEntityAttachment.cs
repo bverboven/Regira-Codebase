@@ -3,8 +3,8 @@ using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.Attachments.Abstractions;
 
-public interface IEntityAttachment : IEntityAttachment<int, int, int>, IHasObjectId;
-public interface IEntityAttachment<TKey, TObjectKey, TAttachmentId> : IEntity<TKey>, IHasObjectId<TObjectKey>, ISortable
+public interface IEntityAttachment;
+public interface IEntityAttachment<TKey, TObjectKey, TAttachmentId> : IEntityAttachment, IEntity<TKey>, IHasObjectId<TObjectKey>, ISortable
 {
     TAttachmentId AttachmentId { get; set; }
     string? ObjectType { get; }

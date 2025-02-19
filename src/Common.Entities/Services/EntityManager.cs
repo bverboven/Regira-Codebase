@@ -18,7 +18,7 @@ public class EntityManager<TEntity, TKey>(IEntityRepository<TEntity, TKey> repo)
     public virtual Task<int> Count(object? so) => Repo.Count(so);
 
     public virtual Task Add(TEntity item) => Repo.Add(item);
-    public virtual Task Modify(TEntity item) => Repo.Modify(item);
+    public virtual Task<TEntity?> Modify(TEntity item) => Repo.Modify(item);
     public virtual Task Save(TEntity item) => Repo.Save(item);
 
     public virtual Task Remove(TEntity item) => Repo.Remove(item);

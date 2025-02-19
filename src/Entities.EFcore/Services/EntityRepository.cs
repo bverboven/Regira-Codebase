@@ -1,107 +1,48 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Regira.DAL.Paging;
+﻿using Regira.DAL.Paging;
 using Regira.Entities.Abstractions;
-using Regira.Entities.EFcore.QueryBuilders.Abstractions;
-using Regira.Entities.Extensions;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
-using Regira.Utilities;
 
 namespace Regira.Entities.EFcore.Services;
 
-public class EntityRepository<TContext, TEntity>
-    (TContext dbContext, IQueryBuilder<TEntity> queryBuilder)
-    : EntityRepository<TContext, TEntity, int>(dbContext, queryBuilder), IEntityRepository<TEntity>
-    where TContext : DbContext
+public class EntityRepository<TEntity>
+    (IEntityReadService<TEntity, int, SearchObject<int>> readService, IEntityWriteService<TEntity, int> writeService)
+    : EntityRepository<TEntity, int>(readService, writeService), IEntityRepository<TEntity>
     where TEntity : class, IEntity<int>;
-public class EntityRepository<TContext, TEntity, TKey>
-    (TContext dbContext, IQueryBuilder<TEntity, TKey> queryBuilder)
-    : EntityRepository<TContext, TEntity, TKey, SearchObject<TKey>>(dbContext, queryBuilder)
-    where TContext : DbContext
+
+public class EntityRepository<TEntity, TKey>
+    (IEntityReadService<TEntity, TKey, SearchObject<TKey>> readService, IEntityWriteService<TEntity, TKey> writeService)
+    : EntityRepository<TEntity, TKey, SearchObject<TKey>>(readService, writeService)
     where TEntity : class, IEntity<TKey>;
-public class EntityRepository<TContext, TEntity, TKey, TSearchObject>
-    (TContext dbContext, IQueryBuilder<TEntity, TKey, TSearchObject> queryBuilder)
+
+public class EntityRepository<TEntity, TKey, TSearchObject>
+    (IEntityReadService<TEntity, TKey, TSearchObject> readService, IEntityWriteService<TEntity, TKey> writeService)
     : IEntityRepository<TEntity, TKey, TSearchObject>
-    where TContext : DbContext
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
 {
-    public virtual DbSet<TEntity> DbSet => dbContext.Set<TEntity>();
-
-
-    public virtual async Task<TEntity?> Details(TKey id)
-        => id != null && id.Equals(default(TKey)) == false // make sure an id is passed or return null
-            ? (await List(new TSearchObject { Id = id }, new PagingInfo { PageSize = 1 })).SingleOrDefault()
-            : null;
-    public virtual async Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
-    {
-        var query = Query(DbSet, so, pagingInfo);
-        return await query
-#if NETSTANDARD2_0
-            .AsNoTracking()
-#else
-            .AsNoTrackingWithIdentityResolution()
-#endif
-            .ToListAsync();
-    }
-
+    public virtual Task<TEntity?> Details(TKey id)
+        => readService.Details(id);
+    public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
+        => readService.List(so, pagingInfo);
     public virtual Task<int> Count(TSearchObject? so)
-        => queryBuilder.Filter(DbSet, so).CountAsync();
+        => readService.Count(so);
 
     Task<IList<TEntity>> IEntityReadService<TEntity, TKey>.List(object? so, PagingInfo? pagingInfo)
-        => List(Convert(so), pagingInfo);
+        => readService.List(so, pagingInfo);
     Task<int> IEntityReadService<TEntity, TKey>.Count(object? so)
-        => Count(Convert(so));
+        => readService.Count(so);
 
-    public virtual IQueryable<TEntity> Query(IQueryable<TEntity> query, TSearchObject? so, PagingInfo? pagingInfo = null)
-        => queryBuilder.Query(query, so != null ? [so] : [], pagingInfo);
 
     public virtual Task Add(TEntity item)
-    {
-        PrepareItem(item);
-
-        DbSet.Add(item);
-        return Task.CompletedTask;
-    }
-    public virtual async Task Modify(TEntity item)
-    {
-        PrepareItem(item);
-
-        var original = await Details(item.Id);
-        if (original == null)
-        {
-            return;
-        }
-
-        dbContext.Attach(original);
-        dbContext.Entry(original).CurrentValues.SetValues(item);
-        dbContext.Entry(original).State = EntityState.Modified;
-
-        Modify(item, original);
-    }
+        => writeService.Add(item);
+    public virtual Task<TEntity?> Modify(TEntity item)
+        => writeService.Modify(item);
     public virtual Task Save(TEntity item)
-        => IsNew(item) ? Add(item) : Modify(item);
+        => writeService.Save(item);
     public virtual Task Remove(TEntity item)
-    {
-        DbSet.Remove(item);
-        return Task.CompletedTask;
-    }
+        => writeService.Remove(item);
 
     public virtual Task<int> SaveChanges(CancellationToken token = default)
-        => dbContext.SaveChangesAsync(token);
-
-    public virtual void PrepareItem(TEntity item)
-    {
-    }
-    public virtual void Modify(TEntity item, TEntity original)
-    {
-    }
-
-    public virtual TSearchObject? Convert(object? so)
-        => so != null
-            ? so as TSearchObject ?? ObjectUtility.Create<TSearchObject>(so)
-            : null;
-    public bool IsNew(TEntity item)
-        => item.IsNew();
+        => writeService.SaveChanges(token);
 }
-

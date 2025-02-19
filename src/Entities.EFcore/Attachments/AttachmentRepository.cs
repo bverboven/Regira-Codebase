@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Regira.DAL.Paging;
+using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
-using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
+using Regira.Entities.Extensions;
 using Regira.IO.Extensions;
 using Regira.IO.Storage.Abstractions;
 using Regira.IO.Storage.Helpers;
@@ -12,15 +13,20 @@ using Regira.IO.Utilities;
 namespace Regira.Entities.EFcore.Attachments;
 
 public class AttachmentRepository<TContext>
-    (TContext dbContext, IFileService fileService, IQueryBuilder<Attachment<int>, int, AttachmentSearchObject<int>> queryBuilder)
-    : AttachmentRepository<TContext, int>(dbContext, fileService, queryBuilder), IAttachmentService
+    (
+        TContext dbContext, IFileService fileService,
+        IEntityReadService<Attachment<int>, int, AttachmentSearchObject<int>> readService,
+        IEntityWriteService<Attachment<int>, int> writeService)
+    : AttachmentRepository<TContext, int>(dbContext, fileService, readService, writeService), IAttachmentService
     where TContext : DbContext;
-public class AttachmentRepository<TContext, TKey>(TContext dbContext, IFileService fileService, IQueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>> queryBuilder)
-    : EntityRepository<TContext, Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>(dbContext, queryBuilder),
-        IAttachmentService<TKey>
+public class AttachmentRepository<TContext, TKey>(
+    TContext dbContext, IFileService fileService,
+    IEntityReadService<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>> readService,
+    IEntityWriteService<Attachment<TKey>, TKey> writeService)
+    : EntityRepository<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>(readService, writeService), IAttachmentService<TKey>
     where TContext : DbContext
 {
-    private readonly IQueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>> _queryBuilder = queryBuilder;
+    public virtual DbSet<Attachment<TKey>> DbSet => dbContext.Set<Attachment<TKey>>();
 
     public override async Task<Attachment<TKey>?> Details(TKey id)
     {
@@ -35,8 +41,7 @@ public class AttachmentRepository<TContext, TKey>(TContext dbContext, IFileServi
     }
     public override async Task<IList<Attachment<TKey>>> List(AttachmentSearchObject<TKey>? so = null, PagingInfo? pagingInfo = null)
     {
-        var query = _queryBuilder.Query(DbSet, so != null ? [so] : [], pagingInfo);
-        var items = await query.ToListAsync();
+        var items = await base.List(so, pagingInfo);
         foreach (var item in items)
         {
             ProcessItem(item);
@@ -47,13 +52,19 @@ public class AttachmentRepository<TContext, TKey>(TContext dbContext, IFileServi
 
     public override async Task Add(Attachment<TKey> item)
     {
+        PrepareItem(item);
+
         await SaveFile(item);
         await base.Add(item);
     }
-    public override async Task Modify(Attachment<TKey> item)
+    public override async Task<Attachment<TKey>?> Modify(Attachment<TKey> item)
     {
+        PrepareItem(item);
+
         await SaveFile(item);
-        await base.Modify(item);
+        var original = await base.Modify(item);
+
+        return original;
     }
     public override async Task Remove(Attachment<TKey> item)
     {
@@ -85,7 +96,7 @@ public class AttachmentRepository<TContext, TKey>(TContext dbContext, IFileServi
 #else
         await using var fileStream = item.GetStream();
 #endif
-        if (IsNew(item))
+        if (item.IsNew())
         {
             var fileNameHelper = new FileNameHelper(fileService);
             // every filename should be unique!
@@ -124,13 +135,12 @@ public class AttachmentRepository<TContext, TKey>(TContext dbContext, IFileServi
         await fileService.Delete(path);
     }
 
-    public override void PrepareItem(Attachment<TKey> item)
+    public virtual void PrepareItem(Attachment<TKey> item)
     {
         if (string.IsNullOrWhiteSpace(item.ContentType))
         {
             item.ContentType = ContentTypeUtility.GetContentType(item.FileName);
         }
-        base.PrepareItem(item);
     }
     public virtual void ProcessItem(IAttachment<TKey> item)
     {

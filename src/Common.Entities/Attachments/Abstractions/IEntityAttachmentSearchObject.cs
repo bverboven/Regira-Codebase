@@ -2,8 +2,8 @@
 
 namespace Regira.Entities.Attachments.Abstractions;
 
-public interface IEntityAttachmentSearchObject : IEntityAttachmentSearchObject<int, int>, ISearchObject;
-public interface IEntityAttachmentSearchObject<TKey, TObjectKey> : ISearchObject<TKey>, IAttachmentSearchObject
+public interface IEntityAttachmentSearchObject;
+public interface IEntityAttachmentSearchObject<TKey, TObjectKey> : IEntityAttachmentSearchObject, ISearchObject<TKey>, IAttachmentSearchObject
 {
     ICollection<TObjectKey>? ObjectId { get; set; }
 }

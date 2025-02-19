@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.DAL.Paging;
@@ -9,6 +8,7 @@ using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Models;
 using Regira.Utilities;
+using System.Diagnostics;
 
 namespace Regira.Entities.Web.Controllers;
 
@@ -151,12 +151,11 @@ public static class ControllerExtensions
             var service = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, TKey>>();
             if (!isNew)
             {
-                if (id == null)
+                if (id != null && !id.Equals(default(TKey)))
                 {
-                    return null;
+                    item.Id = id;
                 }
 
-                item.Id = id;
                 var exists = (await service.Count(new { item.Id })) == 1;
                 if (!exists)
                 {

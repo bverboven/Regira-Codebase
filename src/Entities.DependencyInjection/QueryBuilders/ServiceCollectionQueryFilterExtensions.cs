@@ -90,6 +90,9 @@ public static class ServiceCollectionQueryFilterExtensions
     }
 
 
+    /// <inheritdoc cref="AddDefaultGlobalQueryFilters{TKey}"/>>
+    public static EntityServiceCollectionOptions AddDefaultGlobalQueryFilters(this EntityServiceCollectionOptions options)
+        => options.AddDefaultGlobalQueryFilters<int>();
     /// <summary>
     /// Adds default filtered query builders
     /// <list type="bullet">
@@ -98,17 +101,15 @@ public static class ServiceCollectionQueryFilterExtensions
     /// <item>Archivable</item>
     /// </list>
     /// </summary>
-    public static EntityServiceCollectionOptions AddDefaultGlobalQueryFilters(this EntityServiceCollectionOptions options)
+    /// <typeparam name="TKey"></typeparam>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static EntityServiceCollectionOptions AddDefaultGlobalQueryFilters<TKey>(this EntityServiceCollectionOptions options)
     {
-        options.AddGlobalFilterQueryBuilder<FilterIdsQueryBuilder>();
-        options.AddGlobalFilterQueryBuilder<FilterArchivablesQueryBuilder>();
-        options.AddGlobalFilterQueryBuilder<FilterHasCreatedQueryBuilder>();
-        options.AddGlobalFilterQueryBuilder<FilterHasLastModifiedQueryBuilder>();
-
-        options.AddGlobalFilterQueryBuilder<FilterIdsQueryBuilder<string>>();
-        options.AddGlobalFilterQueryBuilder<FilterArchivablesQueryBuilder<string>>();
-        options.AddGlobalFilterQueryBuilder<FilterHasCreatedQueryBuilder<string>>();
-        options.AddGlobalFilterQueryBuilder<FilterHasLastModifiedQueryBuilder<string>>();
+        options.AddGlobalFilterQueryBuilder<FilterIdsQueryBuilder<TKey>>();
+        options.AddGlobalFilterQueryBuilder<FilterArchivablesQueryBuilder<TKey>>();
+        options.AddGlobalFilterQueryBuilder<FilterHasCreatedQueryBuilder<TKey>>();
+        options.AddGlobalFilterQueryBuilder<FilterHasLastModifiedQueryBuilder<TKey>>();
 
         return options;
     }

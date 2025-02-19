@@ -23,7 +23,7 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
 {
     // Entity service
     public new EntityServiceBuilder<TContext, TEntity> AddDefaultService()
-        => UseEntityService<EntityRepository<TContext, TEntity>>();
+        => UseEntityService<EntityRepository<TEntity>>();
 
     public new EntityServiceBuilder<TContext, TEntity> UseEntityService<TService>()
         where TService : class, IEntityService<TEntity>
@@ -46,6 +46,14 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         return this;
     }
 
+    // Write Service
+    public new EntityServiceBuilder<TContext, TEntity> UseWriteService<TService>()
+        where TService : class, IEntityWriteService<TEntity>
+    {
+        base.UseWriteService<TService>();
+        Services.AddTransient<IEntityWriteService<TEntity>, TService>();
+        return this;
+    }
 
     public new EntityServiceBuilder<TContext, TEntity> HasRepository<TService>()
         where TService : class, IEntityRepository<TEntity>
@@ -92,7 +100,7 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         Services.AddTransient(factory);
         return this;
     }
-    
+
     // Query Filters
     public new EntityServiceBuilder<TContext, TEntity> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, SearchObject>
@@ -105,7 +113,7 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         Services.AddTransient(factory);
         return this;
     }
-    
+
     // Default SortBy
     public new EntityServiceBuilder<TContext, TEntity> UseDefaultSortBy(Func<IQueryable<TEntity>, IQueryable<TEntity>> sortBy)
     {
@@ -187,7 +195,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     /// </summary>
     /// <returns></returns>
     public virtual EntityServiceBuilder<TContext, TEntity, TKey> AddDefaultService()
-        => UseEntityService<EntityRepository<TContext, TEntity, TKey>>();
+        => UseEntityService<EntityRepository<TEntity, TKey>>();
 
     /// <summary>
     /// Adds <typeparamref name="TService"/> implementation for
@@ -213,6 +221,21 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     public virtual EntityServiceBuilder<TContext, TEntity, TKey> UseEntityService(Func<IServiceProvider, IEntityService<TEntity, TKey>> factory)
     {
         Services.AddTransient(factory);
+        return this;
+    }
+
+    // Read Service
+    public EntityServiceBuilder<TContext, TEntity, TKey> UseReadService<TService>()
+        where TService : class, IEntityReadService<TEntity, TKey>
+    {
+        Services.AddTransient<IEntityReadService<TEntity, TKey>, TService>();
+        return this;
+    }
+    // Write Service
+    public EntityServiceBuilder<TContext, TEntity, TKey> UseWriteService<TService>()
+        where TService : class, IEntityWriteService<TEntity, TKey>
+    {
+        Services.AddTransient<IEntityWriteService<TEntity, TKey>, TService>();
         return this;
     }
 
@@ -296,7 +319,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
         Services.UseQueryBuilder(factory);
         return this;
     }
-    
+
     // Query Filters
     public EntityServiceBuilder<TContext, TEntity, TKey> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>
@@ -309,7 +332,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
         Services.AddQueryFilter(factory);
         return this;
     }
-    
+
     // Default SortBy
     public EntityServiceBuilder<TContext, TEntity, TKey> UseDefaultSortBy(Func<IQueryable<TEntity>, IQueryable<TEntity>> sortBy)
     {
@@ -348,7 +371,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
 {
     // Entity services
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddDefaultService()
-        => UseEntityService<EntityRepository<TContext, TEntity, TKey, TSearchObject>>();
+        => UseEntityService<EntityRepository<TEntity, TKey, TSearchObject>>();
     /// <summary> 
     /// Adds an implementation for
     /// <list type="bullet">
@@ -377,6 +400,14 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
         return this;
     }
 
+    // Read Service
+    public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> UseReadService<TService>()
+        where TService : class, IEntityReadService<TEntity, TKey, TSearchObject>
+    {
+        base.UseReadService<TService>();
+        Services.AddTransient<IEntityReadService<TEntity, TKey, TSearchObject>, TService>();
+        return this;
+    }
 
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasRepository<TService>()
         where TService : class, IEntityRepository<TEntity, TKey, TSearchObject>
@@ -423,7 +454,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
         Services.UseQueryBuilder(factory);
         return this;
     }
-    
+
     // Query Filters
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>

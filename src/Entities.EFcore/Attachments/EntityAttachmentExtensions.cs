@@ -6,7 +6,7 @@ namespace Regira.Entities.EFcore.Attachments;
 public static class EntityAttachmentExtensions
 {
     public static void ModifyEntityAttachments<TEntityAttachment>(this DbContext dbContext, IHasAttachments<TEntityAttachment> original, IHasAttachments<TEntityAttachment> item)
-        where TEntityAttachment : class, IEntityAttachment
+        where TEntityAttachment : class, IEntityAttachment<int, int, int>
     {
         if (item.Attachments == null || original.Attachments == null)
         {

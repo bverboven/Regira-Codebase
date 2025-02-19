@@ -13,6 +13,8 @@ namespace Regira.Entities.Web.Controllers.Abstractions;
 /// 
 public abstract class EntityControllerBase<TEntity> : EntityControllerBase<TEntity, SearchObject, TEntity, TEntity>
     where TEntity : class, IEntity<int>;
+public abstract class EntityControllerBase<TEntity, TKey> : EntityControllerBase<TEntity, TKey, SearchObject<TKey>, TEntity, TEntity>
+    where TEntity : class, IEntity<TKey>;
 /// <summary>
 /// Basic EntityController with DTO models
 /// </summary>
@@ -22,7 +24,7 @@ public abstract class EntityControllerBase<TEntity> : EntityControllerBase<TEnti
 public abstract class EntityControllerBase<TEntity, TDto, TInputDto> : EntityControllerBase<TEntity, SearchObject, TDto, TInputDto>
     where TEntity : class, IEntity<int>;
 /// <summary>
-/// Default EntityController with custom <see cref="ISearchObject"/> and DTO models
+/// Default EntityController with custom <see cref="ISearchObject{TKey}"/> and DTO models
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
 /// <typeparam name="TSearchObject"></typeparam>

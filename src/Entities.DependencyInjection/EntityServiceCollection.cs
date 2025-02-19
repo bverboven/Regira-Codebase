@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Abstractions;
@@ -8,6 +9,7 @@ using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
+using Regira.Entities.EFcore.Services;
 using Regira.Entities.Keywords.Abstractions;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Attachments.Models;
@@ -28,6 +30,14 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         if (!builder.HasService<IQueryBuilder<TEntity, int>>())
         {
             builder.AddDefaultQueryBuilder();
+        }
+        if (!builder.HasService<IEntityReadService<TEntity, int>>())
+        {
+            builder.UseReadService<EntityReadService<TContext, TEntity>>();
+        }
+        if (!builder.HasService<IEntityWriteService<TEntity>>())
+        {
+            builder.UseWriteService<EntityWriteService<TContext, TEntity>>();
         }
         if (!builder.HasEntityService())
         {
@@ -53,6 +63,14 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         {
             builder.AddDefaultQueryBuilder();
         }
+        if (!builder.HasService<IEntityReadService<TEntity, TKey>>())
+        {
+            builder.UseReadService<EntityReadService<TContext, TEntity, TKey>>();
+        }
+        if (!builder.HasService<IEntityWriteService<TEntity, TKey>>())
+        {
+            builder.UseWriteService<EntityWriteService<TContext, TEntity, TKey>>();
+        }
         if (!builder.HasEntityService())
         {
             builder.AddDefaultService();
@@ -71,6 +89,14 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         {
             builder.AddDefaultQueryBuilder();
         }
+        if (!builder.HasService<IEntityReadService<TEntity, TKey, TSearchObject>>())
+        {
+            builder.UseReadService<EntityReadService<TContext, TEntity, TKey, TSearchObject>>();
+        }
+        if (!builder.HasService<IEntityWriteService<TEntity, TKey>>())
+        {
+            builder.UseWriteService<EntityWriteService<TContext, TEntity, TKey>>();
+        }
         if (!builder.HasEntityService())
         {
             builder.AddDefaultService();
@@ -81,7 +107,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     public EntityServiceCollection<TContext> For<TEntity, TSearchObject, TSortBy, TIncludes>
         (Action<ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>? configure = null)
         where TEntity : class, IEntity<int>
-        where TSearchObject : class, ISearchObject, new()
+        where TSearchObject : class, ISearchObject<int>, new()
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
     {
@@ -92,6 +118,14 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         if (!builder.HasService<IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>>())
         {
             builder.AddDefaultQueryBuilder();
+        }
+        if (!builder.HasService<IEntityReadService<TEntity, TSearchObject, TSortBy, TIncludes>>())
+        {
+            builder.UseReadService<EntityReadService<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>();
+        }
+        if (!builder.HasService<IEntityWriteService<TEntity>>())
+        {
+            builder.UseWriteService<EntityWriteService<TContext, TEntity>>();
         }
         if (!builder.HasEntityService())
         {
@@ -125,6 +159,14 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         {
             builder.AddDefaultQueryBuilder();
         }
+        if (!builder.HasService<IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>())
+        {
+            builder.UseReadService<EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+        }
+        if (!builder.HasService<IEntityWriteService<TEntity, TKey>>())
+        {
+            builder.UseWriteService<EntityWriteService<TContext, TEntity, TKey>>();
+        }
         if (!builder.HasEntityService())
         {
             builder.AddDefaultService();
@@ -148,9 +190,9 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             => new AttachmentRepository<TContext>(
                 p.GetRequiredService<TContext>(),
                 factory(p),
-                p.GetRequiredService<IQueryBuilder<Attachment<int>, int, AttachmentSearchObject<int>>>()
-                )
-            );
+                p.GetRequiredService<IEntityReadService<Attachment<int>, int, AttachmentSearchObject<int>>>(),
+                p.GetRequiredService<IEntityWriteService<Attachment<int>, int>>()
+            ));
         return ConfigureAttachmentService<int>(factory);
     }
 
@@ -175,7 +217,8 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
                 => new AttachmentRepository<TContext, TKey>(
                     p.GetRequiredService<TContext>(),
                     factory(p),
-                    p.GetRequiredService<IQueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>>()
+                    p.GetRequiredService<IEntityReadService<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>>(),
+                    p.GetRequiredService<IEntityWriteService<Attachment<TKey>, TKey>>()
                 )
             )
             .AddAutoMapper(cfg =>

@@ -19,12 +19,11 @@ using static Regira.Web.Extensions.ControllerExtensions;
 namespace Regira.Entities.Web.Attachments.Abstractions;
 
 public abstract class EntityAttachmentControllerBase<TEntity> : EntityAttachmentControllerBase<TEntity, EntityAttachmentDto, EntityAttachmentInputDto>
-    where TEntity : class, IEntityAttachment;
+    where TEntity : class, IEntityAttachment<int, int, int>;
 public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> : ControllerBase
-    where TEntity : class, IEntityAttachment
-    where TInputDto : class, IEntityAttachmentInput
+    where TEntity : class, IEntityAttachment<int, int, int>
+    where TInputDto : class, IEntityAttachmentInput<int, int, int>
 {
-
     // Details
     [HttpGet("attachments/{id}")]
     public virtual async Task<ActionResult<DetailsResult<TDto>>> Details([FromRoute] int id)

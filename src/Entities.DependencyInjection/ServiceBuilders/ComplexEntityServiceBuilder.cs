@@ -47,7 +47,7 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
 
     // Entity service
     public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddDefaultService()
-        => UseEntityService<EntityRepository<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>();
+        => UseEntityService<EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
 
     /// <summary>
     /// Adds <typeparamref name="TService"/> implementation for
@@ -79,6 +79,15 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
         return this;
     }
 
+    // Read Service
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> UseReadService<TService>()
+        where TService : class, IEntityReadService<TEntity, TSearchObject, TSortBy, TIncludes>
+    {
+        base.UseReadService<TService>();
+        Services.AddTransient<IEntityReadService<TEntity, TSearchObject, TSortBy, TIncludes>, TService>();
+        return this;
+    }
+
     // Query Builders
     public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddDefaultQueryBuilder()
     {
@@ -96,7 +105,7 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
         Services.UseQueryBuilder(factory);
         return this;
     }
-    
+
     // Query Filters
     public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TSearchObject>
@@ -109,7 +118,7 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
         Services.AddQueryFilter(factory);
         return this;
     }
-    
+
     // Default SortBy
     public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> UseDefaultSortBy(Func<IQueryable<TEntity>, IQueryable<TEntity>> sortBy)
     {
@@ -200,7 +209,7 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
 
     // Entity service
     public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddDefaultService()
-        => UseEntityService<EntityRepository<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+        => UseEntityService<EntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
 
     /// <summary>
     /// Adds <typeparamref name="TService"/> implementation for
@@ -231,6 +240,15 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
         return this;
     }
 
+    // Read Service
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> UseReadService<TService>()
+        where TService : class, IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
+    {
+        base.UseReadService<TService>();
+        Services.AddTransient<IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, TService>();
+        return this;
+    }
+
     // Query Builders
     public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddDefaultQueryBuilder()
     {
@@ -248,7 +266,7 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
         Services.UseQueryBuilder(factory);
         return this;
     }
-    
+
     // Query Filters
     public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>

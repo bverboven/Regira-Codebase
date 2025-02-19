@@ -17,8 +17,8 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
     : EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, int>(services),
         IEntityAttachmentServiceBuilder<TEntity, TEntityAttachment>
     where TContext : DbContext
+    where TEntityAttachment : class, IEntityAttachment<int, int, int>
     where TEntity : class, IEntity<int>, IHasAttachments, IHasAttachments<TEntityAttachment>
-    where TEntityAttachment : class, IEntityAttachment
 {
     public new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment> WithDefaultMapping()
     {
@@ -41,6 +41,7 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
         return this;
     }
 }
+
 public class
     EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey,
         TAttachmentKey>(IServiceCollection services) : EntityServiceBuilder<TContext, TObject, TObjectKey>(services),
@@ -95,6 +96,7 @@ public class
 
         return this;
     }
+
     /// <summary>
     /// Adds implementations for
     /// <list type="bullet">

@@ -8,7 +8,7 @@ namespace Regira.Entities.Web.Attachments.Mappings;
 
 public class AttachmentUriResolver<TEntity, TDto>(LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor)
     : AttachmentUriResolver<TEntity, int, int, int, TDto>(linkGenerator, httpContextAccessor)
-    where TEntity : IEntity<int>, IEntityAttachment;
+    where TEntity : IEntity<int>, IEntityAttachment<int, int, int>;
 public class AttachmentUriResolver<TEntity, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TDto>(
     LinkGenerator linkGenerator,
     IHttpContextAccessor httpContextAccessor)

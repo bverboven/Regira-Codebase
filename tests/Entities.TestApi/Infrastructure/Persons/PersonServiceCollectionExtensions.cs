@@ -14,8 +14,8 @@ public static class PersonServiceCollectionExtensions
             .For<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(e =>
             {
                 e.UseEntityService<PersonManager>();
-                e.HasRepository<PersonRepository>();
                 e.HasManager<PersonManager>();
+                e.UseWriteService<PersonEntityWriteService>();
                 e.AddQueryFilter<PersonQueryFilter>();
                 e.UseQueryBuilder<PersonQueryBuilder>();
                 e.AddMapping<PersonDto, PersonInputDto>();
