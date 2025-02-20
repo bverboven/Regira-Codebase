@@ -1,25 +1,36 @@
 ﻿using Regira.DAL.Paging;
 using Regira.Entities.Abstractions;
+using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.EFcore.Services;
 
-public class EntityRepository<TEntity>(IEntityReadService<TEntity, int> readService, IEntityWriteService<TEntity, int> writeService)
+public class EntityRepository<TEntity>(IEntityReadService<TEntity, int, SearchObject<int>> readService, IEntityWriteService<TEntity, int> writeService)
     : EntityRepository<TEntity, int>(readService, writeService), IEntityRepository<TEntity>
     where TEntity : class, IEntity<int>;
 
-public class EntityRepository<TEntity, TKey>(IEntityReadService<TEntity, TKey> readService, IEntityWriteService<TEntity, TKey> writeService)
-    : IEntityRepository<TEntity, TKey>
+public class EntityRepository<TEntity, TKey>(IEntityReadService<TEntity, TKey, SearchObject<TKey>> readService, IEntityWriteService<TEntity, TKey> writeService)
+    : EntityRepository<TEntity, TKey, SearchObject<TKey>>(readService, writeService)
+    where TEntity : class, IEntity<TKey>;
+
+public class EntityRepository<TEntity, TKey, TSearchObject>(IEntityReadService<TEntity, TKey, TSearchObject> readService, IEntityWriteService<TEntity, TKey> writeService)
+    : IEntityRepository<TEntity, TKey, TSearchObject>
     where TEntity : class, IEntity<TKey>
+    where TSearchObject : class, ISearchObject<TKey>, new()
 {
     public virtual Task<TEntity?> Details(TKey id)
-        => readService.Details(id);
+    => readService.Details(id);
 
-
-    Task<IList<TEntity>> IEntityReadService<TEntity, TKey>.List(object? so, PagingInfo? pagingInfo)
+    public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
         => readService.List(so, pagingInfo);
-    Task<long> IEntityReadService<TEntity, TKey>.Count(object? so)
+    public virtual Task<long> Count(TSearchObject? so)
         => readService.Count(so);
+
+    public Task<IList<TEntity>> List(object? so, PagingInfo? pagingInfo)
+         => readService.List(so, pagingInfo);
+    public Task<long> Count(object? so)
+         => readService.Count(so);
+
 
 
     public virtual Task Add(TEntity item)
@@ -33,15 +44,4 @@ public class EntityRepository<TEntity, TKey>(IEntityReadService<TEntity, TKey> r
 
     public virtual Task<int> SaveChanges(CancellationToken token = default)
         => writeService.SaveChanges(token);
-}
-
-public class EntityRepository<TEntity, TKey, TSearchObject>(IEntityReadService<TEntity, TKey, TSearchObject> readService, IEntityWriteService<TEntity, TKey> writeService)
-    : EntityRepository<TEntity, TKey>(readService, writeService), IEntityRepository<TEntity, TKey, TSearchObject>
-    where TEntity : class, IEntity<TKey>
-    where TSearchObject : class, ISearchObject<TKey>, new()
-{
-    public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
-        => readService.List(so, pagingInfo);
-    public virtual Task<long> Count(TSearchObject? so)
-        => readService.Count(so);
 }

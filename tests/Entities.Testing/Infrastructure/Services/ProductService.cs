@@ -7,10 +7,10 @@ using Regira.Entities.Models;
 
 namespace Entities.Testing.Infrastructure.Services;
 
-public class ProductService(IEntityReadService<Product, int, SearchObject<int>> readService, IEntityWriteService<Product> writeService)
+public class ProductService(IEntityReadService<Product, int, SearchObject<int>> readService, IEntityWriteService<Product, int> writeService)
     : EntityRepository<Product>(readService, writeService)
 {
 }
 public class ProductQueryBuilder(IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
-    IEnumerable<IFilteredQueryBuilder<Product, SearchObject<int>>>? filters = null)
+    IEnumerable<IFilteredQueryBuilder<Product, int, SearchObject<int>>>? filters = null)
     : QueryBuilder<Product>(globalFilters, filters);

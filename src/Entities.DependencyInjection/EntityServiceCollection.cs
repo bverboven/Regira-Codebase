@@ -40,15 +40,16 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         {
             builder.UseWriteService<EntityWriteService<TContext, TEntity>>();
         }
-        if (!builder.HasEntityService())
+        if (!builder.HasService<IEntityService<TEntity>>())
         {
-            builder.AddDefaultService();
+            builder.AddTransient<IEntityService<TEntity>, EntityRepository<TEntity>>();
+            builder.UseEntityService(p => p.GetRequiredService<IEntityService<TEntity>>());
         }
 
         return this;
     }
     /// <summary>
-    /// <inheritdoc cref="EntityServiceBuilder{TContext, TEntity}.AddDefaultService"/>
+    /// <inheritdoc cref="EntityServiceBuilder{TContext,TEntity,TKey}.AddDefaultService"/>
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TKey"></typeparam>
@@ -74,7 +75,8 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         }
         if (!builder.HasEntityService())
         {
-            builder.AddDefaultService();
+            builder.AddTransient<IEntityService<TEntity, TKey>, EntityRepository<TEntity, TKey>>();
+            builder.AddTransient<IEntityService<TEntity, TKey, SearchObject<TKey>>, EntityRepository<TEntity, TKey, SearchObject<TKey>>>();
         }
 
         return this;
@@ -100,37 +102,42 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         }
         if (!builder.HasEntityService())
         {
-            builder.AddDefaultService();
+            builder.AddTransient<IEntityService<TEntity, TKey, TSearchObject>, EntityRepository<TEntity, TKey, TSearchObject>>();
+            builder.AddTransient<IEntityService<TEntity, TKey>>(p => p.GetRequiredService<IEntityService<TEntity, TKey, TSearchObject>>());
         }
 
         return this;
     }
     public EntityServiceCollection<TContext> For<TEntity, TSearchObject, TSortBy, TIncludes>
-        (Action<ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>? configure = null)
+        (Action<ComplexEntityServiceBuilder<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>>? configure = null)
         where TEntity : class, IEntity<int>
         where TSearchObject : class, ISearchObject<int>, new()
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
     {
         var simpleBuilder = new EntityServiceBuilder<TContext, TEntity, int, TSearchObject>(this);
-        var builder = new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(simpleBuilder);
+        var builder = new ComplexEntityServiceBuilder<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>(simpleBuilder);
         configure?.Invoke(builder);
 
         if (!builder.HasService<IQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>>())
         {
             builder.AddDefaultQueryBuilder();
         }
-        if (!builder.HasService<IEntityReadService<TEntity, TSearchObject, TSortBy, TIncludes>>())
+        if (!builder.HasService<IEntityReadService<TEntity, int, TSearchObject, TSortBy, TIncludes>>())
         {
             builder.UseReadService<EntityReadService<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>();
         }
-        if (!builder.HasService<IEntityWriteService<TEntity>>())
+        if (!builder.HasService<IEntityWriteService<TEntity, int>>())
         {
             builder.UseWriteService<EntityWriteService<TContext, TEntity>>();
         }
         if (!builder.HasEntityService())
         {
-            builder.AddDefaultService();
+            builder.AddTransient<IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>, EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
+            builder.AddTransient<IEntityService<TEntity, int, TSearchObject, TSortBy, TIncludes>>(p => p.GetRequiredService<IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>>());
+            builder.AddTransient<IEntityService<TEntity, int, TSearchObject>>(p => p.GetRequiredService<IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>>());
+            builder.AddTransient<IEntityService<TEntity, int>>(p => p.GetRequiredService<IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>>());
+            builder.AddTransient<IEntityService<TEntity>>(p => p.GetRequiredService<IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>>());
         }
 
         return this;
@@ -170,7 +177,9 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         }
         if (!builder.HasEntityService())
         {
-            builder.AddDefaultService();
+            builder.AddTransient<IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, EntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+            builder.AddTransient<IEntityService<TEntity, TKey, TSearchObject>>(p => p.GetRequiredService<IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>());
+            builder.AddTransient<IEntityService<TEntity, TKey>>(p => p.GetRequiredService<IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>());
         }
 
         return this;

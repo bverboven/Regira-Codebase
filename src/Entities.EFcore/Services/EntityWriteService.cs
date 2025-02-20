@@ -6,7 +6,7 @@ using Regira.Entities.Models.Abstractions;
 namespace Regira.Entities.EFcore.Services;
 
 public class EntityWriteService<TContext, TEntity>(TContext dbContext, IEntityReadService<TEntity, int> readService)
-    : EntityWriteService<TContext, TEntity, int>(dbContext, readService), IEntityWriteService<TEntity>
+    : EntityWriteService<TContext, TEntity, int>(dbContext, readService)
     where TContext : DbContext
     where TEntity : class, IEntity<int>;
 

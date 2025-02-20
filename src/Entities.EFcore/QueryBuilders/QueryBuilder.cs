@@ -9,9 +9,9 @@ namespace Regira.Entities.EFcore.QueryBuilders;
 
 public class QueryBuilder<TEntity>(
     IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
-    IEnumerable<IFilteredQueryBuilder<TEntity, SearchObject<int>>>? filters = null,
-    ISortedQueryBuilder<TEntity>? sortedQueryBuilder = null,
-    IIncludableQueryBuilder<TEntity>? includableQueryBuilder = null,
+    IEnumerable<IFilteredQueryBuilder<TEntity, int, SearchObject<int>>>? filters = null,
+    ISortedQueryBuilder<TEntity, int>? sortedQueryBuilder = null,
+    IIncludableQueryBuilder<TEntity, int>? includableQueryBuilder = null,
     ILoggerFactory? loggerFactory = null
 ) : QueryBuilder<TEntity, int>(globalFilters, filters, sortedQueryBuilder, includableQueryBuilder, loggerFactory), IQueryBuilder<TEntity>
     where TEntity : IEntity<int>;
@@ -43,9 +43,9 @@ public class QueryBuilder<TEntity, TKey, TSearchObject>(
 
 public class QueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>(
     IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
-    IEnumerable<IFilteredQueryBuilder<TEntity, TSearchObject>>? filters = null,
-    ISortedQueryBuilder<TEntity>? sortedQueryBuilder = null,
-    IIncludableQueryBuilder<TEntity>? includableQueryBuilder = null,
+    IEnumerable<IFilteredQueryBuilder<TEntity, int, TSearchObject>>? filters = null,
+    ISortedQueryBuilder<TEntity, int>? sortedQueryBuilder = null,
+    IIncludableQueryBuilder<TEntity, int>? includableQueryBuilder = null,
     ILoggerFactory? loggerFactory = null)
     : QueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>(globalFilters, filters, sortedQueryBuilder, includableQueryBuilder, loggerFactory),
         IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>

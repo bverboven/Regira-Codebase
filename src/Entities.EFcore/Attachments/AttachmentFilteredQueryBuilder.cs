@@ -5,8 +5,8 @@ using Regira.Entities.Keywords.Abstractions;
 
 namespace Regira.Entities.EFcore.Attachments;
 
-public class AttachmentFilteredQueryBuilder(IQKeywordHelper qHelper) : AttachmentFilteredQueryBuilder<int>(qHelper), 
-    IFilteredQueryBuilder<Attachment, AttachmentSearchObject>
+public class AttachmentFilteredQueryBuilder(IQKeywordHelper qHelper) : AttachmentFilteredQueryBuilder<int>(qHelper),
+    IFilteredQueryBuilder<Attachment, int, AttachmentSearchObject>
 {
     public IQueryable<Attachment> Build(IQueryable<Attachment> query, AttachmentSearchObject? so)
     {

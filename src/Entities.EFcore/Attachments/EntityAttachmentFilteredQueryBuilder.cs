@@ -7,8 +7,7 @@ using Regira.Entities.Models.Abstractions;
 namespace Regira.Entities.EFcore.Attachments;
 
 public class EntityAttachmentFilteredQueryBuilder<TEntityAttachment, TSearchObject>(IQKeywordHelper qHelper)
-    : EntityAttachmentFilteredQueryBuilder<int, TEntityAttachment, int, TSearchObject, int>(qHelper),
-        IFilteredQueryBuilder<TEntityAttachment, TSearchObject>
+    : EntityAttachmentFilteredQueryBuilder<int, TEntityAttachment, int, TSearchObject, int>(qHelper)
     where TEntityAttachment : IEntityAttachment<int, int, int>, IEntity<int>
     where TSearchObject : class, IEntityAttachmentSearchObject<int, int>;
 public class EntityAttachmentFilteredQueryBuilder<TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey>(IQKeywordHelper qHelper)

@@ -31,7 +31,7 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
     {
         base.AddDefaultAttachmentService();
         // Query filter
-        Services.AddTransient<IFilteredQueryBuilder<TEntityAttachment, EntityAttachmentSearchObject>,
+        Services.AddTransient<IFilteredQueryBuilder<TEntityAttachment, int, EntityAttachmentSearchObject>,
             EntityAttachmentFilteredQueryBuilder<TEntityAttachment, EntityAttachmentSearchObject>>();
         // Query builder
         Services.AddDefaultQueryBuilder<TEntityAttachment, int, EntityAttachmentSearchObject<int, int>>();
@@ -45,12 +45,11 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
 }
 
 public class
-    EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey,
-        TAttachmentKey>(IServiceCollection services) : EntityServiceBuilder<TContext, TObject, TObjectKey>(services),
-    IEntityAttachmentServiceBuilder<TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey>
+    EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey>(IServiceCollection services)
+    : EntityServiceBuilder<TContext, TObject, TObjectKey>(services),
+        IEntityAttachmentServiceBuilder<TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey>
     where TContext : DbContext
-    where TObject : class, IEntity<TObjectKey>, IHasAttachments,
-    IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey>
+    where TObject : class, IEntity<TObjectKey>, IHasAttachments, IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey>
     where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey>
 {
     protected internal bool HasEntityAttachmentMapping { get; set; }

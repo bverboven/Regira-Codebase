@@ -2,8 +2,8 @@
 
 namespace Regira.Entities.Abstractions;
 
-public interface IEntityWriteService<TEntity> : IEntityWriteService<TEntity, int>
-    where TEntity : class, IEntity<int>;
+//public interface IEntityWriteService<TEntity> : IEntityWriteService<TEntity, int>
+//    where TEntity : class, IEntity<int>;
 public interface IEntityWriteService<TEntity, TKey>
     where TEntity : class, IEntity<TKey>
 {

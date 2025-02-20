@@ -9,7 +9,7 @@ using Regira.Utilities;
 namespace Regira.Entities.EFcore.Services;
 
 public class EntityReadService<TContext, TEntity>(TContext dbContext, IQueryBuilder<TEntity, int, SearchObject<int>, EntitySortBy, EntityIncludes> queryBuilder)
-    : EntityReadService<TContext, TEntity, int>(dbContext, queryBuilder)//, IEntityReadService<TEntity>
+    : EntityReadService<TContext, TEntity, int>(dbContext, queryBuilder)
     where TContext : DbContext
     where TEntity : class, IEntity<int>;
 
@@ -19,13 +19,14 @@ public class EntityReadService<TContext, TEntity, TKey>(TContext dbContext, IQue
     where TEntity : class, IEntity<TKey>;
 
 public class EntityReadService<TContext, TEntity, TKey, TSearchObject>(TContext dbContext, IQueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes> queryBuilder)
-    : EntityReadService<TContext, TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>(dbContext, queryBuilder)
+    : EntityReadService<TContext, TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>(dbContext, queryBuilder),
+    IEntityReadService<TEntity, TKey, TSearchObject>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new();
 
 public class EntityReadService<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(TContext dbContext, IQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes> queryBuilder)
-    : EntityReadService<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>(dbContext, queryBuilder), IEntityReadService<TEntity, TSearchObject, TSortBy, TIncludes>
+    : EntityReadService<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>(dbContext, queryBuilder)
     where TContext : DbContext
     where TEntity : class, IEntity<int>
     where TSearchObject : class, ISearchObject<int>, new()

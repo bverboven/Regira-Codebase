@@ -28,7 +28,7 @@ public static class CourseServiceCollectionExtensions
                     a.AddMapping<CourseAttachmentDto, CourseAttachmentInputDto>();
                 });
                 // extra person filter
-                e.AddTransient<IFilteredQueryBuilder<Person, PersonSearchObject>, CoursePersonQueryFilter>();
+                e.AddTransient<IFilteredQueryBuilder<Person, int, PersonSearchObject>, CoursePersonQueryFilter>();
             });
 
         return services;

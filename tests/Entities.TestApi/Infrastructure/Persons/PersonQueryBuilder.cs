@@ -7,7 +7,7 @@ namespace Entities.TestApi.Infrastructure.Persons;
 
 public class PersonQueryBuilder(
     IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
-    IEnumerable<IFilteredQueryBuilder<Person, PersonSearchObject>> filters)
+    IEnumerable<IFilteredQueryBuilder<Person, int, PersonSearchObject>> filters)
     : QueryBuilder<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(globalFilters, filters)
 {
     public override IQueryable<Person> SortBy(IQueryable<Person> query, IList<PersonSearchObject?>? so, PersonSortBy? sortBy, PersonIncludes? includes)

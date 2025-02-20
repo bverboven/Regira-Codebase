@@ -4,11 +4,11 @@ using Regira.Entities.Models.Abstractions;
 namespace Regira.Entities.EFcore.QueryBuilders.Abstractions;
 
 public abstract class FilteredQueryBuilderBase<TEntity>
-    : FilteredQueryBuilderBase<TEntity, SearchObject<int>>, IFilteredQueryBuilder<TEntity>
+    : FilteredQueryBuilderBase<TEntity, SearchObject<int>>
     where TEntity : IEntity<int>;
 
 public abstract class FilteredQueryBuilderBase<TEntity, TSearchObject>
-    : FilteredQueryBuilderBase<TEntity, int, TSearchObject>, IFilteredQueryBuilder<TEntity, TSearchObject>
+    : FilteredQueryBuilderBase<TEntity, int, TSearchObject>
     where TEntity : IEntity<int>
     where TSearchObject : ISearchObject<int>;
 

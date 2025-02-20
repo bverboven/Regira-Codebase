@@ -18,7 +18,7 @@ public interface IEntityServiceCollection<TContext>
         where TEntity : class, IEntity<int>;
 
     /// <summary>
-    /// <inheritdoc cref="EntityServiceBuilder{TContext, TEntity}.AddDefaultService"/>
+    /// <inheritdoc cref="EntityServiceBuilder{TContext,TEntity,TKey}.AddDefaultService"/>
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TKey"></typeparam>
@@ -32,7 +32,7 @@ public interface IEntityServiceCollection<TContext>
         where TSearchObject : class, ISearchObject<TKey>, new();
 
     EntityServiceCollection<TContext> For<TEntity, TSearchObject, TSortBy, TIncludes>
-        (Action<ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>? configure = null)
+        (Action<ComplexEntityServiceBuilder<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>>? configure = null)
         where TEntity : class, IEntity<int>
         where TSearchObject : class, ISearchObject<int>, new()
         where TSortBy : struct, Enum
