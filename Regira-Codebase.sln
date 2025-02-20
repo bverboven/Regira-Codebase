@@ -240,6 +240,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contoso.Entities", "..\..\P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contoso.API", "..\..\PoC\RegiraEntities\Contoso.API\Contoso.API.csproj", "{1B9F5FED-4A29-4DFC-B1DC-32047E584CFF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities.DependencyInjection.Testing", "tests\Entities.DependencyInjection.Testing\Entities.DependencyInjection.Testing.csproj", "{D02AA94D-6792-479B-B993-2F4B5409CD93}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -602,6 +604,10 @@ Global
 		{1B9F5FED-4A29-4DFC-B1DC-32047E584CFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B9F5FED-4A29-4DFC-B1DC-32047E584CFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B9F5FED-4A29-4DFC-B1DC-32047E584CFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D02AA94D-6792-479B-B993-2F4B5409CD93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D02AA94D-6792-479B-B993-2F4B5409CD93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D02AA94D-6792-479B-B993-2F4B5409CD93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D02AA94D-6792-479B-B993-2F4B5409CD93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -718,6 +724,7 @@ Global
 		{EC305BDA-3B71-4CA0-A7BF-173E1B483BEB} = {6DC10729-D5B9-4A82-9E67-07DCD04CF6B7}
 		{82BC00AD-C1E1-4AA4-B32B-6BA7644F0388} = {A1ED7974-DFA8-4D2B-A004-34F74565E856}
 		{1B9F5FED-4A29-4DFC-B1DC-32047E584CFF} = {A1ED7974-DFA8-4D2B-A004-34F74565E856}
+		{D02AA94D-6792-479B-B993-2F4B5409CD93} = {C282BB35-A907-4CCC-B5FD-D0ABE60C0EDB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C20C1CB-93D4-46D3-A172-85F0202D818C}

@@ -27,23 +27,30 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     {
         var builder = new EntityServiceBuilder<TContext, TEntity>(this);
         configure?.Invoke(builder);
-
+        
+        // Query Builder
         if (!builder.HasService<IQueryBuilder<TEntity, int, SearchObject<int>, EntitySortBy, EntityIncludes>>())
         {
             builder.AddDefaultQueryBuilder();
         }
+        // Read Service
         if (!builder.HasService<IEntityReadService<TEntity, int>>())
         {
             builder.UseReadService<EntityReadService<TContext, TEntity>>();
         }
+        // Write Service
         if (!builder.HasService<IEntityWriteService<TEntity, int>>())
         {
             builder.UseWriteService<EntityWriteService<TContext, TEntity>>();
         }
+        // Entity Service
         if (!builder.HasService<IEntityService<TEntity>>())
         {
-            builder.AddTransient<IEntityService<TEntity>, EntityRepository<TEntity>>();
-            builder.UseEntityService(p => p.GetRequiredService<IEntityService<TEntity>>());
+            builder.UseEntityService<EntityRepository<TEntity>>();
+        }
+        if (!builder.HasService<IEntityService<TEntity, int, SearchObject<int>>>())
+        {
+            Services.AddTransient<IEntityService<TEntity, int, SearchObject<int>>, EntityRepository<TEntity, int, SearchObject<int>>>();
         }
 
         return this;
@@ -60,23 +67,30 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     {
         var builder = new EntityServiceBuilder<TContext, TEntity, TKey>(this);
         configure?.Invoke(builder);
-
+        
+        // Query Builder
         if (!builder.HasService<IQueryBuilder<TEntity, TKey, SearchObject<TKey>, EntitySortBy, EntityIncludes>>())
         {
             builder.AddDefaultQueryBuilder();
         }
+        // Read Service
         if (!builder.HasService<IEntityReadService<TEntity, TKey>>())
         {
             builder.UseReadService<EntityReadService<TContext, TEntity, TKey>>();
         }
+        // Write Service
         if (!builder.HasService<IEntityWriteService<TEntity, TKey>>())
         {
             builder.UseWriteService<EntityWriteService<TContext, TEntity, TKey>>();
         }
+        // Entity Service
         if (!builder.HasEntityService())
         {
-            builder.AddTransient<IEntityService<TEntity, TKey>, EntityRepository<TEntity, TKey>>();
-            builder.AddTransient<IEntityService<TEntity, TKey, SearchObject<TKey>>, EntityRepository<TEntity, TKey, SearchObject<TKey>>>();
+            builder.UseEntityService<EntityRepository<TEntity, TKey>>();
+        }
+        if (!builder.HasService<IEntityService<TEntity, TKey, SearchObject<TKey>>>())
+        {
+            Services.AddTransient<IEntityService<TEntity, TKey, SearchObject<TKey>>, EntityRepository<TEntity, TKey, SearchObject<TKey>>>();
         }
 
         return this;
@@ -102,8 +116,8 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         }
         if (!builder.HasEntityService())
         {
+            builder.AddTransient<IEntityService<TEntity, TKey>, EntityRepository<TEntity, TKey, TSearchObject>>();
             builder.AddTransient<IEntityService<TEntity, TKey, TSearchObject>, EntityRepository<TEntity, TKey, TSearchObject>>();
-            builder.AddTransient<IEntityService<TEntity, TKey>>(p => p.GetRequiredService<IEntityService<TEntity, TKey, TSearchObject>>());
         }
 
         return this;
@@ -133,11 +147,12 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         }
         if (!builder.HasEntityService())
         {
+            builder.AddTransient<IEntityService<TEntity>, EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
             builder.AddTransient<IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>, EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
-            builder.AddTransient<IEntityService<TEntity, int, TSearchObject, TSortBy, TIncludes>>(p => p.GetRequiredService<IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>>());
-            builder.AddTransient<IEntityService<TEntity, int, TSearchObject>>(p => p.GetRequiredService<IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>>());
-            builder.AddTransient<IEntityService<TEntity, int>>(p => p.GetRequiredService<IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>>());
-            builder.AddTransient<IEntityService<TEntity>>(p => p.GetRequiredService<IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>>());
+
+            builder.AddTransient<IEntityService<TEntity, int>, EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
+            builder.AddTransient<IEntityService<TEntity, int, TSearchObject>, EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
+            builder.AddTransient<IEntityService<TEntity, int, TSearchObject, TSortBy, TIncludes>, EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
         }
 
         return this;
@@ -177,9 +192,9 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         }
         if (!builder.HasEntityService())
         {
+            builder.AddTransient<IEntityService<TEntity, TKey>, EntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+            builder.AddTransient<IEntityService<TEntity, TKey, TSearchObject>, EntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
             builder.AddTransient<IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, EntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
-            builder.AddTransient<IEntityService<TEntity, TKey, TSearchObject>>(p => p.GetRequiredService<IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>());
-            builder.AddTransient<IEntityService<TEntity, TKey>>(p => p.GetRequiredService<IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>());
         }
 
         return this;

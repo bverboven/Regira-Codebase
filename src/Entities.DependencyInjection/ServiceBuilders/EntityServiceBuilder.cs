@@ -32,7 +32,7 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         where TService : class, IEntityService<TEntity>
     {
         Services.AddTransient<IEntityService<TEntity>, TService>();
-        base.UseEntityService<TService>();
+        Services.AddTransient<IEntityService<TEntity, int>, TService>();
         return this;
     }
     /// <summary>
@@ -45,10 +45,10 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
     public virtual EntityServiceBuilder<TContext, TEntity> UseEntityService(Func<IServiceProvider, IEntityService<TEntity>> factory)
     {
         Services.AddTransient(factory);
-        base.UseEntityService(factory);
+        Services.AddTransient<IEntityService<TEntity, int>>(factory);
         return this;
     }
-    
+
     public new EntityServiceBuilder<TContext, TEntity> HasRepository<TService>()
         where TService : class, IEntityRepository<TEntity>, IEntityRepository<TEntity, int, SearchObject<int>>
     {
@@ -268,13 +268,13 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
 
 
     // Default SortBy
-    public EntityServiceBuilder<TContext, TEntity, TKey> UseDefaultSortBy(Func<IQueryable<TEntity>, IQueryable<TEntity>> sortBy)
+    public EntityServiceBuilder<TContext, TEntity, TKey> SortBy(Func<IQueryable<TEntity>, IQueryable<TEntity>> sortBy)
     {
         Services.AddTransient<ISortedQueryBuilder<TEntity, TKey>>(_ => new SortedQueryBuilder<TEntity, TKey>(sortBy));
         return this;
     }
     // Default Includes
-    public EntityServiceBuilder<TContext, TEntity, TKey> UseDefaultIncludes(Func<IQueryable<TEntity>, IQueryable<TEntity>> addIncludes)
+    public EntityServiceBuilder<TContext, TEntity, TKey> Includes(Func<IQueryable<TEntity>, IQueryable<TEntity>> addIncludes)
     {
         Services.AddTransient<IIncludableQueryBuilder<TEntity, TKey>>(_ => new IncludableQueryBuilder<TEntity, TKey>(addIncludes));
         return this;
@@ -318,7 +318,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> UseEntityService<TService>()
         where TService : class, IEntityService<TEntity, TKey, TSearchObject>
     {
-        base.UseEntityService<TService>();
+        Services.AddTransient<IEntityService<TEntity, TKey>, TService>();
         Services.AddTransient<IEntityService<TEntity, TKey, TSearchObject>, TService>();
         return this;
     }
@@ -331,7 +331,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
     /// <returns></returns>
     public EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> UseEntityService(Func<IServiceProvider, IEntityService<TEntity, TKey, TSearchObject>> factory)
     {
-        base.UseEntityService(factory);
+        Services.AddTransient<IEntityService<TEntity, TKey>>(factory);
         Services.AddTransient(factory);
         return this;
     }

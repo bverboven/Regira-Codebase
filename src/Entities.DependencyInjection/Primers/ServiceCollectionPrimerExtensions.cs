@@ -32,7 +32,7 @@ public static class ServiceCollectionPrimerExtensions
         services.AddTransient(factory);
         return services;
     }
-    
+
 
     // AutoTruncate
     public static IServiceCollection AddAutoTruncatePrimer<TServiceCollection>(this TServiceCollection services)
@@ -50,6 +50,7 @@ public static class ServiceCollectionPrimerExtensions
     {
         options.AddPrimer<HasCreatedDbPrimer>();
         options.AddPrimer<HasLastModifiedDbPrimer>();
+        options.AddPrimer<ArchivablePrimer>();
         return options;
     }
     public static EntityServiceCollectionOptions AddPrimer<TPrimer>(this EntityServiceCollectionOptions options)
