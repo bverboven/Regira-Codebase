@@ -29,11 +29,11 @@ public class CourseRepository5(IEntityReadService<Course, int, CourseSearchObjec
 
 // Managers
 public class CourseManager1(IEntityRepository<Course, int, SearchObject<int>> repo)
-    : EntityManager<Course>(repo);
+    : EntityManager<Course>(repo), ICourseService;
 public class CourseManager2(IEntityRepository<Course, int, SearchObject<int>> repo)
-    : EntityManager<Course, int>(repo);
+    : EntityManager<Course, int>(repo), ICourseService;
 public class CourseManager3A(IEntityRepository<Course, int, SearchObject<int>> repo)
-    : EntityManager<Course, int, SearchObject<int>>(repo);
+    : EntityManager<Course, int, SearchObject<int>>(repo), ICourseService;
 public class CourseManager3B(IEntityRepository<Course, int, CourseSearchObject> repo)
     : EntityManager<Course, int, CourseSearchObject>(repo);
 public class CourseManager4(IEntityRepository<Course, CourseSearchObject, CourseSortBy, CourseIncludes> repo)
@@ -43,7 +43,7 @@ public class CourseManager5(IEntityRepository<Course, int, CourseSearchObject, C
 
 // Custom service
 
-public class CourseService1(IEntityRepository<Course, int, SearchObject<int>> service)
+public class CourseService(IEntityRepository<Course, int, SearchObject<int>> service)
     : EntityWrappingServiceBase<Course>(service);
-public class CustomCourseService1(ICourseService service)
+public class CustomCourseService(ICourseService service)
     : EntityWrappingServiceBase<Course>(service);

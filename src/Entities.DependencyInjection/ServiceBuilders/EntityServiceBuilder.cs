@@ -52,7 +52,7 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
     }
 
     // Entity Repository
-    protected internal EntityServiceBuilder<TContext, TEntity> HasRepositoryInner<TService>()
+    protected internal new EntityServiceBuilder<TContext, TEntity> HasRepositoryInner<TService>()
         where TService : class, IEntityRepository<TEntity>, IEntityRepository<TEntity, int, SearchObject<int>>
     {
         Services.AddTransient<IEntityRepository<TEntity>, TService>();
@@ -60,7 +60,7 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         Services.AddTransient<IEntityRepository<TEntity, int, SearchObject<int>>, TService>();
         return this;
     }
-    protected internal EntityServiceBuilder<TContext, TEntity> HasRepositoryInner<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+    protected internal new EntityServiceBuilder<TContext, TEntity> HasRepositoryInner<TImplementation>(Func<IServiceProvider, TImplementation> factory)
         where TImplementation : class, IEntityRepository<TEntity>, IEntityRepository<TEntity, int, SearchObject<int>>
     {
         Services.AddTransient(factory);
@@ -75,7 +75,7 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         HasRepositoryInner<TService>();
         return this;
     }
-    public EntityServiceBuilder<TContext, TEntity> HasRepository<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+    public new EntityServiceBuilder<TContext, TEntity> HasRepository<TImplementation>(Func<IServiceProvider, TImplementation> factory)
         where TImplementation : class, IEntityRepository<TEntity>, IEntityRepository<TEntity, int, SearchObject<int>>
     {
         UseEntityService(factory);
@@ -92,7 +92,7 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         Services.AddTransient<IEntityManager<TEntity, int, SearchObject<int>>, TService>();
         return this;
     }
-    public EntityServiceBuilder<TContext, TEntity> HasManager<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+    public new EntityServiceBuilder<TContext, TEntity> HasManager<TImplementation>(Func<IServiceProvider, TImplementation> factory)
         where TImplementation : class, IEntityManager<TEntity>, IEntityManager<TEntity, int, SearchObject<int>>
     {
         UseEntityService(factory);
@@ -181,9 +181,10 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     /// <typeparam name="TService"></typeparam>
     /// <returns></returns>
     public EntityServiceBuilder<TContext, TEntity, TKey> UseEntityService<TService>()
-        where TService : class, IEntityService<TEntity, TKey>
+        where TService : class, IEntityService<TEntity, TKey>, IEntityService<TEntity, TKey, SearchObject<TKey>>
     {
         Services.AddTransient<IEntityService<TEntity, TKey>, TService>();
+        Services.AddTransient<IEntityService<TEntity, TKey, SearchObject<TKey>>, TService>();
         return this;
     }
     /// <summary>
@@ -219,6 +220,21 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     }
 
     // Entity Repository
+    protected internal EntityServiceBuilder<TContext, TEntity, TKey> HasRepositoryInner<TService>()
+        where TService : class, IEntityRepository<TEntity, TKey>, IEntityRepository<TEntity, TKey, SearchObject<TKey>>
+    {
+        Services.AddTransient<IEntityRepository<TEntity, TKey>, TService>();
+        Services.AddTransient<IEntityRepository<TEntity, TKey, SearchObject<TKey>>, TService>();
+        return this;
+    }
+    protected internal EntityServiceBuilder<TContext, TEntity, TKey> HasRepositoryInner<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityRepository<TEntity, TKey>, IEntityRepository<TEntity, TKey, SearchObject<TKey>>
+    {
+        Services.AddTransient(factory);
+        Services.AddTransient<IEntityRepository<TEntity, TKey>>(factory);
+        Services.AddTransient<IEntityRepository<TEntity, TKey, SearchObject<TKey>>>(factory);
+        return this;
+    }
     /// <summary>
     /// Adds <typeparamref name="TService"/> implementation for
     /// <list type="bullet">
@@ -229,9 +245,10 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     /// <typeparam name="TService"></typeparam>
     /// <returns></returns>
     public EntityServiceBuilder<TContext, TEntity, TKey> HasRepository<TService>()
-        where TService : class, IEntityRepository<TEntity, TKey>
+        where TService : class, IEntityRepository<TEntity, TKey, SearchObject<TKey>>
     {
-        Services.AddTransient<IEntityRepository<TEntity, TKey>, TService>();
+        UseEntityService<TService>();
+        HasRepositoryInner<TService>();
         return this;
     }
     /// <summary>
@@ -244,9 +261,11 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     /// <param name="factory"></param>
     /// <returns></returns>
     /// 
-    public EntityServiceBuilder<TContext, TEntity, TKey> HasRepository(Func<IServiceProvider, IEntityRepository<TEntity, TKey>> factory)
+    public EntityServiceBuilder<TContext, TEntity, TKey> HasRepository<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityRepository<TEntity, TKey>, IEntityRepository<TEntity, TKey, SearchObject<TKey>>
     {
-        Services.AddTransient(factory);
+        UseEntityService(factory);
+        HasRepositoryInner(factory);
         return this;
     }
 
@@ -261,9 +280,11 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     /// <typeparam name="TService"></typeparam>
     /// <returns></returns>
     public EntityServiceBuilder<TContext, TEntity, TKey> HasManager<TService>()
-        where TService : class, IEntityManager<TEntity, TKey>
+        where TService : class, IEntityManager<TEntity, TKey>, IEntityManager<TEntity, TKey, SearchObject<TKey>>
     {
+        UseEntityService<TService>();
         Services.AddTransient<IEntityManager<TEntity, TKey>, TService>();
+        Services.AddTransient<IEntityManager<TEntity, TKey, SearchObject<TKey>>, TService>();
         return this;
     }
     /// <summary>
@@ -275,9 +296,13 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     /// </summary>
     /// <param name="factory"></param>
     /// <returns></returns>
-    public EntityServiceBuilder<TContext, TEntity, TKey> HasManager(Func<IServiceProvider, IEntityManager<TEntity, TKey>> factory)
+    public EntityServiceBuilder<TContext, TEntity, TKey> HasManager<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityManager<TEntity, TKey>, IEntityManager<TEntity, TKey, SearchObject<TKey>>
     {
+        UseEntityService(factory);
         Services.AddTransient(factory);
+        Services.AddTransient<IEntityManager<TEntity, TKey>>(factory);
+        Services.AddTransient<IEntityManager<TEntity, TKey, SearchObject<TKey>>>(factory);
         return this;
     }
 
@@ -351,13 +376,15 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
 {
+    public new bool HasEntityService() => HasService<IEntityService<TEntity, TKey, TSearchObject>>();
+
     // Entity services
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddDefaultService()
         => UseEntityService<EntityRepository<TEntity, TKey, TSearchObject>>();
     /// <summary> 
     /// Adds an implementation for
     /// <list type="bullet">
-    ///     <item><see cref="IEntityService{TEntity, TKey,TSearchObject}"/></item>
+    ///     <item><see cref="IEntityService{TEntity, TKey, TSearchObject}"/></item>
     /// </list>
     /// </summary>
     /// <typeparam name="TService"></typeparam>
@@ -372,7 +399,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
     /// <summary>
     /// Adds an implementation for
     /// <list type="bullet">
-    ///     <item><see cref="IEntityService{TEntity, TKey,TSearchObject}"/></item>
+    ///     <item><see cref="IEntityService{TEntity, TKey, TSearchObject}"/></item>
     /// </list>
     /// </summary>
     /// <returns></returns>
@@ -397,36 +424,93 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> UseWriteService<TService>()
         where TService : class, IEntityWriteService<TEntity, TKey>
     {
-        base.UseWriteService<TService>();
+        Services.AddTransient<IEntityWriteService<TEntity, TKey>, TService>();
         return this;
     }
 
     // Entity Repository
-    public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasRepository<TService>()
+    protected internal new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasRepositoryInner<TService>()
         where TService : class, IEntityRepository<TEntity, TKey, TSearchObject>
     {
-        base.HasRepository<TService>();
+        Services.AddTransient<IEntityRepository<TEntity, TKey>, TService>();
         Services.AddTransient<IEntityRepository<TEntity, TKey, TSearchObject>, TService>();
         return this;
     }
-    public EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasRepository(Func<IServiceProvider, IEntityRepository<TEntity, TKey, TSearchObject>> factory)
+    protected internal new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasRepositoryInner<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityRepository<TEntity, TKey, TSearchObject>
     {
-        base.HasRepository(factory);
         Services.AddTransient(factory);
+        Services.AddTransient<IEntityRepository<TEntity, TKey>>(factory);
+        Services.AddTransient<IEntityRepository<TEntity, TKey, TSearchObject>>(factory);
+        return this;
+    }
+    /// <summary>
+    /// Adds <typeparamref name="TService"/> implementation for
+    /// <list type="bullet">
+    ///     <item><see cref="IEntityRepository{TEntity}"/></item>
+    ///     <item><see cref="IEntityRepository{TEntity, TKey}"/></item>
+    /// </list>
+    /// </summary>
+    /// <typeparam name="TService"></typeparam>
+    /// <returns></returns>
+    public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasRepository<TService>()
+        where TService : class, IEntityRepository<TEntity, TKey, TSearchObject>
+    {
+        UseEntityService<TService>();
+        HasRepositoryInner<TService>();
+        return this;
+    }
+    /// <summary>
+    /// Adds implementation for
+    /// <list type="bullet">
+    ///     <item><see cref="IEntityRepository{TEntity}"/></item>
+    ///     <item><see cref="IEntityRepository{TEntity, TKey}"/></item>
+    /// </list>
+    /// </summary>
+    /// <param name="factory"></param>
+    /// <returns></returns>
+    /// 
+    public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasRepository<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityRepository<TEntity, TKey>, IEntityRepository<TEntity, TKey, TSearchObject>
+    {
+        UseEntityService(factory);
+        HasRepositoryInner(factory);
         return this;
     }
     // Entity Manager
+    /// <summary>
+    /// Adds <typeparamref name="TService"/> implementation for
+    /// <list type="bullet">
+    ///     <item><see cref="IEntityManager{TEntity}"/></item>
+    ///     <item><see cref="IEntityManager{TEntity, TKey, TSearchObject}"/></item>
+    /// </list>
+    /// </summary>
+    /// <typeparam name="TService"></typeparam>
+    /// <returns></returns>
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasManager<TService>()
         where TService : class, IEntityManager<TEntity, TKey, TSearchObject>
     {
-        base.HasManager<TService>();
+        UseEntityService<TService>();
+        Services.AddTransient<IEntityManager<TEntity, TKey>, TService>();
         Services.AddTransient<IEntityManager<TEntity, TKey, TSearchObject>, TService>();
         return this;
     }
-    public EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasManager(Func<IServiceProvider, IEntityManager<TEntity, TKey, TSearchObject>> factory)
+    /// <summary>
+    /// Adds implementation for
+    /// <list type="bullet">
+    ///     <item><see cref="IEntityManager{TEntity}"/></item>
+    ///     <item><see cref="IEntityManager{TEntity, TKey, TSearchObject}"/></item>
+    /// </list>
+    /// </summary>
+    /// <param name="factory"></param>
+    /// <returns></returns>
+    public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasManager<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityManager<TEntity, TKey, TSearchObject>
     {
-        base.HasManager(factory);
+        UseEntityService(factory);
         Services.AddTransient(factory);
+        Services.AddTransient<IEntityManager<TEntity, TKey>>(factory);
+        Services.AddTransient<IEntityManager<TEntity, TKey, TSearchObject>>(factory);
         return this;
     }
 

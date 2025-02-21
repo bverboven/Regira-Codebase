@@ -51,7 +51,6 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         // Entity Service
         if (!builder.HasService<IEntityService<TEntity>>())
         {
-            builder.HasRepositoryInner<EntityRepository<TEntity>>();
             builder.UseEntityService<EntityRepository<TEntity>>();
         }
 
@@ -85,14 +84,15 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         {
             builder.UseWriteService<EntityWriteService<TContext, TEntity, TKey>>();
         }
+        // Entity Repository
+        if (!builder.HasService<IEntityRepository<TEntity, TKey>>())
+        {
+            builder.HasRepositoryInner<EntityRepository<TEntity, TKey>>();
+        }
         // Entity Service
-        if (!builder.HasEntityService())
+        if (!builder.HasService<IEntityService<TEntity, TKey>>())
         {
             builder.UseEntityService<EntityRepository<TEntity, TKey>>();
-        }
-        if (!builder.HasService<IEntityService<TEntity, TKey, SearchObject<TKey>>>())
-        {
-            Services.AddTransient<IEntityService<TEntity, TKey, SearchObject<TKey>>, EntityRepository<TEntity, TKey, SearchObject<TKey>>>();
         }
 
         return this;
@@ -104,22 +104,30 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         var builder = new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(this);
         configure?.Invoke(builder);
 
+        // Query Builder
         if (!builder.HasService<IQueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>>())
         {
             builder.AddDefaultQueryBuilder();
         }
+        // Read Service
         if (!builder.HasService<IEntityReadService<TEntity, TKey, TSearchObject>>())
         {
             builder.UseReadService<EntityReadService<TContext, TEntity, TKey, TSearchObject>>();
         }
+        // Write Service
         if (!builder.HasService<IEntityWriteService<TEntity, TKey>>())
         {
             builder.UseWriteService<EntityWriteService<TContext, TEntity, TKey>>();
         }
-        if (!builder.HasEntityService())
+        // Entity Repository
+        if (!builder.HasService<IEntityRepository<TEntity, TKey, TSearchObject>>())
         {
-            builder.AddTransient<IEntityService<TEntity, TKey>, EntityRepository<TEntity, TKey, TSearchObject>>();
-            builder.AddTransient<IEntityService<TEntity, TKey, TSearchObject>, EntityRepository<TEntity, TKey, TSearchObject>>();
+            builder.HasRepositoryInner<EntityRepository<TEntity, TKey, TSearchObject>>();
+        }
+        // Entity Service
+        if (!builder.HasService<IEntityService<TEntity, TKey, TSearchObject>>())
+        {
+            builder.UseEntityService<EntityRepository<TEntity, TKey, TSearchObject>>();
         }
 
         return this;
