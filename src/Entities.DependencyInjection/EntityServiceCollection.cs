@@ -46,20 +46,13 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         // Entity Repository
         if (!builder.HasService<IEntityRepository<TEntity>>())
         {
-            builder.HasRepository<EntityRepository<TEntity>>();
-        }
-        if (!builder.HasService<IEntityRepository<TEntity>>())
-        {
-            Services.AddTransient<IEntityRepository<TEntity, int, SearchObject<int>>, EntityRepository<TEntity, int, SearchObject<int>>>();
+            builder.HasRepositoryInner<EntityRepository<TEntity>>();
         }
         // Entity Service
         if (!builder.HasService<IEntityService<TEntity>>())
         {
+            builder.HasRepositoryInner<EntityRepository<TEntity>>();
             builder.UseEntityService<EntityRepository<TEntity>>();
-        }
-        if (!builder.HasService<IEntityService<TEntity, int, SearchObject<int>>>())
-        {
-            Services.AddTransient<IEntityService<TEntity, int, SearchObject<int>>, EntityRepository<TEntity, int, SearchObject<int>>>();
         }
 
         return this;

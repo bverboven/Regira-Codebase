@@ -52,7 +52,7 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         return this;
     }
 
-    public new EntityServiceBuilder<TContext, TEntity> HasRepository<TService>()
+    protected internal new EntityServiceBuilder<TContext, TEntity> HasRepositoryInner<TService>()
         where TService : class, IEntityRepository<TEntity>, IEntityRepository<TEntity, int, SearchObject<int>>
     {
         Services.AddTransient<IEntityRepository<TEntity>, TService>();
@@ -60,12 +60,26 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         Services.AddTransient<IEntityRepository<TEntity, int, SearchObject<int>>, TService>();
         return this;
     }
-    public EntityServiceBuilder<TContext, TEntity> HasRepository<TImplementation>(Func<IServiceProvider, TImplementation> factory)
-    where TImplementation : class, IEntityRepository<TEntity>, IEntityRepository<TEntity, int, SearchObject<int>>
+    protected internal EntityServiceBuilder<TContext, TEntity> HasRepositoryInner<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityRepository<TEntity>, IEntityRepository<TEntity, int, SearchObject<int>>
     {
         Services.AddTransient(factory);
         Services.AddTransient<IEntityRepository<TEntity, int>>(factory);
         Services.AddTransient<IEntityRepository<TEntity, int, SearchObject<int>>>(factory);
+        return this;
+    }
+    public new EntityServiceBuilder<TContext, TEntity> HasRepository<TService>()
+        where TService : class, IEntityRepository<TEntity>, IEntityRepository<TEntity, int, SearchObject<int>>
+    {
+        UseEntityService<TService>();
+        HasRepositoryInner<TService>();
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity> HasRepository<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityRepository<TEntity>, IEntityRepository<TEntity, int, SearchObject<int>>
+    {
+        UseEntityService(factory);
+        HasRepositoryInner(factory);
         return this;
     }
 

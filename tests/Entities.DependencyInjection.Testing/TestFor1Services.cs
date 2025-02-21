@@ -19,7 +19,7 @@ using Testing.Library.Data;
 namespace Entities.DependencyInjection.Testing;
 
 [TestFixture]
-public class TestServiceFor1
+public class TestFor1Services
 {
     [Test]
     public void Basic_Without_Defaults()
@@ -168,7 +168,7 @@ public class TestServiceFor1
     }
 
     [Test]
-    public void Basic_With_Custom_GlobalFilter()
+    public void Basic_With_GlobalFilter()
     {
         using var sp = new ServiceCollection()
             .AddDbContext<ContosoContext>()
@@ -215,7 +215,7 @@ public class TestServiceFor1
     }
 
     [Test]
-    public void Basic_With_Custom_Repository()
+    public void Basic_With_Repository()
     {
         using var sp = new ServiceCollection()
             .AddDbContext<ContosoContext>()
@@ -233,12 +233,12 @@ public class TestServiceFor1
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, SearchObject<int>>>();
         var entityWriteService = sp.GetService<IEntityWriteService<Course, int>>();
-        var entityService1 = sp.GetService<IEntityService<Course>>();
-        var entityService2 = sp.GetService<IEntityService<Course, int>>();
-        var entityService3 = sp.GetService<IEntityService<Course, int, SearchObject<int>>>();
         var repo1 = sp.GetService<IEntityRepository<Course>>();
         var repo2 = sp.GetService<IEntityRepository<Course, int>>();
         var repo3 = sp.GetService<IEntityRepository<Course, int, SearchObject<int>>>();
+        var entityService1 = sp.GetService<IEntityService<Course>>();
+        var entityService2 = sp.GetService<IEntityService<Course, int>>();
+        var entityService3 = sp.GetService<IEntityService<Course, int, SearchObject<int>>>();
 
         Assert.That(entityNormalizer, Is.Null);
         Assert.That(globalFilters, Is.Empty);
@@ -250,15 +250,16 @@ public class TestServiceFor1
         Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course>>());
         Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course>>());
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Course>>());
-        Assert.That(entityService1, Is.TypeOf<CourseRepository1>());
-        Assert.That(entityService2, Is.TypeOf<CourseRepository1>());
-        Assert.That(entityService3, Is.TypeOf<CourseRepository1>());
         Assert.That(repo1, Is.TypeOf<CourseRepository1>());
         Assert.That(repo2, Is.TypeOf<CourseRepository1>());
         Assert.That(repo3, Is.TypeOf<CourseRepository1>());
+        Assert.That(entityService1, Is.TypeOf<CourseRepository1>());
+        Assert.That(entityService2, Is.TypeOf<CourseRepository1>());
+        Assert.That(entityService3, Is.TypeOf<CourseRepository1>());
     }
+
     [Test]
-    public void Basic_With_Custom_Manager()
+    public void Basic_With_Manager()
     {
         using var sp = new ServiceCollection()
             .AddDbContext<ContosoContext>()
@@ -311,7 +312,7 @@ public class TestServiceFor1
     }
 
     [Test]
-    public void Basic_With_Custom_EntityService()
+    public void Basic_With_EntityService()
     {
         using var sp = new ServiceCollection()
             .AddDbContext<ContosoContext>()
@@ -352,5 +353,54 @@ public class TestServiceFor1
         Assert.That(entityService1, Is.TypeOf<CourseService1>());
         Assert.That(entityService2, Is.TypeOf<CourseService1>());
         Assert.That(entityService3, Is.TypeOf<CourseService1>());
+    }
+
+    [Test]
+    public void Basic_With_Custom_EntityService()
+    {
+        using var sp = new ServiceCollection()
+            .AddDbContext<ContosoContext>()
+            .UseEntities<ContosoContext>()
+            .For<Course>(e =>
+            {
+                // define custom EntityService interface
+                e.AddTransient<ICourseService, CourseRepository1>();
+                e.UseEntityService<CustomCourseService1>();
+            })
+            .BuildServiceProvider();
+
+        var entityNormalizer = sp.GetService<IEntityNormalizer>();
+        var primers = sp.GetServices<IEntityPrimer>().ToArray();
+        var globalFilters = sp.GetServices<IGlobalFilteredQueryBuilder>();
+        var queryFilters = sp.GetServices<IFilteredQueryBuilder<Course, int, SearchObject<int>>>();
+        var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
+        var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int>>();
+        var queryBuilder = sp.GetService<IQueryBuilder<Course, int, SearchObject<int>, EntitySortBy, EntityIncludes>>();
+        var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
+        var entityReadService3 = sp.GetService<IEntityReadService<Course, int, SearchObject<int>>>();
+        var entityWriteService = sp.GetService<IEntityWriteService<Course, int>>();
+        var repo1 = sp.GetService<IEntityRepository<Course>>();
+        var repo2 = sp.GetService<IEntityRepository<Course, int>>();
+        var repo3 = sp.GetService<IEntityRepository<Course, int, SearchObject<int>>>();
+        var entityService1 = sp.GetService<IEntityService<Course>>();
+        var entityService2 = sp.GetService<IEntityService<Course, int>>();
+        var entityService3 = sp.GetService<IEntityService<Course, int, SearchObject<int>>>();
+
+        Assert.That(entityNormalizer, Is.Null);
+        Assert.That(globalFilters, Is.Empty);
+        Assert.That(queryFilters, Is.Empty);
+        Assert.That(sortableBuilder, Is.Null);
+        Assert.That(includableBuilder, Is.Null);
+        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course>>());
+        Assert.That(primers, Is.Empty);
+        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course>>());
+        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course>>());
+        Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Course>>());
+        Assert.That(repo1, Is.TypeOf<EntityRepository<Course>>());
+        Assert.That(repo2, Is.TypeOf<EntityRepository<Course>>());
+        Assert.That(repo3, Is.TypeOf<EntityRepository<Course>>());
+        Assert.That(entityService1, Is.TypeOf<CustomCourseService1>());
+        Assert.That(entityService2, Is.TypeOf<CustomCourseService1>());
+        Assert.That(entityService3, Is.TypeOf<CustomCourseService1>());
     }
 }

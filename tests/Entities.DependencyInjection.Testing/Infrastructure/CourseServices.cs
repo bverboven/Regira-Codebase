@@ -6,15 +6,17 @@ using Testing.Library.Contoso;
 
 namespace Entities.DependencyInjection.Testing.Infrastructure;
 
+public interface ICourseService : IEntityService<Course, int, SearchObject<int>>;
+
 // Repositories
 public class CourseRepository1(IEntityReadService<Course, int, SearchObject<int>> readService, IEntityWriteService<Course, int> writeService)
-    : EntityRepository<Course>(readService, writeService);
+    : EntityRepository<Course>(readService, writeService), ICourseService;
 
 public class CourseRepository2(IEntityReadService<Course, int, SearchObject<int>> readService, IEntityWriteService<Course, int> writeService)
-    : EntityRepository<Course, int>(readService, writeService);
+    : EntityRepository<Course, int>(readService, writeService), ICourseService;
 
 public class CourseRepository3A(IEntityReadService<Course, int, SearchObject<int>> readService, IEntityWriteService<Course, int> writeService)
-    : EntityRepository<Course, int, SearchObject<int>>(readService, writeService);
+    : EntityRepository<Course, int, SearchObject<int>>(readService, writeService), ICourseService;
 
 public class CourseRepository3B(IEntityReadService<Course, int, CourseSearchObject> readService, IEntityWriteService<Course, int> writeService)
     : EntityRepository<Course, int, CourseSearchObject>(readService, writeService);
@@ -41,5 +43,7 @@ public class CourseManager5(IEntityRepository<Course, int, CourseSearchObject, C
 
 // Custom service
 
-public class CourseService1(IEntityService<Course, int, SearchObject<int>> service)
+public class CourseService1(IEntityRepository<Course, int, SearchObject<int>> service)
+    : EntityWrappingServiceBase<Course>(service);
+public class CustomCourseService1(ICourseService service)
     : EntityWrappingServiceBase<Course>(service);

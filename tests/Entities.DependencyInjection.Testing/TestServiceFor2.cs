@@ -9,7 +9,7 @@ using Testing.Library.Data;
 namespace Entities.DependencyInjection.Testing;
 
 [TestFixture]
-public class TestServiceFor2
+public class TestFor2Services
 {
     [Test]
     public void Simple_Without_Defaults()
