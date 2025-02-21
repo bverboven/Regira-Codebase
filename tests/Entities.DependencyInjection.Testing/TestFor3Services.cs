@@ -99,15 +99,15 @@ public class TestFor3Services
         Assert.That(queryFilters, Is.Empty);
         Assert.That(sortableBuilder, Is.Null);
         Assert.That(includableBuilder, Is.Null);
-        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int>>());
+        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int, CourseSearchObject>>());
         Assert.That(primers, Is.Empty);
-        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
-        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
+        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
+        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Course, int>>());
-        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(entityService2, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(entityService3, Is.TypeOf<EntityRepository<Course, int>>());
+        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(entityService2, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(entityService3, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
     }
 
     [Test]
@@ -142,15 +142,15 @@ public class TestFor3Services
         Assert.That(queryFilters, Is.Empty);
         Assert.That(sortableBuilder, Is.Null);
         Assert.That(includableBuilder, Is.Null);
-        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int>>());
+        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int, CourseSearchObject>>());
         Assert.That(primers, Is.Empty);
-        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
-        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
+        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
+        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Course, int>>());
-        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(entityService2, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(entityService3, Is.TypeOf<EntityRepository<Course, int>>());
+        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(entityService2, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(entityService3, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
     }
 
     [Test]
@@ -186,15 +186,15 @@ public class TestFor3Services
         Assert.That(globalFilters, Is.Empty);
         Assert.That(queryFilters, Is.Empty);
         Assert.That(includableBuilder, Is.Null);
-        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int>>());
+        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int, CourseSearchObject>>());
         Assert.That(primers, Is.Empty);
-        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
-        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
+        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
+        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Course, int>>());
-        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(entityService2, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(entityService3, Is.TypeOf<EntityRepository<Course, int>>());
+        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(entityService2, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(entityService3, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
     }
 
     [Test]
@@ -230,15 +230,15 @@ public class TestFor3Services
         Assert.That(globalFilters, Is.Empty);
         Assert.That(queryFilters, Is.Empty);
         Assert.That(sortableBuilder, Is.Null);
-        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int>>());
+        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int, CourseSearchObject>>());
         Assert.That(primers, Is.Empty);
-        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
-        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
+        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
+        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Course, int>>());
-        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(entityService2, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(entityService3, Is.TypeOf<EntityRepository<Course, int>>());
+        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(entityService2, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(entityService3, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
     }
 
     [Test]
@@ -274,15 +274,15 @@ public class TestFor3Services
         Assert.That(globalFilters, Is.Empty);
         Assert.That(sortableBuilder, Is.Null);
         Assert.That(includableBuilder, Is.Null);
-        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int>>());
+        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int, CourseSearchObject>>());
         Assert.That(primers, Is.Empty);
-        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
-        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
+        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
+        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Course, int>>());
-        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(entityService2, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(entityService3, Is.TypeOf<EntityRepository<Course, int>>());
+        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(entityService2, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(entityService3, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
     }
 
     [Test]
@@ -317,14 +317,14 @@ public class TestFor3Services
         Assert.That(queryFilters, Is.Empty);
         Assert.That(sortableBuilder, Is.Null);
         Assert.That(includableBuilder, Is.Null);
-        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int>>());
-        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
-        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
+        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int, CourseSearchObject>>());
+        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
+        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Course, int>>());
-        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(entityService2, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(entityService3, Is.TypeOf<EntityRepository<Course, int>>());
+        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(entityService2, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(entityService3, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
     }
 
     [Test]
@@ -333,7 +333,7 @@ public class TestFor3Services
         using var sp = new ServiceCollection()
             .AddDbContext<ContosoContext>()
             .UseEntities<ContosoContext>()
-            .For<Course, int, CourseSearchObject>(e => e.HasRepository<CourseRepository2>())
+            .For<Course, int, CourseSearchObject>(e => e.HasRepository<CourseRepository3B>())
             .BuildServiceProvider();
 
         var entityNormalizer = sp.GetService<IEntityNormalizer>();
@@ -351,20 +351,20 @@ public class TestFor3Services
         var entityService2 = sp.GetService<IEntityService<Course, int>>();
         var entityService3 = sp.GetService<IEntityService<Course, int, CourseSearchObject>>();
 
-        Assert.That(repo2, Is.TypeOf<CourseRepository2>());
-        Assert.That(repo3, Is.TypeOf<CourseRepository2>());
-        Assert.That(entityService2, Is.TypeOf<CourseRepository2>());
-        Assert.That(entityService3, Is.TypeOf<CourseRepository2>());
+        Assert.That(repo2, Is.TypeOf<CourseRepository3B>());
+        Assert.That(repo3, Is.TypeOf<CourseRepository3B>());
+        Assert.That(entityService2, Is.TypeOf<CourseRepository3B>());
+        Assert.That(entityService3, Is.TypeOf<CourseRepository3B>());
 
         Assert.That(entityNormalizer, Is.Null);
         Assert.That(globalFilters, Is.Empty);
         Assert.That(queryFilters, Is.Empty);
         Assert.That(sortableBuilder, Is.Null);
         Assert.That(includableBuilder, Is.Null);
-        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int>>());
+        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int, CourseSearchObject>>());
         Assert.That(primers, Is.Empty);
-        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
-        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
+        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
+        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Course, int>>());
     }
 
@@ -376,7 +376,7 @@ public class TestFor3Services
             .UseEntities<ContosoContext>()
             .For<Course, int, CourseSearchObject>(e =>
             {
-                e.HasManager<CourseManager2>();
+                e.HasManager<CourseManager3B>();
             })
             .BuildServiceProvider();
 
@@ -397,23 +397,23 @@ public class TestFor3Services
         var manager2 = sp.GetService<IEntityManager<Course, int>>();
         var manager3 = sp.GetService<IEntityManager<Course, int, CourseSearchObject>>();
 
-        Assert.That(manager2, Is.TypeOf<CourseManager2>());
-        Assert.That(manager3, Is.TypeOf<CourseManager2>());
-        Assert.That(entityService2, Is.TypeOf<CourseManager2>());
-        Assert.That(entityService3, Is.TypeOf<CourseManager2>());
+        Assert.That(manager2, Is.TypeOf<CourseManager3B>());
+        Assert.That(manager3, Is.TypeOf<CourseManager3B>());
+        Assert.That(entityService2, Is.TypeOf<CourseManager3B>());
+        Assert.That(entityService3, Is.TypeOf<CourseManager3B>());
 
         Assert.That(entityNormalizer, Is.Null);
         Assert.That(globalFilters, Is.Empty);
         Assert.That(queryFilters, Is.Empty);
         Assert.That(sortableBuilder, Is.Null);
         Assert.That(includableBuilder, Is.Null);
-        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int>>());
+        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int, CourseSearchObject>>());
         Assert.That(primers, Is.Empty);
-        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
-        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
+        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
+        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Course, int>>());
-        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int>>());
+        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
     }
 
     [Test]
@@ -422,7 +422,7 @@ public class TestFor3Services
         using var sp = new ServiceCollection()
             .AddDbContext<ContosoContext>()
             .UseEntities<ContosoContext>()
-            .For<Course, int, CourseSearchObject>(e => e.UseEntityService<CourseService>())
+            .For<Course, int, CourseSearchObject>(e => e.UseEntityService<CourseServiceB>())
             .BuildServiceProvider();
 
         var entityNormalizer = sp.GetService<IEntityNormalizer>();
@@ -440,21 +440,21 @@ public class TestFor3Services
         var entityService2 = sp.GetService<IEntityService<Course, int>>();
         var entityService3 = sp.GetService<IEntityService<Course, int, CourseSearchObject>>();
 
-        Assert.That(entityService2, Is.TypeOf<CourseService>());
-        Assert.That(entityService3, Is.TypeOf<CourseService>());
+        Assert.That(entityService2, Is.TypeOf<CourseServiceB>());
+        Assert.That(entityService3, Is.TypeOf<CourseServiceB>());
 
         Assert.That(entityNormalizer, Is.Null);
         Assert.That(globalFilters, Is.Empty);
         Assert.That(queryFilters, Is.Empty);
         Assert.That(sortableBuilder, Is.Null);
         Assert.That(includableBuilder, Is.Null);
-        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int>>());
+        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int, CourseSearchObject>>());
         Assert.That(primers, Is.Empty);
-        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
-        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
+        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
+        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Course, int>>());
-        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int>>());
+        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
     }
 
     [Test]
@@ -466,8 +466,8 @@ public class TestFor3Services
             .For<Course, int, CourseSearchObject>(e =>
             {
                 // define custom EntityService interface
-                e.AddTransient<ICourseService, CourseRepository1>();
-                e.UseEntityService<CustomCourseService>();
+                e.AddTransient<ICourseServiceB, CourseRepository3B>();
+                e.UseEntityService<CustomCourseServiceB>();
             })
             .BuildServiceProvider();
 
@@ -486,21 +486,21 @@ public class TestFor3Services
         var entityService2 = sp.GetService<IEntityService<Course, int>>();
         var entityService3 = sp.GetService<IEntityService<Course, int, CourseSearchObject>>();
 
-        Assert.That(entityService2, Is.TypeOf<CustomCourseService>());
-        Assert.That(entityService3, Is.TypeOf<CustomCourseService>());
-
+        Assert.That(entityService2, Is.TypeOf<CustomCourseServiceB>());
+        Assert.That(entityService3, Is.TypeOf<CustomCourseServiceB>());
+        
         Assert.That(entityNormalizer, Is.Null);
         Assert.That(globalFilters, Is.Empty);
         Assert.That(queryFilters, Is.Empty);
         Assert.That(sortableBuilder, Is.Null);
         Assert.That(includableBuilder, Is.Null);
-        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int>>());
+        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int, CourseSearchObject>>());
         Assert.That(primers, Is.Empty);
-        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
-        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
+        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
+        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Course, int>>());
-        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int>>());
-        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int>>());
+        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
+        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, int, CourseSearchObject>>());
     }
 
     [Test]
@@ -519,10 +519,10 @@ public class TestFor3Services
                 e.Includes(query => query.Include(x => x.Instructors));
                 e.AddQueryFilter<CourseQueryFilter1>();
                 e.AddPrimer<CoursePrimer>();
-                e.HasRepository<CourseRepository2>();
-                e.HasManager<CourseManager2>();
-                e.AddTransient<ICourseService, CourseManager2>();
-                e.UseEntityService<CustomCourseService>();
+                e.HasRepository<CourseRepository3B>();
+                e.HasManager<CourseManager3B>();
+                e.AddTransient<ICourseServiceB, CourseManager3B>();
+                e.UseEntityService<CustomCourseServiceB>();
             })
             .BuildServiceProvider();
 
@@ -553,20 +553,20 @@ public class TestFor3Services
         Assert.That(queryFilters.First(), Is.TypeOf<CourseQueryFilter1>());
         Assert.That(sortableBuilder, Is.TypeOf<SortedQueryBuilder<Course, int>>());
         Assert.That(includableBuilder, Is.TypeOf<IncludableQueryBuilder<Course, int>>());
-        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int>>());
+        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, int, CourseSearchObject>>());
         Assert.That(primers.Length, Is.EqualTo(4));
         Assert.That(primers.OfType<HasCreatedDbPrimer>(), Is.Not.Empty);
         Assert.That(primers.OfType<HasLastModifiedDbPrimer>(), Is.Not.Empty);
         Assert.That(primers.OfType<ArchivablePrimer>(), Is.Not.Empty);
         Assert.That(primers.OfType<CoursePrimer>(), Is.Not.Empty);
-        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
-        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int>>());
+        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
+        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, int, CourseSearchObject>>());
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Course, int>>());
-        Assert.That(repo2, Is.TypeOf<CourseRepository2>());
-        Assert.That(repo3, Is.TypeOf<CourseRepository2>());
-        Assert.That(entityService2, Is.TypeOf<CustomCourseService>());
-        Assert.That(entityService3, Is.TypeOf<CustomCourseService>());
-        Assert.That(manager2, Is.TypeOf<CourseManager2>());
-        Assert.That(manager3, Is.TypeOf<CourseManager2>());
+        Assert.That(repo2, Is.TypeOf<CourseRepository3B>());
+        Assert.That(repo3, Is.TypeOf<CourseRepository3B>());
+        Assert.That(entityService2, Is.TypeOf<CustomCourseServiceB>());
+        Assert.That(entityService3, Is.TypeOf<CustomCourseServiceB>());
+        Assert.That(manager2, Is.TypeOf<CourseManager3B>());
+        Assert.That(manager3, Is.TypeOf<CourseManager3B>());
     }
 }
