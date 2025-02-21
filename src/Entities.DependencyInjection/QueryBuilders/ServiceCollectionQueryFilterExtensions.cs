@@ -86,9 +86,9 @@ public static class ServiceCollectionQueryFilterExtensions
     public static EntityServiceCollectionOptions AddDefaultGlobalQueryFilters<TKey>(this EntityServiceCollectionOptions options)
     {
         options.AddGlobalFilterQueryBuilder<FilterIdsQueryBuilder<TKey>>();
-        options.AddGlobalFilterQueryBuilder<FilterArchivablesQueryBuilder<TKey>>();
-        options.AddGlobalFilterQueryBuilder<FilterHasCreatedQueryBuilder<TKey>>();
-        options.AddGlobalFilterQueryBuilder<FilterHasLastModifiedQueryBuilder<TKey>>();
+        options.AddGlobalFilterQueryBuilder<FilterArchivablesQueryBuilder>();
+        options.AddGlobalFilterQueryBuilder<FilterHasCreatedQueryBuilder>();
+        options.AddGlobalFilterQueryBuilder<FilterHasLastModifiedQueryBuilder>();
 
         return options;
     }

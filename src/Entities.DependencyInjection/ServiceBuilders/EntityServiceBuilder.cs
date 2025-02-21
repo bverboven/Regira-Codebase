@@ -26,7 +26,6 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
     // Entity service
     public new EntityServiceBuilder<TContext, TEntity> AddDefaultService()
         => UseEntityService<EntityRepository<TEntity>>();
-
     public new EntityServiceBuilder<TContext, TEntity> UseEntityService<TService>()
         where TService : class, IEntityService<TEntity>, IEntityService<TEntity, int, SearchObject<int>>
     {
@@ -52,7 +51,8 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         return this;
     }
 
-    protected internal new EntityServiceBuilder<TContext, TEntity> HasRepositoryInner<TService>()
+    // Entity Repository
+    protected internal EntityServiceBuilder<TContext, TEntity> HasRepositoryInner<TService>()
         where TService : class, IEntityRepository<TEntity>, IEntityRepository<TEntity, int, SearchObject<int>>
     {
         Services.AddTransient<IEntityRepository<TEntity>, TService>();
@@ -82,7 +82,7 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         HasRepositoryInner(factory);
         return this;
     }
-
+    // Entity Manager
     public new EntityServiceBuilder<TContext, TEntity> HasManager<TService>()
         where TService : class, IEntityManager<TEntity>, IEntityManager<TEntity, int, SearchObject<int>>
     {
@@ -172,7 +172,6 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     /// <returns></returns>
     public EntityServiceBuilder<TContext, TEntity, TKey> AddDefaultService()
         => UseEntityService<EntityRepository<TEntity, TKey>>();
-
     /// <summary>
     /// Adds <typeparamref name="TService"/> implementation for
     /// <list type="bullet">
@@ -355,7 +354,6 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
     // Entity services
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddDefaultService()
         => UseEntityService<EntityRepository<TEntity, TKey, TSearchObject>>();
-
     /// <summary> 
     /// Adds an implementation for
     /// <list type="bullet">
@@ -403,6 +401,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
         return this;
     }
 
+    // Entity Repository
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasRepository<TService>()
         where TService : class, IEntityRepository<TEntity, TKey, TSearchObject>
     {
@@ -416,7 +415,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
         Services.AddTransient(factory);
         return this;
     }
-
+    // Entity Manager
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> HasManager<TService>()
         where TService : class, IEntityManager<TEntity, TKey, TSearchObject>
     {
@@ -435,6 +434,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddDefaultQueryBuilder()
     {
         Services.AddDefaultQueryBuilder<TEntity, TKey, TSearchObject>();
+        Services.UseQueryBuilder<TEntity, TKey, TSearchObject, QueryBuilder<TEntity, TKey, TSearchObject>>();
         return this;
     }
     public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> UseQueryBuilder<TImplementation>()

@@ -88,5 +88,5 @@ public static class ServiceCollectionQueryBuilderExtensions
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
         where TImplementation : class, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
-        => services.AddTransient(factory);
+        => services.AddTransient<IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>(factory);
 }
