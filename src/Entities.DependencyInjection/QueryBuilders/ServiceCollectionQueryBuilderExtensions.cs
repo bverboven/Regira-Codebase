@@ -15,10 +15,11 @@ public static class ServiceCollectionQueryBuilderExtensions
     public static IServiceCollection UseQueryBuilder<TEntity, TImplementation>(this IServiceCollection services)
         where TEntity : IEntity<int>
         where TImplementation : class, IQueryBuilder<TEntity, int, SearchObject<int>, EntitySortBy, EntityIncludes>
-        => services.UseQueryBuilder<TEntity, int, TImplementation>();
-    public static IServiceCollection UseQueryBuilder<TEntity>(this IServiceCollection services, Func<IServiceProvider, IQueryBuilder<TEntity>> factory)
+        => services.UseQueryBuilder<TEntity, int, SearchObject<int>, EntitySortBy, EntityIncludes, TImplementation>();
+    public static IServiceCollection UseQueryBuilder<TEntity, TImplementation>(this IServiceCollection services, Func<IServiceProvider, TImplementation> factory)
         where TEntity : IEntity<int>
-        => services.UseQueryBuilder<TEntity, int>(factory);
+        where TImplementation : class, IQueryBuilder<TEntity, int, SearchObject<int>, EntitySortBy, EntityIncludes>
+        => services.UseQueryBuilder<TEntity, int, SearchObject<int>, EntitySortBy, EntityIncludes, TImplementation>(factory);
 
     public static IServiceCollection AddDefaultQueryBuilder<TEntity, TKey>(this IServiceCollection services)
         where TEntity : IEntity<TKey>
@@ -27,9 +28,10 @@ public static class ServiceCollectionQueryBuilderExtensions
         where TEntity : IEntity<TKey>
         where TImplementation : class, IQueryBuilder<TEntity, TKey, SearchObject<TKey>, EntitySortBy, EntityIncludes>
         => services.UseQueryBuilder<TEntity, TKey, SearchObject<TKey>, EntitySortBy, EntityIncludes, TImplementation>();
-    public static IServiceCollection UseQueryBuilder<TEntity, TKey>(this IServiceCollection services, Func<IServiceProvider, IQueryBuilder<TEntity, TKey>> factory)
+    public static IServiceCollection UseQueryBuilder<TEntity, TKey, TImplementation>(this IServiceCollection services, Func<IServiceProvider, TImplementation> factory)
         where TEntity : IEntity<TKey>
-        => services.UseQueryBuilder<TEntity, TKey, SearchObject<TKey>, EntitySortBy, EntityIncludes>(factory);
+        where TImplementation : class, IQueryBuilder<TEntity, TKey, SearchObject<TKey>, EntitySortBy, EntityIncludes>
+        => services.UseQueryBuilder<TEntity, TKey, SearchObject<TKey>, EntitySortBy, EntityIncludes, TImplementation>(factory);
 
     public static IServiceCollection AddDefaultQueryBuilder<TEntity, TKey, TSearchObject>(this IServiceCollection services)
         where TEntity : IEntity<TKey>
@@ -37,13 +39,14 @@ public static class ServiceCollectionQueryBuilderExtensions
         => services.AddDefaultQueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>();
     public static IServiceCollection UseQueryBuilder<TEntity, TKey, TSearchObject, TImplementation>(this IServiceCollection services)
         where TEntity : IEntity<TKey>
-        where TSearchObject : ISearchObject<TKey>
+        where TSearchObject : ISearchObject<TKey>, new()
         where TImplementation : class, IQueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>
         => services.UseQueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes, TImplementation>();
-    public static IServiceCollection UseQueryBuilder<TEntity, TKey, TSearchObject>(this IServiceCollection services, Func<IServiceProvider, IQueryBuilder<TEntity, TKey, TSearchObject>> factory)
+    public static IServiceCollection UseQueryBuilder<TEntity, TKey, TSearchObject, TImplementation>(this IServiceCollection services, Func<IServiceProvider, TImplementation> factory)
         where TEntity : IEntity<TKey>
-        where TSearchObject : ISearchObject<TKey>
-        => services.UseQueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>(factory);
+        where TSearchObject : ISearchObject<TKey>, new()
+        where TImplementation : class, IQueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>
+        => services.UseQueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes, TImplementation>(factory);
 
     public static IServiceCollection AddDefaultQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>(this IServiceCollection services)
         where TEntity : IEntity<int>
@@ -53,17 +56,18 @@ public static class ServiceCollectionQueryBuilderExtensions
         => services.AddDefaultQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>();
     public static IServiceCollection UseQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes, TImplementation>(this IServiceCollection services)
         where TEntity : IEntity<int>
-        where TSearchObject : ISearchObject<int>
+        where TSearchObject : ISearchObject<int>, new()
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
-        where TImplementation : class, IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>
+        where TImplementation : class, IQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>
         => services.UseQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes, TImplementation>();
-    public static IServiceCollection UseQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>(this IServiceCollection services, Func<IServiceProvider, IQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>> factory)
+    public static IServiceCollection UseQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes, TImplementation>(this IServiceCollection services, Func<IServiceProvider, TImplementation> factory)
         where TEntity : IEntity<int>
-        where TSearchObject : ISearchObject<int>
+        where TSearchObject : ISearchObject<int>, new()
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
-        => services.UseQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>(factory);
+        where TImplementation : class, IQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>
+        => services.UseQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes, TImplementation>(factory);
 
     public static IServiceCollection AddDefaultQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(this IServiceCollection services)
         where TEntity : IEntity<TKey>
@@ -78,10 +82,11 @@ public static class ServiceCollectionQueryBuilderExtensions
         where TIncludes : struct, Enum
         where TImplementation : class, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
         => services.AddTransient<IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, TImplementation>();
-    public static IServiceCollection UseQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(this IServiceCollection services, Func<IServiceProvider, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>> factory)
+    public static IServiceCollection UseQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TImplementation>(this IServiceCollection services, Func<IServiceProvider, TImplementation> factory)
         where TEntity : IEntity<TKey>
         where TSearchObject : ISearchObject<TKey>
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
+        where TImplementation : class, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
         => services.AddTransient(factory);
 }

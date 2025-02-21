@@ -26,9 +26,9 @@ public class EntityRepository<TEntity, TKey, TSearchObject>(IEntityReadService<T
     public virtual Task<long> Count(TSearchObject? so)
         => readService.Count(so);
 
-    public Task<IList<TEntity>> List(object? so, PagingInfo? pagingInfo)
+    public virtual Task<IList<TEntity>> List(object? so, PagingInfo? pagingInfo)
          => readService.List(so, pagingInfo);
-    public Task<long> Count(object? so)
+    public virtual Task<long> Count(object? so)
          => readService.Count(so);
 
 

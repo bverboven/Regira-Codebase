@@ -86,24 +86,6 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
         return this;
     }
 
-    // Query Builders
-    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddDefaultQueryBuilder()
-    {
-        Services.AddDefaultQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>();
-        return this;
-    }
-    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> UseQueryBuilder<TImplementation>()
-        where TImplementation : class, IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>
-    {
-        Services.UseQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes, TImplementation>();
-        return this;
-    }
-    public ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> UseQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>> factory)
-    {
-        Services.UseQueryBuilder(factory);
-        return this;
-    }
-
     // Query Filters
     public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, int, TSearchObject>
@@ -238,9 +220,10 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
         Services.UseQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TImplementation>();
         return this;
     }
-    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> UseQueryBuilder(Func<IServiceProvider, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>> factory)
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> UseQueryBuilder<TQueryBuilder>(Func<IServiceProvider, TQueryBuilder> factory)
+        where TQueryBuilder : class, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
     {
-        Services.UseQueryBuilder(factory);
+        Services.UseQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TQueryBuilder>(factory);
         return this;
     }
 

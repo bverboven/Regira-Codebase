@@ -13,7 +13,7 @@ public class QueryBuilder<TEntity>(
     ISortedQueryBuilder<TEntity, int>? sortedQueryBuilder = null,
     IIncludableQueryBuilder<TEntity, int>? includableQueryBuilder = null,
     ILoggerFactory? loggerFactory = null
-) : QueryBuilder<TEntity, int>(globalFilters, filters, sortedQueryBuilder, includableQueryBuilder, loggerFactory), IQueryBuilder<TEntity>
+) : QueryBuilder<TEntity, int>(globalFilters, filters, sortedQueryBuilder, includableQueryBuilder, loggerFactory)//, IQueryBuilder<TEntity>
     where TEntity : IEntity<int>;
 
 public class QueryBuilder<TEntity, TKey>(
@@ -22,7 +22,7 @@ public class QueryBuilder<TEntity, TKey>(
     ISortedQueryBuilder<TEntity, TKey>? sortedQueryBuilder = null,
     IIncludableQueryBuilder<TEntity, TKey>? includableQueryBuilder = null,
     ILoggerFactory? loggerFactory = null
-) : QueryBuilder<TEntity, TKey, SearchObject<TKey>>(globalFilters, filters, sortedQueryBuilder, includableQueryBuilder, loggerFactory), IQueryBuilder<TEntity, TKey>
+) : QueryBuilder<TEntity, TKey, SearchObject<TKey>>(globalFilters, filters, sortedQueryBuilder, includableQueryBuilder, loggerFactory)//, IQueryBuilder<TEntity, TKey>
     where TEntity : IEntity<TKey>;
 
 public class QueryBuilder<TEntity, TKey, TSearchObject>(
@@ -32,8 +32,7 @@ public class QueryBuilder<TEntity, TKey, TSearchObject>(
     IIncludableQueryBuilder<TEntity, TKey>? includableQueryBuilder = null,
     ILoggerFactory? loggerFactory = null
 )
-    : QueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>(globalFilters, filters, sortedQueryBuilder, includableQueryBuilder, loggerFactory),
-        IQueryBuilder<TEntity, TKey, TSearchObject>
+    : QueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>(globalFilters, filters, sortedQueryBuilder, includableQueryBuilder, loggerFactory)//, IQueryBuilder<TEntity, TKey, TSearchObject>
     where TEntity : IEntity<TKey>
     where TSearchObject : ISearchObject<TKey>
 {
@@ -47,8 +46,7 @@ public class QueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>(
     ISortedQueryBuilder<TEntity, int>? sortedQueryBuilder = null,
     IIncludableQueryBuilder<TEntity, int>? includableQueryBuilder = null,
     ILoggerFactory? loggerFactory = null)
-    : QueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>(globalFilters, filters, sortedQueryBuilder, includableQueryBuilder, loggerFactory),
-        IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>
+    : QueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>(globalFilters, filters, sortedQueryBuilder, includableQueryBuilder, loggerFactory)//, IQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>
     where TEntity : IEntity<int>
     where TSearchObject : ISearchObject<int>
     where TSortBy : struct, Enum

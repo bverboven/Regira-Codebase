@@ -27,7 +27,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     {
         var builder = new EntityServiceBuilder<TContext, TEntity>(this);
         configure?.Invoke(builder);
-        
+
         // Query Builder
         if (!builder.HasService<IQueryBuilder<TEntity, int, SearchObject<int>, EntitySortBy, EntityIncludes>>())
         {
@@ -42,6 +42,15 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         if (!builder.HasService<IEntityWriteService<TEntity, int>>())
         {
             builder.UseWriteService<EntityWriteService<TContext, TEntity>>();
+        }
+        // Entity Repository
+        if (!builder.HasService<IEntityRepository<TEntity>>())
+        {
+            builder.HasRepository<EntityRepository<TEntity>>();
+        }
+        if (!builder.HasService<IEntityRepository<TEntity>>())
+        {
+            Services.AddTransient<IEntityRepository<TEntity, int, SearchObject<int>>, EntityRepository<TEntity, int, SearchObject<int>>>();
         }
         // Entity Service
         if (!builder.HasService<IEntityService<TEntity>>())
@@ -67,7 +76,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     {
         var builder = new EntityServiceBuilder<TContext, TEntity, TKey>(this);
         configure?.Invoke(builder);
-        
+
         // Query Builder
         if (!builder.HasService<IQueryBuilder<TEntity, TKey, SearchObject<TKey>, EntitySortBy, EntityIncludes>>())
         {
@@ -204,7 +213,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     // Complex service with attachments
     public EntityServiceCollection<TContext> ConfigureAttachmentService(Func<IServiceProvider, IFileService> factory)
     {
-        Services.AddTransient<IQueryBuilder<Attachment, int, AttachmentSearchObject>>(p =>
+        Services.AddTransient<IQueryBuilder<Attachment, int, AttachmentSearchObject, EntitySortBy, EntityIncludes>>(p =>
             new QueryBuilder<Attachment, int, AttachmentSearchObject>(
                 p.GetServices<IGlobalFilteredQueryBuilder>(),
             [
@@ -229,7 +238,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     /// <returns></returns>
     public EntityServiceCollection<TContext> ConfigureAttachmentService<TKey>(Func<IServiceProvider, IFileService> factory)
     {
-        Services.AddTransient<IQueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>>(p =>
+        Services.AddTransient<IQueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>, EntitySortBy, EntityIncludes>>(p =>
             new QueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>(
                 p.GetServices<IGlobalFilteredQueryBuilder>(),
                 [
