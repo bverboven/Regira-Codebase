@@ -422,7 +422,7 @@ public class TestFor3Services
         using var sp = new ServiceCollection()
             .AddDbContext<ContosoContext>()
             .UseEntities<ContosoContext>()
-            .For<Course, int, CourseSearchObject>(e => e.UseEntityService<CourseServiceB>())
+            .For<Course, int, CourseSearchObject>(e => e.UseEntityService<CourseService3B>())
             .BuildServiceProvider();
 
         var entityNormalizer = sp.GetService<IEntityNormalizer>();
@@ -440,8 +440,8 @@ public class TestFor3Services
         var entityService2 = sp.GetService<IEntityService<Course, int>>();
         var entityService3 = sp.GetService<IEntityService<Course, int, CourseSearchObject>>();
 
-        Assert.That(entityService2, Is.TypeOf<CourseServiceB>());
-        Assert.That(entityService3, Is.TypeOf<CourseServiceB>());
+        Assert.That(entityService2, Is.TypeOf<CourseService3B>());
+        Assert.That(entityService3, Is.TypeOf<CourseService3B>());
 
         Assert.That(entityNormalizer, Is.Null);
         Assert.That(globalFilters, Is.Empty);
@@ -466,8 +466,8 @@ public class TestFor3Services
             .For<Course, int, CourseSearchObject>(e =>
             {
                 // define custom EntityService interface
-                e.AddTransient<ICourseServiceB, CourseRepository3B>();
-                e.UseEntityService<CustomCourseServiceB>();
+                e.AddTransient<ICourseService3B, CourseRepository3B>();
+                e.UseEntityService<CustomCourseService3B>();
             })
             .BuildServiceProvider();
 
@@ -486,9 +486,9 @@ public class TestFor3Services
         var entityService2 = sp.GetService<IEntityService<Course, int>>();
         var entityService3 = sp.GetService<IEntityService<Course, int, CourseSearchObject>>();
 
-        Assert.That(entityService2, Is.TypeOf<CustomCourseServiceB>());
-        Assert.That(entityService3, Is.TypeOf<CustomCourseServiceB>());
-        
+        Assert.That(entityService2, Is.TypeOf<CustomCourseService3B>());
+        Assert.That(entityService3, Is.TypeOf<CustomCourseService3B>());
+
         Assert.That(entityNormalizer, Is.Null);
         Assert.That(globalFilters, Is.Empty);
         Assert.That(queryFilters, Is.Empty);
@@ -521,8 +521,8 @@ public class TestFor3Services
                 e.AddPrimer<CoursePrimer>();
                 e.HasRepository<CourseRepository3B>();
                 e.HasManager<CourseManager3B>();
-                e.AddTransient<ICourseServiceB, CourseManager3B>();
-                e.UseEntityService<CustomCourseServiceB>();
+                e.AddTransient<ICourseService3B, CourseManager3B>();
+                e.UseEntityService<CustomCourseService3B>();
             })
             .BuildServiceProvider();
 
@@ -564,8 +564,8 @@ public class TestFor3Services
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Course, int>>());
         Assert.That(repo2, Is.TypeOf<CourseRepository3B>());
         Assert.That(repo3, Is.TypeOf<CourseRepository3B>());
-        Assert.That(entityService2, Is.TypeOf<CustomCourseServiceB>());
-        Assert.That(entityService3, Is.TypeOf<CustomCourseServiceB>());
+        Assert.That(entityService2, Is.TypeOf<CustomCourseService3B>());
+        Assert.That(entityService3, Is.TypeOf<CustomCourseService3B>());
         Assert.That(manager2, Is.TypeOf<CourseManager3B>());
         Assert.That(manager3, Is.TypeOf<CourseManager3B>());
     }

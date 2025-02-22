@@ -466,7 +466,7 @@ public class TestFor2Services
             .For<Course, int>(e =>
             {
                 // define custom EntityService interface
-                e.AddTransient<ICourseServiceA, CourseRepository2>();
+                e.AddTransient<ICourseService3A, CourseRepository2>();
                 e.UseEntityService<CustomCourseServiceA>();
             })
             .BuildServiceProvider();
@@ -521,7 +521,7 @@ public class TestFor2Services
                 e.AddPrimer<CoursePrimer>();
                 e.HasRepository<CourseRepository2>();
                 e.HasManager<CourseManager2>();
-                e.AddTransient<ICourseServiceA, CourseManager2>();
+                e.AddTransient<ICourseService3A, CourseManager2>();
                 e.UseEntityService<CustomCourseServiceA>();
             })
             .BuildServiceProvider();

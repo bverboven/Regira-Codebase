@@ -133,27 +133,36 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         return this;
     }
     public EntityServiceCollection<TContext> For<TEntity, TSearchObject, TSortBy, TIncludes>
-        (Action<ComplexEntityServiceBuilder<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>>? configure = null)
+        (Action<ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>? configure = null)
         where TEntity : class, IEntity<int>
         where TSearchObject : class, ISearchObject<int>, new()
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
     {
         var simpleBuilder = new EntityServiceBuilder<TContext, TEntity, int, TSearchObject>(this);
-        var builder = new ComplexEntityServiceBuilder<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>(simpleBuilder);
+        var builder = new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(simpleBuilder);
         configure?.Invoke(builder);
-
+        
+        // Query Builder
         if (!builder.HasService<IQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>>())
         {
             builder.AddDefaultQueryBuilder();
         }
+
+        // Read Service
         if (!builder.HasService<IEntityReadService<TEntity, int, TSearchObject, TSortBy, TIncludes>>())
         {
             builder.UseReadService<EntityReadService<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>();
         }
+        // Write Service
         if (!builder.HasService<IEntityWriteService<TEntity, int>>())
         {
             builder.UseWriteService<EntityWriteService<TContext, TEntity>>();
+        }
+        // Entity Repository
+        if (!builder.HasService<IEntityRepository<TEntity>>())
+        {
+            builder.HasRepositoryInner<EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
         }
         if (!builder.HasEntityService())
         {

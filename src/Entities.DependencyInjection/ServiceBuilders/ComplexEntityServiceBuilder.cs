@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.QueryBuilders;
+using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models.Abstractions;
@@ -17,33 +18,6 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
-    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> HasRepository<TService>()
-        where TService : class, IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>
-    {
-        base.HasRepository<TService>();
-        Services.AddTransient<IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>, TService>();
-        return this;
-    }
-    public ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> HasRepository(Func<IServiceProvider, IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>> factory)
-    {
-        base.HasRepository(factory);
-        Services.AddTransient(factory);
-        return this;
-    }
-    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> HasManager<TService>()
-        where TService : class, IEntityManager<TEntity, TSearchObject, TSortBy, TIncludes>
-    {
-        base.HasManager<TService>();
-        Services.AddTransient<IEntityManager<TEntity, TSearchObject, TSortBy, TIncludes>, TService>();
-        return this;
-    }
-    public ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> HasManager(Func<IServiceProvider, IEntityManager<TEntity, TSearchObject, TSortBy, TIncludes>> factory)
-    {
-        base.HasManager(factory);
-        Services.AddTransient(factory);
-        return this;
-    }
-
     // Entity service
     public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddDefaultService()
         => UseEntityService<EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
@@ -78,11 +52,71 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
         return this;
     }
 
-    // Read Service
-    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> UseReadService<TService>()
-        where TService : class, IEntityReadService<TEntity, int, TSearchObject, TSortBy, TIncludes>
+    // Entity Repository
+    protected internal new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> HasRepositoryInner<TService>()
+        where TService : class, IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>, IEntityRepository<TEntity>
     {
-        base.UseReadService<TService>();
+        Services.AddTransient<IEntityRepository<TEntity>, TService>();
+        Services.AddTransient<IEntityRepository<TEntity, int>, TService>();
+        Services.AddTransient<IEntityRepository<TEntity, int, TSearchObject>, TService>();
+        Services.AddTransient<IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>, TService>();
+        Services.AddTransient<IEntityRepository<TEntity, int, TSearchObject, TSortBy, TIncludes>, TService>();
+        return this;
+    }
+    protected internal new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> HasRepositoryInner<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>, IEntityRepository<TEntity>
+    {
+        Services.AddTransient(factory);
+        Services.AddTransient<IEntityRepository<TEntity, int>>(factory);
+        Services.AddTransient<IEntityRepository<TEntity, int, TSearchObject>>(factory);
+        Services.AddTransient<IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>(factory);
+        Services.AddTransient<IEntityRepository<TEntity, int, TSearchObject, TSortBy, TIncludes>>(factory);
+        return this;
+    }
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> HasRepository<TService>()
+        where TService : class, IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>, IEntityRepository<TEntity>
+    {
+        UseEntityService<TService>();
+        HasRepositoryInner<TService>();
+        return this;
+    }
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> HasRepository<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>, IEntityRepository<TEntity>
+    {
+        UseEntityService(factory);
+        HasRepositoryInner(factory);
+        return this;
+    }
+
+    // Entity Manager
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> HasManager<TService>()
+        where TService : class, IEntityManager<TEntity, TSearchObject, TSortBy, TIncludes>, IEntityManager<TEntity>
+    {
+        UseEntityService<TService>();
+        Services.AddTransient<IEntityManager<TEntity>, TService>();
+        Services.AddTransient<IEntityManager<TEntity, int>, TService>();
+        Services.AddTransient<IEntityManager<TEntity, int, TSearchObject>, TService>();
+        Services.AddTransient<IEntityManager<TEntity, TSearchObject, TSortBy, TIncludes>, TService>();
+        Services.AddTransient<IEntityManager<TEntity, int, TSearchObject, TSortBy, TIncludes>, TService>();
+        return this;
+    }
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> HasManager<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityManager<TEntity, TSearchObject, TSortBy, TIncludes>, IEntityManager<TEntity>
+    {
+        UseEntityService(factory);
+        Services.AddTransient(factory);
+        Services.AddTransient<IEntityManager<TEntity, int>>(factory);
+        Services.AddTransient<IEntityManager<TEntity, int, TSearchObject>>(factory);
+        Services.AddTransient<IEntityManager<TEntity, TSearchObject, TSortBy, TIncludes>>(factory);
+        Services.AddTransient<IEntityManager<TEntity, int, TSearchObject, TSortBy, TIncludes>>(factory);
+        return this;
+    }
+
+    // Query Builders
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddDefaultQueryBuilder()
+    {
+        Services.AddDefaultQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>();
+        Services.UseQueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes, QueryBuilder<TEntity, TSearchObject, TSortBy, TIncludes>>();
         return this;
     }
 
@@ -103,20 +137,12 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
-    /// <summary>
-    /// <inheritdoc cref="EntityServiceBuilder{TContext,TEntity}.HasRepository{TService}"/><br />
-    /// <list type="bullet">
-    ///     <item><see cref="IEntityRepository{TEntity, TSearchObject, TSortBy, TIncludes}"/></item>
-    ///     <item><see cref="IEntityRepository{TEntity, TKey, TSearchObject, TSortBy, TIncludes}"/></item>
-    /// </list>
-    /// </summary>
-    /// <typeparam name="TService"></typeparam>
-    /// <returns></returns>
+    // Entity Repository
     public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> HasRepository<TService>()
         where TService : class, IEntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
     {
-        base.HasRepository<TService>();
-        Services.AddTransient<IEntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, TService>();
+        UseEntityService<TService>();
+        HasRepositoryInner<TService>();
         return this;
     }
     /// <summary>
@@ -128,10 +154,11 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
     /// </summary>
     /// <param name="factory"></param>
     /// <returns></returns>
-    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> HasRepository(Func<IServiceProvider, IEntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>> factory)
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> HasRepository<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, IEntityRepository<TEntity, TKey>
     {
-        base.HasRepository(factory);
-        Services.AddTransient(factory);
+        UseEntityService(factory);
+        HasRepositoryInner(factory);
         return this;
     }
     /// <summary>
@@ -146,7 +173,9 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
     public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> HasManager<TService>()
         where TService : class, IEntityManager<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
     {
-        base.HasManager<TService>();
+        UseEntityService<TService>();
+        Services.AddTransient<IEntityManager<TEntity, TKey>, TService>();
+        Services.AddTransient<IEntityManager<TEntity, TKey, TSearchObject>, TService>();
         Services.AddTransient<IEntityManager<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, TService>();
         return this;
     }
@@ -161,7 +190,7 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
     /// <returns></returns>
     public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> HasManager(Func<IServiceProvider, IEntityManager<TEntity, TKey, TSearchObject, TSortBy, TIncludes>> factory)
     {
-        base.HasManager(factory);
+        UseEntityService(factory);
         Services.AddTransient(factory);
         return this;
     }
@@ -204,6 +233,7 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
         where TService : class, IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
     {
         Services.AddTransient<IEntityReadService<TEntity, TKey>, TService>();
+        Services.AddTransient<IEntityReadService<TEntity, TKey, TSearchObject>, TService>();
         Services.AddTransient<IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, TService>();
         return this;
     }

@@ -32,7 +32,7 @@ public interface IEntityServiceCollection<TContext>
         where TSearchObject : class, ISearchObject<TKey>, new();
 
     EntityServiceCollection<TContext> For<TEntity, TSearchObject, TSortBy, TIncludes>
-        (Action<ComplexEntityServiceBuilder<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>>? configure = null)
+        (Action<ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>? configure = null)
         where TEntity : class, IEntity<int>
         where TSearchObject : class, ISearchObject<int>, new()
         where TSortBy : struct, Enum
