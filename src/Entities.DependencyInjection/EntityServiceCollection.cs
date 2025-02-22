@@ -159,11 +159,14 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         {
             builder.UseWriteService<EntityWriteService<TContext, TEntity>>();
         }
+
         // Entity Repository
-        if (!builder.HasService<IEntityRepository<TEntity>>())
+        if (!builder.HasService<IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>())
         {
             builder.HasRepositoryInner<EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
         }
+
+        // Entity Service
         if (!builder.HasEntityService())
         {
             builder.AddTransient<IEntityService<TEntity>, EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
@@ -196,19 +199,31 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         var simpleBuilder = new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(this);
         var builder = new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(simpleBuilder);
         configure?.Invoke(builder);
-
+        
+        // Query Builder
         if (!builder.HasService<IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>())
         {
             builder.AddDefaultQueryBuilder();
         }
+
+        // Read Service
         if (!builder.HasService<IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>())
         {
             builder.UseReadService<EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
         }
+        // Write Service
         if (!builder.HasService<IEntityWriteService<TEntity, TKey>>())
         {
             builder.UseWriteService<EntityWriteService<TContext, TEntity, TKey>>();
         }
+
+        // Entity Repository
+        if (!builder.HasService<IEntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>())
+        {
+            builder.HasRepositoryInner<EntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+        }
+
+        // Entity Service
         if (!builder.HasEntityService())
         {
             builder.AddTransient<IEntityService<TEntity, TKey>, EntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
