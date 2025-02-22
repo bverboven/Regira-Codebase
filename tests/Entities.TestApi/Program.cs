@@ -65,7 +65,7 @@ builder.Services
     .AddPersons()
     // Attachments
     // FileSystem storage
-    .ConfigureAttachmentService(_ => new BinaryFileService(new FileSystemOptions { RootFolder = ApiConfiguration.AttachmentsDirectory }))
+    .WithAttachments(_ => new BinaryFileService(new FileSystemOptions { RootFolder = ApiConfiguration.AttachmentsDirectory }))
     // Azure storage
     /*
     .ConfigureAttachmentService(_ => new BinaryBlobService(new AzureCommunicator(new AzureConfig

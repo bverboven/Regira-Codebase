@@ -23,10 +23,10 @@ public static class CourseServiceCollectionExtensions
                 e.UseWriteService<CourseEntityWriteService>();
                 //e.UseEntityService<CourseRepository>();
                 e.AddMapping<CourseDto, CourseInputDto>();
-                e.HasAttachments<TContext, Course, CourseAttachment>(a =>
-                {
-                    a.AddMapping<CourseAttachmentDto, CourseAttachmentInputDto>();
-                });
+                //e.HasAttachments<TContext, Course, CourseAttachment>(a =>
+                //{
+                //    a.AddMapping<CourseAttachmentDto, CourseAttachmentInputDto>();
+                //});
                 // extra person filter
                 e.AddTransient<IFilteredQueryBuilder<Person, int, PersonSearchObject>, CoursePersonQueryFilter>();
             });

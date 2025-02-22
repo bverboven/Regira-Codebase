@@ -15,20 +15,31 @@ namespace Regira.Entities.EFcore.Attachments;
 public class AttachmentRepository<TContext>
     (
         TContext dbContext, IFileService fileService,
-        IEntityReadService<Attachment<int>, int, AttachmentSearchObject<int>> readService,
-        IEntityWriteService<Attachment<int>, int> writeService)
-    : AttachmentRepository<TContext, int>(dbContext, fileService, readService, writeService), IAttachmentService
+        IEntityReadService<Attachment, int, AttachmentSearchObject> readService,
+        IEntityWriteService<Attachment, int> writeService)
+    : AttachmentRepository<TContext, Attachment, int, AttachmentSearchObject>(dbContext, fileService, readService, writeService)
     where TContext : DbContext;
-public class AttachmentRepository<TContext, TKey>(
+
+public class AttachmentRepository<TContext, TKey>
+(
     TContext dbContext, IFileService fileService,
     IEntityReadService<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>> readService,
     IEntityWriteService<Attachment<TKey>, TKey> writeService)
-    : EntityRepository<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>(readService, writeService), IAttachmentService<TKey>
-    where TContext : DbContext
-{
-    public virtual DbSet<Attachment<TKey>> DbSet => dbContext.Set<Attachment<TKey>>();
+    : AttachmentRepository<TContext, Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>(dbContext, fileService, readService, writeService)
+    where TContext : DbContext;
 
-    public override async Task<Attachment<TKey>?> Details(TKey id)
+public class AttachmentRepository<TContext, TAttachment, TKey, TAttachmentSearchObject>(
+    TContext dbContext, IFileService fileService,
+    IEntityReadService<TAttachment, TKey, TAttachmentSearchObject> readService,
+    IEntityWriteService<TAttachment, TKey> writeService)
+    : EntityRepository<TAttachment, TKey, TAttachmentSearchObject>(readService, writeService), IAttachmentService<TAttachment, TKey, TAttachmentSearchObject>
+    where TContext : DbContext
+    where TAttachment : class, IAttachment<TKey>, new()
+    where TAttachmentSearchObject : AttachmentSearchObject<TKey>, new()
+{
+    public virtual DbSet<TAttachment> DbSet => dbContext.Set<TAttachment>();
+
+    public override async Task<TAttachment?> Details(TKey id)
     {
         var item = await base.Details(id);
         if (item != null)
@@ -39,7 +50,7 @@ public class AttachmentRepository<TContext, TKey>(
 
         return item;
     }
-    public override async Task<IList<Attachment<TKey>>> List(AttachmentSearchObject<TKey>? so = null, PagingInfo? pagingInfo = null)
+    public override async Task<IList<TAttachment>> List(TAttachmentSearchObject? so = null, PagingInfo? pagingInfo = null)
     {
         var items = await base.List(so, pagingInfo);
         foreach (var item in items)
@@ -50,14 +61,14 @@ public class AttachmentRepository<TContext, TKey>(
     }
 
 
-    public override async Task Add(Attachment<TKey> item)
+    public override async Task Add(TAttachment item)
     {
         PrepareItem(item);
 
         await SaveFile(item);
         await base.Add(item);
     }
-    public override async Task<Attachment<TKey>?> Modify(Attachment<TKey> item)
+    public override async Task<TAttachment?> Modify(TAttachment item)
     {
         PrepareItem(item);
 
@@ -66,13 +77,13 @@ public class AttachmentRepository<TContext, TKey>(
 
         return original;
     }
-    public override async Task Remove(Attachment<TKey> item)
+    public override async Task Remove(TAttachment item)
     {
         await RemoveFile(item);
         await base.Remove(item);
     }
 
-    public async Task<byte[]?> GetBytes(IAttachment<TKey> item)
+    public async Task<byte[]?> GetBytes(TAttachment item)
     {
         if (string.IsNullOrWhiteSpace(item.Identifier))
         {
@@ -81,7 +92,7 @@ public class AttachmentRepository<TContext, TKey>(
 
         return await fileService.GetBytes(item.Identifier);
     }
-    public async Task SaveFile(Attachment<TKey> item)
+    public async Task SaveFile(TAttachment item)
     {
         if (!item.HasContent())
         {
@@ -119,7 +130,7 @@ public class AttachmentRepository<TContext, TKey>(
         item.Prefix = fileService.GetRelativeFolder(item.Identifier);
         item.FileName ??= Path.GetFileName(item.Identifier);
     }
-    public async Task RemoveFile(IAttachment<TKey> item)
+    public async Task RemoveFile(TAttachment item)
     {
         var path = item.Path;
         if (string.IsNullOrWhiteSpace(path))
@@ -135,14 +146,14 @@ public class AttachmentRepository<TContext, TKey>(
         await fileService.Delete(path);
     }
 
-    public virtual void PrepareItem(Attachment<TKey> item)
+    public virtual void PrepareItem(TAttachment item)
     {
         if (string.IsNullOrWhiteSpace(item.ContentType))
         {
             item.ContentType = ContentTypeUtility.GetContentType(item.FileName);
         }
     }
-    public virtual void ProcessItem(IAttachment<TKey> item)
+    public virtual void ProcessItem(TAttachment item)
     {
         if (!string.IsNullOrWhiteSpace(item.Path))
         {

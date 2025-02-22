@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Regira.Entities.Attachments.Abstractions;
+﻿using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Normalizing;
+using System.ComponentModel.DataAnnotations;
 
 namespace Testing.Library.Contoso;
 
@@ -26,7 +26,7 @@ public class Course : IEntityWithSerial, IHasNormalizedTitle, IHasAttachments, I
 
     ICollection<IEntityAttachment>? IHasAttachments.Attachments
     {
-        get => Attachments?.ToArray();
+        get => Attachments?.Cast<IEntityAttachment>().ToArray();
         set => Attachments = value?.Cast<CourseAttachment>().ToArray();
     }
     public ICollection<CourseAttachment>? Attachments { get; set; }

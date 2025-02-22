@@ -1,27 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
+using Regira.Entities.Keywords;
 using Regira.Entities.Keywords.Abstractions;
 
 namespace Regira.Entities.EFcore.Attachments;
 
-public class AttachmentFilteredQueryBuilder(IQKeywordHelper qHelper) : AttachmentFilteredQueryBuilder<int>(qHelper),
-    IFilteredQueryBuilder<Attachment, int, AttachmentSearchObject>
-{
-    public IQueryable<Attachment> Build(IQueryable<Attachment> query, AttachmentSearchObject? so)
-    {
-        return base.Build(query, so)
-            .Cast<Attachment>();
-    }
-}
+public class AttachmentFilteredQueryBuilder(IQKeywordHelper? qHelper = null) : AttachmentFilteredQueryBuilder<Attachment, int, AttachmentSearchObject>(qHelper);
 
-public class AttachmentFilteredQueryBuilder<TKey>(IQKeywordHelper qHelper) : FilteredQueryBuilderBase<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>
+public class AttachmentFilteredQueryBuilder<TAttachment, TKey, TAttachmentSearchObject>(IQKeywordHelper? qHelper = null) : FilteredQueryBuilderBase<TAttachment, TKey, TAttachmentSearchObject>
+    where TAttachment : IAttachment<TKey>
+    where TAttachmentSearchObject : AttachmentSearchObject<TKey>
 {
-    public override IQueryable<Attachment<TKey>> Build(IQueryable<Attachment<TKey>> query, AttachmentSearchObject<TKey>? so)
+    protected IQKeywordHelper QHelper { get; } = qHelper ?? new QKeywordHelper();
+
+    public override IQueryable<TAttachment> Build(IQueryable<TAttachment> query, TAttachmentSearchObject? so)
     {
         if (!string.IsNullOrWhiteSpace(so?.FileName))
         {
-            var kw = qHelper.ParseKeyword(so.FileName);
+            var kw = QHelper.ParseKeyword(so.FileName);
             query = kw.HasWildcard
                 ? query.Where(x => EF.Functions.Like(x.FileName!, kw.Q!))
                 : query.Where(x => x.FileName == so.FileName);

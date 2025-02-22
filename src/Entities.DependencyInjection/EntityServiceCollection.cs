@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
@@ -7,10 +6,8 @@ using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Abstractions;
 using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.EFcore.Attachments;
-using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
-using Regira.Entities.Keywords.Abstractions;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Attachments.Models;
@@ -142,7 +139,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         var simpleBuilder = new EntityServiceBuilder<TContext, TEntity, int, TSearchObject>(this);
         var builder = new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(simpleBuilder);
         configure?.Invoke(builder);
-        
+
         // Query Builder
         if (!builder.HasService<IQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>>())
         {
@@ -199,7 +196,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         var simpleBuilder = new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(this);
         var builder = new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(simpleBuilder);
         configure?.Invoke(builder);
-        
+
         // Query Builder
         if (!builder.HasService<IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>())
         {
@@ -235,58 +232,34 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     }
 
 
-    // Complex service with attachments
-    public EntityServiceCollection<TContext> ConfigureAttachmentService(Func<IServiceProvider, IFileService> factory)
+    // Service with attachments
+    public EntityServiceCollection<TContext> WithAttachments(Func<IServiceProvider, IFileService> factory, Action<EntityServiceBuilder<TContext, Attachment, int, AttachmentSearchObject>>? configure = null)
+        => WithAttachments<Attachment, int, AttachmentSearchObject>(factory, configure);
+    public EntityServiceCollection<TContext> WithAttachments<TAttachment, TKey, TAttachmentSearchObject>(
+        Func<IServiceProvider, IFileService> factory,
+        Action<EntityServiceBuilder<TContext, TAttachment, TKey, TAttachmentSearchObject>>? configure = null
+    )
+        where TAttachment : class, IAttachment<TKey>, new()
+        where TAttachmentSearchObject : AttachmentSearchObject<TKey>, new()
     {
-        Services.AddTransient<IQueryBuilder<Attachment, int, AttachmentSearchObject, EntitySortBy, EntityIncludes>>(p =>
-            new QueryBuilder<Attachment, int, AttachmentSearchObject>(
-                p.GetServices<IGlobalFilteredQueryBuilder>(),
-            [
-                new AttachmentFilteredQueryBuilder(p.GetRequiredService<IQKeywordHelper>())
-            ])
-        );
-        Services.AddTransient<IAttachmentService>(p
-            => new AttachmentRepository<TContext>(
-                p.GetRequiredService<TContext>(),
-                factory(p),
-                p.GetRequiredService<IEntityReadService<Attachment<int>, int, AttachmentSearchObject<int>>>(),
-                p.GetRequiredService<IEntityWriteService<Attachment<int>, int>>()
-            ));
-        return ConfigureAttachmentService<int>(factory);
-    }
+        Services.AddTransient(factory);
 
-    /// <summary>
-    /// Adds <see cref="IAttachmentService"/> to <see cref="IServiceCollection"/> with an implementation of <see cref="IFileService"/>.<br />
-    /// Adds <see cref="IMappingExpression">AutoMapper maps</see> for <see cref="Attachment" /> to <see cref="AttachmentDto"/> and <see cref="AttachmentInputDto"/> to <see cref="Attachment" />.
-    /// </summary>
-    /// <param name="factory"></param>
-    /// <returns></returns>
-    public EntityServiceCollection<TContext> ConfigureAttachmentService<TKey>(Func<IServiceProvider, IFileService> factory)
-    {
-        Services.AddTransient<IQueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>, EntitySortBy, EntityIncludes>>(p =>
-            new QueryBuilder<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>(
-                p.GetServices<IGlobalFilteredQueryBuilder>(),
-                [
-                    new AttachmentFilteredQueryBuilder<TKey>(p.GetRequiredService<IQKeywordHelper>())
-                ]
-            )
-        );
+        var builder = new EntityServiceBuilder<TContext, TAttachment, TKey, TAttachmentSearchObject>(this);
+
+        builder.For<TAttachment, TKey, TAttachmentSearchObject>(e =>
+        {
+            e.UseEntityService<AttachmentRepository<TContext, TAttachment, TKey, TAttachmentSearchObject>>();
+            e.AddQueryFilter<AttachmentFilteredQueryBuilder<TAttachment, TKey, TAttachmentSearchObject>>();
+            e.AddTransient<IAttachmentService<TAttachment, TKey, TAttachmentSearchObject>, AttachmentRepository<TContext, TAttachment, TKey, TAttachmentSearchObject>>();
+            configure?.Invoke(e);
+        });
+
         Services
-            .AddTransient<IAttachmentService<TKey>>(p
-                => new AttachmentRepository<TContext, TKey>(
-                    p.GetRequiredService<TContext>(),
-                    factory(p),
-                    p.GetRequiredService<IEntityReadService<Attachment<TKey>, TKey, AttachmentSearchObject<TKey>>>(),
-                    p.GetRequiredService<IEntityWriteService<Attachment<TKey>, TKey>>()
-                )
-            )
             .AddAutoMapper(cfg =>
             {
-                cfg.CreateMap<Attachment<TKey>, AttachmentDto<TKey>>()
+                cfg.CreateMap<TAttachment, AttachmentDto<TKey>>()
                     .ReverseMap();
-                cfg.CreateMap<AttachmentInputDto<TKey>, Attachment<TKey>>();
-                //cfg.CreateMap<EntityAttachmentBase, EntityAttachmentDto>()
-                //    .IncludeAllDerived();
+                cfg.CreateMap<AttachmentInputDto<TKey>, TAttachment>();
             });
         return this;
     }

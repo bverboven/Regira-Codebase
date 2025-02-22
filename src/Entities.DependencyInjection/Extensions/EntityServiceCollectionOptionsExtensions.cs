@@ -2,6 +2,11 @@
 using Regira.Entities.DependencyInjection.Normalizers;
 using Regira.Entities.DependencyInjection.Primers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
+using Regira.Entities.EFcore.Normalizing;
+using Regira.Entities.EFcore.Primers;
+using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
+using Regira.Entities.Keywords;
+using Regira.Normalizing;
 using Regira.Normalizing.Models;
 
 #if NETCOREAPP3_1_OR_GREATER
@@ -21,6 +26,32 @@ public static class EntityServiceCollectionOptionsExtensions
             => ConfigureNormalizingFunc = configure;
 
     }
+    /// <summary>
+    /// Adds default services
+    /// Primers
+    /// <list type="bullet">
+    ///     <item><see cref="HasCreatedDbPrimer"/></item>
+    ///     <item><see cref="HasLastModifiedDbPrimer"/></item>
+    ///     <item><see cref="ArchivablePrimer"/></item>
+    /// </list>
+    /// Normalizing
+    /// <list type="bullet">
+    ///     <item><see cref="DefaultNormalizer"/></item>
+    ///     <item><see cref="QKeywordHelper"/></item>
+    ///     <item><see cref="ObjectNormalizer"/></item>
+    ///     <item><see cref="DefaultEntityNormalizer"/></item>
+    /// </list>
+    /// QueryFilters
+    /// <list type="bullet">
+    ///     <item><see cref="FilterIdsQueryBuilder"/></item>
+    ///     <item><see cref="FilterArchivablesQueryBuilder"/></item>
+    ///     <item><see cref="FilterHasCreatedQueryBuilder"/></item>
+    ///     <item><see cref="FilterHasLastModifiedQueryBuilder"/></item>
+    /// </list>
+    /// </summary>
+    /// <param name="options"></param>
+    /// <param name="configure"></param>
+    /// <returns></returns>
     public static EntityServiceCollectionOptions UseDefaults(this EntityServiceCollectionOptions options, Action<EntityDefaultOptions>? configure = null)
     {
         var entityDefaultOptions = new EntityDefaultOptions();

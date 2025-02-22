@@ -21,7 +21,7 @@ public static class PersonServiceCollectionExtensions
                 e.AddQueryFilter<PersonQueryFilter>();
                 e.UseQueryBuilder<PersonQueryBuilder>();
                 e.AddMapping<PersonDto, PersonInputDto>();
-                e.HasAttachments<TContext, Person, PersonAttachment>();
+                //e.HasAttachments<TContext, Person, PersonAttachment>();
                 e.AddNormalizer<PersonNormalizer>();
             });
 

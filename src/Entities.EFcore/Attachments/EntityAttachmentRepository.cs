@@ -11,7 +11,7 @@ using Regira.IO.Extensions;
 namespace Regira.Entities.EFcore.Attachments;
 
 public class EntityAttachmentRepository<TContext, TEntity, TEntityAttachment>(
-    IAttachmentService attachmentService,
+    IAttachmentService<Attachment, int> attachmentService,
     IEntityReadService<TEntityAttachment, int, SearchObject<int>> readService,
     IEntityWriteService<TEntityAttachment, int> writeService,
     IIdentifierGenerator? identifierGenerator = null)
@@ -19,19 +19,19 @@ public class EntityAttachmentRepository<TContext, TEntity, TEntityAttachment>(
         (attachmentService, readService, writeService, identifierGenerator)
     where TContext : DbContext
     where TEntity : class, IEntity<int>, IHasAttachments, IHasAttachments<TEntityAttachment>
-    where TEntityAttachment : class, IEntityAttachment<int, int, int>, IEntity<int>;
+    where TEntityAttachment : class, IEntity<int>, IEntityAttachment<int, int, int, Attachment>;
 
 public class EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, TSearchObject>(
-    IAttachmentService attachmentService,
+    IAttachmentService<Attachment, int> attachmentService,
     IEntityReadService<TEntityAttachment, int, TSearchObject> readService,
     IEntityWriteService<TEntityAttachment, int> writeService,
     IIdentifierGenerator? identifierGenerator = null)
-    : EntityAttachmentRepository<TContext, TEntity, int, TEntityAttachment, int, TSearchObject, int>
+    : EntityAttachmentRepository<TContext, TEntity, int, TEntityAttachment, int, TSearchObject, int, Attachment>
         (attachmentService, readService, writeService, identifierGenerator),
         IEntityService<TEntityAttachment>
     where TContext : DbContext
     where TEntity : class, IEntity<int>, IHasAttachments, IHasAttachments<TEntityAttachment>
-    where TEntityAttachment : class, IEntityAttachment<int, int, int>, IEntity<int>
+    where TEntityAttachment : class, IEntity<int>, IEntityAttachment<int, int, int, Attachment>
     where TSearchObject : class, IEntityAttachmentSearchObject<int, int>, new();
 
 /// <summary>
@@ -44,19 +44,20 @@ public class EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, TS
 /// <typeparam name="TEntityAttachmentKey"></typeparam>
 /// <typeparam name="TSearchObject"></typeparam>
 /// <typeparam name="TAttachmentKey"></typeparam>
-public class EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey,
-    TSearchObject, TAttachmentKey>(
-    IAttachmentService<TAttachmentKey> attachmentService,
+/// <typeparam name="TAttachment"></typeparam>
+public class EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>(
+    IAttachmentService<TAttachment, TAttachmentKey> attachmentService,
     IEntityReadService<TEntityAttachment, TEntityAttachmentKey, TSearchObject> readService,
     IEntityWriteService<TEntityAttachment, TEntityAttachmentKey> writeService,
-    IIdentifierGenerator<TEntityAttachmentKey, TObjectKey, TAttachmentKey>? identifierGenerator = null)
+    IIdentifierGenerator<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>? identifierGenerator = null)
     : EntityRepository<TEntityAttachment, TEntityAttachmentKey, TSearchObject>(readService, writeService)
     where TContext : DbContext
-    where TObject : class, IEntity<TObjectKey>, IHasAttachments, IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey>
-    where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey>, IEntity<TEntityAttachmentKey>
+    where TObject : class, IEntity<TObjectKey>, IHasAttachments, IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>
+    where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>, IEntity<TEntityAttachmentKey>
     where TSearchObject : class, IEntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, new()
+    where TAttachment : class, IAttachment<TAttachmentKey>, new()
 {
-    private readonly IIdentifierGenerator<TEntityAttachmentKey, TObjectKey, TAttachmentKey> _identifierGenerator = identifierGenerator ?? new DefaultIdentifierGenerator<TEntityAttachmentKey, TObjectKey, TAttachmentKey>();
+    private readonly IIdentifierGenerator<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment> _identifierGenerator = identifierGenerator ?? new DefaultIdentifierGenerator<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>();
 
     public override async Task<TEntityAttachment?> Details(TEntityAttachmentKey id)
     {
@@ -102,7 +103,7 @@ public class EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAt
     }
     public override async Task Remove(TEntityAttachment item)
     {
-        await attachmentService.RemoveFile(item.Attachment ?? new Attachment<TAttachmentKey> { Id = item.AttachmentId });
+        await attachmentService.RemoveFile(item.Attachment ?? new TAttachment { Id = item.AttachmentId });
         await base.Remove(item);
     }
 

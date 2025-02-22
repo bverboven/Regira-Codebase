@@ -29,7 +29,7 @@ public abstract class AttachmentControllerBase(IAttachmentService service, IMapp
     [HttpPost]
     public virtual async Task<ActionResult<SaveResult<AttachmentDto>>> Save(IFormFile file)
     {
-        var item = file.ToNamedFile().ToAttachment<int>();
+        var item = file.ToNamedFile().ToAttachment();
         await service.Save(item);
         await service.SaveChanges();
         var savedModel = mapper.Map<AttachmentDto>(item);
@@ -38,7 +38,7 @@ public abstract class AttachmentControllerBase(IAttachmentService service, IMapp
     [HttpPut("{id}")]
     public virtual async Task<ActionResult<SaveResult<AttachmentDto>>> Save([FromRoute] int id, IFormFile file)
     {
-        var item = file.ToNamedFile().ToAttachment<int>();
+        var item = file.ToNamedFile().ToAttachment();
         item.Id = id;
         await service.Save(item);
         await service.SaveChanges();
