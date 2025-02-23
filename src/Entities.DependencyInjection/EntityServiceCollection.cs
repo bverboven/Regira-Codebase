@@ -233,8 +233,8 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
 
 
     // Service with attachments
-    public EntityServiceCollection<TContext> WithAttachments(Func<IServiceProvider, IFileService> factory, Action<EntityServiceBuilder<TContext, Attachment, int, AttachmentSearchObject>>? configure = null)
-        => WithAttachments<Attachment, int, AttachmentSearchObject>(factory, configure);
+    public EntityServiceCollection<TContext> WithAttachments(Func<IServiceProvider, IFileService> factory, Action<EntityServiceBuilder<TContext, Attachment, int, AttachmentSearchObject<int>>>? configure = null)
+        => WithAttachments<Attachment, int, AttachmentSearchObject<int>>(factory, configure);
     public EntityServiceCollection<TContext> WithAttachments<TAttachment, TKey, TAttachmentSearchObject>(
         Func<IServiceProvider, IFileService> factory,
         Action<EntityServiceBuilder<TContext, TAttachment, TKey, TAttachmentSearchObject>>? configure = null

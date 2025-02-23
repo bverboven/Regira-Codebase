@@ -11,7 +11,7 @@ using Regira.IO.Extensions;
 namespace Regira.Entities.EFcore.Attachments;
 
 public class EntityAttachmentRepository<TContext, TEntity, TEntityAttachment>(
-    IAttachmentService<Attachment, int> attachmentService,
+    IAttachmentService<Attachment, int, AttachmentSearchObject<int>> attachmentService,
     IEntityReadService<TEntityAttachment, int, SearchObject<int>> readService,
     IEntityWriteService<TEntityAttachment, int> writeService,
     IIdentifierGenerator? identifierGenerator = null)
@@ -22,13 +22,13 @@ public class EntityAttachmentRepository<TContext, TEntity, TEntityAttachment>(
     where TEntityAttachment : class, IEntity<int>, IEntityAttachment<int, int, int, Attachment>;
 
 public class EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, TSearchObject>(
-    IAttachmentService<Attachment, int> attachmentService,
+    IAttachmentService<Attachment, int, AttachmentSearchObject<int>> attachmentService,
     IEntityReadService<TEntityAttachment, int, TSearchObject> readService,
     IEntityWriteService<TEntityAttachment, int> writeService,
     IIdentifierGenerator? identifierGenerator = null)
     : EntityAttachmentRepository<TContext, TEntity, int, TEntityAttachment, int, TSearchObject, int, Attachment>
         (attachmentService, readService, writeService, identifierGenerator),
-        IEntityService<TEntityAttachment>
+        IEntityRepository<TEntityAttachment>
     where TContext : DbContext
     where TEntity : class, IEntity<int>, IHasAttachments, IHasAttachments<TEntityAttachment>
     where TEntityAttachment : class, IEntity<int>, IEntityAttachment<int, int, int, Attachment>
@@ -46,7 +46,7 @@ public class EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, TS
 /// <typeparam name="TAttachmentKey"></typeparam>
 /// <typeparam name="TAttachment"></typeparam>
 public class EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>(
-    IAttachmentService<TAttachment, TAttachmentKey> attachmentService,
+    IAttachmentService<TAttachment, TAttachmentKey, AttachmentSearchObject<TAttachmentKey>> attachmentService,
     IEntityReadService<TEntityAttachment, TEntityAttachmentKey, TSearchObject> readService,
     IEntityWriteService<TEntityAttachment, TEntityAttachmentKey> writeService,
     IIdentifierGenerator<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>? identifierGenerator = null)

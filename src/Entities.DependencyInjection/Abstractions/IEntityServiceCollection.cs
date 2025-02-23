@@ -55,7 +55,7 @@ public interface IEntityServiceCollection<TContext>
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum;
 
-    EntityServiceCollection<TContext> WithAttachments(Func<IServiceProvider, IFileService> factory, Action<EntityServiceBuilder<TContext, Attachment, int, AttachmentSearchObject>>? configure = null);
+    EntityServiceCollection<TContext> WithAttachments(Func<IServiceProvider, IFileService> factory, Action<EntityServiceBuilder<TContext, Attachment, int, AttachmentSearchObject<int>>>? configure = null);
 
     /// <summary>
     /// Adds <see cref="IAttachmentService"/> to <see cref="IServiceCollection"/> with an implementation of <see cref="IFileService"/>.<br />
