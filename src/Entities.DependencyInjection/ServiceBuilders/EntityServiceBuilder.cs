@@ -8,6 +8,8 @@ using Regira.Entities.DependencyInjection.Primers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
 using Regira.Entities.EFcore.Primers.Abstractions;
+using Regira.Entities.EFcore.Processing;
+using Regira.Entities.EFcore.Processing.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
@@ -366,6 +368,13 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
         where TNormalizer : class, IEntityNormalizer<TEntity>
     {
         Services.AddNormalizer<TEntity, TNormalizer>();
+        return this;
+    }
+
+    // Entity Processor
+    public EntityServiceBuilder<TContext, TEntity, TKey> Process<T>(Func<IList<T>, Task> process)
+    {
+        Services.AddTransient<IEntityProcessor>(_ => new EntityProcessor<T>(process));
         return this;
     }
 }

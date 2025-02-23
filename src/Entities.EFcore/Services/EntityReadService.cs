@@ -9,21 +9,24 @@ using Regira.Utilities;
 
 namespace Regira.Entities.EFcore.Services;
 
-public class EntityReadService<TContext, TEntity, TKey, TSearchObject>(TContext dbContext, IQueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes> queryBuilder, IEnumerable<IEntityProcessor<TEntity>> processors)
-    : EntityReadService<TContext, TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>(dbContext, queryBuilder, processors)
+public class EntityReadService<TContext, TEntity, TKey, TSearchObject>(TContext dbContext, IQueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes> queryBuilder,
+    IEnumerable<IEntityProcessor> entityProcessors)
+    : EntityReadService<TContext, TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>(dbContext, queryBuilder, entityProcessors)
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new();
 
-public class EntityReadService<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(TContext dbContext, IQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes> queryBuilder, IEnumerable<IEntityProcessor<TEntity>> processors)
-    : EntityReadService<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>(dbContext, queryBuilder, processors)
+public class EntityReadService<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(TContext dbContext, IQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes> queryBuilder,
+    IEnumerable<IEntityProcessor> entityProcessors)
+    : EntityReadService<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>(dbContext, queryBuilder, entityProcessors)
     where TContext : DbContext
     where TEntity : class, IEntity<int>
     where TSearchObject : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum;
 
-public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(TContext dbContext, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes> queryBuilder, IEnumerable<IEntityProcessor<TEntity>> processors)
+public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(TContext dbContext, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes> queryBuilder,
+    IEnumerable<IEntityProcessor> entityProcessors)
     : IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
@@ -54,10 +57,9 @@ public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, 
             return null;
         }
 
-        foreach (var entityProcessor in processors)
+        foreach (var entityProcessor in entityProcessors)
         {
-            var processedItems = await entityProcessor.ProcessManyAsync([item]).ToListAsync();
-            item = processedItems.First();
+            await entityProcessor.Process([item]);
         }
 
         return item;
@@ -74,9 +76,9 @@ public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, 
 #endif
             .ToListAsync();
 
-        foreach (var entityProcessor in processors)
+        foreach (var entityProcessor in entityProcessors)
         {
-            items = await entityProcessor.ProcessManyAsync(items).ToListAsync();
+            await entityProcessor.Process(items);
         }
 
         return items;

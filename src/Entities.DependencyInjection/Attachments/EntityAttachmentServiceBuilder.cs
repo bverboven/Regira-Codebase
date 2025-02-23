@@ -5,6 +5,7 @@ using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.EFcore.Attachments;
+using Regira.Entities.EFcore.Processing.Abstractions;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Attachments.Mappings;
 using Regira.Entities.Web.Attachments.Models;
@@ -31,6 +32,7 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
         For<TEntityAttachment, int, EntityAttachmentSearchObject>(e =>
         {
             e.AddQueryFilter<EntityAttachmentFilteredQueryBuilder<TEntityAttachment, EntityAttachmentSearchObject>>();
+            e.AddTransient<IEntityProcessor, EntityAttachmentProcessor>();
             e.HasRepository<EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
             e.AddTransient<IEntityRepository<TEntityAttachment>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
             e.AddTransient<IEntityService<TEntityAttachment>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
@@ -110,9 +112,11 @@ public class
         {
             e.Includes(query => query.Include(x => x.Attachment));
             e.AddQueryFilter<EntityAttachmentFilteredQueryBuilder<TObjectKey, TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, TAttachmentKey, TAttachment>>();
+            e.AddTransient<IEntityProcessor, EntityAttachmentProcessor<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>>();
             e.HasRepository<EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, TAttachmentKey, TAttachment>>();
         });
 
         return this;
     }
 }
+

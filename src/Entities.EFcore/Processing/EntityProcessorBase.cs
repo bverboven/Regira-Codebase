@@ -2,21 +2,12 @@
 
 namespace Regira.Entities.EFcore.Processing;
 
-public abstract class EntityProcessorBase<T> : IEntityProcessor<T>
-    where T : class
+public class EntityProcessor<TEntity>(Func<IList<TEntity>, Task>? process = null)
+    : IEntityProcessor<TEntity>
 {
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-    public virtual async IAsyncEnumerable<T> ProcessManyAsync(IEnumerable<T> items)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-    {
-        foreach (var item in items)
-        {
-            yield return Process(item);
-        }
-    }
+    Task IEntityProcessor.Process<T>(IList<T> items)
+        => Process(items.OfType<TEntity>().ToList());
 
-    public virtual T Process(T item)
-    {
-        return item;
-    }
+    public virtual Task Process(IList<TEntity> items)
+        => process?.Invoke(items) ?? Task.CompletedTask;
 }

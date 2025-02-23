@@ -47,7 +47,7 @@ public class TestFor3AttachmentServices
         Assert.That(sortableBuilder, Is.Null);
         Assert.That(includableBuilder, Is.Null);
         Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Attachment, int, AttachmentSearchObject<int>>>());
-        Assert.That(primers, Is.Empty);
+        Assert.That(primers.First(), Is.TypeOf<AttachmentPrimer>());
         Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Attachment, int, AttachmentSearchObject<int>>>());
         Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Attachment, int, AttachmentSearchObject<int>>>());
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Attachment, int>>());
@@ -87,7 +87,7 @@ public class TestFor3AttachmentServices
         Assert.That(sortableBuilder, Is.Null);
         Assert.That(includableBuilder, Is.Null);
         Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Attachment, int, AttachmentSearchObject>>());
-        Assert.That(primers, Is.Empty);
+        Assert.That(primers.First(), Is.TypeOf<AttachmentPrimer>());
         Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Attachment, int, AttachmentSearchObject>>());
         Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Attachment, int, AttachmentSearchObject>>());
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Attachment, int>>());

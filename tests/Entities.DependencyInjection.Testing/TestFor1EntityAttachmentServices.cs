@@ -58,7 +58,7 @@ public class TestFor1EntityAttachmentServices
         Assert.That(sortableBuilder, Is.Null);
         Assert.That(includableBuilder, Is.TypeOf<IncludableQueryBuilder<CourseAttachment, int>>());
         Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<CourseAttachment, int, EntityAttachmentSearchObject>>());
-        Assert.That(primers, Is.Empty);
+        Assert.That(primers.First(), Is.TypeOf<AttachmentPrimer>());
         Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, CourseAttachment, int, EntityAttachmentSearchObject>>());
         Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, CourseAttachment, int, EntityAttachmentSearchObject>>());
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, CourseAttachment, int>>());
@@ -106,10 +106,11 @@ public class TestFor1EntityAttachmentServices
         Assert.That(globalFilters.OfType<FilterHasCreatedQueryBuilder<int>>(), Is.Not.Empty);
         Assert.That(globalFilters.OfType<FilterHasLastModifiedQueryBuilder<int>>(), Is.Not.Empty);
 
-        Assert.That(primers, Is.Not.Empty);
+        Assert.That(primers.Length, Is.EqualTo(4));
         Assert.That(primers.OfType<HasCreatedDbPrimer>(), Is.Not.Empty);
         Assert.That(primers.OfType<HasLastModifiedDbPrimer>(), Is.Not.Empty);
         Assert.That(primers.OfType<ArchivablePrimer>(), Is.Not.Empty);
+        Assert.That(primers.OfType<AttachmentPrimer>(), Is.Not.Empty);
 
         Assert.That(queryFilters.First(), Is.TypeOf<EntityAttachmentFilteredQueryBuilder<CourseAttachment, EntityAttachmentSearchObject>>());
         Assert.That(sortableBuilder, Is.Null);

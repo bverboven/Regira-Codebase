@@ -13,5 +13,4 @@ public interface IAttachmentService<TAttachment, TKey, in TAttachmentSearchObjec
     Task<byte[]?> GetBytes(TAttachment item);
     Task SaveFile(TAttachment item);
     Task RemoveFile(TAttachment item);
-    void ProcessItem(TAttachment item);
 }

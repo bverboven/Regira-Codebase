@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Regira.DAL.Paging;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
@@ -45,19 +44,9 @@ public class AttachmentRepository<TContext, TAttachment, TKey, TAttachmentSearch
         if (item != null)
         {
             item.Bytes = await GetBytes(item);
-            ProcessItem(item);
         }
 
         return item;
-    }
-    public override async Task<IList<TAttachment>> List(TAttachmentSearchObject? so = null, PagingInfo? pagingInfo = null)
-    {
-        var items = await base.List(so, pagingInfo);
-        foreach (var item in items)
-        {
-            ProcessItem(item);
-        }
-        return items;
     }
 
 
@@ -89,7 +78,6 @@ public class AttachmentRepository<TContext, TAttachment, TKey, TAttachmentSearch
         {
             throw new ArgumentNullException(nameof(item.Identifier));
         }
-        item.Identifier ??= fileService.GetIdentifier(item.Path!);
 
         return await fileService.GetBytes(item.Identifier);
     }
@@ -136,11 +124,7 @@ public class AttachmentRepository<TContext, TAttachment, TKey, TAttachmentSearch
         var path = item.Path;
         if (string.IsNullOrWhiteSpace(path))
         {
-#if NETSTANDARD
-            path = await DbSet.AsQueryable().Where(x => x.Id!.Equals(item.Id)).Select(x => x.Path).SingleOrDefaultAsync();
-#else
             path = await DbSet.Where(x => x.Id!.Equals(item.Id)).Select(x => x.Path).SingleOrDefaultAsync();
-#endif
         }
 
         if (string.IsNullOrWhiteSpace(path))
@@ -156,14 +140,6 @@ public class AttachmentRepository<TContext, TAttachment, TKey, TAttachmentSearch
         if (string.IsNullOrWhiteSpace(item.ContentType))
         {
             item.ContentType = ContentTypeUtility.GetContentType(item.FileName);
-        }
-    }
-    public virtual void ProcessItem(TAttachment item)
-    {
-        if (!string.IsNullOrWhiteSpace(item.Path))
-        {
-            item.Identifier = fileService.GetIdentifier(item.Path);
-            item.Prefix = fileService.GetRelativeFolder(item.Identifier);
         }
     }
 }

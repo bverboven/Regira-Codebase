@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Regira.DAL.Paging;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
@@ -67,15 +66,6 @@ public class EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAt
             item.Attachment!.Bytes = await attachmentService.GetBytes(item.Attachment);
         }
         return item;
-    }
-    public override async Task<IList<TEntityAttachment>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
-    {
-        var items = await base.List(so, pagingInfo);
-        foreach (var item in items)
-        {
-            attachmentService.ProcessItem(item.Attachment!);
-        }
-        return items;
     }
 
     public override async Task Add(TEntityAttachment item)

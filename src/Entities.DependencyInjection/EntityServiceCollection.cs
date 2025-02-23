@@ -4,6 +4,7 @@ using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Abstractions;
+using Regira.Entities.DependencyInjection.Primers;
 using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
@@ -243,6 +244,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         where TAttachmentSearchObject : AttachmentSearchObject<TKey>, new()
     {
         Services.AddTransient(factory);
+        Services.AddPrimer<AttachmentPrimer>();
 
         var builder = new EntityServiceBuilder<TContext, TAttachment, TKey, TAttachmentSearchObject>(this);
 
