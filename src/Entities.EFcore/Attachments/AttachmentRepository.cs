@@ -89,6 +89,7 @@ public class AttachmentRepository<TContext, TAttachment, TKey, TAttachmentSearch
         {
             throw new ArgumentNullException(nameof(item.Identifier));
         }
+        item.Identifier ??= fileService.GetIdentifier(item.Path!);
 
         return await fileService.GetBytes(item.Identifier);
     }
@@ -103,7 +104,7 @@ public class AttachmentRepository<TContext, TAttachment, TKey, TAttachmentSearch
             throw new ArgumentNullException(nameof(item.Identifier));
         }
 #if NETSTANDARD2_0
-                using var fileStream = item.GetStream();
+        using var fileStream = item.GetStream();
 #else
         await using var fileStream = item.GetStream();
 #endif
@@ -135,7 +136,11 @@ public class AttachmentRepository<TContext, TAttachment, TKey, TAttachmentSearch
         var path = item.Path;
         if (string.IsNullOrWhiteSpace(path))
         {
+#if NETSTANDARD
+            path = await DbSet.AsQueryable().Where(x => x.Id!.Equals(item.Id)).Select(x => x.Path).SingleOrDefaultAsync();
+#else
             path = await DbSet.Where(x => x.Id!.Equals(item.Id)).Select(x => x.Path).SingleOrDefaultAsync();
+#endif
         }
 
         if (string.IsNullOrWhiteSpace(path))

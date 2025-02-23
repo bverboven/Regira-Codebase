@@ -1,4 +1,5 @@
-﻿using Regira.Entities.Attachments.Models;
+﻿using Regira.Entities.Attachments.Abstractions;
+using Regira.Entities.Attachments.Models;
 using Regira.IO.Abstractions;
 using Regira.Utilities;
 
@@ -9,7 +10,7 @@ public static class AttachmentExtensions
     public static Attachment ToAttachment(this INamedFile file, Attachment? src = null)
         => file.ToAttachment<Attachment, int>();
     public static TAttachment ToAttachment<TAttachment, TKey>(this INamedFile file, TAttachment? src = null)
-        where TAttachment : Attachment<TKey>, new()
+        where TAttachment : class, IAttachment<TKey>, new()
     {
         src ??= new TAttachment();
         src.Bytes = file.Bytes;
@@ -20,7 +21,7 @@ public static class AttachmentExtensions
         return src;
     }
     public static TAttachment ToAttachment<TAttachment, TKey>(this IBinaryFile file, TAttachment? src = null)
-        where TAttachment : Attachment<TKey>, new()
+        where TAttachment : class, IAttachment<TKey>, new()
     {
         var attachment = ((INamedFile)file).ToAttachment<TAttachment, TKey>(src);
         attachment.Identifier = file.Identifier;

@@ -3,12 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
-using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.EFcore.Attachments;
-using Regira.Entities.EFcore.QueryBuilders.Abstractions;
-using Regira.Entities.EFcore.Services;
-using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Attachments.Mappings;
 using Regira.Entities.Web.Attachments.Models;
@@ -31,24 +27,14 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
     public new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment> AddDefaultAttachmentServices()
     {
         base.AddDefaultAttachmentServices();
-        // Query filter
-        Services.AddTransient<IFilteredQueryBuilder<TEntityAttachment, int, EntityAttachmentSearchObject>,
-            EntityAttachmentFilteredQueryBuilder<TEntityAttachment, EntityAttachmentSearchObject>>();
-        // Query builder
-        Services.AddDefaultQueryBuilder<TEntityAttachment, int, EntityAttachmentSearchObject, EntitySortBy, EntityIncludes>();
-        // Read service
-        Services.AddTransient<IEntityReadService<TEntityAttachment, int>, EntityReadService<TContext, TEntityAttachment, int, EntityAttachmentSearchObject>>();
-        Services.AddTransient<IEntityReadService<TEntityAttachment, int, EntityAttachmentSearchObject>, EntityReadService<TContext, TEntityAttachment, int, EntityAttachmentSearchObject>>();
-        // Write service
-        Services.AddTransient<IEntityWriteService<TEntityAttachment, int>, EntityWriteService<TContext, TEntityAttachment>>();
-        // Repository
-        Services.AddTransient<IEntityRepository<TEntityAttachment>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
-        Services.AddTransient<IEntityRepository<TEntityAttachment, int>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
-        Services.AddTransient<IEntityRepository<TEntityAttachment, int, EntityAttachmentSearchObject>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
-        // Entity Service
-        Services.AddTransient<IEntityService<TEntityAttachment>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
-        Services.AddTransient<IEntityService<TEntityAttachment, int>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
-        Services.AddTransient<IEntityService<TEntityAttachment, int, EntityAttachmentSearchObject>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
+
+        For<TEntityAttachment, int, EntityAttachmentSearchObject>(e =>
+        {
+            e.AddQueryFilter<EntityAttachmentFilteredQueryBuilder<TEntityAttachment, EntityAttachmentSearchObject>>();
+            e.HasRepository<EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
+            e.AddTransient<IEntityRepository<TEntityAttachment>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
+            e.AddTransient<IEntityService<TEntityAttachment>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
+        });
 
         return this;
     }
@@ -120,21 +106,12 @@ public class
     /// <returns></returns>
     public EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey, TAttachment> AddDefaultAttachmentServices()
     {
-        // Query filter
-        Services.AddTransient<IFilteredQueryBuilder<TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>>,
-            EntityAttachmentFilteredQueryBuilder<TObjectKey, TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, TAttachmentKey, TAttachment>>();
-        // Query builder
-        Services.AddDefaultQueryBuilder<TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, EntitySortBy, EntityIncludes>();
-        // Read service
-        Services.AddTransient<IEntityReadService<TEntityAttachment, TEntityAttachmentKey>, EntityReadService<TContext, TEntityAttachment, TEntityAttachmentKey>>();
-        Services.AddTransient<IEntityReadService<TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>>, EntityReadService<TContext, TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>>>();
-        // Write service
-        Services.AddTransient<IEntityWriteService<TEntityAttachment, TEntityAttachmentKey>, EntityWriteService<TContext, TEntityAttachment, TEntityAttachmentKey>>();
-        // Repository
-        Services.AddTransient<IEntityService<TEntityAttachment, TEntityAttachmentKey>,
-            EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, TAttachmentKey, TAttachment>>();
-        Services.AddTransient<IEntityService<TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>>,
-            EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, TAttachmentKey, TAttachment>>();
+        For<TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>>(e =>
+        {
+            e.Includes(query => query.Include(x => x.Attachment));
+            e.AddQueryFilter<EntityAttachmentFilteredQueryBuilder<TObjectKey, TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, TAttachmentKey, TAttachment>>();
+            e.HasRepository<EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, TAttachmentKey, TAttachment>>();
+        });
 
         return this;
     }

@@ -1,6 +1,7 @@
 ﻿using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.EFcore.QueryBuilders.Abstractions;
+
 public interface IFilteredQueryBuilder<TEntity, TKey, in TSearchObject>
     where TSearchObject : ISearchObject<TKey>
 {

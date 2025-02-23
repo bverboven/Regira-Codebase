@@ -31,9 +31,9 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             builder.AddDefaultQueryBuilder();
         }
         // Read Service
-        if (!builder.HasService<IEntityReadService<TEntity, int>>())
+        if (!builder.HasService<IEntityReadService<TEntity, int, SearchObject<int>>>())
         {
-            builder.UseReadService<EntityReadService<TContext, TEntity>>();
+            builder.UseReadService<EntityReadService<TContext, TEntity, int, SearchObject<int>>>();
         }
         // Write Service
         if (!builder.HasService<IEntityWriteService<TEntity, int>>())
@@ -72,9 +72,9 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             builder.AddDefaultQueryBuilder();
         }
         // Read Service
-        if (!builder.HasService<IEntityReadService<TEntity, TKey>>())
+        if (!builder.HasService<IEntityReadService<TEntity, TKey, SearchObject<TKey>>>())
         {
-            builder.UseReadService<EntityReadService<TContext, TEntity, TKey>>();
+            builder.UseReadService<EntityReadService<TContext, TEntity, TKey, SearchObject<TKey>>>();
         }
         // Write Service
         if (!builder.HasService<IEntityWriteService<TEntity, TKey>>())
