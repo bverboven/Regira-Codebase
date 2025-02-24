@@ -10,10 +10,10 @@ namespace Regira.Entities.DependencyInjection.Attachments;
 public static class EntityServiceBuilderExtensions
 {
     // Attachments
-    public static EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, int, Attachment> HasAttachments<TContext, TEntity, TEntityAttachment>
+    public static EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, EntityAttachmentSearchObject, int, Attachment> HasAttachments<TContext, TEntity, TEntityAttachment>
     (
         this EntityServiceBuilder<TContext, TEntity> builder,
-        Action<EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, int, Attachment>>? configure = null
+        Action<EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, EntityAttachmentSearchObject, int, Attachment>>? configure = null
     )
         where TContext : DbContext
         where TEntity : class, IEntity<int>, IHasAttachments, IHasAttachments<TEntityAttachment>
@@ -33,18 +33,19 @@ public static class EntityServiceBuilderExtensions
         return attachmentBuilder;
     }
 
-    public static EntityAttachmentServiceBuilder<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey, TAttachment>
-        HasAttachments<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey, TAttachment>
+    public static EntityAttachmentServiceBuilder<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>
+        HasAttachments<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>
         (
             this EntityServiceBuilder<TContext, TEntity, TKey> builder,
-            Action<EntityAttachmentServiceBuilder<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey, TAttachment>>? configure = null
+            Action<EntityAttachmentServiceBuilder<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>>? configure = null
         )
         where TContext : DbContext
         where TEntity : class, IEntity<TKey>, IHasAttachments, IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TKey, TAttachmentKey, TAttachment>
         where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TKey, TAttachmentKey, TAttachment>
+        where TSearchObject : class, IEntityAttachmentSearchObject<TEntityAttachmentKey, TKey>, new()
         where TAttachment : class, IAttachment<TAttachmentKey>, new()
     {
-        var attachmentBuilder = new EntityAttachmentServiceBuilder<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey, TAttachment>(builder.Services);
+        var attachmentBuilder = new EntityAttachmentServiceBuilder<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>(builder.Services);
 
         configure?.Invoke(attachmentBuilder);
 

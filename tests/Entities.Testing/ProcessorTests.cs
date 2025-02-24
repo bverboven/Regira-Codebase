@@ -51,9 +51,9 @@ public class ProcessorTests
             Assert.That(category.NumberOfProducts, Is.Null);
         }
 
-        var processedCategories = categoryProcessor.ProcessManyAsync(categories);
+        await categoryProcessor.Process(categories);
 
-        await foreach (var category in processedCategories)
+        foreach (var category in categories)
         {
             Assert.That(category.NumberOfProducts, Is.EqualTo(category.Id * 2));
         }

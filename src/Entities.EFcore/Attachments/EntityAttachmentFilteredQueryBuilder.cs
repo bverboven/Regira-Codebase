@@ -40,3 +40,14 @@ public class EntityAttachmentFilteredQueryBuilder<TObjectKey, TEntityAttachment,
         return query;
     }
 }
+
+
+public class EntityAttachmentQueryFilter<TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>(Func<IQueryable<TEntityAttachment>, TSearchObject?, IQueryable<TEntityAttachment>> filterFunc) 
+    : FilteredQueryBuilderBase<TEntityAttachment, TEntityAttachmentKey, TSearchObject>
+    where TEntityAttachment : IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>, IEntity<TEntityAttachmentKey>
+    where TSearchObject : class, IEntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>
+    where TAttachment : class, IAttachment<TAttachmentKey>, new()
+{
+    public override IQueryable<TEntityAttachment> Build(IQueryable<TEntityAttachment> query, TSearchObject? so)
+        => filterFunc(query, so);
+}

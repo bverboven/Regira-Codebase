@@ -335,9 +335,15 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
         Services.AddQueryFilter<TEntity, TKey, SearchObject<TKey>, TImplementation>();
         return this;
     }
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>> factory)
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddQueryFilter<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>
     {
-        Services.AddQueryFilter(factory);
+        Services.AddQueryFilter<TEntity, TKey, SearchObject<TKey>, TImplementation>(factory);
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey> Filter(Func<IQueryable<TEntity>, SearchObject<TKey>?, IQueryable<TEntity>> filterFunc)
+    {
+        AddQueryFilter(_ => new EntityQueryFilter<TEntity, TKey, SearchObject<TKey>>(filterFunc));
         return this;
     }
 
@@ -372,9 +378,22 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     }
 
     // Entity Processor
-    public EntityServiceBuilder<TContext, TEntity, TKey> Process<T>(Func<IList<T>, Task> process)
+    public EntityServiceBuilder<TContext, TEntity, TKey> Process(Func<IList<TEntity>, Task> process)
     {
-        Services.AddTransient<IEntityProcessor>(_ => new EntityProcessor<T>(process));
+        Services.AddTransient<IEntityProcessor<TEntity>>(_ => new EntityProcessor<TEntity>(process));
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey> Process(Action<TEntity> process)
+    {
+        Services.AddTransient<IEntityProcessor<TEntity>>(_ => new EntityProcessor<TEntity>(items =>
+        {
+            foreach (var item in items)
+            {
+                process(item);
+            }
+            return Task.CompletedTask;
+        }));
+
         return this;
     }
 }
@@ -550,9 +569,15 @@ public class EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServi
         Services.AddQueryFilter<TEntity, TKey, TSearchObject, TImplementation>();
         return this;
     }
-    public EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddQueryFilter(Func<IServiceProvider, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>> factory)
+    public new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddQueryFilter<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>
     {
-        Services.AddQueryFilter(factory);
+        Services.AddQueryFilter<TEntity, TKey, TSearchObject, TImplementation>(factory);
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject> Filter(Func<IQueryable<TEntity>, TSearchObject?, IQueryable<TEntity>> filterFunc)
+    {
+        AddQueryFilter(_ => new EntityQueryFilter<TEntity, TKey, TSearchObject>(filterFunc));
         return this;
     }
 }

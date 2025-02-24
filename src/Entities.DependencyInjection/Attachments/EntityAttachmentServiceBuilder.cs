@@ -13,7 +13,7 @@ using Regira.Entities.Web.Attachments.Models;
 namespace Regira.Entities.DependencyInjection.Attachments;
 
 public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment>(IServiceCollection services)
-    : EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, int, Attachment>(services),
+    : EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, EntityAttachmentSearchObject, int, Attachment>(services),
         IEntityAttachmentServiceBuilder<TEntity, TEntityAttachment>
     where TContext : DbContext
     where TEntityAttachment : class, IEntityAttachment<int, int, int, Attachment>, new()
@@ -31,8 +31,7 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
 
         For<TEntityAttachment, int, EntityAttachmentSearchObject>(e =>
         {
-            e.AddQueryFilter<EntityAttachmentFilteredQueryBuilder<TEntityAttachment, EntityAttachmentSearchObject>>();
-            e.AddTransient<IEntityProcessor, EntityAttachmentProcessor>();
+            //e.AddQueryFilter<EntityAttachmentFilteredQueryBuilder<TEntityAttachment, EntityAttachmentSearchObject>>();
             e.HasRepository<EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
             e.AddTransient<IEntityRepository<TEntityAttachment>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
             e.AddTransient<IEntityService<TEntityAttachment>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
@@ -42,13 +41,13 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
     }
 }
 
-public class
-    EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey, TAttachment>(IServiceCollection services)
-    : EntityServiceBuilder<TContext, TObject, TObjectKey>(services),
+public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>(IServiceCollection services)
+    : EntityServiceBuilder<TContext, TEntityAttachment, TEntityAttachmentKey, TSearchObject>(services),
         IEntityAttachmentServiceBuilder<TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey, TAttachment>
     where TContext : DbContext
     where TObject : class, IEntity<TObjectKey>, IHasAttachments, IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>
     where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>
+    where TSearchObject : class, IEntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, new()
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
 {
     protected internal bool HasEntityAttachmentMapping { get; set; }
@@ -62,7 +61,7 @@ public class
     /// An implementation of <see cref="AttachmentUriResolver{TEntity,TEntityAttachmentKey,TObjectKey,TAttachmentKey,TAttachment,TDto}"/> resolves the <see cref="EntityAttachmentDto.Uri"/> property
     /// </summary>
     /// <returns></returns>
-    public EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey, TAttachment> WithDefaultMapping()
+    public EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment> WithDefaultMapping()
     {
         Services.AddAutoMapper(cfg =>
         {
@@ -79,7 +78,7 @@ public class
         return this;
     }
 
-    public new EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey, TAttachment> AddMapping<TEntityAttachmentDto, TEntityAttachmentInputDto>()
+    public new EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment> AddMapping<TEntityAttachmentDto, TEntityAttachmentInputDto>()
         where TEntityAttachmentDto : EntityAttachmentDto
     {
         Services.AddAutoMapper(cfg =>
@@ -106,17 +105,16 @@ public class
     /// </list>
     /// </summary>
     /// <returns></returns>
-    public EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey, TAttachment> AddDefaultAttachmentServices()
+    public EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment> AddDefaultAttachmentServices()
     {
-        For<TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>>(e =>
+        For<TEntityAttachment, TEntityAttachmentKey, TSearchObject>(e =>
         {
             e.Includes(query => query.Include(x => x.Attachment));
-            e.AddQueryFilter<EntityAttachmentFilteredQueryBuilder<TObjectKey, TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, TAttachmentKey, TAttachment>>();
-            e.AddTransient<IEntityProcessor, EntityAttachmentProcessor<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>>();
-            e.HasRepository<EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, EntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, TAttachmentKey, TAttachment>>();
+            e.AddQueryFilter<EntityAttachmentFilteredQueryBuilder<TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>>();
+            e.AddTransient<IEntityProcessor<TEntityAttachment>, EntityAttachmentProcessor<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>>();
+            e.HasRepository<EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>>();
         });
 
         return this;
     }
 }
-

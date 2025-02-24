@@ -1,25 +1,20 @@
 ﻿using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.EFcore.Processing;
-using Regira.IO.Storage.Abstractions;
+using Regira.Entities.EFcore.Processing.Abstractions;
 
 namespace Regira.Entities.EFcore.Attachments;
 
-public class EntityAttachmentProcessor(IFileService fileService) : EntityAttachmentProcessor<int, int, int, Attachment>(fileService);
-public class EntityAttachmentProcessor<TKey, TObjectKey, TAttachmentKey, TAttachment>(IFileService fileService) : EntityProcessor<EntityAttachment<TKey, TObjectKey, TAttachmentKey, TAttachment>>
+public class EntityAttachmentProcessor<TEntityAttachment>(IEntityProcessor<Attachment> attachmentProcessor) : EntityAttachmentProcessor<TEntityAttachment, int, int, int, Attachment>(attachmentProcessor)
+    where TEntityAttachment : class, IEntityAttachment<int, int, int, Attachment>, new();
+public class EntityAttachmentProcessor<TEntityAttachment, TKey, TObjectKey, TAttachmentKey, TAttachment>(IEntityProcessor<TAttachment> attachmentProcessor) : EntityProcessor<TEntityAttachment>
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
+    where TEntityAttachment : class, IEntityAttachment<TKey, TObjectKey, TAttachmentKey, TAttachment>
 {
-    public override Task Process(IList<EntityAttachment<TKey, TObjectKey, TAttachmentKey, TAttachment>> items)
+    public override Task Process(IList<TEntityAttachment> items)
     {
-        foreach (var item in items)
-        {
-            if (item.Attachment != null)
-            {
-                item.Attachment.Identifier = fileService.GetIdentifier(item.Attachment.Path!);
-                item.Attachment.Prefix = fileService.GetRelativeFolder(item.Attachment.Identifier);
-            }
-        }
+        var attachments = items.Select(x => x.Attachment!).ToArray();
 
-        return Task.CompletedTask;
+        return attachmentProcessor.Process(attachments);
     }
 }
