@@ -215,7 +215,7 @@ public class TestFor2Services
             .UseEntities<ContosoContext>()
             .For<Course, int>(e =>
             {
-                e.Includes(query => query.Include(x => x.Instructors));
+                e.Includes((query, _) => query.Include(x => x.Instructors));
             })
             .BuildServiceProvider();
         var entityNormalizer = sp.GetService<IEntityNormalizer>();
@@ -637,7 +637,7 @@ public class TestFor2Services
             .For<Course, int>(e =>
             {
                 e.SortBy(query => query.OrderBy(x => x.Title));
-                e.Includes(query => query.Include(x => x.Instructors));
+                e.Includes((query, _) => query.Include(x => x.Instructors));
                 e.AddQueryFilter<CourseQueryFilter1>();
                 e.AddPrimer<CoursePrimer>();
                 e.HasRepository<CourseRepository2>();

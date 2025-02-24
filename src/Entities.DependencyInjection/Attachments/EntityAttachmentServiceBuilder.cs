@@ -109,7 +109,7 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
     {
         For<TEntityAttachment, TEntityAttachmentKey, TSearchObject>(e =>
         {
-            e.Includes(query => query.Include(x => x.Attachment));
+            e.Includes((query, _) => query.Include(x => x.Attachment));
             e.AddQueryFilter<EntityAttachmentFilteredQueryBuilder<TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>>();
             e.AddTransient<IEntityProcessor<TEntityAttachment>, EntityAttachmentProcessor<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>>();
             e.HasRepository<EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>>();

@@ -71,6 +71,16 @@ public static class EntityServiceCollectionOptionsExtensions
         return options;
     }
 #if NETCOREAPP3_1_OR_GREATER
+    /// <summary>
+    /// <list type="bullet">
+    /// <item>Ignore nulls</item>
+    /// <item>Ignore reference cycles</item>
+    /// <item>Enums as string</item>
+    /// </list>
+    /// </summary>
+    /// <param name="options"></param>
+    /// <param name="configure"></param>
+    /// <returns></returns>
     public static EntityServiceCollectionOptions ConfigureDefaultJsonOptions(this EntityServiceCollectionOptions options, Action<JsonOptions>? configure = null)
     {
         options.Services
@@ -78,6 +88,7 @@ public static class EntityServiceCollectionOptionsExtensions
             {
                 o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 configure?.Invoke(o);
             });
 

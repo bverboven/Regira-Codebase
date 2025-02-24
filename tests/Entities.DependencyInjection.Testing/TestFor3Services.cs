@@ -215,7 +215,7 @@ public class TestFor3Services
             .UseEntities<ContosoContext>()
             .For<Course, int, CourseSearchObject>(e =>
             {
-                e.Includes(query => query.Include(x => x.Instructors));
+                e.Includes((query, _) => query.Include(x => x.Instructors));
             })
             .BuildServiceProvider();
         var entityNormalizer = sp.GetService<IEntityNormalizer>();
@@ -333,7 +333,7 @@ public class TestFor3Services
         var repo3 = sp.GetService<IEntityRepository<Course, int, CourseSearchObject>>();
         var entityService2 = sp.GetService<IEntityService<Course, int>>();
         var entityService3 = sp.GetService<IEntityService<Course, int, CourseSearchObject>>();
-        
+
         Assert.That(queryFilters.First(), Is.TypeOf<EntityQueryFilter<Course, int, CourseSearchObject>>());
 
         Assert.That(entityNormalizer, Is.Null);
@@ -360,7 +360,7 @@ public class TestFor3Services
             .UseEntities<ContosoContext>()
             .For<Course, int, CourseSearchObject>(e => e.Process(item => item.HasAttachment = item.Attachments?.Any()))
             .BuildServiceProvider();
-        
+
         var entityNormalizer = sp.GetService<IEntityNormalizer>();
         var globalFilters = sp.GetServices<IGlobalFilteredQueryBuilder>().ToArray();
         var queryFilters = sp.GetServices<IFilteredQueryBuilder<Course, int, CourseSearchObject>>().ToArray();
@@ -376,10 +376,10 @@ public class TestFor3Services
         var repo3 = sp.GetService<IEntityRepository<Course, int, CourseSearchObject>>();
         var entityService2 = sp.GetService<IEntityService<Course, int>>();
         var entityService3 = sp.GetService<IEntityService<Course, int, CourseSearchObject>>();
-        
+
         Assert.That(entityProcessors.Length, Is.EqualTo(1));
         Assert.That(entityProcessors.OfType<EntityProcessor<Course>>(), Is.Not.Empty);
-        
+
         Assert.That(entityNormalizer, Is.Null);
         Assert.That(globalFilters, Is.Empty);
         Assert.That(queryFilters, Is.Empty);
@@ -637,7 +637,7 @@ public class TestFor3Services
             .For<Course, int, CourseSearchObject>(e =>
             {
                 e.SortBy(query => query.OrderBy(x => x.Title));
-                e.Includes(query => query.Include(x => x.Instructors));
+                e.Includes((query, _) => query.Include(x => x.Instructors));
                 e.AddQueryFilter<CourseQueryFilter1>();
                 e.AddPrimer<CoursePrimer>();
                 e.HasRepository<CourseRepository3B>();

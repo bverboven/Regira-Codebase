@@ -1,12 +1,14 @@
-﻿using Regira.Entities.Models.Abstractions;
+﻿using Regira.Entities.Models;
+using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.EFcore.QueryBuilders.Abstractions;
 
-//public interface ISortedQueryBuilder<TEntity> : ISortedQueryBuilder<TEntity, int>
-//    where TEntity : IEntity<int>;
+public interface ISortedQueryBuilder<TEntity, TKey> : ISortedQueryBuilder<TEntity, TKey, EntitySortBy>
+    where TEntity : IEntity<TKey>;
 
-public interface ISortedQueryBuilder<TEntity, TKey>
+public interface ISortedQueryBuilder<TEntity, TKey, TSortBy>
     where TEntity : IEntity<TKey>
+    where TSortBy : struct, Enum
 {
-    IQueryable<TEntity> SortBy(IQueryable<TEntity> query);
+    IQueryable<TEntity> SortBy(IQueryable<TEntity> query, TSortBy? sortBy = null);
 }

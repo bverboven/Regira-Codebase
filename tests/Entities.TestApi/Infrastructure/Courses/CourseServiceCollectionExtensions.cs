@@ -15,7 +15,7 @@ public static class CourseServiceCollectionExtensions
         services
             .For<Course, int, CourseSearchObject>(e =>
             {
-                e.Includes(query => query
+                e.Includes((query, _) => query
                     .Include(c => c.Attachments!)
                     .ThenInclude(x => x.Attachment)
                 );

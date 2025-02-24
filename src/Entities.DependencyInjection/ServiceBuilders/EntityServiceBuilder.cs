@@ -355,7 +355,7 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
         return this;
     }
     // Default Includes
-    public EntityServiceBuilder<TContext, TEntity, TKey> Includes(Func<IQueryable<TEntity>, IQueryable<TEntity>> addIncludes)
+    public EntityServiceBuilder<TContext, TEntity, TKey> Includes(Func<IQueryable<TEntity>, EntityIncludes?, IQueryable<TEntity>> addIncludes)
     {
         Services.AddTransient<IIncludableQueryBuilder<TEntity, TKey>>(_ => new IncludableQueryBuilder<TEntity, TKey>(addIncludes));
         return this;

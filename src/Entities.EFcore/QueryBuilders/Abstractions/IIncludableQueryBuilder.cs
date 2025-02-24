@@ -1,12 +1,13 @@
-﻿using Regira.Entities.Models.Abstractions;
+﻿using Regira.Entities.Models;
+using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.EFcore.QueryBuilders.Abstractions;
 
-//public interface IIncludableQueryBuilder<TEntity> : IIncludableQueryBuilder<TEntity, int>
-//    where TEntity : IEntity<int>;
-
-public interface IIncludableQueryBuilder<TEntity, TKey>
+public interface IIncludableQueryBuilder<TEntity, TKey> : IIncludableQueryBuilder<TEntity, TKey, EntityIncludes>
+    where TEntity : IEntity<TKey>;
+public interface IIncludableQueryBuilder<TEntity, TKey, TIncludes>
     where TEntity : IEntity<TKey>
+    where TIncludes : struct, Enum
 {
-    IQueryable<TEntity> AddIncludes(IQueryable<TEntity> query);
+    IQueryable<TEntity> AddIncludes(IQueryable<TEntity> query, TIncludes? includes = null);
 }

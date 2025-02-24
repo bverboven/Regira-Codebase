@@ -282,4 +282,17 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
         AddQueryFilter(_ => new EntityQueryFilter<TEntity, TKey, TSearchObject>(filterFunc));
         return this;
     }
+
+    // Default SortBy
+    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> SortBy(Func<IQueryable<TEntity>, TSortBy?, IQueryable<TEntity>> sortByFunc)
+    {
+        Services.AddTransient<ISortedQueryBuilder<TEntity, TKey, TSortBy>>(_ => new SortedQueryBuilder<TEntity, TKey, TSortBy>(sortByFunc));
+        return this;
+    }
+    // Default Includes
+    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> Includes(Func<IQueryable<TEntity>, TIncludes?, IQueryable<TEntity>> addIncludes)
+    {
+        Services.AddTransient<IIncludableQueryBuilder<TEntity, TKey, TIncludes>>(_ => new IncludableQueryBuilder<TEntity, TKey, TIncludes>(addIncludes));
+        return this;
+    }
 }

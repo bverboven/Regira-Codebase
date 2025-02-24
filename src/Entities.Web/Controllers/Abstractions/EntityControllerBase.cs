@@ -22,7 +22,9 @@ public abstract class EntityControllerBase<TEntity, TKey> : EntityControllerBase
 /// <typeparam name="TDto"></typeparam>
 /// <typeparam name="TInputDto"></typeparam>
 public abstract class EntityControllerBase<TEntity, TDto, TInputDto> : EntityControllerBase<TEntity, SearchObject, TDto, TInputDto>
-    where TEntity : class, IEntity<int>;
+    where TEntity : class, IEntity<int>
+    where TDto : class
+    where TInputDto : class;
 /// <summary>
 /// Default EntityController with custom <see cref="ISearchObject{TKey}"/> and DTO models
 /// </summary>
@@ -32,7 +34,9 @@ public abstract class EntityControllerBase<TEntity, TDto, TInputDto> : EntityCon
 /// <typeparam name="TInputDto"></typeparam>
 public abstract class EntityControllerBase<TEntity, TSearchObject, TDto, TInputDto> : EntityControllerBase<TEntity, int, TSearchObject, TDto, TInputDto>
     where TEntity : class, IEntity<int>
-    where TSearchObject : class, ISearchObject<int>;
+    where TSearchObject : class, ISearchObject<int>
+    where TDto : class
+    where TInputDto : class;
 
 /// <summary>
 /// Default EntityController with custom <see cref="ISearchObject{TKey}"/> and DTO models
@@ -47,6 +51,8 @@ public abstract class EntityControllerBase<TEntity, TSearchObject, TDto, TInputD
 public abstract class EntityControllerBase<TEntity, TKey, TSearchObject, TDto, TInputDto> : ControllerBase
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>
+    where TDto : class
+    where TInputDto : class
 {
     // Details
     [HttpGet("{id}")]
@@ -89,7 +95,9 @@ public abstract class EntityControllerBase<TEntity, TSo, TSortBy, TIncludes, TDt
     where TEntity : class, IEntity<int>
     where TSo : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum
-    where TIncludes : struct, Enum;
+    where TIncludes : struct, Enum
+    where TDto : class
+    where TInputDto : class;
 /// <summary>
 /// Complex EntityController
 /// </summary>
@@ -107,6 +115,8 @@ public abstract class EntityControllerBase<TEntity, TKey, TSo, TSortBy, TInclude
     where TSo : class, ISearchObject<TKey>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
+    where TDto : class
+    where TInputDto : class
 {
     // Details
     [HttpGet("{id}")]
