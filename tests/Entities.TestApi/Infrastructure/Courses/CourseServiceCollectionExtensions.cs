@@ -21,12 +21,11 @@ public static class CourseServiceCollectionExtensions
                 );
                 e.AddQueryFilter<CourseQueryFilter>();
                 e.UseWriteService<CourseEntityWriteService>();
-                //e.UseEntityService<CourseRepository>();
                 e.AddMapping<CourseDto, CourseInputDto>();
-                //e.HasAttachments<TContext, Course, CourseAttachment>(a =>
-                //{
-                //    a.AddMapping<CourseAttachmentDto, CourseAttachmentInputDto>();
-                //});
+                e.HasAttachments<TContext, Course, CourseAttachment>(a =>
+                {
+                    a.AddMapping<CourseAttachmentDto, CourseAttachmentInputDto>();
+                });
                 // extra person filter
                 e.AddTransient<IFilteredQueryBuilder<Person, int, PersonSearchObject>, CoursePersonQueryFilter>();
             });

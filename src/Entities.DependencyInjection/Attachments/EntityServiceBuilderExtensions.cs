@@ -2,7 +2,7 @@
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
-using Regira.Entities.DependencyInjection.ServiceBuilders;
+using Regira.Entities.DependencyInjection.Abstractions;
 using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.DependencyInjection.Attachments;
@@ -12,7 +12,7 @@ public static class EntityServiceBuilderExtensions
     // Attachments
     public static EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, EntityAttachmentSearchObject, int, Attachment> HasAttachments<TContext, TEntity, TEntityAttachment>
     (
-        this EntityServiceBuilder<TContext, TEntity> builder,
+        this IEntityServiceBuilder<TEntity, int> builder,
         Action<EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, EntityAttachmentSearchObject, int, Attachment>>? configure = null
     )
         where TContext : DbContext
@@ -20,6 +20,9 @@ public static class EntityServiceBuilderExtensions
         where TEntityAttachment : class, IEntityAttachment<int, int, int, Attachment>, new()
     {
         var attachmentBuilder = new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment>(builder.Services);
+
+        configure?.Invoke(attachmentBuilder);
+
         if (!attachmentBuilder.HasService<IEntityService<TEntityAttachment>>())
         {
             attachmentBuilder.AddDefaultAttachmentServices();
@@ -36,7 +39,7 @@ public static class EntityServiceBuilderExtensions
     public static EntityAttachmentServiceBuilder<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>
         HasAttachments<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>
         (
-            this EntityServiceBuilder<TContext, TEntity, TKey> builder,
+            this IEntityServiceBuilder<TEntity, TKey> builder,
             Action<EntityAttachmentServiceBuilder<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>>? configure = null
         )
         where TContext : DbContext

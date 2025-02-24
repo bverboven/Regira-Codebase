@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Entities.DependencyInjection.Testing.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Attachments;
@@ -20,7 +21,7 @@ using Testing.Library.Data;
 namespace Entities.DependencyInjection.Testing;
 
 [TestFixture]
-public class TestFor1EntityAttachmentServices
+public class TestFor3EntityAttachmentServices
 {
     [Test]
     public void Without_Defaults()
@@ -29,7 +30,7 @@ public class TestFor1EntityAttachmentServices
             .AddDbContext<ContosoContext>()
             .UseEntities<ContosoContext>()
             .WithAttachments(_ => new BinaryFileService(new FileSystemOptions()))
-            .For<Course>(e =>
+            .For<Course, int, CourseSearchObject>(e =>
             {
                 e.HasAttachments<ContosoContext, Course, CourseAttachment>();
             })
@@ -78,7 +79,7 @@ public class TestFor1EntityAttachmentServices
             .AddDbContext<ContosoContext>()
             .UseEntities<ContosoContext>(e => e.UseDefaults())
             .WithAttachments(_ => new BinaryFileService(new FileSystemOptions()))
-            .For<Course>(e =>
+            .For<Course, int, CourseSearchObject>(e =>
             {
                 e.HasAttachments<ContosoContext, Course, CourseAttachment>();
             })
@@ -137,7 +138,7 @@ public class TestFor1EntityAttachmentServices
             .AddDbContext<ContosoContext>()
             .UseEntities<ContosoContext>()
             .WithAttachments(_ => new BinaryFileService(new FileSystemOptions()))
-            .For<Course>(e =>
+            .For<Course, int, CourseSearchObject>(e =>
             {
                 e.HasAttachments<ContosoContext, Course, CourseAttachment>(a =>
                 {
@@ -169,7 +170,7 @@ public class TestFor1EntityAttachmentServices
         var entityService1 = sp.GetService<IEntityService<CourseAttachment>>();
         var entityService2 = sp.GetService<IEntityService<CourseAttachment, int>>();
         var entityService3 = sp.GetService<IEntityService<CourseAttachment, int, EntityAttachmentSearchObject>>();
-        
+
         Assert.That(queryFilters.Length, Is.EqualTo(2));
         Assert.That(queryFilters.OfType<EntityQueryFilter<CourseAttachment, int, EntityAttachmentSearchObject>>().Count(), Is.EqualTo(1));
         Assert.That(queryFilters.OfType<EntityAttachmentFilteredQueryBuilder<int, CourseAttachment, int, EntityAttachmentSearchObject, int, Attachment>>().Count, Is.EqualTo(1));

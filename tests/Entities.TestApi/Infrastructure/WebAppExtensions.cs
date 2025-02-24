@@ -14,9 +14,9 @@ public static class WebAppExtensions
     public static WebApplication MapEndPoints(this WebApplication app)
     {
         app.MapGet("/", () => "Hello");
-        app.MapPost("/db", (ContosoContext db) => db.Database.EnsureCreatedAsync());
-        app.MapDelete("/db", (ContosoContext db) => db.Database.EnsureDeletedAsync());
-        app.MapPost("/test-data", async (ContosoContext db, IEntityService<CourseAttachment> courseAttachmentService) =>
+        app.MapPost("/db", ([FromServices] ContosoContext db) => db.Database.EnsureCreatedAsync());
+        app.MapDelete("/db", ([FromServices] ContosoContext db) => db.Database.EnsureDeletedAsync());
+        app.MapPost("/test-data", async ([FromServices] ContosoContext db, [FromServices] IEntityService<CourseAttachment> courseAttachmentService) =>
         {
             await db.Database.EnsureCreatedAsync();
 
@@ -48,8 +48,8 @@ public static class WebAppExtensions
         });
         var departments = app.MapGroup("/minimal/departments")
             .WithOpenApi();
-        departments.MapGet("", async (ContosoContext db) => await db.Departments.ToListAsync());
-        departments.MapPut("", async (ContosoContext db, [FromBody] Department input) =>
+        departments.MapGet("", async ([FromServices] ContosoContext db) => await db.Departments.ToListAsync());
+        departments.MapPut("", async ([FromServices] ContosoContext db, [FromBody] Department input) =>
         {
             db.Departments.Add(input);
             await db.SaveChangesAsync();
