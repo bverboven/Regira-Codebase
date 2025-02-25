@@ -84,6 +84,7 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         HasRepositoryInner(factory);
         return this;
     }
+
     // Entity Manager
     public new EntityServiceBuilder<TContext, TEntity> HasManager<TService>()
         where TService : class, IEntityManager<TEntity>, IEntityManager<TEntity, int, SearchObject<int>>

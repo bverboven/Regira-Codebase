@@ -269,6 +269,68 @@ public class TestFor4Services
             .UseEntities<ContosoContext>()
             .For<Course, CourseSearchObject, CourseSortBy, CourseIncludes>(e =>
             {
+                e.Includes<CourseIncludingQueryBuilder>();
+            })
+            .BuildServiceProvider();
+
+        var entityNormalizer = sp.GetService<IEntityNormalizer>();
+        var globalFilters = sp.GetServices<IGlobalFilteredQueryBuilder>().ToArray();
+        var queryFilters = sp.GetServices<IFilteredQueryBuilder<Course, int, CourseSearchObject>>().ToArray();
+        var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
+        var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
+        var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
+        var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
+        var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
+        var primers = sp.GetServices<IEntityPrimer>().ToArray();
+        var entityWriteService = sp.GetService<IEntityWriteService<Course, int>>();
+        var repo1 = sp.GetService<IEntityRepository<Course>>();
+        var repo2 = sp.GetService<IEntityRepository<Course, int>>();
+        var repo3 = sp.GetService<IEntityRepository<Course, int, CourseSearchObject>>();
+        var repo4 = sp.GetService<IEntityRepository<Course, CourseSearchObject, CourseSortBy, CourseIncludes>>();
+        var repo5 = sp.GetService<IEntityRepository<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
+        var entityService1 = sp.GetService<IEntityService<Course>>();
+        var entityService2 = sp.GetService<IEntityService<Course, int>>();
+        var entityService3 = sp.GetService<IEntityService<Course, int, CourseSearchObject>>();
+        var entityService4 = sp.GetService<IEntityService<Course, CourseSearchObject, CourseSortBy, CourseIncludes>>();
+        var entityService5 = sp.GetService<IEntityService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
+
+        Assert.That(includableBuilder, Is.Not.Null);
+        Assert.That(includableBuilder, Is.TypeOf<CourseIncludingQueryBuilder>());
+
+        Assert.That(entityNormalizer, Is.Null);
+        Assert.That(globalFilters, Is.Empty);
+        Assert.That(queryFilters, Is.Empty);
+        Assert.That(sortableBuilder, Is.Null);
+        Assert.That(queryFilters, Is.Empty);
+        Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Course, CourseSearchObject, CourseSortBy, CourseIncludes>>());
+        Assert.That(entityProcessors, Is.Empty);
+        Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Course, CourseSearchObject, CourseSortBy, CourseIncludes>>());
+        Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Course, CourseSearchObject, CourseSortBy, CourseIncludes>>());
+        Assert.That(entityReadService5, Is.TypeOf<EntityReadService<ContosoContext, Course, CourseSearchObject, CourseSortBy, CourseIncludes>>());
+        Assert.That(primers, Is.Empty);
+        Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Course>>());
+        Assert.That(repo1, Is.TypeOf<EntityRepository<Course, CourseSearchObject, CourseSortBy, CourseIncludes>>());
+        Assert.That(repo2, Is.TypeOf<EntityRepository<Course, CourseSearchObject, CourseSortBy, CourseIncludes>>());
+        Assert.That(repo3, Is.TypeOf<EntityRepository<Course, CourseSearchObject, CourseSortBy, CourseIncludes>>());
+        Assert.That(repo4, Is.TypeOf<EntityRepository<Course, CourseSearchObject, CourseSortBy, CourseIncludes>>());
+        Assert.That(repo5, Is.TypeOf<EntityRepository<Course, CourseSearchObject, CourseSortBy, CourseIncludes>>());
+        Assert.That(entityService1, Is.TypeOf<EntityRepository<Course, CourseSearchObject, CourseSortBy, CourseIncludes>>());
+        Assert.That(entityService2, Is.TypeOf<EntityRepository<Course, CourseSearchObject, CourseSortBy, CourseIncludes>>());
+        Assert.That(entityService3, Is.TypeOf<EntityRepository<Course, CourseSearchObject, CourseSortBy, CourseIncludes>>());
+        Assert.That(entityService4, Is.TypeOf<EntityRepository<Course, CourseSearchObject, CourseSortBy, CourseIncludes>>());
+        Assert.That(entityService5, Is.TypeOf<EntityRepository<Course, CourseSearchObject, CourseSortBy, CourseIncludes>>());
+    }
+
+    [Test]
+    public void With_Include_Shortcut()
+    {
+        using var sp = new ServiceCollection()
+            .AddDbContext<ContosoContext>()
+            .UseEntities<ContosoContext>()
+            .For<Course, CourseSearchObject, CourseSortBy, CourseIncludes>(e =>
+            {
                 e.Includes((query, _) => query.Include(x => x.Instructors));
             })
             .BuildServiceProvider();

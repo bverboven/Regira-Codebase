@@ -283,13 +283,38 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject,
         return this;
     }
 
-    // Default SortBy
+    // SortBy
+    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> SortBy<TImplementation>()
+        where TImplementation : class, ISortedQueryBuilder<TEntity, TKey, TSortBy>
+    {
+        Services.AddTransient<ISortedQueryBuilder<TEntity, TKey, TSortBy>, TImplementation>();
+        return this;
+    }
+    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> SortBy<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, ISortedQueryBuilder<TEntity, TKey, TSortBy>
+    {
+        Services.AddTransient<ISortedQueryBuilder<TEntity, TKey, TSortBy>>(factory);
+        return this;
+    }
     public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> SortBy(Func<IQueryable<TEntity>, TSortBy?, IQueryable<TEntity>> sortByFunc)
     {
         Services.AddTransient<ISortedQueryBuilder<TEntity, TKey, TSortBy>>(_ => new SortedQueryBuilder<TEntity, TKey, TSortBy>(sortByFunc));
         return this;
     }
-    // Default Includes
+
+    // Includes
+    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> Includes<TImplementation>()
+        where TImplementation : class, IIncludableQueryBuilder<TEntity, TKey, TIncludes>
+    {
+        Services.AddTransient<IIncludableQueryBuilder<TEntity, TKey, TIncludes>, TImplementation>();
+        return this;
+    }
+    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> Includes<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IIncludableQueryBuilder<TEntity, TKey, TIncludes>
+    {
+        Services.AddTransient<IIncludableQueryBuilder<TEntity, TKey, TIncludes>>(factory);
+        return this;
+    }
     public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> Includes(Func<IQueryable<TEntity>, TIncludes?, IQueryable<TEntity>> addIncludes)
     {
         Services.AddTransient<IIncludableQueryBuilder<TEntity, TKey, TIncludes>>(_ => new IncludableQueryBuilder<TEntity, TKey, TIncludes>(addIncludes));

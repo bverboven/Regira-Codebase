@@ -10,7 +10,7 @@ namespace Office.Barcodes.Testing.Extensions;
 
 public static class QRCodeTestExtensions
 {
-    public static async Task Create_QRCode(this IQRCodeWriter writer, string input, string outputPath)
+    public static async Task Create_QRCode(this IQRCodeWriter? writer, string input, string outputPath)
     {
         if (writer == null)
         {
@@ -23,7 +23,7 @@ public static class QRCodeTestExtensions
         ClassicAssert.IsNotNull(barCodeImg.GetBytes());
         Assert.That(barCodeImg.GetLength() > 0, Is.True);
     }
-    public static async Task Check_Dimensions(this IQRCodeWriter writer, string content, int size, string outputDirectory)
+    public static async Task Check_Dimensions(this IQRCodeWriter? writer, string content, int size, string outputDirectory)
     {
         if (writer == null)
         {
@@ -42,7 +42,7 @@ public static class QRCodeTestExtensions
         Assert.That(barCodeImg.GetLength() > 0, Is.True);
         Assert.That(barCodeImg.Size?.Width, Is.EqualTo(input.Size.Width));
     }
-    public static void TooLong_Expect_InputException(this IQRCodeWriter writer)
+    public static void TooLong_Expect_InputException(this IQRCodeWriter? writer)
     {
         if (writer == null)
         {
@@ -57,7 +57,7 @@ public static class QRCodeTestExtensions
         });
     }
 
-    public static void Read_QRCode(this IQRCodeReader reader, string inputPath, string expectedContent)
+    public static void Read_QRCode(this IQRCodeReader? reader, string inputPath, string expectedContent)
     {
         if (reader == null)
         {
@@ -74,7 +74,7 @@ public static class QRCodeTestExtensions
 
     public static Task Create_And_Read_QRCode(this IQRCodeService service)
         => service.Create_And_Read_QRCode(service);
-    public static Task Create_And_Read_QRCode(this IQRCodeWriter writer, IQRCodeReader reader)
+    public static Task Create_And_Read_QRCode(this IQRCodeWriter? writer, IQRCodeReader? reader)
     {
         if (reader == null)
         {
