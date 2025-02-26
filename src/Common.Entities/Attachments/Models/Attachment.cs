@@ -5,7 +5,7 @@ using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.Attachments.Models;
 
-public class Attachment : Attachment<int>, IEntityWithSerial, IAttachment;
+public class Attachment : Attachment<int>, IEntityWithSerial;
 public class Attachment<TKey> : IAttachment<TKey>
 {
     public TKey Id { get; set; } = default!;

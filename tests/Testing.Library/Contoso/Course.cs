@@ -1,15 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Regira.Entities.Attachments.Abstractions;
+﻿using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Normalizing;
+using System.ComponentModel.DataAnnotations;
 
 namespace Testing.Library.Contoso;
 
 public class Course : IEntityWithSerial, IHasNormalizedTitle, IHasAttachments, IHasAttachments<CourseAttachment>
 {
     public int Id { get; set; }
-    public int DepartmentId { get; set; }
+    public int? DepartmentId { get; set; }
 
     [StringLength(64, MinimumLength = 3)]
     public string? Title { get; set; }
@@ -26,7 +26,7 @@ public class Course : IEntityWithSerial, IHasNormalizedTitle, IHasAttachments, I
 
     ICollection<IEntityAttachment>? IHasAttachments.Attachments
     {
-        get => Attachments?.ToArray();
+        get => Attachments?.Cast<IEntityAttachment>().ToArray();
         set => Attachments = value?.Cast<CourseAttachment>().ToArray();
     }
     public ICollection<CourseAttachment>? Attachments { get; set; }
@@ -41,5 +41,6 @@ public class CourseAttachment : EntityAttachment
         ObjectType = nameof(Course);
     }
 
+    [MaxLength(256)]
     public string? Description { get; set; }
 }

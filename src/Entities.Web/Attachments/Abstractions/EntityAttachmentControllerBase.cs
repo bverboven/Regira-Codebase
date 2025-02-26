@@ -1,26 +1,28 @@
-﻿using System.Diagnostics;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Regira.DAL.Paging;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Extensions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.Models;
+using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Attachments.Models;
 using Regira.Entities.Web.Controllers;
 using Regira.Entities.Web.Models;
 using Regira.Web.IO;
+using System.Diagnostics;
 using static Regira.Web.Extensions.ControllerExtensions;
 
 namespace Regira.Entities.Web.Attachments.Abstractions;
 
 public abstract class EntityAttachmentControllerBase<TEntity> : EntityAttachmentControllerBase<TEntity, EntityAttachmentDto, EntityAttachmentInputDto>
-    where TEntity : class, IEntityAttachment;
+    where TEntity : class, IEntityAttachment<int, int, int, Attachment>, IEntity<int>;
 public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> : ControllerBase
-    where TEntity : class, IEntityAttachment
+    where TEntity : class, IEntityAttachment<int, int, int, Attachment>, IEntity<int>
     where TInputDto : class, IEntityAttachmentInput
 {
     // Details
@@ -78,6 +80,8 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
         }
         catch (Exception ex)
         {
+            var logger = HttpContext.RequestServices.GetRequiredService<ILogger<EntityAttachmentControllerBase<TEntity>>>();
+            logger.LogError(ex, "Updating entity failed");
             throw;
         }
     }
@@ -127,7 +131,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
 
         var item = mapper.Map<TEntity>(model);
         item.ObjectId = objectId;
-        item.Attachment = file.ToNamedFile().ToAttachment<int>();
+        item.Attachment = file.ToNamedFile().ToAttachment();
 
         await service.Save(item);
         var affected = await service.SaveChanges();

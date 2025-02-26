@@ -176,7 +176,7 @@ public static class StringUtility
     }
 
     public static string? GetInitials(this string? input)
-        => string.IsNullOrWhiteSpace(input) ? input : string.Join("", input!.Split(' ').Select(s => s.First()));
+        => string.IsNullOrWhiteSpace(input) ? input : string.Join("", input.Split(' ').Select(s => s.First()));
     public static string? Capitalize(this string? input, CultureInfo? culture = null)
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -185,7 +185,7 @@ public static class StringUtility
         }
 
         culture ??= CultureInfo.CurrentCulture;
-        return culture.TextInfo.ToTitleCase(input!.ToLower(culture));
+        return culture.TextInfo.ToTitleCase(input.ToLower(culture));
     }
     //public static string RemoveDiacritics(string input)
     //{
@@ -218,7 +218,7 @@ public static class StringUtility
         }
 
         // https://stackoverflow.com/questions/249087/how-do-i-remove-diacritics-accents-from-a-string-in-net#answer-67569854
-        var normalizedString = input!.Normalize(NormalizationForm.FormD);
+        var normalizedString = input.Normalize(NormalizationForm.FormD);
         var stringBuilder = new StringBuilder();
 
 #if NETSTANDARD2_0

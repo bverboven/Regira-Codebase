@@ -1,8 +1,11 @@
-﻿namespace Regira.Entities.Attachments.Abstractions;
+﻿using Regira.Entities.Attachments.Models;
 
-public interface IIdentifierGenerator<TEntityAttachmentKey, TObjectKey, TAttachmentKey>
+namespace Regira.Entities.Attachments.Abstractions;
+
+public interface IIdentifierGenerator<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>
+    where TAttachment : class, IAttachment<TAttachmentKey>, new()
 {
-    string Generate(IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey> entity, string? rootFolder = null);
+    string Generate(IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment> entity, string? rootFolder = null);
 }
 
-public interface IIdentifierGenerator : IIdentifierGenerator<int, int, int>;
+public interface IIdentifierGenerator : IIdentifierGenerator<int, int, int, Attachment>;

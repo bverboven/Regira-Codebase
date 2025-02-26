@@ -3,8 +3,9 @@
 /// <summary>
 /// Always define value All as last value
 /// </summary>
+[Flags]
 public enum EntityIncludes
 {
-    None,
-    All
+    Default = 0,
+    All = 1
 }

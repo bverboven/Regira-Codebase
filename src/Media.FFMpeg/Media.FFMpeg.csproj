@@ -11,14 +11,14 @@
     <AssemblyName>Regira.Media.FFMpeg</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.1.0</Version>
+    <Version>4.2.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FFMpegCore" Version="5.1.0" />
   </ItemGroup>
   <ItemGroup>
     <!-- Upgraded for vulnerabilities -->
-    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Media\Common.Media.csproj" />

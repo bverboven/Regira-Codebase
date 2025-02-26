@@ -13,7 +13,7 @@
     <AssemblyName>Regira.Web.Swagger</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.1.0</Version>
+    <Version>4.2.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />

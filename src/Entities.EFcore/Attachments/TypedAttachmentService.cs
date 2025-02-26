@@ -3,10 +3,11 @@ using Regira.DAL.Paging;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Extensions;
+using Regira.Entities.Attachments.Models;
 
 namespace Regira.Entities.EFcore.Attachments;
 
-public interface ITypedAttachmentService : IEntityReadService<IEntityAttachment>;
+public interface ITypedAttachmentService : IEntityReadService<IEntityAttachment<int, int, int, Attachment>, int>;
 public class TypedAttachmentService<TContext>(
     TContext dbContext,
     Func<TContext, IList<IAttachmentQuerySetDescriptor>>? querySetFactory = null)
@@ -25,11 +26,11 @@ public class TypedAttachmentService<TContext>(
     ///     .Concat(...)
     /// </code>
     /// </summary>
-    public virtual IQueryable<IEntityAttachment> Query => _querySets?.ConcatAll() ?? throw new NotImplementedException();
+    public virtual IQueryable<IEntityAttachment<int, int, int, Attachment>> Query => _querySets?.ConcatAll() ?? throw new NotImplementedException();
 
-    public async Task<IEntityAttachment?> Details(int id)
+    public async Task<IEntityAttachment<int, int, int, Attachment>?> Details(int id)
         => (await List(new { id }, new PagingInfo { PageSize = 1 })).SingleOrDefault();
-    public async Task<IList<IEntityAttachment>> List(object? so = null, PagingInfo? pagingInfo = null)
+    public async Task<IList<IEntityAttachment<int, int, int, Attachment>>> List(object? so = null, PagingInfo? pagingInfo = null)
     {
         var query = Query
             .Filter(so?.ToSearchObject())
@@ -44,6 +45,6 @@ public class TypedAttachmentService<TContext>(
 
         return items;
     }
-    public Task<int> Count(object? so)
-        => Query.Filter(so?.ToSearchObject()).CountAsync();
+    public Task<long> Count(object? so)
+        => Query.Filter(so?.ToSearchObject()).LongCountAsync();
 }

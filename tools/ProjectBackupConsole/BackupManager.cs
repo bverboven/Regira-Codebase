@@ -37,7 +37,7 @@ public class BackupManager(IFileService fileService, ZipBuilder zipBuilder)
             .Select(file => new BinaryFileItem
             {
                 FileName = file.Replace('\\', '/').Trim('/'),
-                Path = Path.Combine(fileService.RootFolder, file)
+                Path = Path.Combine(fileService.Root, file)
             });
 
         using var zipFile = await zipBuilder

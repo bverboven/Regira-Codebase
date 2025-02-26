@@ -1,5 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
+using Regira.Normalizing;
+using Regira.Normalizing.Models;
 
 namespace Regira.DAL.EFcore.Extensions;
 
@@ -16,7 +20,12 @@ public static class DbContextExtension
     /// <param name="dbContext"></param>
     /// <returns></returns>
     public static IEnumerable<EntityEntry> GetPendingEntries(this DbContext dbContext)
-        => dbContext.ChangeTracker.Entries().Where(x => x.State is EntityState.Modified or EntityState.Added or EntityState.Deleted);
+        => dbContext.ChangeTracker.Entries()
+            .Where(x => x.State is EntityState.Modified or EntityState.Added or EntityState.Deleted);
+    public static IEnumerable<EntityEntry<T>> GetPendingEntries<T>(this DbContext dbContext)
+        where T : class
+        => dbContext.ChangeTracker.Entries<T>()
+            .Where(x => x.State is EntityState.Modified or EntityState.Added or EntityState.Deleted);
 
     /// <summary>
     /// Extends native SaveChangesAsync, by removing modifications on entries that caused errors, to enable recalling SaveChangesAsync for other entries<br />
@@ -27,7 +36,8 @@ public static class DbContextExtension
     /// <param name="acceptAllChangesOnSuccess"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static async Task<int> SaveAndCleanUpOnError<TContext>(this TContext dbContext, bool acceptAllChangesOnSuccess = true, CancellationToken cancellationToken = default)
+    public static async Task<int> SaveAndCleanUpOnError<TContext>(this TContext dbContext,
+        bool acceptAllChangesOnSuccess = true, CancellationToken cancellationToken = default)
         where TContext : DbContext
     {
         try
@@ -54,6 +64,31 @@ public static class DbContextExtension
             }
 
             throw;
+        }
+    }
+
+    public static DbContextOptionsBuilder AddRegisteredInterceptors(this DbContextOptionsBuilder optionsBuilder,
+        IServiceCollection services, IServiceProvider? sp = null)
+    {
+        sp ??= services.BuildServiceProvider();
+        var interceptorDescriptors = services
+            .CollectDescriptors<IInterceptor>();
+        var interceptors = interceptorDescriptors
+            .Select(d => (IInterceptor)sp.GetRequiredService(d.ServiceType));
+        return optionsBuilder.AddInterceptors(interceptors);
+    }
+    public static DbContextOptionsBuilder AddInterceptors(this DbContextOptionsBuilder optionsBuilder, Func<IEnumerable<IInterceptor>> factory)
+        => optionsBuilder.AddInterceptors(factory());
+
+
+    public static void AutoNormalizeStringsForEntries(this DbContext dbContext, NormalizingOptions? options = null)
+    {
+        foreach (var entry in dbContext.GetPendingEntries())
+        {
+            if (entry.State != EntityState.Deleted)
+            {
+                NormalizingUtility.InvokeObjectNormalizer(entry.Entity, options);
+            }
         }
     }
 }

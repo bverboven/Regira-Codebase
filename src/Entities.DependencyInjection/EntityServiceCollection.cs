@@ -1,10 +1,16 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
+using Regira.Entities.DependencyInjection.Abstractions;
+using Regira.Entities.DependencyInjection.Primers;
+using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.EFcore.Attachments;
+using Regira.Entities.EFcore.Processing.Abstractions;
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
+using Regira.Entities.EFcore.Services;
+using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Attachments.Models;
 using Regira.IO.Storage.Abstractions;
@@ -12,63 +18,45 @@ using Regira.Web.DependencyInjection;
 
 namespace Regira.Entities.DependencyInjection;
 
-public class EntityServiceCollection<TContext>(IServiceCollection services) : ServiceCollectionWrapper(services)
-    where TContext : DbContext
+public class EntityServiceCollection<TContext>(IServiceCollection services) : ServiceCollectionWrapper(services), IEntityServiceCollection<TContext> where TContext : DbContext
 {
-    // Entity service
-    public EntityServiceCollection<TContext> For<TEntity, TService>(
-        Action<EntityServiceBuilder<TContext, TEntity, int>>? configure = null)
-        where TEntity : class, IEntity<int>
-        where TService : class, IEntityService<TEntity>
-    {
-        var builder = new EntityServiceBuilder<TContext, TEntity>(this)
-            .AddService<TService>();
-        configure?.Invoke(builder);
-
-        return this;
-    }
-    /// <summary>
-    /// <inheritdoc cref="EntityServiceBuilder{TContext, TEntity}.AddService{TService}"/>
-    /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TService"></typeparam>
-    /// <param name="configure"></param>
-    /// <returns></returns>
-    public EntityServiceCollection<TContext> For<TEntity, TKey, TService>(Action<EntityServiceBuilder<TContext, TEntity, TKey>>? configure = null)
-        where TEntity : class, IEntity<TKey>
-        where TService : class, IEntityService<TEntity, TKey>
-    {
-        var builder = new EntityServiceBuilder<TContext, TEntity, TKey>(this)
-            .AddService<TService>();
-        configure?.Invoke(builder);
-
-        return this;
-    }
-    public EntityServiceCollection<TContext> For<TEntity, TKey, TSearchObject, TService>(Action<EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>>? configure = null)
-        where TEntity : class, IEntity<TKey>
-        where TSearchObject : class, ISearchObject<TKey>, new()
-        where TService : class, IEntityService<TEntity, TKey, TSearchObject>
-    {
-        var builder = new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(this)
-            .AddService<TService>();
-        configure?.Invoke(builder);
-
-        return this;
-    }
-
     // Default service
-    public EntityServiceCollection<TContext> For<TEntity>(Action<EntityServiceBuilder<TContext, TEntity, int>>? configure = null)
+    public EntityServiceCollection<TContext> For<TEntity>(Action<EntityServiceBuilder<TContext, TEntity>>? configure = null)
         where TEntity : class, IEntity<int>
     {
-        var builder = new EntityServiceBuilder<TContext, TEntity>(this)
-            .AddDefaultService();
+        var builder = new EntityServiceBuilder<TContext, TEntity>(this);
         configure?.Invoke(builder);
+
+        // Query Builder
+        if (!builder.HasService<IQueryBuilder<TEntity, int, SearchObject<int>, EntitySortBy, EntityIncludes>>())
+        {
+            builder.AddDefaultQueryBuilder();
+        }
+        // Read Service
+        if (!builder.HasService<IEntityReadService<TEntity, int, SearchObject<int>>>())
+        {
+            builder.UseReadService<EntityReadService<TContext, TEntity, int, SearchObject<int>>>();
+        }
+        // Write Service
+        if (!builder.HasService<IEntityWriteService<TEntity, int>>())
+        {
+            builder.UseWriteService<EntityWriteService<TContext, TEntity>>();
+        }
+        // Entity Repository
+        if (!builder.HasService<IEntityRepository<TEntity>>())
+        {
+            builder.HasRepositoryInner<EntityRepository<TEntity>>();
+        }
+        // Entity Service
+        if (!builder.HasService<IEntityService<TEntity>>())
+        {
+            builder.UseEntityService<EntityRepository<TEntity>>();
+        }
 
         return this;
     }
     /// <summary>
-    /// <inheritdoc cref="EntityServiceBuilder{TContext, TEntity}.AddDefaultService"/>
+    /// <inheritdoc cref="EntityServiceBuilder{TContext,TEntity,TKey}.AddDefaultService"/>
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TKey"></typeparam>
@@ -77,9 +65,34 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     public EntityServiceCollection<TContext> For<TEntity, TKey>(Action<EntityServiceBuilder<TContext, TEntity, TKey>>? configure = null)
         where TEntity : class, IEntity<TKey>
     {
-        var builder = new EntityServiceBuilder<TContext, TEntity, TKey>(this)
-            .AddDefaultService();
+        var builder = new EntityServiceBuilder<TContext, TEntity, TKey>(this);
         configure?.Invoke(builder);
+
+        // Query Builder
+        if (!builder.HasService<IQueryBuilder<TEntity, TKey, SearchObject<TKey>, EntitySortBy, EntityIncludes>>())
+        {
+            builder.AddDefaultQueryBuilder();
+        }
+        // Read Service
+        if (!builder.HasService<IEntityReadService<TEntity, TKey, SearchObject<TKey>>>())
+        {
+            builder.UseReadService<EntityReadService<TContext, TEntity, TKey, SearchObject<TKey>>>();
+        }
+        // Write Service
+        if (!builder.HasService<IEntityWriteService<TEntity, TKey>>())
+        {
+            builder.UseWriteService<EntityWriteService<TContext, TEntity, TKey>>();
+        }
+        // Entity Repository
+        if (!builder.HasService<IEntityRepository<TEntity, TKey>>())
+        {
+            builder.HasRepositoryInner<EntityRepository<TEntity, TKey>>();
+        }
+        // Entity Service
+        if (!builder.HasService<IEntityService<TEntity, TKey>>())
+        {
+            builder.UseEntityService<EntityRepository<TEntity, TKey>>();
+        }
 
         return this;
     }
@@ -87,173 +100,173 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         where TEntity : class, IEntity<TKey>
         where TSearchObject : class, ISearchObject<TKey>, new()
     {
-        var builder = new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(this)
-            .AddDefaultService();
+        var builder = new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(this);
         configure?.Invoke(builder);
+
+        // Query Builder
+        if (!builder.HasService<IQueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>>())
+        {
+            builder.AddDefaultQueryBuilder();
+        }
+        // Read Service
+        if (!builder.HasService<IEntityReadService<TEntity, TKey, TSearchObject>>())
+        {
+            builder.UseReadService<EntityReadService<TContext, TEntity, TKey, TSearchObject>>();
+        }
+        // Write Service
+        if (!builder.HasService<IEntityWriteService<TEntity, TKey>>())
+        {
+            builder.UseWriteService<EntityWriteService<TContext, TEntity, TKey>>();
+        }
+        // Entity Repository
+        if (!builder.HasService<IEntityRepository<TEntity, TKey, TSearchObject>>())
+        {
+            builder.HasRepositoryInner<EntityRepository<TEntity, TKey, TSearchObject>>();
+        }
+        // Entity Service
+        if (!builder.HasService<IEntityService<TEntity, TKey, TSearchObject>>())
+        {
+            builder.UseEntityService<EntityRepository<TEntity, TKey, TSearchObject>>();
+        }
+
+        return this;
+    }
+    public EntityServiceCollection<TContext> For<TEntity, TSearchObject, TSortBy, TIncludes>
+        (Action<ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>? configure = null)
+        where TEntity : class, IEntity<int>
+        where TSearchObject : class, ISearchObject<int>, new()
+        where TSortBy : struct, Enum
+        where TIncludes : struct, Enum
+    {
+        var simpleBuilder = new EntityServiceBuilder<TContext, TEntity, int, TSearchObject>(this);
+        var builder = new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(simpleBuilder);
+        configure?.Invoke(builder);
+
+        // Query Builder
+        if (!builder.HasService<IQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>>())
+        {
+            builder.AddDefaultQueryBuilder();
+        }
+
+        // Read Service
+        if (!builder.HasService<IEntityReadService<TEntity, int, TSearchObject, TSortBy, TIncludes>>())
+        {
+            builder.UseReadService<EntityReadService<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>();
+        }
+        // Write Service
+        if (!builder.HasService<IEntityWriteService<TEntity, int>>())
+        {
+            builder.UseWriteService<EntityWriteService<TContext, TEntity>>();
+        }
+
+        // Entity Repository
+        if (!builder.HasService<IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>())
+        {
+            builder.HasRepositoryInner<EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
+        }
+
+        // Entity Service
+        if (!builder.HasEntityService())
+        {
+            builder.AddTransient<IEntityService<TEntity>, EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
+            builder.AddTransient<IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>, EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
+
+            builder.AddTransient<IEntityService<TEntity, int>, EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
+            builder.AddTransient<IEntityService<TEntity, int, TSearchObject>, EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
+            builder.AddTransient<IEntityService<TEntity, int, TSearchObject, TSortBy, TIncludes>, EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
+        }
+
+        return this;
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TSearchObject"></typeparam>
+    /// <typeparam name="TSortBy"></typeparam>
+    /// <typeparam name="TIncludes"></typeparam>
+    /// <param name="configure"></param>
+    /// <returns></returns>
+    public EntityServiceCollection<TContext> For<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
+        (Action<ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>>? configure = null)
+        where TEntity : class, IEntity<TKey>
+        where TSearchObject : class, ISearchObject<TKey>, new()
+        where TSortBy : struct, Enum
+        where TIncludes : struct, Enum
+    {
+        var simpleBuilder = new EntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>(this);
+        var builder = new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(simpleBuilder);
+        configure?.Invoke(builder);
+
+        // Query Builder
+        if (!builder.HasService<IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>())
+        {
+            builder.AddDefaultQueryBuilder();
+        }
+
+        // Read Service
+        if (!builder.HasService<IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>())
+        {
+            builder.UseReadService<EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+        }
+        // Write Service
+        if (!builder.HasService<IEntityWriteService<TEntity, TKey>>())
+        {
+            builder.UseWriteService<EntityWriteService<TContext, TEntity, TKey>>();
+        }
+
+        // Entity Repository
+        if (!builder.HasService<IEntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>())
+        {
+            builder.HasRepositoryInner<EntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+        }
+
+        // Entity Service
+        if (!builder.HasEntityService())
+        {
+            builder.AddTransient<IEntityService<TEntity, TKey>, EntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+            builder.AddTransient<IEntityService<TEntity, TKey, TSearchObject>, EntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+            builder.AddTransient<IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, EntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+        }
 
         return this;
     }
 
 
     // Service with attachments
-    //public EntityServiceCollection<TContext> For<TEntity, TEntityAttachment, TService>(
-    //    Action<EntityServiceBuilder<TContext, TEntity, int>>? configure = null,
-    //    Action<EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, int>>?
-    //        configureAttachments = null
-    //)
-    //    where TEntity : class, IEntity<int>, IHasAttachments, IHasAttachments<TEntityAttachment>
-    //    where TEntityAttachment : class, IEntityAttachment
-    //    where TService : class, IEntityService<TEntity>
-    //{
-    //    var builder = new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment>(this)
-    //        .AddDefaultAttachmentService()
-    //        .WithDefaultMapping();
-    //    configureAttachments?.Invoke(builder);
-
-    //    return For<TEntity, TService>(configure);
-    //}
-    ///// <summary>
-    ///// <inheritdoc cref="EntityAttachmentServiceBuilder{TContext, TEntity, TEntityAttachment}.AddDefaultAttachmentService"/>
-    ///// <inheritdoc cref="EntityAttachmentServiceBuilder{TContext, TEntity, TEntityAttachment}.WithDefaultMapping"/>
-    ///// <inheritdoc cref="EntityServiceBuilder{TContext, TEntity}.AddService{TService}"/>
-    ///// </summary>
-    ///// <typeparam name="TEntity"></typeparam>
-    ///// <typeparam name="TEntityKey"></typeparam>
-    ///// <typeparam name="TEntityAttachment"></typeparam>
-    ///// <typeparam name="TEntityAttachmentKey"></typeparam>
-    ///// <typeparam name="TAttachmentKey"></typeparam>
-    ///// <typeparam name="TService"></typeparam>
-    ///// <param name="configure"></param>
-    ///// <param name="configureAttachments"></param>
-    ///// <returns></returns>
-    //public EntityServiceCollection<TContext> For<TEntity, TEntityKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey, TService>(
-    //    Action<EntityServiceBuilder<TContext, TEntity, TEntityKey>>? configure = null,
-    //    Action<EntityAttachmentServiceBuilder<TContext, TEntity, TEntityKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey>>? configureAttachments = null
-    //)
-    //    where TEntity : class, IEntity<TEntityKey>, IHasAttachments, IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TEntityKey, TAttachmentKey>
-    //    where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TEntityKey, TAttachmentKey>
-    //    where TService : class, IEntityService<TEntity, TEntityKey>
-    //{
-    //    var builder = new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey>(this)
-    //        .AddDefaultAttachmentService()
-    //        .WithDefaultMapping();
-    //    configureAttachments?.Invoke(builder);
-
-    //    return For<TEntity, TEntityKey, TService>(configure);
-    //}
-
-    // Default service with attachments
-    //public EntityServiceCollection<TContext> For<TEntity, TEntityAttachment>(
-    //    Action<EntityServiceBuilder<TContext, TEntity, int>>? configure = null,
-    //    // ReSharper disable once MethodOverloadWithOptionalParameter
-    //    Action<EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, int>>?
-    //        configureAttachments = null
-    //)
-    //    where TEntity : class, IEntity<int>, IHasAttachments, IHasAttachments<TEntityAttachment>
-    //    where TEntityAttachment : class, IEntityAttachment
-    //{
-    //    var builder = new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment>(this)
-    //        .AddDefaultAttachmentService()
-    //        .WithDefaultMapping();
-    //    configureAttachments?.Invoke(builder);
-
-    //    return For(configure);
-    //}
-    ///// <summary>
-    ///// <inheritdoc cref="EntityAttachmentServiceBuilder{TContext, TEntity, TEntityAttachment}.AddDefaultAttachmentService"/>
-    ///// <inheritdoc cref="EntityAttachmentServiceBuilder{TContext, TEntity, TEntityAttachment}.WithDefaultMapping"/>
-    ///// <inheritdoc cref="EntityServiceCollection{TContext}.For{TEntity}"/>
-    ///// </summary>
-    ///// <typeparam name="TEntity"></typeparam>
-    ///// <typeparam name="TEntityKey"></typeparam>
-    ///// <typeparam name="TEntityAttachment"></typeparam>
-    ///// <typeparam name="TEntityAttachmentKey"></typeparam>
-    ///// <typeparam name="TAttachmentKey"></typeparam>
-    ///// <param name="configure"></param>
-    ///// <param name="configureAttachments"></param>
-    ///// <returns></returns>
-    //public EntityServiceCollection<TContext> For<TEntity, TEntityKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey>(
-    //    Action<EntityServiceBuilder<TContext, TEntity, TEntityKey>>? configure = null,
-    //    // ReSharper disable once MethodOverloadWithOptionalParameter
-    //    Action<EntityAttachmentServiceBuilder<TContext, TEntity, TEntityKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey>>? configureAttachments = null
-    //)
-    //    where TEntity : class, IEntity<TEntityKey>, IHasAttachments, IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TEntityKey, TAttachmentKey>
-    //    where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TEntityKey, TAttachmentKey>
-    //{
-    //    var builder = new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey>(this)
-    //        .AddDefaultAttachmentService()
-    //        .WithDefaultMapping();
-    //    configureAttachments?.Invoke(builder);
-
-    //    return For(configure);
-    //}
-
-
-    // Complex service
-    public EntityServiceCollection<TContext> For<TEntity, TService, TSearchObject, TSortBy, TIncludes>(
-        Action<ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>? configure = null)
-        where TService : class, IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>, IEntityService<TEntity>
-        where TEntity : class, IEntity<int>
-        where TSearchObject : class, ISearchObject, new()
-        where TSortBy : struct, Enum
-        where TIncludes : struct, Enum
+    public EntityServiceCollection<TContext> WithAttachments(Func<IServiceProvider, IFileService> factory, Action<EntityServiceBuilder<TContext, Attachment, int, AttachmentSearchObject<int>>>? configure = null)
     {
-        var builder = new EntityServiceBuilder<TContext, TEntity>(this)
-            .AddComplexService<TService, TSearchObject, TSortBy, TIncludes>();
-        configure?.Invoke(builder);
-        return this;
-    }
-    /// <summary>
-    /// <inheritdoc cref="EntityServiceBuilder{TContext, TEntity}.AddComplexService{TService, TSearchObject, TSortBy, TIncludes}"/>
-    /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TService"></typeparam>
-    /// <typeparam name="TSearchObject"></typeparam>
-    /// <typeparam name="TSortBy"></typeparam>
-    /// <typeparam name="TIncludes"></typeparam>
-    /// <param name="configure"></param>
-    /// <returns></returns>
-    public EntityServiceCollection<TContext> For<TEntity, TKey, TService, TSearchObject, TSortBy, TIncludes>(Action<ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>>? configure = null)
-        where TService : class, IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, IEntityService<TEntity, TKey>
-        where TEntity : class, IEntity<TKey>
-        where TSearchObject : class, ISearchObject<TKey>, new()
-        where TSortBy : struct, Enum
-        where TIncludes : struct, Enum
-    {
-        var builder = new EntityServiceBuilder<TContext, TEntity, TKey>(this)
-            .AddComplexService<TService, TSearchObject, TSortBy, TIncludes>();
-        configure?.Invoke(builder);
-
-        return this;
+        return WithAttachments<Attachment, int, AttachmentSearchObject<int>>(factory, configure);
     }
 
-    // Complex service with attachments
-    public EntityServiceCollection<TContext> ConfigureAttachmentService(Func<IServiceProvider, IFileService> factory)
+    public EntityServiceCollection<TContext> WithAttachments<TAttachment, TKey, TAttachmentSearchObject>(
+        Func<IServiceProvider, IFileService> factory,
+        Action<EntityServiceBuilder<TContext, TAttachment, TKey, TAttachmentSearchObject>>? configure = null
+    )
+        where TAttachment : class, IAttachment<TKey>, new()
+        where TAttachmentSearchObject : AttachmentSearchObject<TKey>, new()
     {
-        Services.AddTransient<IAttachmentService>(p
-            => new AttachmentRepository<TContext>(p.GetRequiredService<TContext>(), factory(p)));
-        return ConfigureAttachmentService<int>(factory);
-    }
+        Services.AddTransient(factory);
+        Services.AddPrimer<AttachmentPrimer>();
 
-    /// <summary>
-    /// Adds <see cref="IAttachmentService"/> to <see cref="IServiceCollection"/> with an implementation of <see cref="IFileService"/>.<br />
-    /// Adds <see cref="IMappingExpression">AutoMapper maps</see> for <see cref="Attachment" /> to <see cref="AttachmentDto"/> and <see cref="AttachmentInputDto"/> to <see cref="Attachment" />.
-    /// </summary>
-    /// <param name="factory"></param>
-    /// <returns></returns>
-    public EntityServiceCollection<TContext> ConfigureAttachmentService<TKey>(Func<IServiceProvider, IFileService> factory)
-    {
+        var builder = new EntityServiceBuilder<TContext, TAttachment, TKey, TAttachmentSearchObject>(this);
+
+        builder.For<TAttachment, TKey, TAttachmentSearchObject>(e =>
+        {
+            e.AddTransient<IEntityProcessor<TAttachment>, AttachmentProcessor<TAttachment, TKey>>();
+            e.UseEntityService<AttachmentRepository<TContext, TAttachment, TKey, TAttachmentSearchObject>>();
+            e.AddQueryFilter<AttachmentFilteredQueryBuilder<TAttachment, TKey, TAttachmentSearchObject>>();
+            e.AddTransient<IAttachmentService<TAttachment, TKey, TAttachmentSearchObject>, AttachmentRepository<TContext, TAttachment, TKey, TAttachmentSearchObject>>();
+            configure?.Invoke(e);
+        });
+
         Services
-            .AddTransient<IAttachmentService<TKey>>(p
-                => new AttachmentRepository<TContext, TKey>(p.GetRequiredService<TContext>(), factory(p)))
             .AddAutoMapper(cfg =>
             {
-                cfg.CreateMap<Attachment<TKey>, AttachmentDto<TKey>>()
+                cfg.CreateMap<TAttachment, AttachmentDto<TKey>>()
                     .ReverseMap();
-                cfg.CreateMap<AttachmentInputDto<TKey>, Attachment<TKey>>();
-                //cfg.CreateMap<EntityAttachmentBase, EntityAttachmentDto>()
-                //    .IncludeAllDerived();
+                cfg.CreateMap<AttachmentInputDto<TKey>, TAttachment>();
             });
         return this;
     }

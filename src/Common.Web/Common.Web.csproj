@@ -11,7 +11,7 @@
     <AssemblyName>Regira.Web</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.1.0</Version>
+    <Version>4.2.1</Version>
   </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
     <!-- Upgrading to v2.3.0 causes errors in other projects (LinkGenerator is missing) -->
@@ -20,7 +20,7 @@
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
     <!-- Upgraded for vulnerabilities -->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="9.0.1" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="9.0.2" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) == 'net6.0' or $(TargetFramework) == 'net8.0' or $(TargetFramework) == 'net9.0'">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

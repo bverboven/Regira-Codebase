@@ -1,45 +1,51 @@
 ﻿using Regira.DAL.Paging;
+using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Utilities;
 
 namespace Regira.Entities.Abstractions;
 
-public abstract class EntityWrappingServiceBase<TEntity>(IEntityService<TEntity> service)
-    : EntityWrappingServiceBase<TEntity, int>(service), IEntityService<TEntity>
+public abstract class EntityWrappingServiceBase<TEntity>(IEntityService<TEntity, int, SearchObject<int>> service)
+    : EntityWrappingServiceBase<TEntity, int, SearchObject<int>>(service), IEntityService<TEntity>
     where TEntity : class, IEntity<int>;
 
-public abstract class EntityWrappingServiceBase<TEntity, TKey>(IEntityService<TEntity, TKey> service)
-    : IEntityService<TEntity, TKey>
-    where TEntity : class, IEntity<TKey>
-{
-    public virtual Task<TEntity?> Details(TKey id)
-        => service.Details(id);
-    public virtual Task<IList<TEntity>> List(object? so = null, PagingInfo? pagingInfo = null)
-        => service.List(so, pagingInfo);
-    public virtual Task<int> Count(object? so)
-        => service.Count(so);
-
-    public virtual Task Add(TEntity item)
-        => service.Add(item);
-    public virtual Task Modify(TEntity item)
-        => service.Modify(item);
-    public virtual Task Save(TEntity item)
-        => service.Save(item);
-    public virtual Task Remove(TEntity item)
-        => service.Remove(item);
-
-    public virtual Task<int> SaveChanges(CancellationToken token = default)
-        => service.SaveChanges(token);
-}
+public abstract class EntityWrappingServiceBase<TEntity, TKey>(
+    IEntityService<TEntity, TKey, SearchObject<TKey>> service)
+    : EntityWrappingServiceBase<TEntity, TKey, SearchObject<TKey>>(service), IEntityService<TEntity, TKey>
+    where TEntity : class, IEntity<TKey>;
 
 public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject>(
-    IEntityService<TEntity, TKey, TSearchObject> service) : EntityWrappingServiceBase<TEntity, TKey>(service),
-    IEntityService<TEntity, TKey, TSearchObject>
+    IEntityService<TEntity, TKey, TSearchObject> service) : IEntityService<TEntity, TKey, TSearchObject>
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
 {
+    protected readonly IEntityService<TEntity, TKey, TSearchObject> Service = service;
+
+    public virtual Task<TEntity?> Details(TKey id)
+        => Service.Details(id);
+
     public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
-        => service.List(so, pagingInfo);
+        => Service.List(so, pagingInfo);
+    public virtual Task<long> Count(TSearchObject? so)
+        => Service.Count(so);
+
+    public virtual Task<IList<TEntity>> List(object? so, PagingInfo? pagingInfo)
+        => Service.List(so, pagingInfo);
+    public virtual Task<long> Count(object? so)
+        => Service.Count(so);
+
+
+    public virtual Task Add(TEntity item)
+        => Service.Add(item);
+    public virtual Task<TEntity?> Modify(TEntity item)
+        => Service.Modify(item);
+    public virtual Task Save(TEntity item)
+        => Service.Save(item);
+    public virtual Task Remove(TEntity item)
+        => Service.Remove(item);
+
+    public virtual Task<int> SaveChanges(CancellationToken token = default)
+        => Service.SaveChanges(token);
 }
 
 public abstract class EntityWrappingServiceBase<TEntity, TSearchObject, TSortBy, TIncludes>(
@@ -61,17 +67,21 @@ public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject, TS
         => service.Details(id);
     public virtual Task<IList<TEntity>> List(object? so = null, PagingInfo? pagingInfo = null)
         => service.List(so, pagingInfo);
-    public virtual Task<int> Count(object? so)
-        => service.Count(so);
-
+    public Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
+        => service.List(so, pagingInfo);
     public virtual Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null)
         => service.List(so, sortBy, includes, pagingInfo);
-    public virtual Task<int> Count(IList<TSearchObject?> so)
+
+    public virtual Task<long> Count(object? so)
+        => service.Count(so);
+    public Task<long> Count(TSearchObject? so)
+        => service.Count(so);
+    public virtual Task<long> Count(IList<TSearchObject?> so)
         => service.Count(so);
 
     public virtual Task Add(TEntity item)
         => service.Add(item);
-    public virtual Task Modify(TEntity item)
+    public virtual Task<TEntity?> Modify(TEntity item)
         => service.Modify(item);
     public virtual Task Save(TEntity item)
         => service.Save(item);

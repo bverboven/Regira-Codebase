@@ -234,6 +234,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectsCleanerConsole", "t
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Security.Authentication", "src\Security.Authentication\Security.Authentication.csproj", "{EC305BDA-3B71-4CA0-A7BF-173E1B483BEB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities.DependencyInjection.Testing", "tests\Entities.DependencyInjection.Testing\Entities.DependencyInjection.Testing.csproj", "{D02AA94D-6792-479B-B993-2F4B5409CD93}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -588,6 +590,10 @@ Global
 		{EC305BDA-3B71-4CA0-A7BF-173E1B483BEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC305BDA-3B71-4CA0-A7BF-173E1B483BEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC305BDA-3B71-4CA0-A7BF-173E1B483BEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D02AA94D-6792-479B-B993-2F4B5409CD93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D02AA94D-6792-479B-B993-2F4B5409CD93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D02AA94D-6792-479B-B993-2F4B5409CD93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D02AA94D-6792-479B-B993-2F4B5409CD93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -702,6 +708,7 @@ Global
 		{F33D6B41-8195-458C-A77C-5246298B4BF8} = {8196140F-293A-4CA0-ADF1-CFB4F71D4374}
 		{DDF96C67-AF2E-417E-BD8E-C6598147A14D} = {DFD0CE90-E26D-4D90-A837-797EF8782A14}
 		{EC305BDA-3B71-4CA0-A7BF-173E1B483BEB} = {6DC10729-D5B9-4A82-9E67-07DCD04CF6B7}
+		{D02AA94D-6792-479B-B993-2F4B5409CD93} = {C282BB35-A907-4CCC-B5FD-D0ABE60C0EDB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C20C1CB-93D4-46D3-A172-85F0202D818C}

@@ -1,9 +1,15 @@
 ﻿using Entities.Testing.Infrastructure.Normalizers;
+using Entities.Testing.Infrastructure.Primers;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Regira.DAL.EFcore.Normalizing;
-using Regira.Normalizing.Abstractions;
+using Regira.Entities.DependencyInjection.Extensions;
+using Regira.Entities.DependencyInjection.Normalizers;
+using Regira.Entities.EFcore.Normalizing;
+using Regira.Entities.EFcore.Normalizing.Abstractions;
+using Regira.Entities.EFcore.Primers;
+using Regira.Entities.EFcore.Primers.Abstractions;
+using Regira.Entities.Models.Abstractions;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
@@ -12,51 +18,12 @@ namespace Entities.Testing;
 [TestFixture]
 internal class NormalizingTests
 {
-    private Person John = null!;
-    private Student Jane = null!;
-    private Student Francois = null!;
-    private Instructor Bob = null!;
-    private Instructor Bill = null!;
     private SqliteConnection _connection = null!;
     [SetUp]
     public void Setup()
     {
         _connection = new SqliteConnection("Filename=:memory:");
         _connection.Open();
-        John = new Student
-        {
-            GivenName = "John",
-            LastName = "Doe",
-            Description = "This is a male test person",
-            Email = "john.doe@email.com"
-        };
-        Jane = new Student
-        {
-            GivenName = "Jane",
-            LastName = "Doe",
-            Description = "This is a female test person",
-            Phone = "001 234 567 890"
-        };
-        Francois = new Student
-        {
-            GivenName = "François",
-            LastName = "Du sacre Cœur",
-            Description = "Le poète parisien du xiiie siècle Rutebeuf se fait gravement l'écho de la faiblesse humaine, de l'incertitude et de la pauvreté à l'opposé des valeurs courtoises. Crème brûlée"
-        };
-        Bob = new Instructor
-        {
-            GivenName = "Robert",
-            LastName = "Kennedy",
-            Description = "He's an American politician and lawyer, known for his roles as U.S. Attorney General and Senator, his advocacy for civil rights and social justice, and his tragic assassination in 1968 while campaigning for the presidency.",
-            Courses = [new() { Title = "Going to the moon" }]
-        };
-        Bill = new Instructor
-        {
-            GivenName = "Richard",
-            LastName = "Nixon",
-            Description = "He's the 37th President of the United States, remembered for his foreign policy achievements and his involvement in the Watergate scandal, which led to his resignation in 1974.",
-            Courses = [new() { Title = "Befriending China" }, new() { Title = "How to cheat" }]
-        };
     }
     [TearDown]
     public void TearDown()
@@ -74,10 +41,10 @@ internal class NormalizingTests
         using var spScope = serviceProvider.CreateScope();
         var sp = spScope.ServiceProvider;
 
-        var container = new ObjectNormalizerContainer(sp);
-        container.Register<Person>((_) => new PersonNormalizer());
-        container.Register<IHasCourses>((_) => new ItemWithCoursesNormalizer());
-        container.Register<Department>(p => new DepartmentNormalizer(p.GetRequiredService<ContosoContext>(), new ItemWithCoursesNormalizer()));
+        var container = new EntityNormalizerContainer(sp);
+        container.Register<Person>(_ => new PersonNormalizer(null));
+        container.Register<IHasCourses>((_) => new ItemWithCoursesNormalizer(null));
+        container.Register<Department>(p => new DepartmentAdministratorNormalizer(p.GetRequiredService<ContosoContext>(), new ItemWithCoursesNormalizer(null), null));
 
         var personNormalizers = container.FindAll<Person>();
         Assert.That(personNormalizers, Is.Not.Empty);
@@ -97,12 +64,12 @@ internal class NormalizingTests
         using var spScope = serviceProvider.CreateScope();
         var sp = spScope.ServiceProvider;
 
-        var container = new ObjectNormalizerContainer(sp);
-        container.Register<Person>((_) => new PersonNormalizer());
-        container.Register<IHasCourses>((_) => new ItemWithCoursesNormalizer());
-        container.Register<Department>(p => new DepartmentNormalizer(p.GetRequiredService<ContosoContext>(), new ItemWithCoursesNormalizer()));
+        var container = new EntityNormalizerContainer(sp);
+        container.Register<Person>(_ => new PersonNormalizer(null));
+        container.Register<IHasCourses>((_) => new ItemWithCoursesNormalizer(null));
+        container.Register<Department>(p => new DepartmentAdministratorNormalizer(p.GetRequiredService<ContosoContext>(), new ItemWithCoursesNormalizer(null), null));
 
-        var departmentNormalizer = container.FindAll<Department>();
+        var departmentNormalizer = container.FindAll<Department>().ToArray();
         Assert.That(departmentNormalizer, Is.Not.Empty);
         Assert.That(departmentNormalizer.Count, Is.EqualTo(1));
     }
@@ -112,27 +79,29 @@ internal class NormalizingTests
         IServiceCollection services = new ServiceCollection();
         services
             .AddDbContext<ContosoContext>(db => db.UseSqlite(_connection))
-            .AddTransient<IObjectNormalizer<Person>, PersonNormalizer>()
-            .AddTransient<IObjectNormalizer<IHasCourses>, ItemWithCoursesNormalizer>()
-            .AddTransient<IObjectNormalizer<Department>, DepartmentNormalizer>()
+            .UseEntities<ContosoContext>(e => e.AddDefaultEntityNormalizer())
+            .AddTransient<IEntityNormalizer<Person>, PersonNormalizer>()
+            .AddTransient<IEntityNormalizer<IHasCourses>, ItemWithCoursesNormalizer>()
+            .AddTransient<IEntityNormalizer<Department>, DepartmentAdministratorNormalizer>()
             .AddObjectNormalizingContainer();
         var serviceProvider = services.BuildServiceProvider();
 
         using var spScope = serviceProvider.CreateScope();
         var sp = spScope.ServiceProvider;
 
-        var container = sp.GetRequiredService<ObjectNormalizerContainer>();
+        var container = sp.GetRequiredService<EntityNormalizerContainer>();
 
-        var personNormalizers = container.FindAll<Person>();
+        var personNormalizers = container.FindAll<Person>().ToArray();
         Assert.That(personNormalizers, Is.Not.Empty);
-        Assert.That(personNormalizers.Count, Is.EqualTo(1));
+        Assert.That(personNormalizers.Count, Is.EqualTo(2));
 
-        var instructorNormalizers = container.FindAll<Instructor>();
+        var instructorNormalizers = container.FindAll<Instructor>().ToArray();
         Assert.That(instructorNormalizers, Is.Not.Empty);
-        Assert.That(instructorNormalizers.Count, Is.EqualTo(2));
+        Assert.That(instructorNormalizers.Count, Is.EqualTo(3));
 
-        var departmentNormalizer = container.FindAll<Department>();
+        var departmentNormalizer = container.FindAll<Department>().ToArray();
         Assert.That(departmentNormalizer, Is.Not.Empty);
+        // exclusive
         Assert.That(departmentNormalizer.Count, Is.EqualTo(1));
     }
 
@@ -142,9 +111,7 @@ internal class NormalizingTests
         IServiceCollection services = new ServiceCollection();
         services
             .AddDbContext<ContosoContext>(db => db.UseSqlite(_connection))
-            .AddTransient<IObjectNormalizer<Person>, PersonNormalizer>()
-            .AddTransient<IObjectNormalizer<IHasCourses>, ItemWithCoursesNormalizer>()
-            .AddTransient<IObjectNormalizer<Department>, DepartmentNormalizer>()
+            .AddTransient<IEntityNormalizer<IEntity>, DefaultEntityNormalizer>()
             .AddObjectNormalizingContainer();
         var serviceProvider = services.BuildServiceProvider();
 
@@ -154,23 +121,75 @@ internal class NormalizingTests
         var dbContext = sp.GetRequiredService<ContosoContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
-        dbContext.AddRange(John, Jane, Francois, Bob, Bill);
+        var (people, _, _) = TestData.Generate();
+        var john = people.John;
+        var jane = people.Jane;
+        var francois = people.Francois;
+        var bob = people.Bob;
+        var bill = people.Bill;
+
+        dbContext.AddRange(john, jane, francois, bob, bill);
 
         await dbContext.ApplyNormalizers();
 
-        Assert.That(John.NormalizedTitle, Is.EqualTo("Doe John"));
-        Assert.That(John.NormalizedContent, Is.EqualTo("John Doe This is a male test person johndoeemailcom"));
+        Assert.That(john.NormalizedTitle, Is.EqualTo("Doe John"));
+        Assert.That(john.NormalizedContent, Is.EqualTo("John Doe This is a male test person johndoeemailcom"));
 
-        Assert.That(Jane.NormalizedTitle, Is.EqualTo("Doe Jane"));
-        Assert.That(Jane.NormalizedContent, Is.EqualTo("Jane Doe This is a female test person 001 234 567 890"));
+        Assert.That(jane.NormalizedTitle, Is.EqualTo("Doe Jane"));
+        Assert.That(jane.NormalizedContent, Is.EqualTo("Jane Doe This is a female test person 001 234 567 890"));
 
-        Assert.That(Francois.NormalizedTitle, Is.EqualTo("Du sacre Coeur Francois"));
-        Assert.That(Francois.NormalizedContent, Is.EqualTo("Francois Du sacre Coeur Le poete parisien du xiiie siecle Rutebeuf se fait gravement l echo de la faiblesse humaine de l incertitude et de la pauvrete a l oppose des valeurs courtoises Creme brulee"));
+        Assert.That(francois.NormalizedTitle, Is.EqualTo("Du sacre Coeur Francois"));
+        Assert.That(francois.NormalizedContent, Is.EqualTo("Francois Du sacre Coeur Le poete parisien du xiiie siecle Rutebeuf se fait gravement l echo de la faiblesse humaine de l incertitude et de la pauvrete a l oppose des valeurs courtoises Creme brulee"));
 
-        Assert.That(Bob.NormalizedTitle, Is.EqualTo("Kennedy Robert"));
-        Assert.That(Bob.NormalizedContent, Is.EqualTo("Robert Kennedy He s an American politician and lawyer known for his roles as US Attorney General and Senator his advocacy for civil rights and social justice and his tragic assassination in 1968 while campaigning for the presidency"));
+        Assert.That(bob.NormalizedTitle, Is.EqualTo("Kennedy Robert"));
+        Assert.That(bob.NormalizedContent, Is.EqualTo("Robert Kennedy He s an American politician and lawyer known for his roles as US Attorney General and Senator his advocacy for civil rights and social justice and his tragic assassination in 1968 while campaigning for the presidency"));
 
-        Assert.That(Bill.NormalizedTitle, Is.EqualTo("Nixon Richard"));
-        Assert.That(Bill.NormalizedContent, Is.EqualTo("Richard Nixon He s the 37th President of the United States remembered for his foreign policy achievements and his involvement in the Watergate scandal which led to his resignation in 1974"));
+        Assert.That(bill.NormalizedTitle, Is.EqualTo("Nixon Richard"));
+        Assert.That(bill.NormalizedContent, Is.EqualTo("Richard Nixon He s the 37th President of the United States remembered for his foreign policy achievements and his involvement in the Watergate scandal which led to his resignation in 1974"));
+    }
+    [Test]
+    public async Task Apply_Normalizing_As_Primer_Interceptor()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services
+            .AddDbContext<ContosoContext>((sp, db) =>
+            {
+                db.UseSqlite(_connection);
+                db.AddPrimerInterceptors(sp);
+            })
+            .AddTransient<IEntityPrimer, NormalizingPrimer>();
+        var serviceProvider = services.BuildServiceProvider();
+
+        using var spScope = serviceProvider.CreateScope();
+        var sp = spScope.ServiceProvider;
+
+        var dbContext = sp.GetRequiredService<ContosoContext>();
+        await dbContext.Database.EnsureCreatedAsync();
+
+        var (people, _, _) = TestData.Generate();
+        var john = people.John;
+        var jane = people.Jane;
+        var francois = people.Francois;
+        var bob = people.Bob;
+        var bill = people.Bill;
+
+        dbContext.AddRange(john, jane, francois, bob, bill);
+
+        await dbContext.SaveChangesAsync();
+
+        Assert.That(john.NormalizedTitle, Is.EqualTo("Doe John"));
+        Assert.That(john.NormalizedContent, Is.EqualTo("John Doe This is a male test person johndoeemailcom"));
+
+        Assert.That(jane.NormalizedTitle, Is.EqualTo("Doe Jane"));
+        Assert.That(jane.NormalizedContent, Is.EqualTo("Jane Doe This is a female test person 001 234 567 890"));
+
+        Assert.That(francois.NormalizedTitle, Is.EqualTo("Du sacre Coeur Francois"));
+        Assert.That(francois.NormalizedContent, Is.EqualTo("Francois Du sacre Coeur Le poete parisien du xiiie siecle Rutebeuf se fait gravement l echo de la faiblesse humaine de l incertitude et de la pauvrete a l oppose des valeurs courtoises Creme brulee"));
+
+        Assert.That(bob.NormalizedTitle, Is.EqualTo("Kennedy Robert"));
+        Assert.That(bob.NormalizedContent, Is.EqualTo("Robert Kennedy He s an American politician and lawyer known for his roles as US Attorney General and Senator his advocacy for civil rights and social justice and his tragic assassination in 1968 while campaigning for the presidency"));
+
+        Assert.That(bill.NormalizedTitle, Is.EqualTo("Nixon Richard"));
+        Assert.That(bill.NormalizedContent, Is.EqualTo("Richard Nixon He s the 37th President of the United States remembered for his foreign policy achievements and his involvement in the Watergate scandal which led to his resignation in 1974"));
     }
 }

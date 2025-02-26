@@ -2,10 +2,6 @@
 
 namespace Testing.Library.Contoso;
 
-public enum Grade
-{
-    A, B, C, D, F
-}
 public class Enrollment : IEntityWithSerial
 {
     public int Id { get; set; }

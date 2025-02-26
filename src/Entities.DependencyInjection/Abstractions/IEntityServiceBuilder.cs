@@ -11,3 +11,7 @@ public interface IEntityServiceBuilder<TEntity, TKey>
 {
     IServiceCollection Services { get; }
 }
+// ReSharper disable once UnusedTypeParameter
+public interface IEntityServiceBuilder<TEntity, TKey, TSearchObject> : IEntityServiceBuilder<TEntity, TKey>
+    where TEntity : class, IEntity<TKey>
+    where TSearchObject : class, ISearchObject<TKey>, new();

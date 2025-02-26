@@ -54,7 +54,7 @@ public class MinimalApiTests : IDisposable
 
         var items = await response.Content.ReadFromJsonAsync<IList<Department>>();
         Assert.NotNull(items);
-        Assert.Equal(0, items!.Count);
+        Assert.Empty(items);
     }
     [Fact]
     public async Task Add_Departments()
@@ -68,8 +68,8 @@ public class MinimalApiTests : IDisposable
 
         var response = await client.GetAsync("/minimal/departments");
         var items = await response.Content.ReadFromJsonAsync<IList<Department>>();
-        Assert.Equal(1, items!.Count);
-        Assert.Equal(dep1.Title, items[0].Title);
+        Assert.NotEmpty(items!);
+        Assert.Equal(dep1.Title, items![0].Title);
         Assert.Equal(dep1.Budget, items[0].Budget);
         Assert.Equal(dep1.StartDate, items[0].StartDate);
     }

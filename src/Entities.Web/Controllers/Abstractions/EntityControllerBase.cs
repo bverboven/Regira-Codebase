@@ -10,8 +10,11 @@ namespace Regira.Entities.Web.Controllers.Abstractions;
 /// Basic EntityController without extra models
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
+/// 
 public abstract class EntityControllerBase<TEntity> : EntityControllerBase<TEntity, SearchObject, TEntity, TEntity>
     where TEntity : class, IEntity<int>;
+public abstract class EntityControllerBase<TEntity, TKey> : EntityControllerBase<TEntity, TKey, SearchObject<TKey>, TEntity, TEntity>
+    where TEntity : class, IEntity<TKey>;
 /// <summary>
 /// Basic EntityController with DTO models
 /// </summary>
@@ -19,9 +22,11 @@ public abstract class EntityControllerBase<TEntity> : EntityControllerBase<TEnti
 /// <typeparam name="TDto"></typeparam>
 /// <typeparam name="TInputDto"></typeparam>
 public abstract class EntityControllerBase<TEntity, TDto, TInputDto> : EntityControllerBase<TEntity, SearchObject, TDto, TInputDto>
-    where TEntity : class, IEntity<int>;
+    where TEntity : class, IEntity<int>
+    where TDto : class
+    where TInputDto : class;
 /// <summary>
-/// Default EntityController with custom <see cref="ISearchObject"/> and DTO models
+/// Default EntityController with custom <see cref="ISearchObject{TKey}"/> and DTO models
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
 /// <typeparam name="TSearchObject"></typeparam>
@@ -29,7 +34,9 @@ public abstract class EntityControllerBase<TEntity, TDto, TInputDto> : EntityCon
 /// <typeparam name="TInputDto"></typeparam>
 public abstract class EntityControllerBase<TEntity, TSearchObject, TDto, TInputDto> : EntityControllerBase<TEntity, int, TSearchObject, TDto, TInputDto>
     where TEntity : class, IEntity<int>
-    where TSearchObject : class, ISearchObject<int>;
+    where TSearchObject : class, ISearchObject<int>
+    where TDto : class
+    where TInputDto : class;
 
 /// <summary>
 /// Default EntityController with custom <see cref="ISearchObject{TKey}"/> and DTO models
@@ -39,9 +46,13 @@ public abstract class EntityControllerBase<TEntity, TSearchObject, TDto, TInputD
 /// <typeparam name="TDto"></typeparam>
 /// <typeparam name="TInputDto"></typeparam>
 /// <typeparam name="TSearchObject"></typeparam>
+
+[ApiController]
 public abstract class EntityControllerBase<TEntity, TKey, TSearchObject, TDto, TInputDto> : ControllerBase
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>
+    where TDto : class
+    where TInputDto : class
 {
     // Details
     [HttpGet("{id}")]
@@ -84,7 +95,9 @@ public abstract class EntityControllerBase<TEntity, TSo, TSortBy, TIncludes, TDt
     where TEntity : class, IEntity<int>
     where TSo : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum
-    where TIncludes : struct, Enum;
+    where TIncludes : struct, Enum
+    where TDto : class
+    where TInputDto : class;
 /// <summary>
 /// Complex EntityController
 /// </summary>
@@ -95,11 +108,15 @@ public abstract class EntityControllerBase<TEntity, TSo, TSortBy, TIncludes, TDt
 /// <typeparam name="TIncludes"></typeparam>
 /// <typeparam name="TDto"></typeparam>
 /// <typeparam name="TInputDto"></typeparam>
+
+[ApiController]
 public abstract class EntityControllerBase<TEntity, TKey, TSo, TSortBy, TIncludes, TDto, TInputDto> : ControllerBase
     where TEntity : class, IEntity<TKey>
     where TSo : class, ISearchObject<TKey>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
+    where TDto : class
+    where TInputDto : class
 {
     // Details
     [HttpGet("{id}")]

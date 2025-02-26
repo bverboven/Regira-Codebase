@@ -4,9 +4,9 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework.Legacy;
-using Regira.Entities.EFcore.Abstractions;
+using Regira.Entities.DependencyInjection.Primers;
 using Regira.Entities.EFcore.Extensions;
-using Regira.Entities.EFcore.Services;
+using Regira.Entities.EFcore.Primers;
 using Regira.Entities.Models.Abstractions;
 using Regira.Utilities;
 
@@ -33,10 +33,11 @@ public class InterceptorTests
     public async Task Execute_EntityPrimer_By_Interceptor()
     {
         var services = new ServiceCollection()
-            .AddDbContext<ProductContext>(db =>
+            .AddDbContext<ProductContext>((sp, db) =>
                 db.UseSqlite(_connection)
-                    .AddPrimerInterceptors([new ProductPrimer()])
-            );
+                    .AddPrimerInterceptors(sp)
+            )
+            .AddPrimer<ProductPrimer>();
 
         var sp = services.BuildServiceProvider();
         var dbContext = sp.GetRequiredService<ProductContext>();
@@ -58,24 +59,25 @@ public class InterceptorTests
     [Test]
     public async Task ApplyTo_Interface()
     {
-        IServiceCollection services = new ServiceCollection();
-        services.Add(new ServiceDescriptor(typeof(IEntityPrimer<IHasEncryptedPassword>), _ => new PasswordPrimer(), ServiceLifetime.Transient));
-        services.AddDbContext<ProductContext>(db =>
+        var services = new ServiceCollection()
+            .AddDbContext<ProductContext>((sp, db) =>
                 db.UseSqlite(_connection)
-                    .AddPrimerInterceptors(services)
-            );
+                    .AddPrimerInterceptors(sp)
+            )
+            .AddPrimer<IHasEncryptedPassword, PasswordPrimer>();
 
         var sp = services.BuildServiceProvider();
         var dbContext = sp.GetRequiredService<ProductContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
-        var account = new UserAccount
+        var account = new User
         {
+            Id = Guid.NewGuid().ToString(),
             Username = "TestUser",
             Password = "Testing Primer"
         };
 
-        dbContext.UserAccounts.Add(account);
+        dbContext.Users.Add(account);
 
         await dbContext.SaveChangesAsync();
 
@@ -87,12 +89,13 @@ public class InterceptorTests
     [Test]
     public async Task Fill_Timestamps()
     {
-        IServiceCollection services = new ServiceCollection();
-        services.AddDbContext<ProductContext>((db) =>
-        {
-            db.UseSqlite(_connection)
-                .AddPrimerInterceptors([new TimestampPrimer()]);
-        });
+        var services = new ServiceCollection()
+            .AddDbContext<ProductContext>((sp, db) =>
+            {
+                db.UseSqlite(_connection)
+                    .AddPrimerInterceptors(sp);
+            })
+            .AddPrimer<TimestampPrimer>();
         services.RegisterPrimerContainer<ProductContext>();
 
         var sp = services.BuildServiceProvider();
@@ -123,12 +126,12 @@ public class InterceptorTests
     [Test]
     public async Task Fill_ChildCollection_Timestamps()
     {
-        IServiceCollection services = new ServiceCollection();
-        services.Add(new ServiceDescriptor(typeof(IEntityPrimer<IHasTimestamps>), _ => new TimestampPrimer(), ServiceLifetime.Transient));
-        services.AddDbContext<ProductContext>(db =>
-            db.UseSqlite(_connection)
-                .AddPrimerInterceptors(services)
-        );
+        var services = new ServiceCollection()
+            .AddDbContext<ProductContext>((sp, db) =>
+                db.UseSqlite(_connection)
+                    .AddPrimerInterceptors(sp)
+            )
+            .AddPrimer<IHasTimestamps, TimestampPrimer>();
 
         var sp = services.BuildServiceProvider();
 
@@ -204,14 +207,14 @@ public class InterceptorTests
     [Test]
     public async Task Execute_Base_Primers()
     {
-        IServiceCollection services = new ServiceCollection();
-        services.Add(new ServiceDescriptor(typeof(IEntityPrimer<IHasTimestamps>), _ => new TimestampPrimer(), ServiceLifetime.Transient));
-        services.Add(new ServiceDescriptor(typeof(IEntityPrimer<IEntity>), _ => new NormalizingPrimer(), ServiceLifetime.Transient));
-        services.Add(new ServiceDescriptor(typeof(IEntityPrimer<Product>), _ => new ProductPrimer(), ServiceLifetime.Transient));
-        services.AddDbContext<ProductContext>(db =>
-            db.UseSqlite(_connection)
-                .AddPrimerInterceptors(services)
-        );
+        var services = new ServiceCollection()
+            .AddDbContext<ProductContext>((sp, db) =>
+                db.UseSqlite(_connection)
+                    .AddPrimerInterceptors(sp)
+            )
+            .AddPrimer<IHasTimestamps, TimestampPrimer>()
+            .AddPrimer<NormalizingPrimer>()
+            .AddPrimer<Product, ProductPrimer>();
 
         var sp = services.BuildServiceProvider();
         var dbContext = sp.GetRequiredService<ProductContext>();
@@ -244,15 +247,15 @@ public class InterceptorTests
     [Test]
     public async Task Execute_Base_Primers_In_Order()
     {
-        IServiceCollection services = new ServiceCollection();
-        services.Add(new ServiceDescriptor(typeof(IEntityPrimer<IEntity>), _ => new NormalizingPrimer(), ServiceLifetime.Transient));
-        // overwrites Normalized title using Uppercase Normalizer
-        services.Add(new ServiceDescriptor(typeof(IEntityPrimer<IHasNormalizedTitle>), _ => new TitlePrimer(), ServiceLifetime.Transient));
-        services.Add(new ServiceDescriptor(typeof(IEntityPrimer<Product>), _ => new ProductPrimer(), ServiceLifetime.Transient));
-        services.AddDbContext<ProductContext>(db =>
-            db.UseSqlite(_connection)
-                .AddPrimerInterceptors(services)
-        );
+        var services = new ServiceCollection()
+            .AddDbContext<ProductContext>((sp, db) =>
+                db.UseSqlite(_connection)
+                    .AddPrimerInterceptors(sp)
+            )
+            .AddPrimer<NormalizingPrimer>()
+            // overwrites Normalized title using Uppercase Normalizer
+            .AddPrimer<IHasNormalizedTitle, TitlePrimer>()
+            .AddPrimer<Product, ProductPrimer>();
 
         var sp = services.BuildServiceProvider();
         var dbContext = sp.GetRequiredService<ProductContext>();
@@ -273,17 +276,13 @@ public class InterceptorTests
     [Test]
     public async Task Execute_Matching_Primers()
     {
-        IServiceCollection services = new ServiceCollection();
-        services.Add(new ServiceDescriptor(typeof(IEntityPrimer<Category>), p => new CategoryPrimer(
-            p.GetRequiredService<ProductContext>(),
-            new TimestampPrimer(),
-            new NormalizingPrimer()
-        ), ServiceLifetime.Transient));
-        services.Add(new ServiceDescriptor(typeof(IEntityPrimer<Product>), _ => new ProductPrimer(), ServiceLifetime.Transient));
-        services.AddDbContext<ProductContext>(db =>
-            db.UseSqlite(_connection)
-                .AddPrimerInterceptors(services)
-        );
+        var services = new ServiceCollection()
+            .AddDbContext<ProductContext>((sp, db) =>
+                db.UseSqlite(_connection)
+                    .AddPrimerInterceptors(sp)
+            )
+            .AddPrimer(p => new CategoryPrimer(p.GetRequiredService<ProductContext>(), new TimestampPrimer(), new NormalizingPrimer()))
+            .AddPrimer<Product, ProductPrimer>();
 
         var sp = services.BuildServiceProvider();
         var dbContext = sp.GetRequiredService<ProductContext>();
@@ -308,17 +307,13 @@ public class InterceptorTests
     {
         var items = Enumerable.Range(0, 10).Select((_, i) => new Category { Title = $"Category #{i + 1}" }).ToArray();
 
-        IServiceCollection services = new ServiceCollection();
-        services.Add(new ServiceDescriptor(typeof(IEntityPrimer<IHasTimestamps>), _ => new TimestampPrimer(), ServiceLifetime.Transient));
-        services.Add(new ServiceDescriptor(typeof(IEntityPrimer<Category>), p => new CategoryPrimer(
-            p.GetRequiredService<ProductContext>(),
-            p.GetRequiredService<IEntityPrimer<IHasTimestamps>>(),
-            new NormalizingPrimer()
-        ), ServiceLifetime.Transient));
-        services.AddDbContext<ProductContext>(db =>
-            db.UseSqlite(_connection)
-                .AddPrimerInterceptors(services)
-        );
+        var services = new ServiceCollection()
+            .AddDbContext<ProductContext>((sp, db) =>
+                db.UseSqlite(_connection)
+                    .AddPrimerInterceptors(sp)
+            )
+            .AddPrimer<IHasTimestamps, TimestampPrimer>()
+            .AddPrimer(p => new CategoryPrimer(p.GetRequiredService<ProductContext>(), new TimestampPrimer(), new NormalizingPrimer()));
 
         var sp = services.BuildServiceProvider();
         var dbContext = sp.GetRequiredService<ProductContext>();

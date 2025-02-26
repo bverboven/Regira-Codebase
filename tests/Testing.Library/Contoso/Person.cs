@@ -1,19 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Regira.Entities.Attachments.Abstractions;
+﻿using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Normalizing;
+using System.ComponentModel.DataAnnotations;
 
 namespace Testing.Library.Contoso;
 
-public class Person : IEntityWithSerial, IHasNormalizedTitle, IHasAttachments, IHasAttachments<PersonAttachment>, IHasNormalizedContent
+public class Person : IEntityWithSerial, IHasAggregateKey, IHasNormalizedTitle, IHasAttachments, IHasAttachments<PersonAttachment>, IHasNormalizedContent
 {
     public int Id { get; set; }
+    public Guid? AggregateKey { get; set; } = Guid.NewGuid();
 
     [Required]
-    [StringLength(32)]
+    [MaxLength(32)]
     public string? GivenName { get; set; }
-    [StringLength(32)]
+    [MaxLength(32)]
     [Normalized(SourceProperty = nameof(GivenName))]
     public string? NormalizedGivenName { get; set; }
 
@@ -25,9 +26,11 @@ public class Person : IEntityWithSerial, IHasNormalizedTitle, IHasAttachments, I
     public string? NormalizedLastName { get; set; }
 
     public string Title => $"{GivenName} {LastName}".Trim();
+    [MaxLength(64)]
     [Normalized(SourceProperties = [nameof(LastName), nameof(GivenName)])]
     public string? NormalizedTitle { get; set; }
 
+    [MaxLength(1024)]
     public string? Description { get; set; }
 
 
@@ -53,8 +56,8 @@ public class Person : IEntityWithSerial, IHasNormalizedTitle, IHasAttachments, I
         set => Attachments = value?.Cast<PersonAttachment>().ToArray();
     }
 
-    [Normalized(SourceProperties = [nameof(GivenName), nameof(LastName), nameof(Description), nameof(Phone), nameof(Email)
-    ])]
+    [MaxLength(1024)]
+    [Normalized(SourceProperties = [nameof(GivenName), nameof(LastName), nameof(Description), nameof(Phone), nameof(Email)])]
     public string? NormalizedContent { get; set; }
 }
 

@@ -1,5 +1,4 @@
-﻿using Entities.TestApi.Infrastructure;
-using Entities.TestApi.Models;
+﻿using Entities.TestApi.Infrastructure.Courses;
 using Microsoft.AspNetCore.Mvc;
 using Regira.Entities.Web.Attachments.Abstractions;
 using Regira.Entities.Web.Controllers.Abstractions;

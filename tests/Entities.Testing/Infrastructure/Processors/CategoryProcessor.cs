@@ -1,16 +1,14 @@
 ﻿using Entities.Testing.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Regira.Entities.EFcore.Abstractions;
-using Regira.Utilities;
+using Regira.Entities.EFcore.Processing;
 
 namespace Entities.Testing.Infrastructure.Processors;
 
-public class CategoryProcessor(ProductContext dbContext) : EntityProcessorBase<Category>
+public class CategoryProcessor(ProductContext dbContext) : EntityProcessor<Category>
 {
-    public override async IAsyncEnumerable<Category> ProcessManyAsync(IEnumerable<Category> items)
+    public override async Task Process(IList<Category> items)
     {
-        var list = items.AsList();
-        var categoryIds = list
+        var categoryIds = items
             .Select(x => x.Id)
             .Distinct()
             .ToArray();
@@ -18,10 +16,9 @@ public class CategoryProcessor(ProductContext dbContext) : EntityProcessorBase<C
             .Where(p => categoryIds.Contains(p.CategoryId!.Value))
             .GroupBy(p => p.CategoryId!.Value)
             .ToDictionaryAsync(k => k.Key, v => v.Count());
-        foreach (var item in list)
+        foreach (var item in items)
         {
             item.NumberOfProducts = countPerCategory[item.Id];
-            yield return item;
         }
     }
 }

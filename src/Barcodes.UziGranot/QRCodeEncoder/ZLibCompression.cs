@@ -36,51 +36,50 @@
 using System.IO.Compression;
 
 // ReSharper disable once CheckNamespace
-namespace QRCodeEncoderLibrary
+namespace QRCodeEncoderLibrary;
+
+internal static class ZLibCompression
 {
-    internal static class ZLibCompression
+    internal static byte[] Compress(byte[] inputBuf)
     {
-        internal static byte[] Compress(byte[] inputBuf)
-        {
-            // input length
-            var inputLen = inputBuf.Length;
+        // input length
+        var inputLen = inputBuf.Length;
 
-            // create output memory stream to receive the compressed buffer
-            var outputStream = new MemoryStream();
+        // create output memory stream to receive the compressed buffer
+        var outputStream = new MemoryStream();
 
-            // deflate compression object
-            var deflate = new DeflateStream(outputStream, CompressionMode.Compress, true);
+        // deflate compression object
+        var deflate = new DeflateStream(outputStream, CompressionMode.Compress, true);
 
-            // load input buffer into the compression class
-            deflate.Write(inputBuf, 0, inputLen);
+        // load input buffer into the compression class
+        deflate.Write(inputBuf, 0, inputLen);
 
-            // compress, flush and close
-            deflate.Close();
+        // compress, flush and close
+        deflate.Close();
 
-            // compressed file length
-            var outputLen = (int)outputStream.Length;
+        // compressed file length
+        var outputLen = (int)outputStream.Length;
 
-            // create empty output buffer
-            var outputBuf = new byte[outputLen + 18];
+        // create empty output buffer
+        var outputBuf = new byte[outputLen + 18];
 
-            // Header is made out of 16 bits [iiiicccclldxxxxx]
-            // iiii is compression information. It is WindowBit - 8 in this case 7. iiii = 0111
-            // cccc is compression method. Deflate (8 dec) or Store (0 dec)
-            // The first byte is 0x78 for deflate and 0x70 for store
-            // ll is compression level 2
-            // d is preset dictionary. The preset dictionary is not supported by this program. d is always 0
-            // xxx is 5 bit check sum (31 - header % 31)
-            // write two bytes in most significant byte first
-            outputBuf[8] = 0x78;
-            outputBuf[9] = 0x9c;
+        // Header is made out of 16 bits [iiiicccclldxxxxx]
+        // iiii is compression information. It is WindowBit - 8 in this case 7. iiii = 0111
+        // cccc is compression method. Deflate (8 dec) or Store (0 dec)
+        // The first byte is 0x78 for deflate and 0x70 for store
+        // ll is compression level 2
+        // d is preset dictionary. The preset dictionary is not supported by this program. d is always 0
+        // xxx is 5 bit check sum (31 - header % 31)
+        // write two bytes in most significant byte first
+        outputBuf[8] = 0x78;
+        outputBuf[9] = 0x9c;
 
-            // copy the compressed result
-            outputStream.Seek(0, SeekOrigin.Begin);
-            outputStream.Read(outputBuf, 10, outputLen);
-            outputStream.Close();
+        // copy the compressed result
+        outputStream.Seek(0, SeekOrigin.Begin);
+        outputStream.Read(outputBuf, 10, outputLen);
+        outputStream.Close();
 
-            // successful exit
-            return outputBuf;
-        }
+        // successful exit
+        return outputBuf;
     }
 }

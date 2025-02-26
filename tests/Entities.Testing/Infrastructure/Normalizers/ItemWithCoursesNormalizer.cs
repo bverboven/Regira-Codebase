@@ -1,20 +1,15 @@
-﻿using Regira.Normalizing;
+﻿using Regira.Entities.EFcore.Normalizing.Abstractions;
+using Regira.Normalizing.Abstractions;
 using Testing.Library.Contoso;
 
 namespace Entities.Testing.Infrastructure.Normalizers;
 
-public class ItemWithCoursesNormalizer : ObjectNormalizer<IHasCourses>
+public class ItemWithCoursesNormalizer(INormalizer? normalizer)
+    : EntityNormalizerBase<IHasCourses>(normalizer)
 {
-    public override async Task HandleNormalizeMany(IEnumerable<IHasCourses?> items, bool recursive = false)
+    public override Task HandleNormalize(IHasCourses item)
     {
-        await base.HandleNormalizeMany(items, recursive);
-
-        foreach (var item in items)
-        {
-            if (item != null)
-            {
-                item.NormalizedContent = $"{item.NormalizedContent} {string.Join(" ", (item.Courses ?? []).Select(c => DefaultNormalizer.Normalize(c.Title)))}";
-            }
-        }
+        item.NormalizedContent = $"{item.NormalizedContent} {string.Join(" ", (item.Courses ?? []).Select(c => DefaultPropertyNormalizer.Normalize(c.Title)))}";
+        return Task.CompletedTask;
     }
 }

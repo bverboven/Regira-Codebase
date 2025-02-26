@@ -11,7 +11,7 @@
     <AssemblyName>Regira.Entities.Web</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.1.0</Version>
+    <Version>4.5.4</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Entities\Common.Entities.csproj" />
@@ -25,7 +25,10 @@
       <Version>8.1.1</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net8.0' or '$(TargetFramework)' == 'net9.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0' or '$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
   </ItemGroup>
 </Project>

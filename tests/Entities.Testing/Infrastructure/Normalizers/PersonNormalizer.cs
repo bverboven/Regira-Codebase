@@ -1,11 +1,18 @@
-﻿using Regira.Normalizing;
+﻿using Regira.Entities.EFcore.Normalizing.Abstractions;
+using Regira.Normalizing.Abstractions;
 using Testing.Library.Contoso;
 
 namespace Entities.Testing.Infrastructure.Normalizers;
-public class PersonNormalizer : ObjectNormalizer<Person>
+
+public class PersonNormalizer(INormalizer? normalizer) : EntityNormalizerBase<Person>(normalizer)
 {
-    public override async Task HandleNormalizeMany(IEnumerable<Person?> items, bool recursive = false)
+    public override Task HandleNormalizeMany(IEnumerable<Person> items)
     {
-        await base.HandleNormalizeMany(items, false);
+        foreach (var item in items)
+        {
+            item.NormalizedContent = $"PERSON {item.NormalizedContent}".Trim();
+        }
+
+        return Task.CompletedTask;
     }
 }

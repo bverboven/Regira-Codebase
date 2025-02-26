@@ -83,7 +83,7 @@ public static class ControllerExtensions
     }
 
     // Search
-    public static OkObjectResult SearchResult<TDto>(this ControllerBase _, IList<TDto> items, int count, long? duration = null) =>
+    public static OkObjectResult SearchResult<TDto>(this ControllerBase _, IList<TDto> items, long count, long? duration = null) =>
         new(new SearchResult<TDto> { Items = items, Count = count, Duration = duration });
     // simple
     public static async Task<ActionResult<SearchResult<TDto>>> Search<TEntity, TKey, TDto>(this ControllerBase ctrl, SearchObject<TKey>? so = null, PagingInfo? pagingInfo = null)
@@ -151,12 +151,11 @@ public static class ControllerExtensions
             var service = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, TKey>>();
             if (!isNew)
             {
-                if (id == null)
+                if (id != null && !id.Equals(default(TKey)))
                 {
-                    return null;
+                    item.Id = id;
                 }
 
-                item.Id = id;
                 var exists = (await service.Count(new { item.Id })) == 1;
                 if (!exists)
                 {

@@ -8,7 +8,7 @@ namespace Regira.Entities.EFcore.Attachments;
 public static class EntityAttachmentQueryExtensions
 {
     public static IQueryable<TEntityAttachment> Filter<TEntityAttachment>(this IQueryable<TEntityAttachment> query, EntityAttachmentSearchObject? aso)
-        where TEntityAttachment : class, IEntityAttachment, IEntity<int>
+        where TEntityAttachment : class, IEntityAttachment<int, int, int, Attachment>, IEntity<int>
     {
         if (aso != null)
         {
