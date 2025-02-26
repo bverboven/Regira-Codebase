@@ -14,6 +14,7 @@ using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 using Regira.Entities.EFcore.Services;
+using Regira.Entities.Models;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
@@ -37,7 +38,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
@@ -98,7 +99,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
@@ -154,7 +155,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
@@ -217,7 +218,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
@@ -279,7 +280,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
@@ -341,7 +342,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
@@ -403,7 +404,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
@@ -470,7 +471,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
@@ -518,7 +519,7 @@ public class TestFor4Services
         using var sp = new ServiceCollection()
             .AddDbContext<ContosoContext>()
             .UseEntities<ContosoContext>()
-            .For<Course, CourseSearchObject, CourseSortBy, CourseIncludes>(e => e.Process(item => item.HasAttachment = item.Attachments?.Any()))
+            .For<Course, CourseSearchObject, CourseSortBy, CourseIncludes>(e => e.Process((item, _) => item.HasAttachment = item.Attachments?.Any()))
             .BuildServiceProvider();
 
         var entityNormalizer = sp.GetService<IEntityNormalizer>();
@@ -527,7 +528,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
@@ -545,7 +546,7 @@ public class TestFor4Services
         var entityService5 = sp.GetService<IEntityService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
 
         Assert.That(entityProcessors.Length, Is.EqualTo(1));
-        Assert.That(entityProcessors.OfType<EntityProcessor<Course>>(), Is.Not.Empty);
+        Assert.That(entityProcessors.OfType<EntityProcessor<Course, EntityIncludes>>(), Is.Not.Empty);
 
         Assert.That(entityNormalizer, Is.Null);
         Assert.That(globalFilters, Is.Empty);
@@ -585,7 +586,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
@@ -643,7 +644,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
@@ -703,7 +704,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
@@ -770,7 +771,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
@@ -832,7 +833,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
@@ -903,7 +904,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();

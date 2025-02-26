@@ -10,9 +10,11 @@ namespace Entities.TestApi.Infrastructure.Courses;
 public class CourseEntityWriteService(ContosoContext dbContext, IEntityReadService<Course, int, CourseSearchObject> readService)
     : EntityWriteService<ContosoContext, Course>(dbContext, readService)
 {
-    public override void PrepareItem(Course item)
+    public override Task PrepareItem(Course item, Course? _)
     {
         item.Attachments?.SetSortOrder();
+
+        return Task.CompletedTask;
     }
 
     public override async Task<Course?> Modify(Course item)

@@ -19,19 +19,18 @@ public class EntityWriteService<TContext, TEntity, TKey>(TContext dbContext, IEn
     protected TContext DbContext = dbContext;
     public virtual DbSet<TEntity> DbSet => DbContext.Set<TEntity>();
 
-    public virtual Task Add(TEntity item)
+    public virtual async Task Add(TEntity item)
     {
-        PrepareItem(item);
+        await PrepareItem(item, null);
 
         DbSet.Add(item);
-
-        return Task.CompletedTask;
     }
     public virtual async Task<TEntity?> Modify(TEntity item)
     {
-        PrepareItem(item);
-
         var original = await readService.Details(item.Id);
+
+        await PrepareItem(item, original);
+
         if (original != null)
         {
             DbContext.Attach(original);
@@ -49,9 +48,8 @@ public class EntityWriteService<TContext, TEntity, TKey>(TContext dbContext, IEn
         return Task.CompletedTask;
     }
 
-    public virtual void PrepareItem(TEntity item)
-    {
-    }
+    public virtual Task PrepareItem(TEntity item, TEntity? original)
+        => Task.CompletedTask;
     public virtual Task<int> SaveChanges(CancellationToken token = default)
         => DbContext.SaveChangesAsync(token);
 }

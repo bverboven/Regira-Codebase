@@ -379,22 +379,28 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     }
 
     // Entity Processor
-    public EntityServiceBuilder<TContext, TEntity, TKey> Process(Func<IList<TEntity>, Task> process)
+    public EntityServiceBuilder<TContext, TEntity, TKey> Process(Func<IList<TEntity>, EntityIncludes?, Task> process)
     {
-        Services.AddTransient<IEntityProcessor<TEntity>>(_ => new EntityProcessor<TEntity>(process));
+        Services.AddTransient<IEntityProcessor<TEntity, EntityIncludes>>(_ => new EntityProcessor<TEntity, EntityIncludes>(process));
         return this;
     }
-    public EntityServiceBuilder<TContext, TEntity, TKey> Process(Action<TEntity> process)
+    public EntityServiceBuilder<TContext, TEntity, TKey> Process(Action<TEntity, EntityIncludes?> process)
     {
-        Services.AddTransient<IEntityProcessor<TEntity>>(_ => new EntityProcessor<TEntity>(items =>
+        Services.AddTransient<IEntityProcessor<TEntity, EntityIncludes>>(_ => new EntityProcessor<TEntity, EntityIncludes>((items, includes) =>
         {
             foreach (var item in items)
             {
-                process(item);
+                process(item, includes);
             }
             return Task.CompletedTask;
         }));
 
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey> Process<TImplementation>()
+        where TImplementation : class, IEntityProcessor<TEntity, EntityIncludes>
+    {
+        Services.AddTransient<IEntityProcessor<TEntity, EntityIncludes>, TImplementation>();
         return this;
     }
 }

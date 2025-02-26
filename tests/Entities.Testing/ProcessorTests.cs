@@ -51,7 +51,7 @@ public class ProcessorTests
             Assert.That(category.NumberOfProducts, Is.Null);
         }
 
-        await categoryProcessor.Process(categories);
+        await categoryProcessor.Process(categories, null);
 
         foreach (var category in categories)
         {

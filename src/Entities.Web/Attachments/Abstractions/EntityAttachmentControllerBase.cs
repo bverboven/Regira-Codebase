@@ -52,7 +52,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
             var mapper = HttpContext.RequestServices.GetRequiredService<IMapper>();
             var item = mapper.Map<TEntity>(model);
 
-            var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity>>();
+            var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, int>>();
             var original = await FetchItem(item.Id);
             if (original == null)
             {
@@ -95,7 +95,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
     [HttpGet("files/{id}")]
     public virtual async Task<IActionResult> GetFile([FromRoute] int id, bool inline = true)
     {
-        var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity>>();
+        var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, int>>();
         var item = await service.Details(id);
 
         if (item == null)
@@ -109,7 +109,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
     public virtual async Task<IActionResult> GetFile([FromRoute] int objectId, [FromRoute] string fileName, bool inline = true)
     {
         var decodedFileName = Uri.UnescapeDataString(fileName);// necessary for comparing file names with subfolders (%2F, ...)
-        var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity>>();
+        var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, int>>();
         var items = await service.List(new { objectId = new[] { objectId }, fileName = decodedFileName }, new PagingInfo { PageSize = 1 });
 
         if (!items.Any())
@@ -126,7 +126,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
         var sw = new Stopwatch();
         sw.Start();
 
-        var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity>>();
+        var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, int>>();
         var mapper = HttpContext.RequestServices.GetRequiredService<IMapper>();
 
         var item = mapper.Map<TEntity>(model);
@@ -142,12 +142,12 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
         return this.SaveResult(savedModel, affected, true, sw.ElapsedMilliseconds);
     }
     [HttpPut("{objectId}/files/{id}")]
-    public virtual async Task<ActionResult<SaveResult<TDto>>> Modify([FromRoute] int objectId, [FromRoute] int id, IFormFile file, [FromForm] TInputDto model)
+    public virtual async Task<ActionResult<SaveResult<TDto>>> Modify([FromRoute] int objectId, [FromRoute] int id, IFormFile file)
     {
         var sw = new Stopwatch();
         sw.Start();
 
-        var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity>>();
+        var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, int>>();
         var mapper = HttpContext.RequestServices.GetRequiredService<IMapper>();
 
         var original = (await service.List(new { id }, new PagingInfo { PageSize = 1 })).SingleOrDefault();
@@ -185,7 +185,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
     /// <returns></returns>
     protected async Task<TEntity?> FetchItem(int id)
     {
-        var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity>>();
+        var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, int>>();
         return (await service.List(new { id }, new PagingInfo { PageSize = 1 })).SingleOrDefault();
     }
 }

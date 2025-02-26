@@ -10,14 +10,14 @@ using Regira.Utilities;
 namespace Regira.Entities.EFcore.Services;
 
 public class EntityReadService<TContext, TEntity, TKey, TSearchObject>(TContext dbContext, IQueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes> queryBuilder,
-    IEnumerable<IEntityProcessor> entityProcessors)
+    IEnumerable<IEntityProcessor<TEntity, EntityIncludes>> entityProcessors)
     : EntityReadService<TContext, TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>(dbContext, queryBuilder, entityProcessors)
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new();
 
 public class EntityReadService<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(TContext dbContext, IQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes> queryBuilder,
-    IEnumerable<IEntityProcessor> entityProcessors)
+    IEnumerable<IEntityProcessor<TEntity, TIncludes>> entityProcessors)
     : EntityReadService<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>(dbContext, queryBuilder, entityProcessors)
     where TContext : DbContext
     where TEntity : class, IEntity<int>
@@ -26,7 +26,7 @@ public class EntityReadService<TContext, TEntity, TSearchObject, TSortBy, TInclu
     where TIncludes : struct, Enum;
 
 public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(TContext dbContext, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes> queryBuilder,
-    IEnumerable<IEntityProcessor> entityProcessors)
+    IEnumerable<IEntityProcessor<TEntity, TIncludes>> entityProcessors)
     : IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
@@ -43,7 +43,8 @@ public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, 
             return null;
         }
 
-        var item = await queryBuilder.Query(DbSet, [Convert(new { Id = id })], [], Enum.GetValues(typeof(TIncludes)).Cast<TIncludes>().Last(), null)
+        var includes = Enum.GetValues(typeof(TIncludes)).Cast<TIncludes>().Max();
+        var item = await queryBuilder.Query(DbSet, [Convert(new { Id = id })], [], includes, null)
 #if NETSTANDARD2_0
             .AsNoTracking()
 #else
@@ -59,7 +60,7 @@ public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, 
 
         foreach (var entityProcessor in entityProcessors)
         {
-            await entityProcessor.Process([item]);
+            await entityProcessor.Process([item], includes);
         }
 
         return item;
@@ -78,7 +79,7 @@ public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, 
 
         foreach (var entityProcessor in entityProcessors)
         {
-            await entityProcessor.Process(items);
+            await entityProcessor.Process(items, includes);
         }
 
         return items;

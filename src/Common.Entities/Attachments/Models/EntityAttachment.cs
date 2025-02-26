@@ -9,17 +9,23 @@ public class EntityAttachment<TKey, TObjectKey, TAttachmentKey, TAttachment> : I
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
 {
     public TKey Id { get; set; } = default!;
-
     public TObjectKey ObjectId { get; set; } = default!;
     public TAttachmentKey AttachmentId { get; set; } = default!;
     [NotMapped]
     public string? ObjectType { get; set; }
     public int SortOrder { get; set; }
 
+    public TAttachment? Attachment { get; set; }
+
+
     [NotMapped]
     public string? NewFileName { get; set; }
     [NotMapped]
     public string? NewContentType { get; set; }
-
-    public TAttachment? Attachment { get; set; }
+    
+    IAttachment? IEntityAttachment.Attachment
+    {
+        get => Attachment;
+        set => Attachment = value as TAttachment;
+    }
 }

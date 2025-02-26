@@ -2,12 +2,13 @@
 
 namespace Regira.Entities.EFcore.Processing;
 
-public class EntityProcessor<TEntity>(Func<IList<TEntity>, Task>? process = null)
-    : IEntityProcessor<TEntity>
+public class EntityProcessor<TEntity, TIncludes>(Func<IList<TEntity>, TIncludes?, Task>? process = null)
+    : IEntityProcessor<TEntity, TIncludes>
+        where TIncludes : struct, Enum
 {
-    Task IEntityProcessor.Process<T>(IList<T> items)
-        => Process(items.OfType<TEntity>().ToList());
+    //Task IEntityProcessor.Process<T, TIncludes>(IList<T> items, TIncludes? includes)
+    //    => Process(items.OfType<TEntity>().ToList(), includes);
 
-    public virtual Task Process(IList<TEntity> items)
-        => process?.Invoke(items) ?? Task.CompletedTask;
+    public virtual Task Process(IList<TEntity> items, TIncludes? includes)
+        => process?.Invoke(items, includes) ?? Task.CompletedTask;
 }

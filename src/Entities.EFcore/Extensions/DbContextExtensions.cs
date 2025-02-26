@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.Primers.Abstractions;
 using Regira.Entities.Models.Abstractions;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Regira.Entities.EFcore.Extensions;
 
@@ -28,6 +30,20 @@ public static class DbContextExtensions
 
 
     #region ChildCollections
+    public static void UpdateEntityChildCollection<TEntity, TChild>(this DbContext dbContext, TEntity original, TEntity modified, Expression<Func<TEntity, ICollection<TChild>?>> navigationExpression)
+        where TEntity : class, IEntity<int>
+        where TChild : class, IEntity<int>
+    {
+        var selectorFunc = navigationExpression.Compile();
+        var originalChildren = selectorFunc(original)!;
+        var modifiedChildren = selectorFunc(modified)!;
+        dbContext.UpdateChildCollection(originalChildren, modifiedChildren);
+
+        if (navigationExpression.Body is MemberExpression { Member: PropertyInfo { CanWrite: true } propertyInfo })
+        {
+            propertyInfo.SetValue(original, originalChildren);
+        }
+    }
     public static void UpdateEntityChildCollection<TEntity, TChild>(this DbContext dbContext, TEntity original, TEntity modified, Func<TEntity, ICollection<TChild>?> childrenGetter, Action<TEntity, ICollection<TChild>> childrenSetter, Action<TChild, TChild>? processExtra = null)
         where TEntity : class, IEntity<int>
         where TChild : class, IEntity<int>
