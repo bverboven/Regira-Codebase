@@ -30,120 +30,49 @@ public static class DbContextExtensions
 
 
     #region ChildCollections
-    public static void UpdateEntityChildCollection<TEntity, TChild>(this DbContext dbContext, TEntity original, TEntity modified, Expression<Func<TEntity, ICollection<TChild>?>> navigationExpression)
+    public static void UpdateRelatedCollection<TEntity, TRelated>(this DbContext dbContext, TEntity original, TEntity modified, Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
         where TEntity : class, IEntity<int>
-        where TChild : class, IEntity<int>
-    {
-        var selectorFunc = navigationExpression.Compile();
-        var originalChildren = selectorFunc(original)!;
-        var modifiedChildren = selectorFunc(modified)!;
-        dbContext.UpdateChildCollection(originalChildren, modifiedChildren);
-
-        if (navigationExpression.Body is MemberExpression { Member: PropertyInfo { CanWrite: true } propertyInfo })
-        {
-            propertyInfo.SetValue(original, originalChildren);
-        }
-    }
-    public static void UpdateEntityChildCollection<TEntity, TChild>(this DbContext dbContext, TEntity original, TEntity modified, Func<TEntity, ICollection<TChild>?> childrenGetter, Action<TEntity, ICollection<TChild>> childrenSetter, Action<TChild, TChild>? processExtra = null)
-        where TEntity : class, IEntity<int>
-        where TChild : class, IEntity<int>
-        => UpdateEntityChildCollection<TEntity, TChild, int>(dbContext, original, modified, childrenGetter, childrenSetter, processExtra);
-    public static void UpdateEntityChildCollection<TEntity, TChild, TKey>(this DbContext dbContext, TEntity original, TEntity modified, Func<TEntity, ICollection<TChild>?> childrenGetter, Action<TEntity, ICollection<TChild>> childrenSetter, Action<TChild, TChild>? processExtra = null)
-        where TEntity : class, IEntity<TKey>
-        where TChild : class, IEntity<TKey>
-        => UpdateEntityChildCollection<TEntity, TKey, TChild, TKey>(dbContext, original, modified, childrenGetter, childrenSetter, processExtra);
-    public static void UpdateEntityChildCollection<TEntity, TEntityKey, TChild, TChildKey>(this DbContext dbContext, TEntity original, TEntity modified, Func<TEntity, ICollection<TChild>?> childrenGetter, Action<TEntity, ICollection<TChild>> childrenSetter, Action<TChild, TChild>? processExtra = null)
+        where TRelated : class, IEntity<int>
+    => dbContext.UpdateRelatedCollection<TEntity, TRelated, int, int>(original, modified, navigationExpression);
+    public static void UpdateRelatedCollection<TEntity, TRelated, TEntityKey, TRelatedKey>(this DbContext dbContext, TEntity original, TEntity modified, Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
         where TEntity : class, IEntity<TEntityKey>
-        where TChild : class, IEntity<TChildKey>
+        where TRelated : class, IEntity<TRelatedKey>
     {
-        // ignore when no child collection is passed for either original OR modified entity
-        if (childrenGetter(original) == null || childrenGetter(modified) == null)
+        TRelatedKey IdSelector(TRelated x) => x.Id;
+        var selectorFunc = navigationExpression.Compile();
+        var originalItems = selectorFunc(original)!;
+        var modifiedItems = selectorFunc(modified)!;
+
+        if (modifiedItems == null)
         {
             return;
         }
 
-        // processes modified & deleted children
-        UpdateChildCollection<TChild, TChildKey>(dbContext, childrenGetter(original)!, childrenGetter(modified)!, x => x.Id!, processExtra);
-        // also includes newly added children
-        childrenSetter(original, childrenGetter(modified)!);
-    }
-    public static void UpdateChildCollection<T>(this DbContext dbContext, ICollection<T> originalItems, ICollection<T> modifiedItems, Action<T, T>? processExtra = null)
-        where T : class, IEntity<int>
-        => UpdateChildCollection<T, int>(dbContext, originalItems, modifiedItems, x => x.Id, processExtra);
-    public static void UpdateChildCollection<T>(this DbContext dbContext, ICollection<T> originalItems, ICollection<T> modifiedItems, Func<T, object> idSelector, Action<T, T>? processExtra = null)
-        where T : class, IEntity<int>
-        => UpdateChildCollection<T, int>(dbContext, originalItems, modifiedItems, idSelector, processExtra);
-    public static void UpdateChildCollection<T, TKey>(this DbContext dbContext, ICollection<T> originalItems, ICollection<T> modifiedItems, Func<T, object> idSelector, Action<T, T>? processExtra = null)
-        where T : class, IEntity<TKey>
-    {
-        foreach (var originalItem in originalItems)
+        var relatedItemsToAdd = modifiedItems.Where(p => originalItems.All(o => !IdSelector(p)!.Equals(IdSelector(o)))).ToArray();
+        var relatedItemsToDelete = originalItems.Where(o => modifiedItems.All(p => !IdSelector(p)!.Equals(IdSelector(o)))).ToArray();
+        foreach (var entity in relatedItemsToAdd)
         {
-            var modifiedItem = modifiedItems.FirstOrDefault(p => idSelector(p).Equals(idSelector(originalItem)));
-            if (modifiedItem == null)
-            {
-                dbContext.Entry(originalItem).State = EntityState.Deleted;
-            }
-            else
-            {
-                processExtra?.Invoke(originalItem, modifiedItem);
-                dbContext.Entry(originalItem).State = EntityState.Detached;
-                dbContext.Entry(modifiedItem).OriginalValues.SetValues(originalItem);
-                dbContext.Update(modifiedItem);
-            }
+            dbContext.Attach(entity);
+            dbContext.Entry(entity).State = EntityState.Added;
+        }
+        foreach (var entity in relatedItemsToDelete)
+        {
+            dbContext.Entry(entity).State = EntityState.Deleted;
+        }
+        var relatedItemsToModify = modifiedItems.Except(relatedItemsToAdd);
+        foreach (var entity in relatedItemsToModify)
+        {
+            var originalEntity = originalItems.Single(p => IdSelector(p)!.Equals(IdSelector(entity)));
+            dbContext.Entry(originalEntity).State = EntityState.Detached;
+            dbContext.Attach(entity);
+            dbContext.Entry(entity).OriginalValues.SetValues(originalEntity);
+            dbContext.Update(entity);
+        }
+
+        if (navigationExpression.Body is MemberExpression { Member: PropertyInfo { CanWrite: true } propertyInfo })
+        {
+            propertyInfo.SetValue(original, modifiedItems);
         }
     }
-
-    #region PrepareUpdate
-
-    public class UpdateEntityChildrenWrapper<TEntity, TChild>
-        where TEntity : class, IEntity
-        where TChild : class, IEntity
-    {
-        public DbContext DbContext { get; set; } = null!;
-        public TEntity Original { get; set; } = null!;
-        public TEntity Modified { get; set; } = null!;
-        public Func<TEntity, ICollection<TChild>> ChildrenGetter { get; set; } = null!;
-        public Action<TEntity, ICollection<TChild>> ChildrenSetter { get; set; } = null!;
-        public Func<TChild, object> IdSelector { get; set; } = null!;
-    }
-    /// <summary>
-    /// Prepares a child collection update.<br />
-    /// Call <see cref="Submit{TEntity,TChild}"/> to execute prepared actions
-    /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    /// <typeparam name="TChild"></typeparam>
-    /// <param name="dbContext"></param>
-    /// <param name="original"></param>
-    /// <param name="modified"></param>
-    /// <param name="childrenGetter"></param>
-    /// <param name="childrenSetter"></param>
-    /// <returns></returns>
-    public static UpdateEntityChildrenWrapper<TEntity, TChild> PrepareEntityChildrenUpdate<TEntity, TChild>(this DbContext dbContext, TEntity original, TEntity modified, Func<TEntity, ICollection<TChild>> childrenGetter, Action<TEntity, ICollection<TChild>> childrenSetter)
-        where TEntity : class, IEntity<int>
-        where TChild : class, IEntity<int>
-    {
-        return new UpdateEntityChildrenWrapper<TEntity, TChild>
-        {
-            DbContext = dbContext,
-            Original = original,
-            Modified = modified,
-            ChildrenGetter = childrenGetter,
-            ChildrenSetter = childrenSetter,
-            IdSelector = x => x.Id
-        };
-    }
-    /// <summary>
-    /// Executes prepared actions to update an entity's child collection
-    /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    /// <typeparam name="TChild"></typeparam>
-    /// <param name="updater"></param>
-    /// <param name="processExtra"></param>
-    public static void Submit<TEntity, TChild>(this UpdateEntityChildrenWrapper<TEntity, TChild> updater, Action<TChild, TChild>? processExtra = null)
-        where TEntity : class, IEntity<int>
-        where TChild : class, IEntity<int>
-        => UpdateEntityChildCollection(updater.DbContext, updater.Original, updater.Modified, updater.ChildrenGetter, updater.ChildrenSetter, processExtra);
-    #endregion
-
     #endregion
 }

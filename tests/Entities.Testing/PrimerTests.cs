@@ -168,7 +168,7 @@ public class PrimerTests
                 .AsNoTrackingWithIdentityResolution()
                 .SingleAsync(x => x.Id == 1);
 
-            dbContext.UpdateEntityChildCollection(originalItem, modifiedItem, x => x.Products, (x, products) => x.Products = products);
+            dbContext.UpdateRelatedCollection(originalItem, modifiedItem, x => x.Products);
 
             dbContext.Update(originalItem);
             dbContext.Entry(originalItem).CurrentValues.SetValues(modifiedItem);

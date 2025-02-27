@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
+using Regira.Entities.EFcore.Preppers.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Extensions;
 
@@ -71,8 +72,9 @@ public class EntityAttachmentWriteService<TContext, TEntityAttachment, TEntityAt
 (
     TContext dbContext,
     IEntityReadService<TEntityAttachment, TEntityAttachmentKey> readService,
+    IEnumerable<IPrepper<TEntityAttachment, TEntityAttachmentKey>> preppers,
     IFileIdentifierGenerator<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment> identifierGenerator)
-    : EntityWriteService<TContext, TEntityAttachment, TEntityAttachmentKey>(dbContext, readService)
+    : EntityWriteService<TContext, TEntityAttachment, TEntityAttachmentKey>(dbContext, readService, preppers)
     where TContext : DbContext
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
     where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>

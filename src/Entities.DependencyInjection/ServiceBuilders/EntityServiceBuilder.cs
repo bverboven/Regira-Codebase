@@ -7,6 +7,8 @@ using Regira.Entities.DependencyInjection.Normalizers;
 using Regira.Entities.DependencyInjection.Primers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
+using Regira.Entities.EFcore.Preppers;
+using Regira.Entities.EFcore.Preppers.Abstractions;
 using Regira.Entities.EFcore.Primers.Abstractions;
 using Regira.Entities.EFcore.Processing;
 using Regira.Entities.EFcore.Processing.Abstractions;
@@ -15,6 +17,7 @@ using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
+using System.Linq.Expressions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 
@@ -122,6 +125,16 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
         where TImplementation : class, IQueryBuilder<TEntity, int, SearchObject<int>, EntitySortBy, EntityIncludes>
     {
         Services.UseQueryBuilder<TEntity, TImplementation>(factory);
+        return this;
+    }
+
+    // Related
+    public new EntityServiceBuilder<TContext, TEntity> Related<TRelated>(
+        Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
+        where TRelated : class, IEntity<int>
+    {
+        Services.AddTransient<IPrepper<TEntity, int>>(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, int, int>(p.GetRequiredService<TContext>(), navigationExpression));
+
         return this;
     }
 }
@@ -401,6 +414,16 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
         where TImplementation : class, IEntityProcessor<TEntity, EntityIncludes>
     {
         Services.AddTransient<IEntityProcessor<TEntity, EntityIncludes>, TImplementation>();
+        return this;
+    }
+
+    // Related
+    public EntityServiceBuilder<TContext, TEntity, TKey> Related<TRelated, TRelatedKey>(
+        Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
+        where TRelated : class, IEntity<TRelatedKey>
+    {
+        Services.AddTransient<IPrepper<TEntity, TKey>>(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, TKey, TRelatedKey>(p.GetRequiredService<TContext>(), navigationExpression));
+
         return this;
     }
 }

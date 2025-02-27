@@ -2,10 +2,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.QueryBuilders;
+using Regira.Entities.EFcore.Preppers;
+using Regira.Entities.EFcore.Preppers.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models.Abstractions;
+using System.Linq.Expressions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 
@@ -125,6 +128,16 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
         where TImplementation : class, IFilteredQueryBuilder<TEntity, int, TSearchObject>
     {
         Services.AddQueryFilter<TEntity, TSearchObject, TImplementation>();
+        return this;
+    }
+
+    // Related
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> Related<TRelated>(
+        Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
+        where TRelated : class, IEntity<int>
+    {
+        Services.AddTransient<IPrepper<TEntity, int>>(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, int, int>(p.GetRequiredService<TContext>(), navigationExpression));
+
         return this;
     }
 }
