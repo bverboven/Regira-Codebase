@@ -93,12 +93,14 @@ public class EntityAttachmentWriteService<TContext, TEntityAttachment, TEntityAt
 
         if (original is { Attachment: not null })
         {
-            if (item.Attachment != null && item.Attachment.IsNew())
+            if (item.Attachment?.IsNew() == true)
             {
                 DbContext.Entry(original.Attachment).State = EntityState.Detached;
                 DbContext.Attach(item.Attachment);
+                DbContext.Entry(item.Attachment).State = EntityState.Added;
                 original.Attachment = item.Attachment;
-                DbContext.Entry(original.Attachment).State = EntityState.Added;
+                original.AttachmentId = item.Attachment.Id;
+                DbContext.Update(original);
             }
 
             if (!string.IsNullOrWhiteSpace(item.NewFileName))

@@ -291,15 +291,18 @@ public class CourseAttachmentsControllerTests : IDisposable
 
         var updateFileText = $"This is an updated testmessage for attachment #{insertedItem.Id}";
         var updateContent = new MultipartFormDataContent{
-            { new StreamContent(FileUtility.GetStreamFromString(updateFileText)), "file", attachmentFileName }
+            { new StreamContent(FileUtility.GetStreamFromString(updateFileText)), "file", "new-attachment.txt" }
         };
         var updateResponse = await client.PutAsync($"/courses/{courseId}/files/{insertedItem.Id}", updateContent);
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
         var updateResult = await updateResponse.Content.ReadFromJsonAsync<SaveResult<EntityAttachmentDto>>();
 
-        Assert.NotEqual(insertResult.Item.Attachment!.Length, updateResult!.Item.Attachment!.Length);
+        Assert.NotEqual(insertResult.Item.Attachment!.Id, updateResult!.Item.Attachment!.Id);
+        Assert.NotEqual(insertResult.Item.Attachment!.Length, updateResult.Item.Attachment!.Length);
+        Assert.NotEqual(insertResult.Item.Attachment!.FileName, updateResult.Item.Attachment!.FileName);
 
         using var downloadResponse = await client.GetAsync($"/courses/{courseId}/files/{updateResult.Item.Attachment!.FileName}");
+        Assert.Equal(HttpStatusCode.OK, downloadResponse.StatusCode);
         await using var downloadStream = await downloadResponse.Content.ReadAsStreamAsync();
         Assert.NotNull(downloadStream);
         Assert.NotEqual(fileStream.Length, downloadStream.Length);

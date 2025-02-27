@@ -150,27 +150,27 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
         var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, int>>();
         var mapper = HttpContext.RequestServices.GetRequiredService<IMapper>();
 
-        var original = (await service.List(new { id }, new PagingInfo { PageSize = 1 })).SingleOrDefault();
-        if (original == null)
+        var item = (await service.List(new { id }, new PagingInfo { PageSize = 1 })).SingleOrDefault();
+        if (item == null)
         {
             return NotFound();
         }
-        if (original.ObjectId != objectId)
+        if (item.ObjectId != objectId)
         {
-            return BadRequest($"Bad {nameof(original.ObjectId)}");
+            return BadRequest($"Bad {nameof(item.ObjectId)}");
         }
 
-        original.ObjectId = objectId;
-        original.Attachment = file.ToNamedFile().ToAttachment(original.Attachment);
+        item.ObjectId = objectId;
+        item.Attachment = file.ToNamedFile().ToAttachment();
 #if NETSTANDARD2_0
         using var fileStream = file.OpenReadStream();
 #else
         await using var fileStream = file.OpenReadStream();
 #endif
 
-        await service.Save(original);
+        await service.Save(item);
         var affected = await service.SaveChanges();
-        var savedModel = mapper.Map<TDto>(original);
+        var savedModel = mapper.Map<TDto>(item);
 
         sw.Stop();
 
