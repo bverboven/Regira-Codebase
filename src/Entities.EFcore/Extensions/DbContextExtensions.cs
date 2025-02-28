@@ -5,7 +5,6 @@ using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.Primers.Abstractions;
 using Regira.Entities.Models.Abstractions;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Regira.Entities.EFcore.Extensions;
 
@@ -30,11 +29,11 @@ public static class DbContextExtensions
 
 
     #region ChildCollections
-    public static void UpdateRelatedCollection<TEntity, TRelated>(this DbContext dbContext, TEntity original, TEntity modified, Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
+    public static void UpdateRelatedCollection<TEntity, TRelated>(this DbContext dbContext, TEntity modified, TEntity original, Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
         where TEntity : class, IEntity<int>
         where TRelated : class, IEntity<int>
-    => dbContext.UpdateRelatedCollection<TEntity, TRelated, int, int>(original, modified, navigationExpression);
-    public static void UpdateRelatedCollection<TEntity, TRelated, TEntityKey, TRelatedKey>(this DbContext dbContext, TEntity original, TEntity modified, Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
+    => dbContext.UpdateRelatedCollection<TEntity, TRelated, int, int>(modified, original, navigationExpression);
+    public static void UpdateRelatedCollection<TEntity, TRelated, TEntityKey, TRelatedKey>(this DbContext dbContext, TEntity modified, TEntity original, Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
         where TEntity : class, IEntity<TEntityKey>
         where TRelated : class, IEntity<TRelatedKey>
     {
@@ -52,7 +51,6 @@ public static class DbContextExtensions
         var relatedItemsToDelete = originalItems.Where(o => modifiedItems.All(p => !IdSelector(p)!.Equals(IdSelector(o)))).ToArray();
         foreach (var entity in relatedItemsToAdd)
         {
-            dbContext.Attach(entity);
             dbContext.Entry(entity).State = EntityState.Added;
         }
         foreach (var entity in relatedItemsToDelete)
@@ -69,10 +67,10 @@ public static class DbContextExtensions
             dbContext.Update(entity);
         }
 
-        if (navigationExpression.Body is MemberExpression { Member: PropertyInfo { CanWrite: true } propertyInfo })
-        {
-            propertyInfo.SetValue(original, modifiedItems);
-        }
+        //if (navigationExpression.Body is MemberExpression { Member: PropertyInfo { CanWrite: true } propertyInfo })
+        //{
+        //    propertyInfo.SetValue(original, modifiedItems);
+        //}
     }
     #endregion
 }

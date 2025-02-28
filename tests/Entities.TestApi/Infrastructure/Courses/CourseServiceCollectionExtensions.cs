@@ -20,16 +20,12 @@ public static class CourseServiceCollectionExtensions
                     .ThenInclude(x => x.Attachment)
                 );
                 e.AddQueryFilter<CourseQueryFilter>();
-                e.UseWriteService<CourseEntityWriteService>();
+                //e.UseWriteService<CourseEntityWriteService>();
                 e.AddMapping<CourseDto, CourseInputDto>();
                 e.HasAttachments(
                     course => course.Attachments,
                     a => a.AddMapping<CourseAttachmentDto, CourseAttachmentInputDto>()
                 );
-                //e.HasAttachments<TContext, Course, CourseAttachment>(a =>
-                //{
-                //    a.AddMapping<CourseAttachmentDto, CourseAttachmentInputDto>();
-                //});
                 // extra person filter
                 e.AddTransient<IFilteredQueryBuilder<Person, int, PersonSearchObject>, CoursePersonQueryFilter>();
             });

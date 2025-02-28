@@ -72,7 +72,7 @@ public class EntityAttachmentWriteService<TContext, TEntityAttachment, TEntityAt
 (
     TContext dbContext,
     IEntityReadService<TEntityAttachment, TEntityAttachmentKey> readService,
-    IEnumerable<IPrepper<TEntityAttachment, TEntityAttachmentKey>> preppers,
+    IEnumerable<IEntityPrepper<TEntityAttachment, TEntityAttachmentKey>> preppers,
     IFileIdentifierGenerator<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment> identifierGenerator)
     : EntityWriteService<TContext, TEntityAttachment, TEntityAttachmentKey>(dbContext, readService, preppers)
     where TContext : DbContext
@@ -93,29 +93,30 @@ public class EntityAttachmentWriteService<TContext, TEntityAttachment, TEntityAt
     {
         var original = await base.Modify(item);
 
-        if (original is { Attachment: not null })
-        {
-            if (item.Attachment?.IsNew() == true)
-            {
-                DbContext.Entry(original.Attachment).State = EntityState.Detached;
-                DbContext.Attach(item.Attachment);
-                DbContext.Entry(item.Attachment).State = EntityState.Added;
-                original.Attachment = item.Attachment;
-                original.AttachmentId = item.Attachment.Id;
-                DbContext.Update(original);
-            }
+        item.Attachment ??= original?.Attachment;
 
+        if (item.Attachment != null)
+        {
             if (!string.IsNullOrWhiteSpace(item.NewFileName))
             {
-                original.Attachment.FileName = item.NewFileName;
-                DbContext.Set<TAttachment>().Update(original.Attachment!);
+                item.Attachment.FileName = item.NewFileName;
+                DbContext.Set<TAttachment>().Update(item.Attachment!);
             }
 
             if (!string.IsNullOrWhiteSpace(item.NewContentType))
             {
-                original.Attachment.ContentType = item.NewContentType;
-                DbContext.Set<TAttachment>().Update(original.Attachment!);
+                item.Attachment.ContentType = item.NewContentType;
+                DbContext.Set<TAttachment>().Update(item.Attachment!);
             }
+        }
+
+        if (item.Attachment?.IsNew() == true)
+        {
+            if (original?.Attachment != null)
+            {
+                DbContext.Entry(original.Attachment).State = EntityState.Deleted;
+            }
+            DbContext.Entry(item.Attachment).State = EntityState.Added;
         }
 
         return original;

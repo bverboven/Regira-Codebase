@@ -6,13 +6,13 @@ using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.EFcore.Services;
 
-public class EntityWriteService<TContext, TEntity>(TContext dbContext, IEntityReadService<TEntity, int> readService, IEnumerable<IPrepper<TEntity, int>> preppers)
+public class EntityWriteService<TContext, TEntity>(TContext dbContext, IEntityReadService<TEntity, int> readService, IEnumerable<IEntityPrepper<TEntity, int>> preppers)
     : EntityWriteService<TContext, TEntity, int>(dbContext, readService, preppers)
     where TContext : DbContext
     where TEntity : class, IEntity<int>;
 
 
-public class EntityWriteService<TContext, TEntity, TKey>(TContext dbContext, IEntityReadService<TEntity, TKey> readService, IEnumerable<IPrepper<TEntity, TKey>> preppers)
+public class EntityWriteService<TContext, TEntity, TKey>(TContext dbContext, IEntityReadService<TEntity, TKey> readService, IEnumerable<IEntityPrepper<TEntity, TKey>> preppers)
     : IEntityWriteService<TEntity, TKey>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
@@ -34,9 +34,10 @@ public class EntityWriteService<TContext, TEntity, TKey>(TContext dbContext, IEn
 
         if (original != null)
         {
-            DbContext.Attach(original);
-            DbContext.Entry(original).CurrentValues.SetValues(item);
-            DbContext.Entry(original).State = EntityState.Modified;
+            DbContext.Entry(original).State = EntityState.Detached;
+            DbContext.Attach(item);
+            DbContext.Entry(item).OriginalValues.SetValues(original);
+            DbContext.Entry(item).State = EntityState.Modified;
         }
 
         return original;

@@ -136,7 +136,7 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
         Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
         where TRelated : class, IEntity<int>
     {
-        Services.AddTransient<IPrepper<TEntity, int>>(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, int, int>(p.GetRequiredService<TContext>(), navigationExpression));
+        Services.AddTransient<IEntityPrepper<TEntity, int>>(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, int, int>(p.GetRequiredService<TContext>(), navigationExpression));
 
         return this;
     }

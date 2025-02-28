@@ -157,14 +157,15 @@ public class InterceptorTests
 
             await dbContext.SaveChangesAsync();
         }
-
+        
+        var updatedTitle = "Category (updated)";
         using (var updateScope = sp.CreateScope())
         {
             var dbContext = updateScope.ServiceProvider.GetRequiredService<ProductContext>();
             var modifiedItem = new Category
             {
                 Id = 1,
-                Title = "Category (updated)",
+                Title = updatedTitle,
                 Products = new List<Product>
                 {
                     new() { Id = 1, Title = "Product (1)", Description = "updated"},
@@ -176,22 +177,23 @@ public class InterceptorTests
                 .Include(x => x.Products)
                 .AsNoTrackingWithIdentityResolution()
                 .SingleAsync(x => x.Id == 1);
+            
+            dbContext.Attach(modifiedItem);
+            dbContext.Entry(modifiedItem).OriginalValues.SetValues(originalItem);
+            dbContext.Update(modifiedItem);
 
-            dbContext.UpdateRelatedCollection(originalItem, modifiedItem, x => x.Products);
-
-            dbContext.Update(originalItem);
-            dbContext.Entry(originalItem).CurrentValues.SetValues(modifiedItem);
-
-            await dbContext.SaveChangesAsync();
-
-            Assert.That(originalItem.Title, Is.EqualTo(modifiedItem.Title));
-            Assert.That(originalItem.Created, Is.EqualTo(created));
-            Assert.That(originalItem.LastModified, Is.Not.Null);
+            dbContext.UpdateRelatedCollection(modifiedItem, originalItem, x => x.Products);
 
             await dbContext.SaveChangesAsync();
+            
+            Assert.That(modifiedItem.Title, Is.EqualTo(updatedTitle));
+            Assert.That(modifiedItem.Created, Is.EqualTo(created));
+            Assert.That(modifiedItem.LastModified, Is.Not.Null);
 
-            Assert.That(originalItem.Products?.Count, Is.EqualTo(2));
-            foreach (var product in originalItem.Products!)
+            await dbContext.SaveChangesAsync();
+            
+            Assert.That(modifiedItem.Products?.Count, Is.EqualTo(2));
+            foreach (var product in modifiedItem.Products!)
             {
                 Assert.That(product.Created, Is.EqualTo(created));
                 if (product.Id == 1)

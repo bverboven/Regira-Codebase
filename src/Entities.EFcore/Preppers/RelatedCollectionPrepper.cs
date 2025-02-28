@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace Regira.Entities.EFcore.Preppers;
 
-public class RelatedCollectionPrepper<TContext, TEntity, TRelated, TEntityKey, TRelatedKey>(TContext dbContext, Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression) : IPrepper<TEntity, TEntityKey>
+public class RelatedCollectionPrepper<TContext, TEntity, TRelated, TEntityKey, TRelatedKey>(TContext dbContext, Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression) : IEntityPrepper<TEntity, TEntityKey>
     where TContext : DbContext
     where TEntity : class, IEntity<TEntityKey>
     where TRelated : class, IEntity<TRelatedKey>
@@ -15,7 +15,7 @@ public class RelatedCollectionPrepper<TContext, TEntity, TRelated, TEntityKey, T
     {
         if (original != null)
         {
-            dbContext.UpdateRelatedCollection<TEntity, TRelated, TEntityKey, TRelatedKey>(original, modified, navigationExpression);
+            dbContext.UpdateRelatedCollection<TEntity, TRelated, TEntityKey, TRelatedKey>(modified, original, navigationExpression);
         }
 
         return Task.CompletedTask;
