@@ -3,5 +3,5 @@
 public static class ApiConfiguration
 {
     public static string ConnectionString = $"Filename={Path.Combine(Path.GetTempPath(), "test.db")}";
-    public static string AttachmentsDirectory = Path.Combine(Path.GetTempPath(), "testing");
+    public static string AttachmentsDirectory = Path.Combine(Path.GetTempPath(), "testing", Guid.NewGuid().ToString("n"));
 }

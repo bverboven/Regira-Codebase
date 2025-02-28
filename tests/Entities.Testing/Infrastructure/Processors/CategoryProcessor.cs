@@ -1,12 +1,13 @@
 ﻿using Entities.Testing.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Regira.Entities.EFcore.Processing;
+using Regira.Entities.Models;
 
 namespace Entities.Testing.Infrastructure.Processors;
 
-public class CategoryProcessor(ProductContext dbContext) : EntityProcessor<Category>
+public class CategoryProcessor(ProductContext dbContext) : EntityProcessor<Category, EntityIncludes>
 {
-    public override async Task Process(IList<Category> items)
+    public override async Task Process(IList<Category> items, EntityIncludes? _)
     {
         var categoryIds = items
             .Select(x => x.Id)

@@ -8,9 +8,4 @@ public interface IAttachmentService<TAttachment, TKey> : IAttachmentService<TAtt
     where TAttachment : class, IAttachment<TKey>, new();
 public interface IAttachmentService<TAttachment, TKey, in TAttachmentSearchObject> : IEntityService<TAttachment, TKey, TAttachmentSearchObject>
     where TAttachment : class, IAttachment<TKey>, new()
-    where TAttachmentSearchObject : AttachmentSearchObject<TKey>, new()
-{
-    Task<byte[]?> GetBytes(TAttachment item);
-    Task SaveFile(TAttachment item);
-    Task RemoveFile(TAttachment item);
-}
+    where TAttachmentSearchObject : AttachmentSearchObject<TKey>, new();

@@ -166,8 +166,8 @@ public static class ControllerExtensions
             await service.Save(item);
             var affected = await service.SaveChanges();
 
-            var savedItem = await service.Details(item.Id);
-            var savedModel = mapper.Map<TDto>(savedItem)!;
+            //var savedItem = await service.Details(item.Id);
+            var savedModel = mapper.Map<TDto>(item)!;
 
             sw.Stop();
 

@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.QueryBuilders;
+using Regira.Entities.EFcore.Preppers;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
@@ -18,6 +20,8 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
+    private readonly EntityServiceBuilder<TContext, TEntity, int, TSearchObject> _simpleBuilder = services;
+
     // Entity service
     public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddDefaultService()
         => UseEntityService<EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
@@ -125,6 +129,16 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
         where TImplementation : class, IFilteredQueryBuilder<TEntity, int, TSearchObject>
     {
         Services.AddQueryFilter<TEntity, TSearchObject, TImplementation>();
+        return this;
+    }
+
+    // Related
+    public ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> Related<TRelated>(
+        Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
+        where TRelated : class, IEntity<int>
+    {
+        _simpleBuilder.AddPrepper(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, int, int>(p.GetRequiredService<TContext>(), navigationExpression));
+
         return this;
     }
 }

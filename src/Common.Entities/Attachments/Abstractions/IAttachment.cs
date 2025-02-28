@@ -3,5 +3,5 @@ using Regira.IO.Abstractions;
 
 namespace Regira.Entities.Attachments.Abstractions;
 
-public interface IAttachment;
-public interface IAttachment<TKey> : IEntity<TKey>, IAttachment, IBinaryFile, IHasTimestamps;
+public interface IAttachment : IBinaryFile, IHasTimestamps;
+public interface IAttachment<TKey> : IAttachment, IEntity<TKey>;

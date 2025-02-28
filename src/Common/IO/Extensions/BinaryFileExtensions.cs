@@ -65,7 +65,12 @@ public static class BinaryFileExtensions
     }
 
     public static long GetLength(this IBinaryFile file)
-        => file.HasPath()
+    {
+        var length = MemoryFileExtensions.GetLength(file);
+        if (length == 0)
+            length = file.HasPath()
             ? new FileInfo(file.Path!).Length
-            : MemoryFileExtensions.GetLength(file);
+            : 0;
+        return length;
+    }
 }

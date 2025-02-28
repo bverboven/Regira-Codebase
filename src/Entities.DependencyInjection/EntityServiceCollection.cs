@@ -7,7 +7,6 @@ using Regira.Entities.DependencyInjection.Abstractions;
 using Regira.Entities.DependencyInjection.Primers;
 using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.EFcore.Attachments;
-using Regira.Entities.EFcore.Processing.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models;
@@ -247,17 +246,16 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         where TAttachment : class, IAttachment<TKey>, new()
         where TAttachmentSearchObject : AttachmentSearchObject<TKey>, new()
     {
-        Services.AddTransient(factory);
-        Services.AddPrimer<AttachmentPrimer>();
-
         var builder = new EntityServiceBuilder<TContext, TAttachment, TKey, TAttachmentSearchObject>(this);
+
+        builder.AddPrimer<EntityAttachmentPrimer>();
 
         builder.For<TAttachment, TKey, TAttachmentSearchObject>(e =>
         {
-            e.AddTransient<IEntityProcessor<TAttachment>, AttachmentProcessor<TAttachment, TKey>>();
-            e.UseEntityService<AttachmentRepository<TContext, TAttachment, TKey, TAttachmentSearchObject>>();
+            Services.AddTransient<IAttachmentFileService<TAttachment, TKey>>(p => new AttachmentFileService<TAttachment, TKey>(factory(p)));
             e.AddQueryFilter<AttachmentFilteredQueryBuilder<TAttachment, TKey, TAttachmentSearchObject>>();
-            e.AddTransient<IAttachmentService<TAttachment, TKey, TAttachmentSearchObject>, AttachmentRepository<TContext, TAttachment, TKey, TAttachmentSearchObject>>();
+            e.Process<AttachmentProcessor<TAttachment, TKey>>();
+            e.AddPrimer<AttachmentPrimer>();
             configure?.Invoke(e);
         });
 

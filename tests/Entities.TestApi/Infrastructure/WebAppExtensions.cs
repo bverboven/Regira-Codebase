@@ -1,9 +1,9 @@
-﻿using System.Text;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Utilities;
+using System.Text;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
@@ -16,7 +16,7 @@ public static class WebAppExtensions
         app.MapGet("/", () => "Hello");
         app.MapPost("/db", ([FromServices] ContosoContext db) => db.Database.EnsureCreatedAsync());
         app.MapDelete("/db", ([FromServices] ContosoContext db) => db.Database.EnsureDeletedAsync());
-        app.MapPost("/test-data", async ([FromServices] ContosoContext db, [FromServices] IEntityService<CourseAttachment> courseAttachmentService) =>
+        app.MapPost("/test-data", async ([FromServices] ContosoContext db, [FromServices] IEntityService<CourseAttachment, int> courseAttachmentService) =>
         {
             await db.Database.EnsureCreatedAsync();
 

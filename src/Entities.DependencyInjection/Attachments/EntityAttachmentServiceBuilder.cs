@@ -5,7 +5,6 @@ using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.EFcore.Attachments;
-using Regira.Entities.EFcore.Processing.Abstractions;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Attachments.Mappings;
 using Regira.Entities.Web.Attachments.Models;
@@ -17,26 +16,12 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
         IEntityAttachmentServiceBuilder<TEntity, TEntityAttachment>
     where TContext : DbContext
     where TEntityAttachment : class, IEntityAttachment<int, int, int, Attachment>, new()
-    where TEntity : class, IEntity<int>, IHasAttachments, IHasAttachments<TEntityAttachment>
+    where TEntity : class, IEntity<int>, IHasAttachments<TEntityAttachment>
 {
     public new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment> WithDefaultMapping()
     {
         base.WithDefaultMapping();
         Services.AddTransient<AttachmentUriResolver<TEntityAttachment, EntityAttachmentDto>>();
-        return this;
-    }
-    public new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment> AddDefaultAttachmentServices()
-    {
-        base.AddDefaultAttachmentServices();
-
-        For<TEntityAttachment, int, EntityAttachmentSearchObject>(e =>
-        {
-            //e.AddQueryFilter<EntityAttachmentFilteredQueryBuilder<TEntityAttachment, EntityAttachmentSearchObject>>();
-            e.HasRepository<EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
-            e.AddTransient<IEntityRepository<TEntityAttachment>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
-            e.AddTransient<IEntityService<TEntityAttachment>, EntityAttachmentRepository<TContext, TEntity, TEntityAttachment, EntityAttachmentSearchObject>>();
-        });
-
         return this;
     }
 }
@@ -45,7 +30,7 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
     : EntityServiceBuilder<TContext, TEntityAttachment, TEntityAttachmentKey, TSearchObject>(services),
         IEntityAttachmentServiceBuilder<TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey, TAttachment>
     where TContext : DbContext
-    where TObject : class, IEntity<TObjectKey>, IHasAttachments, IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>
+    where TObject : class, IEntity<TObjectKey>, IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>
     where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>
     where TSearchObject : class, IEntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, new()
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
@@ -109,10 +94,15 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
     {
         For<TEntityAttachment, TEntityAttachmentKey, TSearchObject>(e =>
         {
+            e.AddTransient<
+                IFileIdentifierGenerator<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>,
+                DefaultFileIdentifierGenerator<TObject, TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>
+            >();
             e.Includes((query, _) => query.Include(x => x.Attachment));
             e.AddQueryFilter<EntityAttachmentFilteredQueryBuilder<TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>>();
-            e.AddTransient<IEntityProcessor<TEntityAttachment>, EntityAttachmentProcessor<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>>();
-            e.HasRepository<EntityAttachmentRepository<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>>();
+            e.Process<EntityAttachmentProcessor<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>>();
+            e.AddPrepper<EntityAttachmentPrepper<TContext, TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>>();
+            e.UseWriteService<EntityAttachmentWriteService<TContext, TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>>();
         });
 
         return this;
