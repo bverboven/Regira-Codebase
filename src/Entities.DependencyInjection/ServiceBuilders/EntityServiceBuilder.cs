@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq.Expressions;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
@@ -17,7 +18,6 @@ using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
-using System.Linq.Expressions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 
@@ -425,6 +425,18 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     }
 
     // Preppers
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddPrepper<TImplementation>()
+        where TImplementation : class, IEntityPrepper<TEntity, TKey>
+    {
+        Services.AddTransient<IEntityPrepper<TEntity, TKey>, TImplementation>();
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddPrepper<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityPrepper<TEntity, TKey>
+    {
+        Services.AddTransient(factory);
+        return this;
+    }
     public EntityServiceBuilder<TContext, TEntity, TKey> Prepare(Action<TEntity> prepareFunc)
     {
         Services.AddTransient<IEntityPrepper<TEntity, TKey>>(p => new EntityPrepper<TContext, TEntity, TKey>(p.GetRequiredService<TContext>(), (item, _) =>

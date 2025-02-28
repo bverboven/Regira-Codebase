@@ -1,14 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.EFcore.Preppers;
-using Regira.Entities.EFcore.Preppers.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models.Abstractions;
-using System.Linq.Expressions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 
@@ -21,6 +20,8 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
+    private readonly EntityServiceBuilder<TContext, TEntity, int, TSearchObject> _simpleBuilder = services;
+
     // Entity service
     public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> AddDefaultService()
         => UseEntityService<EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
@@ -132,11 +133,11 @@ public class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSort
     }
 
     // Related
-    public new ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> Related<TRelated>(
+    public ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> Related<TRelated>(
         Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
         where TRelated : class, IEntity<int>
     {
-        Services.AddTransient<IEntityPrepper<TEntity, int>>(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, int, int>(p.GetRequiredService<TContext>(), navigationExpression));
+        _simpleBuilder.AddPrepper(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, int, int>(p.GetRequiredService<TContext>(), navigationExpression));
 
         return this;
     }

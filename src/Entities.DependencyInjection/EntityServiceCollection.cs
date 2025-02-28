@@ -248,6 +248,8 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     {
         var builder = new EntityServiceBuilder<TContext, TAttachment, TKey, TAttachmentSearchObject>(this);
 
+        builder.AddPrimer<EntityAttachmentPrimer>();
+
         builder.For<TAttachment, TKey, TAttachmentSearchObject>(e =>
         {
             Services.AddTransient<IAttachmentFileService<TAttachment, TKey>>(p => new AttachmentFileService<TAttachment, TKey>(factory(p)));

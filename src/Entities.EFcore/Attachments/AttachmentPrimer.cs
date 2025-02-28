@@ -3,9 +3,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.EFcore.Primers.Abstractions;
-using Regira.Entities.Extensions;
 using Regira.IO.Extensions;
-using Regira.IO.Storage.Helpers;
 using Regira.IO.Utilities;
 
 namespace Regira.Entities.EFcore.Attachments;

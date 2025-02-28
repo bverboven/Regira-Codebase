@@ -20,7 +20,6 @@ public static class CourseServiceCollectionExtensions
                     .ThenInclude(x => x.Attachment)
                 );
                 e.AddQueryFilter<CourseQueryFilter>();
-                //e.UseWriteService<CourseEntityWriteService>();
                 e.AddMapping<CourseDto, CourseInputDto>();
                 e.HasAttachments(
                     course => course.Attachments,

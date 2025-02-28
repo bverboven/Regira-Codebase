@@ -53,7 +53,9 @@ public class TestWithAttachmentServices
         Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Attachment, int, AttachmentSearchObject<int>>>());
         Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Attachment, int, AttachmentSearchObject<int>>>());
         Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Attachment, int, AttachmentSearchObject<int>>>());
-        Assert.That(primers.First(), Is.TypeOf<AttachmentPrimer>());
+        Assert.That(primers.Length, Is.EqualTo(2));
+        Assert.That(primers.OfType<AttachmentPrimer>().Count(), Is.EqualTo(1));
+        Assert.That(primers.OfType<EntityAttachmentPrimer>().Count(), Is.EqualTo(1));
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Attachment, int>>());
         Assert.That(repo2, Is.TypeOf<EntityRepository<Attachment, int, AttachmentSearchObject<int>>>());
         Assert.That(repo3, Is.TypeOf<EntityRepository<Attachment, int, AttachmentSearchObject<int>>>());
@@ -96,7 +98,9 @@ public class TestWithAttachmentServices
         Assert.That(entityProcessors.OfType<AttachmentProcessor<Attachment, int>>(), Is.Not.Empty);
         Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Attachment, int, AttachmentSearchObject>>());
         Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Attachment, int, AttachmentSearchObject>>());
-        Assert.That(primers.First(), Is.TypeOf<AttachmentPrimer>());
+        Assert.That(primers.Length, Is.EqualTo(2));
+        Assert.That(primers.OfType<AttachmentPrimer>().Count(), Is.EqualTo(1));
+        Assert.That(primers.OfType<EntityAttachmentPrimer>().Count(), Is.EqualTo(1));
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Attachment, int>>());
         Assert.That(repo2, Is.TypeOf<EntityRepository<Attachment, int, AttachmentSearchObject>>());
         Assert.That(repo3, Is.TypeOf<EntityRepository<Attachment, int, AttachmentSearchObject>>());
@@ -151,7 +155,9 @@ public class TestWithAttachmentServices
         Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<Attachment, int, AttachmentSearchObject<int>>>());
         Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, Attachment, int, AttachmentSearchObject<int>>>());
         Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, Attachment, int, AttachmentSearchObject<int>>>());
-        Assert.That(primers.First(), Is.TypeOf<AttachmentPrimer>());
+        Assert.That(primers.Length, Is.EqualTo(2));
+        Assert.That(primers.OfType<AttachmentPrimer>().Count(), Is.EqualTo(1));
+        Assert.That(primers.OfType<EntityAttachmentPrimer>().Count(), Is.EqualTo(1));
         Assert.That(entityWriteService, Is.TypeOf<EntityWriteService<ContosoContext, Attachment, int>>());
         Assert.That(repo2, Is.TypeOf<EntityRepository<Attachment, int, AttachmentSearchObject<int>>>());
         Assert.That(repo3, Is.TypeOf<EntityRepository<Attachment, int, AttachmentSearchObject<int>>>());
