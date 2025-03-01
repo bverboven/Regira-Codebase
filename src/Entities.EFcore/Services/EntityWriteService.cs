@@ -1,18 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Abstractions;
+using Regira.Entities.EFcore.Extensions;
 using Regira.Entities.EFcore.Preppers.Abstractions;
 using Regira.Entities.Extensions;
 using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.EFcore.Services;
 
-public class EntityWriteService<TContext, TEntity>(TContext dbContext, IEntityReadService<TEntity, int> readService, IEnumerable<IEntityPrepper<TEntity, int>> preppers)
+public class EntityWriteService<TContext, TEntity>(TContext dbContext, IEntityReadService<TEntity, int> readService, IEnumerable<IEntityPrepper> preppers)
     : EntityWriteService<TContext, TEntity, int>(dbContext, readService, preppers)
     where TContext : DbContext
     where TEntity : class, IEntity<int>;
 
 
-public class EntityWriteService<TContext, TEntity, TKey>(TContext dbContext, IEntityReadService<TEntity, TKey> readService, IEnumerable<IEntityPrepper<TEntity, TKey>> preppers)
+public class EntityWriteService<TContext, TEntity, TKey>(TContext dbContext, IEntityReadService<TEntity, TKey> readService, IEnumerable<IEntityPrepper> preppers)
     : IEntityWriteService<TEntity, TKey>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
@@ -52,7 +53,8 @@ public class EntityWriteService<TContext, TEntity, TKey>(TContext dbContext, IEn
 
     public virtual async Task PrepareItem(TEntity item, TEntity? original)
     {
-        foreach (var prepper in preppers)
+        var matchingPreppers = preppers.FindMatchingServices(item);
+        foreach (var prepper in matchingPreppers)
         {
             await prepper.Prepare(item, original);
         }

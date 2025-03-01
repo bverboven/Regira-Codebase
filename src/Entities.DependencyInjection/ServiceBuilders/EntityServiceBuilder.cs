@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
@@ -18,6 +17,7 @@ using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
+using System.Linq.Expressions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 
@@ -131,16 +131,16 @@ public class EntityServiceBuilder<TContext, TEntity>(IServiceCollection services
     // Preppers
     public new EntityServiceBuilder<TContext, TEntity> Prepare(Func<TEntity, TContext, Task> prepareFunc)
     {
-        Services.AddTransient<IEntityPrepper<TEntity, int>>(p => new EntityPrepper<TContext, TEntity, int>(p.GetRequiredService<TContext>(), prepareFunc));
+        Services.AddTransient<IEntityPrepper>(p => new EntityPrepper<TContext, TEntity, int>(p.GetRequiredService<TContext>(), prepareFunc));
 
         return this;
     }
     // Related
-    public new EntityServiceBuilder<TContext, TEntity> Related<TRelated>(
+    public EntityServiceBuilder<TContext, TEntity> Related<TRelated>(
         Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
         where TRelated : class, IEntity<int>
     {
-        Services.AddTransient<IEntityPrepper<TEntity, int>>(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, int, int>(p.GetRequiredService<TContext>(), navigationExpression));
+        AddPrepper(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, int, int>(p.GetRequiredService<TContext>(), navigationExpression));
 
         return this;
     }
@@ -428,18 +428,18 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     public EntityServiceBuilder<TContext, TEntity, TKey> AddPrepper<TImplementation>()
         where TImplementation : class, IEntityPrepper<TEntity, TKey>
     {
-        Services.AddTransient<IEntityPrepper<TEntity, TKey>, TImplementation>();
+        Services.AddTransient<IEntityPrepper, TImplementation>();
         return this;
     }
     public EntityServiceBuilder<TContext, TEntity, TKey> AddPrepper<TImplementation>(Func<IServiceProvider, TImplementation> factory)
         where TImplementation : class, IEntityPrepper<TEntity, TKey>
     {
-        Services.AddTransient(factory);
+        Services.AddTransient<IEntityPrepper>(factory);
         return this;
     }
     public EntityServiceBuilder<TContext, TEntity, TKey> Prepare(Action<TEntity> prepareFunc)
     {
-        Services.AddTransient<IEntityPrepper<TEntity, TKey>>(p => new EntityPrepper<TContext, TEntity, TKey>(p.GetRequiredService<TContext>(), (item, _) =>
+        Services.AddTransient<IEntityPrepper>(p => new EntityPrepper<TContext, TEntity, TKey>(p.GetRequiredService<TContext>(), (item, _) =>
         {
             prepareFunc(item);
             return Task.CompletedTask;
@@ -449,16 +449,20 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection se
     }
     public EntityServiceBuilder<TContext, TEntity, TKey> Prepare(Func<TEntity, TContext, Task> prepareFunc)
     {
-        Services.AddTransient<IEntityPrepper<TEntity, TKey>>(p => new EntityPrepper<TContext, TEntity, TKey>(p.GetRequiredService<TContext>(), prepareFunc));
+        Services.AddTransient<IEntityPrepper>(p => new EntityPrepper<TContext, TEntity, TKey>(p.GetRequiredService<TContext>(), prepareFunc));
 
         return this;
     }
     // Related
     public EntityServiceBuilder<TContext, TEntity, TKey> Related<TRelated, TRelatedKey>(
-        Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
+        Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression, Action<TEntity>? prepareFunc = null)
         where TRelated : class, IEntity<TRelatedKey>
     {
-        Services.AddTransient<IEntityPrepper<TEntity, TKey>>(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, TKey, TRelatedKey>(p.GetRequiredService<TContext>(), navigationExpression));
+        AddPrepper(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, TKey, TRelatedKey>(p.GetRequiredService<TContext>(), navigationExpression));
+        if (prepareFunc != null)
+        {
+            Prepare(prepareFunc);
+        }
 
         return this;
     }

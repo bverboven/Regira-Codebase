@@ -5,8 +5,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.DAL.EFcore.Extensions;
+using Regira.Entities.EFcore.Extensions;
 using Regira.Entities.EFcore.Primers.Abstractions;
-using Regira.Utilities;
 
 namespace Regira.Entities.EFcore.Primers;
 
@@ -30,16 +30,7 @@ public class EntityPrimerContainerInterceptor(IServiceProvider serviceProvider) 
             {
                 foreach (var entriesGroup in groupedEntries)
                 {
-                    var genericEntityTypes = new[] { entriesGroup.Key }
-                        .Concat(TypeUtility.GetBaseTypes(entriesGroup.Key))
-                        .Distinct();
-                    var matchingPrimers = primers
-                        .Where(x => genericEntityTypes.Any(entityType =>
-                        {
-                            var normalizerType = typeof(IEntityPrimer<>).MakeGenericType(entityType);
-                            return TypeUtility.ImplementsInterface(x.GetType(), normalizerType);
-                        }))
-                        .ToArray();
+                    var matchingPrimers = primers.FindMatchingServices(entriesGroup.Key);
 
                     foreach (var primer in matchingPrimers)
                     {

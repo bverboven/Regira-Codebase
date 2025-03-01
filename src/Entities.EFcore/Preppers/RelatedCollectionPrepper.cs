@@ -6,12 +6,12 @@ using System.Linq.Expressions;
 
 namespace Regira.Entities.EFcore.Preppers;
 
-public class RelatedCollectionPrepper<TContext, TEntity, TRelated, TEntityKey, TRelatedKey>(TContext dbContext, Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression) : IEntityPrepper<TEntity, TEntityKey>
+public class RelatedCollectionPrepper<TContext, TEntity, TRelated, TEntityKey, TRelatedKey>(TContext dbContext, Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression) : EntityPrepperBase<TEntity, TEntityKey>
     where TContext : DbContext
     where TEntity : class, IEntity<TEntityKey>
     where TRelated : class, IEntity<TRelatedKey>
 {
-    public Task Prepare(TEntity modified, TEntity? original)
+    public override Task Prepare(TEntity modified, TEntity? original)
     {
         if (original != null)
         {
