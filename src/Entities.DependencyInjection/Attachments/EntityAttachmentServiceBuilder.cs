@@ -24,6 +24,16 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
         Services.AddTransient<AttachmentUriResolver<TEntityAttachment, EntityAttachmentDto>>();
         return this;
     }
+
+
+    public new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment> AddDefaultAttachmentServices()
+    {
+        For<TEntityAttachment>();
+
+        base.AddDefaultAttachmentServices();
+
+        return this;
+    }
 }
 
 public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>(IServiceCollection services)

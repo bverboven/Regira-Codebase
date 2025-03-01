@@ -105,7 +105,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
 
         return this.File(item.Attachment!, inline);
     }
-    [HttpGet("{objectId}/files/{filename}")]
+    [HttpGet("{objectId}/files/{fileName}")]
     public virtual async Task<IActionResult> GetFile([FromRoute] int objectId, [FromRoute] string fileName, bool inline = true)
     {
         var decodedFileName = Uri.UnescapeDataString(fileName);// necessary for comparing file names with subfolders (%2F, ...)
