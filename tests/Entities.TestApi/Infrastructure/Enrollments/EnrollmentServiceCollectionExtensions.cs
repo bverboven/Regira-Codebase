@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Regira.Entities.DependencyInjection.Abstractions;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
 using Testing.Library.Contoso;
 
 namespace Entities.TestApi.Infrastructure.Enrollments;

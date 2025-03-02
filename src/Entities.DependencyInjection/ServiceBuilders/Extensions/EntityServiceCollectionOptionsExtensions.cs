@@ -1,7 +1,7 @@
-﻿using Regira.Entities.DependencyInjection.Models;
-using Regira.Entities.DependencyInjection.Normalizers;
+﻿using Regira.Entities.DependencyInjection.Normalizers;
 using Regira.Entities.DependencyInjection.Primers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
@@ -9,13 +9,15 @@ using Regira.Entities.Keywords;
 using Regira.Normalizing;
 using Regira.Normalizing.Models;
 
+
+
 #if NETCOREAPP3_1_OR_GREATER
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 #endif
 
-namespace Regira.Entities.DependencyInjection.Extensions;
+namespace Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 
 public static class EntityServiceCollectionOptionsExtensions
 {

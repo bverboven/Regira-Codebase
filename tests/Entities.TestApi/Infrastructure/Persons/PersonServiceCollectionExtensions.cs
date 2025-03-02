@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Regira.Entities.DependencyInjection.Abstractions;
 using Regira.Entities.DependencyInjection.Attachments;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Testing.Library.Contoso;
 
@@ -12,6 +12,21 @@ public static class PersonServiceCollectionExtensions
         where TContext : DbContext
     {
         services
+            //.For<Person>(builder =>
+            //{
+            //    builder
+            //        .WithSearchObject<PersonSearchObject>()
+            //        .Complex<PersonSortBy, PersonIncludes>()
+            //        .AddNormalizer<PersonNormalizer>()
+            //        .UseEntityService<PersonManager>()
+            //        .HasRepository<EntityRepository<Person, PersonSearchObject, PersonSortBy, PersonIncludes>>()
+            //        .HasManager<PersonManager>()
+            //        .Related(x => x.Departments)
+            //        .AddQueryFilter<PersonQueryFilter>()
+            //        .UseQueryBuilder<PersonQueryBuilder>()
+            //        .AddMapping<PersonDto, PersonInputDto>()
+            //        .HasAttachments<TContext, Person, PersonAttachment>();
+            //})
             .For<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(e =>
             {
                 e.UseEntityService<PersonManager>();
@@ -23,7 +38,8 @@ public static class PersonServiceCollectionExtensions
                 e.AddMapping<PersonDto, PersonInputDto>();
                 e.HasAttachments<TContext, Person, PersonAttachment>();
                 e.AddNormalizer<PersonNormalizer>();
-            });
+            })
+            ;
 
         return services;
     }

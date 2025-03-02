@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.DependencyInjection.Models;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 
-namespace Regira.Entities.DependencyInjection.Extensions;
+namespace Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 
 public static class ServiceCollectionExtensions
 {

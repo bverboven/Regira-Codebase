@@ -37,7 +37,7 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
 }
 
 public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>(IServiceCollection services)
-    : EntityServiceBuilder<TContext, TEntityAttachment, TEntityAttachmentKey, TSearchObject>(services),
+    : EntitySearchObjectServiceBuilder<TContext, TEntityAttachment, TEntityAttachmentKey, TSearchObject>(services),
         IEntityAttachmentServiceBuilder<TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey, TAttachment>
     where TContext : DbContext
     where TObject : class, IEntity<TObjectKey>, IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>

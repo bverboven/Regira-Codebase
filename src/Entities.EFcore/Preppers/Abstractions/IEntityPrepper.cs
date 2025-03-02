@@ -11,11 +11,3 @@ public interface IEntityPrepper<in TEntity, TEntityKey> : IEntityPrepper
 {
     Task Prepare(TEntity modified, TEntity? original);
 }
-
-public abstract class EntityPrepperBase<TEntity, TKey> : IEntityPrepper<TEntity, TKey>
-    where TEntity : class, IEntity<TKey>
-{
-    public abstract Task Prepare(TEntity modified, TEntity? original);
-    Task IEntityPrepper.Prepare(object modified, object? original)
-        => Prepare((TEntity)modified, original as TEntity);
-}
