@@ -12,33 +12,33 @@ public static class PersonServiceCollectionExtensions
         where TContext : DbContext
     {
         services
-            //.For<Person>(builder =>
-            //{
-            //    builder
-            //        .WithSearchObject<PersonSearchObject>()
-            //        .Complex<PersonSortBy, PersonIncludes>()
-            //        .AddNormalizer<PersonNormalizer>()
-            //        .UseEntityService<PersonManager>()
-            //        .HasRepository<EntityRepository<Person, PersonSearchObject, PersonSortBy, PersonIncludes>>()
-            //        .HasManager<PersonManager>()
-            //        .Related(x => x.Departments)
-            //        .AddQueryFilter<PersonQueryFilter>()
-            //        .UseQueryBuilder<PersonQueryBuilder>()
-            //        .AddMapping<PersonDto, PersonInputDto>()
-            //        .HasAttachments<TContext, Person, PersonAttachment>();
-            //})
-            .For<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(e =>
+            .For<Person>(builder =>
             {
-                e.UseEntityService<PersonManager>();
-                e.HasRepository<EntityRepository<Person, PersonSearchObject, PersonSortBy, PersonIncludes>>();
-                e.HasManager<PersonManager>();
-                e.Related(x => x.Departments);
-                e.AddQueryFilter<PersonQueryFilter>();
-                e.UseQueryBuilder<PersonQueryBuilder>();
-                e.AddMapping<PersonDto, PersonInputDto>();
-                e.HasAttachments<TContext, Person, PersonAttachment>();
-                e.AddNormalizer<PersonNormalizer>();
+                builder
+                    .WithSearchObject<PersonSearchObject>()
+                    .Complex<PersonSortBy, PersonIncludes>()
+                    .AddNormalizer<PersonNormalizer>()
+                    .UseEntityService<PersonManager>()
+                    .HasRepository<EntityRepository<Person, PersonSearchObject, PersonSortBy, PersonIncludes>>()
+                    .HasManager<PersonManager>()
+                    .Related(x => x.Departments)
+                    .AddQueryFilter<PersonQueryFilter>()
+                    .UseQueryBuilder<PersonQueryBuilder>()
+                    .AddMapping<PersonDto, PersonInputDto>()
+                    .HasAttachments<TContext, Person, PersonAttachment>();
             })
+            //.For<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(e =>
+            //{
+            //    e.UseEntityService<PersonManager>();
+            //    e.HasRepository<EntityRepository<Person, PersonSearchObject, PersonSortBy, PersonIncludes>>();
+            //    e.HasManager<PersonManager>();
+            //    e.Related(x => x.Departments);
+            //    e.AddQueryFilter<PersonQueryFilter>();
+            //    e.UseQueryBuilder<PersonQueryBuilder>();
+            //    e.AddMapping<PersonDto, PersonInputDto>();
+            //    e.HasAttachments<TContext, Person, PersonAttachment>();
+            //    e.AddNormalizer<PersonNormalizer>();
+            //})
             ;
 
         return services;

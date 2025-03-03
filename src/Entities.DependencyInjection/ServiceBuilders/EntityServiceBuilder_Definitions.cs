@@ -26,12 +26,12 @@ public class EntityIntServiceBuilder<TContext, TEntity, TSearchObject>(IServiceC
     where TEntity : class, IEntity<int>
     where TSearchObject : class, ISearchObject<int>, new()
 {
-    public new ComplexEntityServiceBuilder<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes> Complex<TSortBy, TIncludes>()
+    public new ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> Complex<TSortBy, TIncludes>()
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
     {
         var simpleBuilder = new EntitySearchObjectServiceBuilder<TContext, TEntity, int, TSearchObject>(this);
-        var builder = new ComplexEntityServiceBuilder<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>(simpleBuilder);
+        var builder = new ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(simpleBuilder);
         //configure?.Invoke(builder);
 
         // Query Builder
@@ -54,7 +54,7 @@ public class EntityIntServiceBuilder<TContext, TEntity, TSearchObject>(IServiceC
         // Entity Repository
         if (!builder.HasService<IEntityRepository<TEntity, int, TSearchObject, TSortBy, TIncludes>>())
         {
-            builder.HasRepositoryInner<EntityRepository<TEntity, int, TSearchObject, TSortBy, TIncludes>>();
+            builder.HasRepositoryInner<EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
         }
 
         // Entity Service
@@ -69,7 +69,7 @@ public class EntityIntServiceBuilder<TContext, TEntity, TSearchObject>(IServiceC
     }
 }
 
-public partial class ComplexEntityServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(
+public partial class ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(
     EntitySearchObjectServiceBuilder<TContext, TEntity, int, TSearchObject> services)
     : ComplexEntityServiceBuilder<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>(services)
     where TContext : DbContext
