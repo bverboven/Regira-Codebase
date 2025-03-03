@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
+using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
 using Regira.Entities.EFcore.Preppers;
@@ -137,7 +138,7 @@ public partial class EntityIntServiceBuilder<TContext, TEntity>
         Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
         where TRelated : class, IEntity<int>
     {
-        AddPrepper(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, int, int>(p.GetRequiredService<TContext>(), navigationExpression));
+        Services.AddPrepper(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, int, int>(p.GetRequiredService<TContext>(), navigationExpression));
 
         return this;
     }

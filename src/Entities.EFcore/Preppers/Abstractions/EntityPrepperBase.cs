@@ -1,9 +1,7 @@
-﻿using Regira.Entities.Models.Abstractions;
+﻿namespace Regira.Entities.EFcore.Preppers.Abstractions;
 
-namespace Regira.Entities.EFcore.Preppers.Abstractions;
-
-public abstract class EntityPrepperBase<TEntity, TKey> : IEntityPrepper<TEntity, TKey>
-    where TEntity : class, IEntity<TKey>
+public abstract class EntityPrepperBase<TEntity> : IEntityPrepper<TEntity>
+    where TEntity : class
 {
     public abstract Task Prepare(TEntity modified, TEntity? original);
     Task IEntityPrepper.Prepare(object modified, object? original)

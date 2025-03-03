@@ -6,8 +6,7 @@ public interface IEntityPrepper
 {
     Task Prepare(object modified, object? original);
 }
-public interface IEntityPrepper<in TEntity, TEntityKey> : IEntityPrepper
-    where TEntity : class, IEntity<TEntityKey>
+public interface IEntityPrepper<in TEntity> : IEntityPrepper
 {
     Task Prepare(TEntity modified, TEntity? original);
 }

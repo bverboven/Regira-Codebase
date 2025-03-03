@@ -4,7 +4,6 @@ using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Primers;
-using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
@@ -15,7 +14,7 @@ using Regira.Entities.Web.Attachments.Models;
 using Regira.IO.Storage.Abstractions;
 using Regira.Web.DependencyInjection;
 
-namespace Regira.Entities.DependencyInjection;
+namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 
 public class EntityServiceCollection<TContext>(IServiceCollection services) : ServiceCollectionWrapper(services), IEntityServiceCollection<TContext> where TContext : DbContext
 {

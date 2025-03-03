@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.Normalizers;
+using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.Primers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
@@ -295,18 +296,6 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
     }
 
     // Preppers
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddPrepper<TImplementation>()
-        where TImplementation : class, IEntityPrepper<TEntity, TKey>
-    {
-        Services.AddTransient<IEntityPrepper, TImplementation>();
-        return this;
-    }
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddPrepper<TImplementation>(Func<IServiceProvider, TImplementation> factory)
-        where TImplementation : class, IEntityPrepper<TEntity, TKey>
-    {
-        Services.AddTransient<IEntityPrepper>(factory);
-        return this;
-    }
     public EntityServiceBuilder<TContext, TEntity, TKey> Prepare(Action<TEntity> prepareFunc)
     {
         Services.AddTransient<IEntityPrepper>(p => new EntityPrepper<TContext, TEntity, TKey>(p.GetRequiredService<TContext>(), (item, _) =>
@@ -328,7 +317,7 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
         Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression, Action<TEntity>? prepareFunc = null)
         where TRelated : class, IEntity<TRelatedKey>
     {
-        AddPrepper(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, TKey, TRelatedKey>(p.GetRequiredService<TContext>(), navigationExpression));
+        Services.AddPrepper(p => new RelatedCollectionPrepper<TContext, TEntity, TRelated, TKey, TRelatedKey>(p.GetRequiredService<TContext>(), navigationExpression));
         if (prepareFunc != null)
         {
             Prepare(prepareFunc);

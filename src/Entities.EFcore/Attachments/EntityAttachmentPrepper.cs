@@ -9,7 +9,7 @@ public class EntityAttachmentPrepper<TContext, TEntityAttachment, TEntityAttachm
     TContext dbContext,
     IFileIdentifierGenerator<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment> identifierGenerator
 )
-    : EntityPrepperBase<TEntityAttachment, TEntityAttachmentKey>
+    : EntityPrepperBase<TEntityAttachment>
     where TContext : DbContext
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
     where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>

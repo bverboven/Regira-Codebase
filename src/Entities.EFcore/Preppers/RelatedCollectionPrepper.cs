@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace Regira.Entities.EFcore.Preppers;
 
-public class RelatedCollectionPrepper<TContext, TEntity, TRelated, TEntityKey, TRelatedKey>(TContext dbContext, Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression) : EntityPrepperBase<TEntity, TEntityKey>
+public class RelatedCollectionPrepper<TContext, TEntity, TRelated, TEntityKey, TRelatedKey>(TContext dbContext, Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression) : EntityPrepperBase<TEntity>
     where TContext : DbContext
     where TEntity : class, IEntity<TEntityKey>
     where TRelated : class, IEntity<TRelatedKey>

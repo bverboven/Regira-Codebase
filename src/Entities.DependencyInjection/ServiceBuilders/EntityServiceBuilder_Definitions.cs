@@ -4,6 +4,7 @@ using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
+using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
@@ -19,6 +20,37 @@ public partial class EntityIntServiceBuilder<TContext, TEntity>(IServiceCollecti
     {
         return new EntityIntServiceBuilder<TContext, TEntity, TSearchObject>(Services);
     }
+
+    public override void Build()
+    {
+        base.Build();
+
+        // Query Builder
+        if (!HasService<IQueryBuilder<TEntity, int, SearchObject<int>, EntitySortBy, EntityIncludes>>())
+        {
+            AddDefaultQueryBuilder();
+        }
+        // Read Service
+        if (!HasService<IEntityReadService<TEntity, int, SearchObject<int>>>())
+        {
+            UseReadService<EntityReadService<TContext, TEntity, int, SearchObject<int>>>();
+        }
+        // Write Service
+        if (!HasService<IEntityWriteService<TEntity, int>>())
+        {
+            UseWriteService<EntityWriteService<TContext, TEntity>>();
+        }
+        // Entity Repository
+        if (!HasService<IEntityRepository<TEntity>>())
+        {
+            HasRepositoryInner<EntityRepository<TEntity>>();
+        }
+        // Entity Service
+        if (!HasService<IEntityService<TEntity>>())
+        {
+            UseEntityService<EntityRepository<TEntity>>();
+        }
+    }
 }
 public class EntityIntServiceBuilder<TContext, TEntity, TSearchObject>(IServiceCollection services)
     : EntitySearchObjectServiceBuilder<TContext, TEntity, int, TSearchObject>(services), IEntityServiceBuilder<TContext, TEntity>
@@ -32,40 +64,39 @@ public class EntityIntServiceBuilder<TContext, TEntity, TSearchObject>(IServiceC
     {
         var simpleBuilder = new EntitySearchObjectServiceBuilder<TContext, TEntity, int, TSearchObject>(this);
         var builder = new ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(simpleBuilder);
-        //configure?.Invoke(builder);
-
-        // Query Builder
-        if (!builder.HasService<IQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>>())
-        {
-            builder.AddDefaultQueryBuilder();
-        }
-
-        // Read Service
-        if (!builder.HasService<IEntityReadService<TEntity, int, TSearchObject, TSortBy, TIncludes>>())
-        {
-            builder.UseReadService<EntityReadService<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>>();
-        }
-        // Write Service
-        if (!builder.HasService<IEntityWriteService<TEntity, int>>())
-        {
-            builder.UseWriteService<EntityWriteService<TContext, TEntity, int>>();
-        }
-
-        // Entity Repository
-        if (!builder.HasService<IEntityRepository<TEntity, int, TSearchObject, TSortBy, TIncludes>>())
-        {
-            builder.HasRepositoryInner<EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
-        }
-
-        // Entity Service
-        if (!builder.HasEntityService())
-        {
-            builder.AddTransient<IEntityService<TEntity, int>, EntityRepository<TEntity, int, TSearchObject, TSortBy, TIncludes>>();
-            builder.AddTransient<IEntityService<TEntity, int, TSearchObject>, EntityRepository<TEntity, int, TSearchObject, TSortBy, TIncludes>>();
-            builder.AddTransient<IEntityService<TEntity, int, TSearchObject, TSortBy, TIncludes>, EntityRepository<TEntity, int, TSearchObject, TSortBy, TIncludes>>();
-        }
 
         return builder;
+    }
+
+    public override void Build()
+    {
+        base.Build();
+
+        // Query Builder
+        if (!HasService<IQueryBuilder<TEntity, int, TSearchObject, EntitySortBy, EntityIncludes>>())
+        {
+            AddDefaultQueryBuilder();
+        }
+        // Read Service
+        if (!HasService<IEntityReadService<TEntity, int, TSearchObject>>())
+        {
+            UseReadService<EntityReadService<TContext, TEntity, int, TSearchObject>>();
+        }
+        // Write Service
+        if (!HasService<IEntityWriteService<TEntity, int>>())
+        {
+            UseWriteService<EntityWriteService<TContext, TEntity, int>>();
+        }
+        // Entity Repository
+        if (!HasService<IEntityRepository<TEntity, int, TSearchObject>>())
+        {
+            HasRepositoryInner<EntityRepository<TEntity, int, TSearchObject>>();
+        }
+        // Entity Service
+        if (!HasService<IEntityService<TEntity, int, TSearchObject>>())
+        {
+            UseEntityService<EntityRepository<TEntity, int, TSearchObject>>();
+        }
     }
 }
 
@@ -76,19 +107,83 @@ public partial class ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchOb
     where TEntity : class, IEntity<int>
     where TSearchObject : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum
-    where TIncludes : struct, Enum;
+    where TIncludes : struct, Enum
+{
+
+    public override void Build()
+    {
+        base.Build();
+
+        // Query Builder
+        if (!HasService<IQueryBuilder<TEntity, int, TSearchObject, TSortBy, TIncludes>>())
+        {
+            AddDefaultQueryBuilder();
+        }
+
+        // Read Service
+        if (!HasService<IEntityReadService<TEntity, int, TSearchObject, TSortBy, TIncludes>>())
+        {
+            UseReadService<EntityReadService<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>>();
+        }
+        // Write Service
+        if (!HasService<IEntityWriteService<TEntity, int>>())
+        {
+            UseWriteService<EntityWriteService<TContext, TEntity, int>>();
+        }
+
+        // Entity Repository
+        if (!HasService<IEntityRepository<TEntity, int, TSearchObject, TSortBy, TIncludes>>())
+        {
+            HasRepositoryInner<EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
+        }
+
+        // Entity Service
+        if (!HasEntityService())
+        {
+            UseEntityService<EntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>>();
+        }
+    }
+}
 
 
 public partial class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection services)
     : EntityServiceCollection<TContext>(services),
-        IEntityServiceBuilder<TContext, TEntity, TKey>//,
-                                                      //IEntityServiceBuilderImplementation<EntityServiceBuilder<TContext, TEntity, TKey>, TContext, TEntity, TKey>
+        IEntityServiceBuilder<TContext, TEntity, TKey>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
 {
     public EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject> WithSearchObject<TSearchObject>()
         where TSearchObject : class, ISearchObject<TKey>, new()
         => new(Services);
+
+    public virtual void Build()
+    {
+        // Query Builder
+        if (!HasService<IQueryBuilder<TEntity, TKey, SearchObject<TKey>, EntitySortBy, EntityIncludes>>())
+        {
+            AddDefaultQueryBuilder();
+        }
+        // Read Service
+        if (!HasService<IEntityReadService<TEntity, TKey, SearchObject<TKey>>>())
+        {
+            UseReadService<EntityReadService<TContext, TEntity, TKey, SearchObject<TKey>>>();
+        }
+        // Write Service
+        if (!HasService<IEntityWriteService<TEntity, TKey>>())
+        {
+            UseWriteService<EntityWriteService<TContext, TEntity, TKey>>();
+        }
+        // Entity Repository
+        if (!HasService<IEntityRepository<TEntity, TKey>>())
+        {
+            HasRepositoryInner<EntityRepository<TEntity, TKey>>();
+        }
+        // Entity Service
+        if (!HasService<IEntityService<TEntity, TKey>>())
+        {
+            UseEntityService<EntityRepository<TEntity, TKey>>();
+        }
+    }
 }
 public partial class EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServiceCollection services)
     : EntityServiceBuilder<TContext, TEntity, TKey>(services),
@@ -101,6 +196,37 @@ public partial class EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, T
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
         => new(this);
+
+    public override void Build()
+    {
+        base.Build();
+
+        // Query Builder
+        if (!HasService<IQueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>>())
+        {
+            AddDefaultQueryBuilder();
+        }
+        // Read Service
+        if (!HasService<IEntityReadService<TEntity, TKey, TSearchObject>>())
+        {
+            UseReadService<EntityReadService<TContext, TEntity, TKey, TSearchObject>>();
+        }
+        // Write Service
+        if (!HasService<IEntityWriteService<TEntity, TKey>>())
+        {
+            UseWriteService<EntityWriteService<TContext, TEntity, TKey>>();
+        }
+        // Entity Repository
+        if (!HasService<IEntityRepository<TEntity, TKey, TSearchObject>>())
+        {
+            HasRepositoryInner<EntityRepository<TEntity, TKey, TSearchObject>>();
+        }
+        // Entity Service
+        if (!HasService<IEntityService<TEntity, TKey, TSearchObject>>())
+        {
+            UseEntityService<EntityRepository<TEntity, TKey, TSearchObject>>();
+        }
+    }
 }
 
 public partial class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
@@ -110,4 +236,39 @@ public partial class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearc
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
     where TSortBy : struct, Enum
-    where TIncludes : struct, Enum;
+    where TIncludes : struct, Enum
+{
+    public override void Build()
+    {
+        base.Build();
+
+        // Query Builder
+        if (!HasService<IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>())
+        {
+            AddDefaultQueryBuilder();
+        }
+
+        // Read Service
+        if (!HasService<IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>())
+        {
+            UseReadService<EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+        }
+        // Write Service
+        if (!HasService<IEntityWriteService<TEntity, TKey>>())
+        {
+            UseWriteService<EntityWriteService<TContext, TEntity, TKey>>();
+        }
+
+        // Entity Repository
+        if (!HasService<IEntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>())
+        {
+            HasRepositoryInner<EntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+        }
+
+        // Entity Service
+        if (!HasEntityService())
+        {
+            UseEntityService<EntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>>();
+        }
+    }
+}

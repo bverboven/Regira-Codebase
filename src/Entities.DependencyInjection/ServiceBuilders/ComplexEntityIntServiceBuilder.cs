@@ -85,6 +85,7 @@ public partial class ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchOb
         where TService : class, IEntityManager<TEntity, TSearchObject, TSortBy, TIncludes>, IEntityManager<TEntity>
     {
         base.HasManager<TService>();
+        UseEntityService<TService>();
         Services.AddTransient<IEntityManager<TEntity>, TService>();
         Services.AddTransient<IEntityManager<TEntity, TSearchObject, TSortBy, TIncludes>, TService>();
         return this;
@@ -93,6 +94,7 @@ public partial class ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchOb
         where TImplementation : class, IEntityManager<TEntity, TSearchObject, TSortBy, TIncludes>, IEntityManager<TEntity>
     {
         base.HasManager(factory);
+        UseEntityService(factory);
         Services.AddTransient<IEntityManager<TEntity>>(factory);
         Services.AddTransient<IEntityManager<TEntity, TSearchObject, TSortBy, TIncludes>>(factory);
         return this;
