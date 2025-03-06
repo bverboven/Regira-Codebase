@@ -4,9 +4,9 @@ using Testing.Library.Contoso;
 
 namespace Entities.DependencyInjection.Testing.Infrastructure;
 
-public class CourseQueryFilter1 : FilteredQueryBuilderBase<Course, int, SearchObject<int>>
+public class CourseQueryFilter1 : IFilteredQueryBuilder<Course, int, SearchObject<int>>
 {
-    public override IQueryable<Course> Build(IQueryable<Course> query, SearchObject<int>? so)
+    public IQueryable<Course> Build(IQueryable<Course> query, SearchObject<int>? so)
     {
         if (!string.IsNullOrWhiteSpace(so?.Q))
         {
@@ -17,9 +17,9 @@ public class CourseQueryFilter1 : FilteredQueryBuilderBase<Course, int, SearchOb
     }
 }
 
-public class CourseQueryFilter3 : FilteredQueryBuilderBase<Course, int, CourseSearchObject>
+public class CourseQueryFilter3 : IFilteredQueryBuilder<Course, int, CourseSearchObject>
 {
-    public override IQueryable<Course> Build(IQueryable<Course> query, CourseSearchObject? so)
+    public IQueryable<Course> Build(IQueryable<Course> query, CourseSearchObject? so)
     {
         if (so?.DepartmentId is not null)
         {

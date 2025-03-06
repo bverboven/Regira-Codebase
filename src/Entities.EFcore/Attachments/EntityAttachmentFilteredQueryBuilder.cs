@@ -13,14 +13,14 @@ public class EntityAttachmentFilteredQueryBuilder<TEntityAttachment, TSearchObje
     where TEntityAttachment : IEntityAttachment<int, int, int, Attachment>, IEntity<int>
     where TSearchObject : class, IEntityAttachmentSearchObject<int, int>;
 public class EntityAttachmentFilteredQueryBuilder<TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>(IQKeywordHelper? qHelper = null)
-    : FilteredQueryBuilderBase<TEntityAttachment, TEntityAttachmentKey, TSearchObject>
+    : IFilteredQueryBuilder<TEntityAttachment, TEntityAttachmentKey, TSearchObject>
     where TEntityAttachment : IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>, IEntity<TEntityAttachmentKey>
     where TSearchObject : class, IEntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
 {
     protected internal IQKeywordHelper QHelper = qHelper ?? new QKeywordHelper();
 
-    public override IQueryable<TEntityAttachment> Build(IQueryable<TEntityAttachment> query, TSearchObject? so)
+    public IQueryable<TEntityAttachment> Build(IQueryable<TEntityAttachment> query, TSearchObject? so)
     {
         if (so != null)
         {
@@ -43,11 +43,11 @@ public class EntityAttachmentFilteredQueryBuilder<TObjectKey, TEntityAttachment,
 
 
 public class EntityAttachmentQueryFilter<TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>(Func<IQueryable<TEntityAttachment>, TSearchObject?, IQueryable<TEntityAttachment>> filterFunc) 
-    : FilteredQueryBuilderBase<TEntityAttachment, TEntityAttachmentKey, TSearchObject>
+    : IFilteredQueryBuilder<TEntityAttachment, TEntityAttachmentKey, TSearchObject>
     where TEntityAttachment : IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>, IEntity<TEntityAttachmentKey>
     where TSearchObject : class, IEntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
 {
-    public override IQueryable<TEntityAttachment> Build(IQueryable<TEntityAttachment> query, TSearchObject? so)
+    public IQueryable<TEntityAttachment> Build(IQueryable<TEntityAttachment> query, TSearchObject? so)
         => filterFunc(query, so);
 }

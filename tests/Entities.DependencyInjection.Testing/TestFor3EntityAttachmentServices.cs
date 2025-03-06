@@ -34,7 +34,7 @@ public class TestFor3EntityAttachmentServices
             .WithAttachments(_ => new BinaryFileService(new FileSystemOptions()))
             .For<Course, int, CourseSearchObject>(e =>
             {
-                e.HasAttachments<ContosoContext, Course, CourseAttachment>();
+                e.HasAttachments(item => item.Attachments);
             })
             .BuildServiceProvider();
 
@@ -86,7 +86,7 @@ public class TestFor3EntityAttachmentServices
             .WithAttachments(_ => new BinaryFileService(new FileSystemOptions()))
             .For<Course, int, CourseSearchObject>(e =>
             {
-                e.HasAttachments<ContosoContext, Course, CourseAttachment>();
+                e.HasAttachments(item => item.Attachments);
             })
             .BuildServiceProvider();
 
@@ -147,7 +147,7 @@ public class TestFor3EntityAttachmentServices
             .WithAttachments(_ => new BinaryFileService(new FileSystemOptions()))
             .For<Course, int, CourseSearchObject>(e =>
             {
-                e.HasAttachments<ContosoContext, Course, CourseAttachment>(a =>
+                e.HasAttachments(item => item.Attachments, a =>
                 {
                     a.Filter((query, so) =>
                     {

@@ -14,12 +14,12 @@ public static class PersonServiceCollectionExtensions
             .For<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(e =>
             {
                 e.Related(x => x.Departments);
+                e.HasAttachments(x => x.Attachments);
                 e.AddQueryFilter<PersonQueryFilter>();
                 e.Includes<PersonIncludableQueryBuilder>();
                 e.SortBy<PersonSortQueryBuilder>();
                 e.AddNormalizer<PersonNormalizer>();
                 e.HasManager<PersonManager>();
-                e.HasAttachments(x => x.Attachments);
                 e.AddMapping<PersonDto, PersonInputDto>();
             })
             //.For<Person>(builder =>
@@ -28,6 +28,7 @@ public static class PersonServiceCollectionExtensions
             //        .AddMapping<PersonDto, PersonInputDto>()
             //        .WithSearchObject<PersonSearchObject>()
             //        .Complex<PersonSortBy, PersonIncludes>()
+            //
             //        .AddNormalizer<PersonNormalizer>()
             //        .HasManager<PersonManager>()
             //        .Related(x => x.Departments)

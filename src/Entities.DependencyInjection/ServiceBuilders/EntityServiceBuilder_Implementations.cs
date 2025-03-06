@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq.Expressions;
+using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.Normalizers;
@@ -7,7 +8,6 @@ using Regira.Entities.DependencyInjection.Primers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
 using Regira.Entities.EFcore.Preppers;
-using Regira.Entities.EFcore.Preppers.Abstractions;
 using Regira.Entities.EFcore.Primers.Abstractions;
 using Regira.Entities.EFcore.Processing;
 using Regira.Entities.EFcore.Processing.Abstractions;
@@ -16,7 +16,6 @@ using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
-using System.Linq.Expressions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 
