@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Regira.Entities.DependencyInjection.Attachments;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
-using Regira.Entities.EFcore.Services;
 using Testing.Library.Contoso;
 
 namespace Entities.TestApi.Infrastructure.Persons;
@@ -14,15 +13,14 @@ public static class PersonServiceCollectionExtensions
         services
             .For<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(e =>
             {
-                e.UseEntityService<PersonManager>();
-                e.HasRepository<EntityRepository<Person, PersonSearchObject, PersonSortBy, PersonIncludes>>();
-                e.HasManager<PersonManager>();
                 e.Related(x => x.Departments);
                 e.AddQueryFilter<PersonQueryFilter>();
-                e.UseQueryBuilder<PersonQueryBuilder>();
-                e.AddMapping<PersonDto, PersonInputDto>();
-                e.HasAttachments<TContext, Person, PersonAttachment>();
+                e.Includes<PersonIncludableQueryBuilder>();
+                e.SortBy<PersonSortQueryBuilder>();
                 e.AddNormalizer<PersonNormalizer>();
+                e.HasManager<PersonManager>();
+                e.HasAttachments(x => x.Attachments);
+                e.AddMapping<PersonDto, PersonInputDto>();
             })
             //.For<Person>(builder =>
             //{
@@ -31,12 +29,11 @@ public static class PersonServiceCollectionExtensions
             //        .WithSearchObject<PersonSearchObject>()
             //        .Complex<PersonSortBy, PersonIncludes>()
             //        .AddNormalizer<PersonNormalizer>()
-            //        .UseEntityService<PersonManager>()
-            //        .HasRepository<EntityRepository<Person, PersonSearchObject, PersonSortBy, PersonIncludes>>()
             //        .HasManager<PersonManager>()
             //        .Related(x => x.Departments)
             //        .AddQueryFilter<PersonQueryFilter>()
-            //        .UseQueryBuilder<PersonQueryBuilder>()
+            //        .SortBy<PersonSortQueryBuilder>()
+            //        .Includes<PersonIncludableQueryBuilder>()
             //        .HasAttachments<TContext, Person, PersonAttachment>()
             //        .Build();
             //})

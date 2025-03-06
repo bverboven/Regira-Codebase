@@ -1,16 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Testing.Library.Contoso;
 
 namespace Entities.TestApi.Infrastructure.Persons;
 
-public class PersonQueryBuilder(
-    IEnumerable<IGlobalFilteredQueryBuilder> globalFilters,
-    IEnumerable<IFilteredQueryBuilder<Person, int, PersonSearchObject>> filters)
-    : QueryBuilder<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(globalFilters, filters)
+public class PersonSortQueryBuilder(Func<IQueryable<Person>, PersonSortBy?, IQueryable<Person>> sortQuery) : ISortedQueryBuilder<Person, int, PersonSortBy>
 {
-    public override IQueryable<Person> SortBy(IQueryable<Person> query, IList<PersonSearchObject?>? so, PersonSortBy? sortBy, PersonIncludes? includes)
+    public IQueryable<Person> SortBy(IQueryable<Person> query, PersonSortBy? sortBy)
     {
         if (sortBy != null)
         {
@@ -72,7 +68,10 @@ public class PersonQueryBuilder(
 
         return query.OrderBy(x => x.LastName);
     }
-    public override IQueryable<Person> AddIncludes(IQueryable<Person> query, IList<PersonSearchObject?>? so, IList<PersonSortBy>? sortByList, PersonIncludes? includes)
+}
+public class PersonIncludableQueryBuilder : IIncludableQueryBuilder<Person, int, PersonIncludes>
+{
+    public IQueryable<Person> AddIncludes(IQueryable<Person> query, PersonIncludes? includes = null)
     {
         if (includes.HasValue)
         {

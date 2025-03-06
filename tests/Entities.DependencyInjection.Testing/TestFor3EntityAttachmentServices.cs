@@ -64,7 +64,7 @@ public class TestFor3EntityAttachmentServices
         Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, CourseAttachment, int, EntityAttachmentSearchObject>>());
         Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, CourseAttachment, int, EntityAttachmentSearchObject>>());
         Assert.That(entityPreppers.Length, Is.EqualTo(3));
-        Assert.That(entityPreppers.OfType<EntityPrepper<ContosoContext, Course, int>>().Count(), Is.EqualTo(1));
+        Assert.That(entityPreppers.OfType<EntityPrepper<Course>>().Count(), Is.EqualTo(1));
         Assert.That(entityPreppers.OfType<RelatedCollectionPrepper<ContosoContext, Course, CourseAttachment, int, int>>().Count(), Is.EqualTo(1));
         Assert.That(entityPreppers.OfType<EntityAttachmentPrepper<ContosoContext, CourseAttachment, int, int, int, Attachment>>().Count(), Is.EqualTo(1));
         Assert.That(primers.Length, Is.EqualTo(2));
@@ -128,7 +128,7 @@ public class TestFor3EntityAttachmentServices
         Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, CourseAttachment, int, EntityAttachmentSearchObject>>());
         Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, CourseAttachment, int, EntityAttachmentSearchObject>>());
         Assert.That(entityPreppers.Length, Is.EqualTo(3));
-        Assert.That(entityPreppers.OfType<EntityPrepper<ContosoContext, Course, int>>().Count(), Is.EqualTo(1));
+        Assert.That(entityPreppers.OfType<EntityPrepper<Course>>().Count(), Is.EqualTo(1));
         Assert.That(entityPreppers.OfType<RelatedCollectionPrepper<ContosoContext, Course, CourseAttachment, int, int>>().Count(), Is.EqualTo(1));
         Assert.That(entityPreppers.OfType<EntityAttachmentPrepper<ContosoContext, CourseAttachment, int, int, int, Attachment>>().Count(), Is.EqualTo(1));
         Assert.That(entityWriteService, Is.TypeOf<EntityAttachmentWriteService<ContosoContext, CourseAttachment, int, int, int, Attachment>>());
@@ -189,7 +189,7 @@ public class TestFor3EntityAttachmentServices
         Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, CourseAttachment, int, EntityAttachmentSearchObject>>());
         Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, CourseAttachment, int, EntityAttachmentSearchObject>>());
         Assert.That(entityPreppers.Length, Is.EqualTo(3));
-        Assert.That(entityPreppers.OfType<EntityPrepper<ContosoContext, Course, int>>().Count(), Is.EqualTo(1));
+        Assert.That(entityPreppers.OfType<EntityPrepper<Course>>().Count(), Is.EqualTo(1));
         Assert.That(entityPreppers.OfType<RelatedCollectionPrepper<ContosoContext, Course, CourseAttachment, int, int>>().Count(), Is.EqualTo(1));
         Assert.That(entityPreppers.OfType<EntityAttachmentPrepper<ContosoContext, CourseAttachment, int, int, int, Attachment>>().Count(), Is.EqualTo(1));
         Assert.That(primers.Length, Is.EqualTo(2));

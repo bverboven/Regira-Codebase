@@ -298,18 +298,12 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
     // Preppers
     public EntityServiceBuilder<TContext, TEntity, TKey> Prepare(Action<TEntity> prepareFunc)
     {
-        Services.AddTransient<IEntityPrepper>(p => new EntityPrepper<TContext, TEntity, TKey>(p.GetRequiredService<TContext>(), (item, _) =>
-        {
-            prepareFunc(item);
-            return Task.CompletedTask;
-        }));
-
+        Services.AddPrepper(prepareFunc);
         return this;
     }
     public EntityServiceBuilder<TContext, TEntity, TKey> Prepare(Func<TEntity, TContext, Task> prepareFunc)
     {
-        Services.AddTransient<IEntityPrepper>(p => new EntityPrepper<TContext, TEntity, TKey>(p.GetRequiredService<TContext>(), prepareFunc));
-
+        Services.AddPrepper<TContext, TEntity, TKey>(prepareFunc);
         return this;
     }
     // Related
