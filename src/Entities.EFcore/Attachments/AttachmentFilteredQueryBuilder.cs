@@ -9,13 +9,13 @@ namespace Regira.Entities.EFcore.Attachments;
 
 public class AttachmentFilteredQueryBuilder(IQKeywordHelper? qHelper = null) : AttachmentFilteredQueryBuilder<Attachment, int, AttachmentSearchObject>(qHelper);
 
-public class AttachmentFilteredQueryBuilder<TAttachment, TKey, TAttachmentSearchObject>(IQKeywordHelper? qHelper = null) : FilteredQueryBuilderBase<TAttachment, TKey, TAttachmentSearchObject>
+public class AttachmentFilteredQueryBuilder<TAttachment, TKey, TAttachmentSearchObject>(IQKeywordHelper? qHelper = null) : IFilteredQueryBuilder<TAttachment, TKey, TAttachmentSearchObject>
     where TAttachment : IAttachment<TKey>
     where TAttachmentSearchObject : AttachmentSearchObject<TKey>
 {
     protected IQKeywordHelper QHelper { get; } = qHelper ?? new QKeywordHelper();
 
-    public override IQueryable<TAttachment> Build(IQueryable<TAttachment> query, TAttachmentSearchObject? so)
+    public IQueryable<TAttachment> Build(IQueryable<TAttachment> query, TAttachmentSearchObject? so)
     {
         if (!string.IsNullOrWhiteSpace(so?.FileName))
         {

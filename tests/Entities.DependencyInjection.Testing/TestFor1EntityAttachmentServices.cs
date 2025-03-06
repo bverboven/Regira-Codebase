@@ -2,7 +2,7 @@
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Attachments;
-using Regira.Entities.DependencyInjection.Extensions;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
@@ -33,7 +33,7 @@ public class TestFor1EntityAttachmentServices
             .WithAttachments(_ => new BinaryFileService(new FileSystemOptions()))
             .For<Course>(e =>
             {
-                e.HasAttachments<ContosoContext, Course, CourseAttachment>();
+                e.HasAttachments(item => item.Attachments);
             })
             .BuildServiceProvider();
 
@@ -45,8 +45,7 @@ public class TestFor1EntityAttachmentServices
         var queryBuilder = sp.GetService<IQueryBuilder<CourseAttachment, int, EntityAttachmentSearchObject, EntitySortBy, EntityIncludes>>();
         var entityReadService2 = sp.GetService<IEntityReadService<CourseAttachment, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<CourseAttachment, int, EntityAttachmentSearchObject>>();
-        var entityPreppers = sp.GetServices<IEntityPrepper<Course, int>>().ToArray();
-        var attachmentPreppers = sp.GetServices<IEntityPrepper<CourseAttachment, int>>().ToArray();
+        var entityPreppers = sp.GetServices<IEntityPrepper>().ToArray();
         var primers = sp.GetServices<IEntityPrimer>().ToArray();
         var entityWriteService = sp.GetService<IEntityWriteService<CourseAttachment, int>>();
         var repo2 = sp.GetService<IEntityRepository<CourseAttachment, int>>();
@@ -63,11 +62,10 @@ public class TestFor1EntityAttachmentServices
         Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<CourseAttachment, int, EntityAttachmentSearchObject>>());
         Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, CourseAttachment, int, EntityAttachmentSearchObject>>());
         Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, CourseAttachment, int, EntityAttachmentSearchObject>>());
-        Assert.That(entityPreppers.Length, Is.EqualTo(2));
-        Assert.That(entityPreppers.OfType<EntityPrepper<ContosoContext, Course, int>>().Count(), Is.EqualTo(1));
+        Assert.That(entityPreppers.Length, Is.EqualTo(3));
+        Assert.That(entityPreppers.OfType<EntityPrepper<Course>>().Count(), Is.EqualTo(1));
         Assert.That(entityPreppers.OfType<RelatedCollectionPrepper<ContosoContext, Course, CourseAttachment, int, int>>().Count(), Is.EqualTo(1));
-        Assert.That(attachmentPreppers.Length, Is.EqualTo(1));
-        Assert.That(attachmentPreppers.OfType<EntityAttachmentPrepper<ContosoContext, CourseAttachment, int, int, int, Attachment>>().Count(), Is.EqualTo(1));
+        Assert.That(entityPreppers.OfType<EntityAttachmentPrepper<ContosoContext, CourseAttachment, int, int, int, Attachment>>().Count(), Is.EqualTo(1));
         Assert.That(primers.Length, Is.EqualTo(2));
         Assert.That(primers.OfType<AttachmentPrimer>().Count(), Is.EqualTo(1));
         Assert.That(primers.OfType<EntityAttachmentPrimer>().Count(), Is.EqualTo(1));
@@ -87,7 +85,7 @@ public class TestFor1EntityAttachmentServices
             .WithAttachments(_ => new BinaryFileService(new FileSystemOptions()))
             .For<Course>(e =>
             {
-                e.HasAttachments<ContosoContext, Course, CourseAttachment>();
+                e.HasAttachments(item => item.Attachments);
             })
             .BuildServiceProvider();
 
@@ -99,8 +97,7 @@ public class TestFor1EntityAttachmentServices
         var queryBuilder = sp.GetService<IQueryBuilder<CourseAttachment, int, EntityAttachmentSearchObject, EntitySortBy, EntityIncludes>>();
         var entityReadService2 = sp.GetService<IEntityReadService<CourseAttachment, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<CourseAttachment, int, EntityAttachmentSearchObject>>();
-        var entityPreppers = sp.GetServices<IEntityPrepper<Course, int>>().ToArray();
-        var attachmentPreppers = sp.GetServices<IEntityPrepper<CourseAttachment, int>>().ToArray();
+        var entityPreppers = sp.GetServices<IEntityPrepper>().ToArray();
         var primers = sp.GetServices<IEntityPrimer>().ToArray();
         var entityWriteService = sp.GetService<IEntityWriteService<CourseAttachment, int>>();
         var repo2 = sp.GetService<IEntityRepository<CourseAttachment, int>>();
@@ -129,11 +126,10 @@ public class TestFor1EntityAttachmentServices
         Assert.That(queryBuilder, Is.TypeOf<QueryBuilder<CourseAttachment, int, EntityAttachmentSearchObject>>());
         Assert.That(entityReadService2, Is.TypeOf<EntityReadService<ContosoContext, CourseAttachment, int, EntityAttachmentSearchObject>>());
         Assert.That(entityReadService3, Is.TypeOf<EntityReadService<ContosoContext, CourseAttachment, int, EntityAttachmentSearchObject>>());
-        Assert.That(entityPreppers.Length, Is.EqualTo(2));
-        Assert.That(entityPreppers.OfType<EntityPrepper<ContosoContext, Course, int>>().Count(), Is.EqualTo(1));
+        Assert.That(entityPreppers.Length, Is.EqualTo(3));
+        Assert.That(entityPreppers.OfType<EntityPrepper<Course>>().Count(), Is.EqualTo(1));
         Assert.That(entityPreppers.OfType<RelatedCollectionPrepper<ContosoContext, Course, CourseAttachment, int, int>>().Count(), Is.EqualTo(1));
-        Assert.That(attachmentPreppers.Length, Is.EqualTo(1));
-        Assert.That(attachmentPreppers.OfType<EntityAttachmentPrepper<ContosoContext, CourseAttachment, int, int, int, Attachment>>().Count(), Is.EqualTo(1));
+        Assert.That(entityPreppers.OfType<EntityAttachmentPrepper<ContosoContext, CourseAttachment, int, int, int, Attachment>>().Count(), Is.EqualTo(1));
         Assert.That(entityWriteService, Is.TypeOf<EntityAttachmentWriteService<ContosoContext, CourseAttachment, int, int, int, Attachment>>());
         Assert.That(repo2, Is.TypeOf<EntityRepository<CourseAttachment, int, EntityAttachmentSearchObject>>());
         Assert.That(repo3, Is.TypeOf<EntityRepository<CourseAttachment, int, EntityAttachmentSearchObject>>());
@@ -150,7 +146,7 @@ public class TestFor1EntityAttachmentServices
             .WithAttachments(_ => new BinaryFileService(new FileSystemOptions()))
             .For<Course>(e =>
             {
-                e.HasAttachments<ContosoContext, Course, CourseAttachment>(a =>
+                e.HasAttachments(item => item.Attachments, a =>
                 {
                     a.Filter((query, so) =>
                     {
@@ -172,8 +168,7 @@ public class TestFor1EntityAttachmentServices
         var queryBuilder = sp.GetService<IQueryBuilder<CourseAttachment, int, EntityAttachmentSearchObject, EntitySortBy, EntityIncludes>>();
         var entityReadService2 = sp.GetService<IEntityReadService<CourseAttachment, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<CourseAttachment, int, EntityAttachmentSearchObject>>();
-        var entityPreppers = sp.GetServices<IEntityPrepper<Course, int>>().ToArray();
-        var attachmentPreppers = sp.GetServices<IEntityPrepper<CourseAttachment, int>>().ToArray();
+        var entityPreppers = sp.GetServices<IEntityPrepper>().ToArray();
         var primers = sp.GetServices<IEntityPrimer>().ToArray();
         var entityWriteService = sp.GetService<IEntityWriteService<CourseAttachment, int>>();
         var repo2 = sp.GetService<IEntityRepository<CourseAttachment, int>>();
@@ -195,11 +190,10 @@ public class TestFor1EntityAttachmentServices
         Assert.That(primers.Length, Is.EqualTo(2));
         Assert.That(primers.OfType<AttachmentPrimer>().Count(), Is.EqualTo(1));
         Assert.That(primers.OfType<EntityAttachmentPrimer>().Count(), Is.EqualTo(1));
-        Assert.That(entityPreppers.Length, Is.EqualTo(2));
-        Assert.That(entityPreppers.OfType<EntityPrepper<ContosoContext, Course, int>>().Count(), Is.EqualTo(1));
+        Assert.That(entityPreppers.Length, Is.EqualTo(3));
+        Assert.That(entityPreppers.OfType<EntityPrepper<Course>>().Count(), Is.EqualTo(1));
         Assert.That(entityPreppers.OfType<RelatedCollectionPrepper<ContosoContext, Course, CourseAttachment, int, int>>().Count(), Is.EqualTo(1));
-        Assert.That(attachmentPreppers.Length, Is.EqualTo(1));
-        Assert.That(attachmentPreppers.OfType<EntityAttachmentPrepper<ContosoContext, CourseAttachment, int, int, int, Attachment>>().Count(), Is.EqualTo(1));
+        Assert.That(entityPreppers.OfType<EntityAttachmentPrepper<ContosoContext, CourseAttachment, int, int, int, Attachment>>().Count(), Is.EqualTo(1));
         Assert.That(entityWriteService, Is.TypeOf<EntityAttachmentWriteService<ContosoContext, CourseAttachment, int, int, int, Attachment>>());
         Assert.That(repo2, Is.TypeOf<EntityRepository<CourseAttachment, int, EntityAttachmentSearchObject>>());
         Assert.That(repo3, Is.TypeOf<EntityRepository<CourseAttachment, int, EntityAttachmentSearchObject>>());

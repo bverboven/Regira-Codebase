@@ -25,8 +25,8 @@ public class EntityReadService<TContext, TEntity, TSearchObject, TSortBy, TInclu
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum;
 
-public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(TContext dbContext, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes> queryBuilder,
-    IEnumerable<IEntityProcessor<TEntity, TIncludes>> entityProcessors)
+public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>
+(TContext dbContext, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes> queryBuilder, IEnumerable<IEntityProcessor<TEntity, TIncludes>> entityProcessors)
     : IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>

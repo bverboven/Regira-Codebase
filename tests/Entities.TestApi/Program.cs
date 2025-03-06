@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Entities.TestApi.Infrastructure;
 using Entities.TestApi.Infrastructure.Courses;
 using Entities.TestApi.Infrastructure.Departments;
@@ -8,14 +7,17 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Regira.DAL.EFcore.Services;
-using Regira.Entities.DependencyInjection.Extensions;
 using Regira.Entities.DependencyInjection.Mapping;
+using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
+using Regira.Entities.Models.Abstractions;
 using Regira.IO.Storage.FileSystem;
+using System.Text.Json.Serialization;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
@@ -57,6 +59,7 @@ builder.Services
         o.UseDefaults();
         o.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
         o.UseAutoMapper([typeof(Person).Assembly]);
+        o.AddPrepper<IHasAggregateKey>(x => x.AggregateKey ??= Guid.NewGuid());
     })
     // Entity types
     .AddEnrollments()

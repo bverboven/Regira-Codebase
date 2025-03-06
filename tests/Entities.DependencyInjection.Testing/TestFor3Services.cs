@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
-using Regira.Entities.DependencyInjection.Extensions;
 using Regira.Entities.DependencyInjection.QueryBuilders;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
 using Regira.Entities.EFcore.Primers;

@@ -9,12 +9,12 @@ public class EntityAttachmentPrepper<TContext, TEntityAttachment, TEntityAttachm
     TContext dbContext,
     IFileIdentifierGenerator<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment> identifierGenerator
 )
-    : IEntityPrepper<TEntityAttachment, TEntityAttachmentKey>
+    : EntityPrepperBase<TEntityAttachment>
     where TContext : DbContext
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
     where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>
 {
-    public async Task Prepare(TEntityAttachment item, TEntityAttachment? original)
+    public override async Task Prepare(TEntityAttachment item, TEntityAttachment? original)
     {
         item.Attachment ??= original?.Attachment;
 

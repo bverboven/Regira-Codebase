@@ -3,9 +3,9 @@ using Testing.Library.Contoso;
 
 namespace Entities.TestApi.Infrastructure.Courses;
 
-public class CourseQueryFilter : FilteredQueryBuilderBase<Course, int, CourseSearchObject>
+public class CourseQueryFilter : IFilteredQueryBuilder<Course, int, CourseSearchObject>
 {
-    public override IQueryable<Course> Build(IQueryable<Course> query, CourseSearchObject? so)
+    public IQueryable<Course> Build(IQueryable<Course> query, CourseSearchObject? so)
     {
         if (so?.DepartmentId.HasValue == true)
         {

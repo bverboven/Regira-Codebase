@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Regira.Entities.DependencyInjection.Abstractions;
 using Regira.Entities.DependencyInjection.Attachments;
-using Regira.Entities.EFcore.Services;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
 using Testing.Library.Contoso;
 
 namespace Entities.TestApi.Infrastructure.Persons;
@@ -14,16 +13,32 @@ public static class PersonServiceCollectionExtensions
         services
             .For<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(e =>
             {
-                e.UseEntityService<PersonManager>();
-                e.HasRepository<EntityRepository<Person, PersonSearchObject, PersonSortBy, PersonIncludes>>();
-                e.HasManager<PersonManager>();
                 e.Related(x => x.Departments);
+                e.HasAttachments(x => x.Attachments);
                 e.AddQueryFilter<PersonQueryFilter>();
-                e.UseQueryBuilder<PersonQueryBuilder>();
-                e.AddMapping<PersonDto, PersonInputDto>();
-                e.HasAttachments<TContext, Person, PersonAttachment>();
+                e.Includes<PersonIncludableQueryBuilder>();
+                e.SortBy<PersonSortQueryBuilder>();
                 e.AddNormalizer<PersonNormalizer>();
-            });
+                e.HasManager<PersonManager>();
+                e.AddMapping<PersonDto, PersonInputDto>();
+            })
+            //.For<Person>(builder =>
+            //{
+            //    builder
+            //        .AddMapping<PersonDto, PersonInputDto>()
+            //        .WithSearchObject<PersonSearchObject>()
+            //        .Complex<PersonSortBy, PersonIncludes>()
+            //
+            //        .AddNormalizer<PersonNormalizer>()
+            //        .HasManager<PersonManager>()
+            //        .Related(x => x.Departments)
+            //        .AddQueryFilter<PersonQueryFilter>()
+            //        .SortBy<PersonSortQueryBuilder>()
+            //        .Includes<PersonIncludableQueryBuilder>()
+            //        .HasAttachments<TContext, Person, PersonAttachment>()
+            //        .Build();
+            //})
+            ;
 
         return services;
     }

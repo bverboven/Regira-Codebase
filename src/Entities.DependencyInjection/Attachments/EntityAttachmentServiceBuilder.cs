@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
+using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.Models.Abstractions;
@@ -37,7 +38,7 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
 }
 
 public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>(IServiceCollection services)
-    : EntityServiceBuilder<TContext, TEntityAttachment, TEntityAttachmentKey, TSearchObject>(services),
+    : EntitySearchObjectServiceBuilder<TContext, TEntityAttachment, TEntityAttachmentKey, TSearchObject>(services),
         IEntityAttachmentServiceBuilder<TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey, TAttachment>
     where TContext : DbContext
     where TObject : class, IEntity<TObjectKey>, IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>

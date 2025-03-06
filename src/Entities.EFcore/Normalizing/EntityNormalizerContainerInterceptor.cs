@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.DAL.EFcore.Extensions;
+using Regira.Entities.EFcore.Extensions;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
 using Regira.Utilities;
 
@@ -30,16 +31,7 @@ public class EntityNormalizerContainerInterceptor(IServiceProvider serviceProvid
             {
                 foreach (var entriesGroup in groupedEntries)
                 {
-                    var genericEntityTypes = new[] { entriesGroup.Key }
-                        .Concat(TypeUtility.GetBaseTypes(entriesGroup.Key))
-                        .Distinct();
-                    var matchingNormalizers = normalizers
-                        .Where(x => genericEntityTypes.Any(entityType =>
-                        {
-                            var normalizerType = typeof(IEntityNormalizer<>).MakeGenericType(entityType);
-                            return TypeUtility.ImplementsInterface(x.GetType(), normalizerType);
-                        }))
-                        .ToArray();
+                    var matchingNormalizers = normalizers.FindMatchingServices(entriesGroup.Key);
 
                     var entities = entriesGroup.Select(e => e.Entity).ToArray();
 

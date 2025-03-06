@@ -4,9 +4,9 @@ using Testing.Library.Contoso;
 
 namespace Entities.TestApi.Infrastructure.Courses;
 
-public class CoursePersonQueryFilter : FilteredQueryBuilderBase<Person, PersonSearchObject>
+public class CoursePersonQueryFilter : IFilteredQueryBuilder<Person, int, PersonSearchObject>
 {
-    public override IQueryable<Person> Build(IQueryable<Person> query, PersonSearchObject? so)
+    public IQueryable<Person> Build(IQueryable<Person> query, PersonSearchObject? so)
     {
         if (so?.StudentCourseIds?.Any() == true)
         {

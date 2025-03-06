@@ -5,9 +5,9 @@ using Testing.Library.Contoso;
 
 namespace Entities.TestApi.Infrastructure.Persons;
 
-public class PersonQueryFilter(IQKeywordHelper queryHelper) : FilteredQueryBuilderBase<Person, PersonSearchObject>
+public class PersonQueryFilter(IQKeywordHelper queryHelper) : IFilteredQueryBuilder<Person, int, PersonSearchObject>
 {
-    public override IQueryable<Person> Build(IQueryable<Person> query, PersonSearchObject? so)
+    public IQueryable<Person> Build(IQueryable<Person> query, PersonSearchObject? so)
     {
         if (so == null)
         {

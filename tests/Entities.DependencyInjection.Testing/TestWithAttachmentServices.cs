@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Models;
-using Regira.Entities.DependencyInjection.Extensions;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
 using Regira.Entities.EFcore.Primers.Abstractions;
