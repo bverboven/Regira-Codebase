@@ -89,3 +89,14 @@ public class PersonAttachmentController : EntityAttachmentControllerBase<PersonA
 - React to modifications (interceptors)
     - e.g. [Set LastModified date](../Entities.EFcore/Primers/HasLastModifiedDbPrimer.cs)
     - e.g. [Archive instead of delete entities](../Entities.EFcore/Primers/ArchivablePrimer.cs)
+
+## Supported Formats
+
+```csharp
+services
+    .For<Person>(e => { /* ... */ })
+    .For<Person, int>(e => { /* ... */ })
+    .For<Person, int, PersonSearchObject>(e => { /* ... */ })
+    .For<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(e => { /* ... */ })
+    .For<Person, int, PersonSearchObject, PersonSortBy, PersonIncludes>(e => { /* ... */ });
+```
