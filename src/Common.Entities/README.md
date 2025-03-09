@@ -87,7 +87,7 @@ public class PersonAttachmentController : EntityAttachmentControllerBase<PersonA
 - Prepare entities
     - e.g. Sort related entities
 - React to modifications (interceptors)
-    - e.g. [Set LastModified date](../Entities.EFcore/Primers/HasLastModifiedDbPrimer.cs)
+    - e.g. [Set Created date](../Entities.EFcore/Primers/HasCreatedDbPrimer.cs)
     - e.g. [Archive instead of delete entities](../Entities.EFcore/Primers/ArchivablePrimer.cs)
 
 ## Supported Formats

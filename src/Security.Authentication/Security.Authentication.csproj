@@ -11,13 +11,13 @@
     <AssemblyName>Regira.Security.Authentication</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.3.0</Version>
+    <Version>4.3.1</Version>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Common.Security\Common.Security.csproj" />
+    <PackageReference Include="Duende.IdentityModel" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="IdentityModel" Version="7.0.0" />
+    <ProjectReference Include="..\Common.Security\Common.Security.csproj" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) == 'net8.0'">
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.13" />

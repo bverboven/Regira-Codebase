@@ -418,6 +418,10 @@ public class CourseAttachmentsControllerTests : IDisposable
         Assert.NotNull(detailsResult?.Item.Attachments);
         Assert.NotEmpty(detailsResult.Item.Attachments!);
         Assert.Equal(insertedAttachments.Count, detailsResult.Item.Attachments.Count);
+        foreach (var courseAttachment in detailsResult.Item.Attachments)
+        {
+            Assert.NotNull(courseAttachment.Attachment);
+        }
     }
 
 

@@ -1,7 +1,7 @@
-using System.Globalization;
-using IdentityModel.Client;
+using Duende.IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using System.Globalization;
 
 namespace Regira.Security.Authentication.Jwt.Samples;
 

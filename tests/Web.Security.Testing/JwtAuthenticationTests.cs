@@ -1,9 +1,9 @@
-﻿using System.Net;
-using System.Net.Http.Json;
-using IdentityModel.Client;
+﻿using Duende.IdentityModel.Client;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Shouldly;
+using System.Net;
+using System.Net.Http.Json;
 using Web.Security.Testing.Infrastructure;
 using Web.Security.Testing.Infrastructure.Jwt;
 using Xunit;
