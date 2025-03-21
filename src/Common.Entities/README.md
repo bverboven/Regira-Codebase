@@ -93,10 +93,20 @@ public class PersonAttachmentController : EntityAttachmentControllerBase<PersonA
 ## Supported Formats
 
 ```csharp
+// Dependency Injection
 services
     .For<Person>(e => { /* ... */ })
     .For<Person, int>(e => { /* ... */ })
     .For<Person, int, PersonSearchObject>(e => { /* ... */ })
     .For<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(e => { /* ... */ })
     .For<Person, int, PersonSearchObject, PersonSortBy, PersonIncludes>(e => { /* ... */ });
+
+// Controllers
+public class PersonController : EntityControllerBase<Person>;
+public class PersonController : EntityControllerBase<Person, PersonDto, PersonInputDto>;
+public class PersonController : EntityControllerBase<Person, PersonSearchObject, PersonDto, PersonInputDto>;
+public class PersonController : EntityControllerBase<Person, PersonSearchObject, PersonSortBy, PersonIncludes, PersonDto, PersonInputDto>;
+public class PersonController : EntityControllerBase<Person, int>;
+public class PersonController : EntityControllerBase<Person, int, PersonSearchObject, PersonDto, PersonInputDto>;
+public class PersonController : EntityControllerBase<Person, int, PersonSearchObject, PersonSortBy, PersonIncludes, PersonDto, PersonInputDto>;
 ```
