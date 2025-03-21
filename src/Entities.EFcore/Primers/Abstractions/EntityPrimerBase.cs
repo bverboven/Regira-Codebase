@@ -5,18 +5,16 @@ namespace Regira.Entities.EFcore.Primers.Abstractions;
 public abstract class EntityPrimerBase<T> : IEntityPrimer<T>
     where T : class
 {
-    public virtual Task PrepareManyAsync(IList<EntityEntry> entries)
+    public virtual async Task PrepareManyAsync(IList<EntityEntry> entries)
     {
         foreach (var entry in entries)
         {
             var entity = (T)entry.Entity;
             if (CanPrepare(entity))
             {
-                PrepareAsync(entity, entry);
+                await PrepareAsync(entity, entry);
             }
         }
-
-        return Task.CompletedTask;
     }
 
 

@@ -17,6 +17,8 @@ using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 using Regira.Entities.Models.Abstractions;
 using Regira.IO.Storage.FileSystem;
+using Serilog;
+using Serilog.Events;
 using System.Text.Json.Serialization;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
@@ -42,6 +44,12 @@ builder.Services
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Host.UseSerilog((_, config) => config
+    .WriteTo.Console()
+    .MinimumLevel.Debug()
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+);
 
 builder.Services.AddProblemDetails();
 

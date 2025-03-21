@@ -4,13 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Regira.DAL.EFcore.Extensions;
 using Regira.Entities.EFcore.Extensions;
 using Regira.Entities.EFcore.Primers.Abstractions;
 
 namespace Regira.Entities.EFcore.Primers;
 
-public class EntityPrimerContainerInterceptor(IServiceProvider serviceProvider) : SaveChangesInterceptor
+public class EntityPrimerContainerInterceptor(IServiceProvider serviceProvider, ILogger<EntityPrimerContainerInterceptor>? logger = null) : SaveChangesInterceptor
 {
     public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
@@ -34,6 +35,7 @@ public class EntityPrimerContainerInterceptor(IServiceProvider serviceProvider) 
 
                     foreach (var primer in matchingPrimers)
                     {
+                        logger?.LogDebug($"Priming {entriesGroup.Count()} {entriesGroup.Key.FullName} entries using {primer.GetType().FullName}");
                         await primer.PrepareManyAsync(entriesGroup.ToArray());
                     }
                 }
