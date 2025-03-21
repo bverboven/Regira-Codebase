@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Regira.Entities.Abstractions;
 using Regira.Entities.EFcore.Extensions;
 using Regira.Entities.EFcore.Preppers.Abstractions;
@@ -7,17 +8,27 @@ using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.EFcore.Services;
 
-public class EntityWriteService<TContext, TEntity>(TContext dbContext, IEntityReadService<TEntity, int> readService, IEnumerable<IEntityPrepper> preppers)
-    : EntityWriteService<TContext, TEntity, int>(dbContext, readService, preppers)
+public class EntityWriteService<TContext, TEntity>(
+    TContext dbContext,
+    IEntityReadService<TEntity, int> readService,
+    IEnumerable<IEntityPrepper> preppers,
+    ILoggerFactory? loggerFactory = null)
+    : EntityWriteService<TContext, TEntity, int>(dbContext, readService, preppers, loggerFactory)
     where TContext : DbContext
     where TEntity : class, IEntity<int>;
 
 
-public class EntityWriteService<TContext, TEntity, TKey>(TContext dbContext, IEntityReadService<TEntity, TKey> readService, IEnumerable<IEntityPrepper> preppers)
+public class EntityWriteService<TContext, TEntity, TKey>(
+    TContext dbContext,
+    IEntityReadService<TEntity, TKey> readService,
+    IEnumerable<IEntityPrepper> preppers,
+    ILoggerFactory? loggerFactory = null)
     : IEntityWriteService<TEntity, TKey>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
 {
+    protected ILogger? Logger = loggerFactory?.CreateLogger<EntityWriteService<TContext, TEntity, TKey>>();
+
     protected TContext DbContext = dbContext;
     public virtual DbSet<TEntity> DbSet => DbContext.Set<TEntity>();
 
@@ -25,11 +36,15 @@ public class EntityWriteService<TContext, TEntity, TKey>(TContext dbContext, IEn
     {
         await PrepareItem(item, null);
 
+        Logger?.LogDebug($"Adding new {typeof(TEntity).FullName}");
+
         DbSet.Add(item);
     }
     public virtual async Task<TEntity?> Modify(TEntity item)
     {
         var original = await readService.Details(item.Id);
+
+        Logger?.LogDebug($"Modifying {typeof(TEntity).FullName} #{item.Id} {(original == null ? "" : " with original")}");
 
         await PrepareItem(item, original);
 
@@ -48,6 +63,7 @@ public class EntityWriteService<TContext, TEntity, TKey>(TContext dbContext, IEn
     public virtual Task Remove(TEntity item)
     {
         DbSet.Remove(item);
+        Logger?.LogDebug($"Removing {typeof(TEntity).FullName} #{item.Id}");
         return Task.CompletedTask;
     }
 
@@ -56,6 +72,7 @@ public class EntityWriteService<TContext, TEntity, TKey>(TContext dbContext, IEn
         var matchingPreppers = preppers.FindMatchingServices(item);
         foreach (var prepper in matchingPreppers)
         {
+            Logger?.LogDebug($"Preparing {typeof(TEntity).FullName} #{item.Id} using {prepper.GetType().FullName}");
             await prepper.Prepare(item, original);
         }
     }

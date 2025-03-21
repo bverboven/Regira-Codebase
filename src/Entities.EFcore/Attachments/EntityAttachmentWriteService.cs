@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.EFcore.Preppers.Abstractions;
@@ -10,8 +11,9 @@ public class EntityAttachmentWriteService<TContext, TEntityAttachment, TEntityAt
 (
     TContext dbContext,
     IEntityReadService<TEntityAttachment, TEntityAttachmentKey> readService,
-    IEnumerable<IEntityPrepper> preppers)
-    : EntityWriteService<TContext, TEntityAttachment, TEntityAttachmentKey>(dbContext, readService, preppers)
+    IEnumerable<IEntityPrepper> preppers,
+    ILoggerFactory? loggerFactory = null)
+    : EntityWriteService<TContext, TEntityAttachment, TEntityAttachmentKey>(dbContext, readService, preppers, loggerFactory)
     where TContext : DbContext
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
     where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>
