@@ -87,16 +87,26 @@ public class PersonAttachmentController : EntityAttachmentControllerBase<PersonA
 - Prepare entities
     - e.g. Sort related entities
 - React to modifications (interceptors)
-    - e.g. [Set LastModified date](../Entities.EFcore/Primers/HasLastModifiedDbPrimer.cs)
+    - e.g. [Set Created date](../Entities.EFcore/Primers/HasCreatedDbPrimer.cs)
     - e.g. [Archive instead of delete entities](../Entities.EFcore/Primers/ArchivablePrimer.cs)
 
 ## Supported Formats
 
 ```csharp
+// Dependency Injection
 services
     .For<Person>(e => { /* ... */ })
     .For<Person, int>(e => { /* ... */ })
     .For<Person, int, PersonSearchObject>(e => { /* ... */ })
     .For<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(e => { /* ... */ })
     .For<Person, int, PersonSearchObject, PersonSortBy, PersonIncludes>(e => { /* ... */ });
+
+// Controllers
+public class PersonController : EntityControllerBase<Person>;
+public class PersonController : EntityControllerBase<Person, PersonDto, PersonInputDto>;
+public class PersonController : EntityControllerBase<Person, PersonSearchObject, PersonDto, PersonInputDto>;
+public class PersonController : EntityControllerBase<Person, PersonSearchObject, PersonSortBy, PersonIncludes, PersonDto, PersonInputDto>;
+public class PersonController : EntityControllerBase<Person, int>;
+public class PersonController : EntityControllerBase<Person, int, PersonSearchObject, PersonDto, PersonInputDto>;
+public class PersonController : EntityControllerBase<Person, int, PersonSearchObject, PersonSortBy, PersonIncludes, PersonDto, PersonInputDto>;
 ```

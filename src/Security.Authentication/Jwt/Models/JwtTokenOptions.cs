@@ -1,4 +1,4 @@
-using IdentityModel;
+using Duende.IdentityModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Regira.Security.Authentication.Jwt.Models;

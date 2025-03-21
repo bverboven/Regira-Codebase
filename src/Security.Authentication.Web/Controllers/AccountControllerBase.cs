@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using IdentityModel;
+﻿using Duende.IdentityModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +9,7 @@ using Regira.Security.Authentication.Jwt.Extensions;
 using Regira.Security.Authentication.Web.Constants;
 using Regira.Security.Authentication.Web.Models;
 using Regira.Web.Utilities;
+using System.Security.Claims;
 
 namespace Regira.Security.Authentication.Web.Controllers;
 
