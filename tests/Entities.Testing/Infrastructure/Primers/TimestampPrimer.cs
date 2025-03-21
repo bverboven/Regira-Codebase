@@ -9,14 +9,16 @@ public class TimestampPrimer : EntityPrimerBase<IHasTimestamps>
 {
     public override Task PrepareAsync(IHasTimestamps entity, EntityEntry entry)
     {
-        if (entry.State == EntityState.Modified)
-        {
-            entity.Created = (DateTime)entry.OriginalValues[nameof(entity.Created)]!;
-            entity.LastModified = DateTime.Now;
-        }
-        else if (entity.Created == DateTime.MinValue)
+        entity.Created = (DateTime)entry.OriginalValues[nameof(entity.Created)]!;
+
+        if (entity.Created == DateTime.MinValue)
         {
             entity.Created = DateTime.Now;
+        }
+
+        if (entry.State == EntityState.Modified)
+        {
+            entity.LastModified = DateTime.Now;
         }
 
         return Task.CompletedTask;

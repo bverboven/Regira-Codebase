@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Regira.Entities.DependencyInjection.Attachments;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
+using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Testing.Library.Contoso;
 
@@ -15,10 +16,7 @@ public static class CourseServiceCollectionExtensions
         services
             .For<Course, int, CourseSearchObject>(e =>
             {
-                e.Includes((query, _) => query
-                    .Include(c => c.Attachments!)
-                    .ThenInclude(x => x.Attachment)
-                );
+                e.Includes((query, _) => query.IncludeEntityAttachments());
                 e.AddQueryFilter<CourseQueryFilter>();
                 e.AddMapping<CourseDto, CourseInputDto>();
                 e.HasAttachments(

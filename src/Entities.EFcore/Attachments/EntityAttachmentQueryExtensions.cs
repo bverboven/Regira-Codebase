@@ -38,4 +38,14 @@ public static class EntityAttachmentQueryExtensions
 
         return query;
     }
+    /// <summary>
+    /// Include the <see cref="IEntityAttachment">EntityAttachments</see> and it's underlying <see cref="IAttachment">Attachment</see>
+    /// </summary>
+    /// <typeparam name="THasEntityAttachments"></typeparam>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public static IQueryable<THasEntityAttachments> IncludeEntityAttachments<THasEntityAttachments>(this IQueryable<THasEntityAttachments> query)
+        where THasEntityAttachments : class, IHasAttachments, IEntity<int>
+        => query.Include(item => item.Attachments!)
+            .ThenInclude(a => a.Attachment);
 }

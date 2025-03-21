@@ -48,9 +48,10 @@ public static class ServiceCollectionPrimerExtensions
     // EntityServiceCollectionOptions
     public static EntityServiceCollectionOptions AddDefaultPrimers(this EntityServiceCollectionOptions options)
     {
+        // add ArchivablePrimer first since it modifies the entry state
+        options.AddPrimer<ArchivablePrimer>();
         options.AddPrimer<HasCreatedDbPrimer>();
         options.AddPrimer<HasLastModifiedDbPrimer>();
-        options.AddPrimer<ArchivablePrimer>();
         return options;
     }
     public static EntityServiceCollectionOptions AddPrimer<TPrimer>(this EntityServiceCollectionOptions options)
