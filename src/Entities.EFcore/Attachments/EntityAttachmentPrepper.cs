@@ -2,6 +2,7 @@
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.EFcore.Preppers.Abstractions;
 using Regira.Entities.Extensions;
+using Regira.IO.Extensions;
 
 namespace Regira.Entities.EFcore.Attachments;
 
@@ -20,12 +21,17 @@ public class EntityAttachmentPrepper<TContext, TEntityAttachment, TEntityAttachm
 
         if (item.Attachment?.IsNew() == true)
         {
-            item.Attachment!.Identifier ??= await identifierGenerator.Generate(item);
             if (original?.Attachment != null)
             {
                 dbContext.Entry(original.Attachment).State = EntityState.Deleted;
             }
-            dbContext.Entry(item.Attachment).State = EntityState.Added;
+
+            // Don't add when attachment has no content
+            if (item.Attachment.HasContent())
+            {
+                item.Attachment!.Identifier ??= await identifierGenerator.Generate(item);
+                dbContext.Entry(item.Attachment).State = EntityState.Added;
+            }
         }
     }
 }

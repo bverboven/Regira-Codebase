@@ -26,8 +26,7 @@ public static class EntityServiceBuilderExtensions
 
         configure?.Invoke(attachmentBuilder);
 
-        builder.Prepare(entity => entity.Attachments?.SetSortOrder());
-        builder.Related<TEntityAttachment, int>(x => x.Attachments);
+        attachmentBuilder.RelatedAttachments(x => x.Attachments, entity => entity.Attachments?.SetSortOrder());
 
         if (!attachmentBuilder.HasService<IEntityService<TEntityAttachment>>())
         {
@@ -54,8 +53,7 @@ public static class EntityServiceBuilderExtensions
 
         configure?.Invoke(attachmentBuilder);
 
-        builder.Prepare(entity => entity.Attachments?.SetSortOrder());
-        builder.Related<TEntityAttachment, int>(x => x.Attachments);
+        attachmentBuilder.RelatedAttachments(x => x.Attachments, entity => entity.Attachments?.SetSortOrder());
 
         if (!attachmentBuilder.HasService<IEntityService<TEntityAttachment>>())
         {
@@ -86,8 +84,7 @@ public static class EntityServiceBuilderExtensions
 
         configure?.Invoke(attachmentBuilder);
 
-        builder.Prepare(entity => entity.Attachments?.OfType<TEntityAttachment>().SetSortOrder());
-        builder.Related<TEntityAttachment, TEntityAttachmentKey>(x => x.Attachments);
+        attachmentBuilder.RelatedAttachments(x => x.Attachments, entity => entity.Attachments?.SetSortOrder());
 
         if (!attachmentBuilder.HasService<IEntityService<TEntityAttachment, TEntityAttachmentKey>>())
         {

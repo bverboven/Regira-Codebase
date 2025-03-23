@@ -26,7 +26,10 @@ public class AttachmentPrimer<TAttachment, TKey>(IAttachmentFileService<TAttachm
 
         if (entry.State is EntityState.Added or EntityState.Modified)
         {
-            await fileService.SaveFile(entity);
+            if (entity.HasContent())
+            {
+                await fileService.SaveFile(entity);
+            }
         }
 
         // delete file if entity is marked as deleted

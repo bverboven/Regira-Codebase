@@ -9,6 +9,7 @@ using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Attachments.Mappings;
 using Regira.Entities.Web.Attachments.Models;
+using System.Linq.Expressions;
 
 namespace Regira.Entities.DependencyInjection.Attachments;
 
@@ -115,6 +116,19 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
             e.AddPrepper<EntityAttachmentPrepper<TContext, TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>>();
             e.UseWriteService<EntityAttachmentWriteService<TContext, TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>>();
         });
+
+        return this;
+    }
+
+    // Related
+    public EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment> RelatedAttachments(
+        Expression<Func<TObject, ICollection<TEntityAttachment>?>> navigationExpression, Action<TObject>? prepareFunc = null)
+    {
+        Services.AddPrepper(p => new RelatedAttachmentsPrepper<TContext, TObject, TEntityAttachment, TObjectKey, TEntityAttachmentKey, TAttachmentKey, TAttachment>(p.GetRequiredService<TContext>(), navigationExpression));
+        if (prepareFunc != null)
+        {
+            Services.AddPrepper(prepareFunc);
+        }
 
         return this;
     }

@@ -37,18 +37,23 @@ public static class DbContextExtensions
         where TEntity : class, IEntity<TEntityKey>
         where TRelated : class, IEntity<TRelatedKey>
     {
-        TRelatedKey IdSelector(TRelated x) => x.Id;
         var selectorFunc = navigationExpression.Compile();
-        var originalItems = selectorFunc(original)!;
-        var modifiedItems = selectorFunc(modified)!;
+        var originalItems = selectorFunc(original);
+        var modifiedItems = selectorFunc(modified);
 
-        if (modifiedItems == null)
+        dbContext.UpdateRelatedCollection<TEntity, TRelated, TEntityKey, TRelatedKey>(modified, modifiedItems, original, originalItems);
+    }
+    public static void UpdateRelatedCollection<TEntity, TRelated, TEntityKey, TRelatedKey>(this DbContext dbContext, TEntity modified, ICollection<TRelated>? modifiedItems, TEntity original, ICollection<TRelated>? originalItems)
+        where TEntity : class, IEntity<TEntityKey>
+        where TRelated : class, IEntity<TRelatedKey>
+    {
+        if (modifiedItems == null || originalItems == null)
         {
             return;
         }
-
-        var relatedItemsToAdd = modifiedItems.Where(p => originalItems.All(o => !IdSelector(p)!.Equals(IdSelector(o)))).ToArray();
-        var relatedItemsToDelete = originalItems.Where(o => modifiedItems.All(p => !IdSelector(p)!.Equals(IdSelector(o)))).ToArray();
+        
+        var relatedItemsToAdd = modifiedItems.Where(m => m.Id == null || m.Id.Equals(default(TRelatedKey)) || originalItems.All(o => m.Id.Equals(o.Id) != true)).ToArray();
+        var relatedItemsToDelete = originalItems.Where(o => modifiedItems.All(m => m.Id != null && m.Id.Equals(o.Id) != true)).ToArray();
         foreach (var entity in relatedItemsToAdd)
         {
             dbContext.Entry(entity).State = EntityState.Added;
@@ -57,20 +62,15 @@ public static class DbContextExtensions
         {
             dbContext.Entry(entity).State = EntityState.Deleted;
         }
-        var relatedItemsToModify = modifiedItems.Except(relatedItemsToAdd);
+        var relatedItemsToModify = modifiedItems.Except(relatedItemsToAdd).Where(m => m.Id != null && !m.Id.Equals(default(TRelatedKey)));
         foreach (var entity in relatedItemsToModify)
         {
-            var originalEntity = originalItems.Single(p => IdSelector(p)!.Equals(IdSelector(entity)));
+            var originalEntity = originalItems.Single(p => p.Id!.Equals(entity.Id));
             dbContext.Entry(originalEntity).State = EntityState.Detached;
             dbContext.Attach(entity);
             dbContext.Entry(entity).OriginalValues.SetValues(originalEntity);
             dbContext.Update(entity);
         }
-
-        //if (navigationExpression.Body is MemberExpression { Member: PropertyInfo { CanWrite: true } propertyInfo })
-        //{
-        //    propertyInfo.SetValue(original, modifiedItems);
-        //}
     }
     #endregion
 }
