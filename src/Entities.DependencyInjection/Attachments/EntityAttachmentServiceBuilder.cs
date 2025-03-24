@@ -47,6 +47,11 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
     where TSearchObject : class, IEntityAttachmentSearchObject<TEntityAttachmentKey, TObjectKey>, new()
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
 {
+    /// <summary>
+    /// EntityAttachment and Attachment are strictly related (one on one), which implies removing the Attachment when removing the EntityAttachment
+    /// Defaults to true
+    /// </summary>
+    public bool HasStrictRelation { get; set; } = true;
     protected internal bool HasEntityAttachmentMapping { get; set; }
 
     /// <summary>
@@ -106,10 +111,6 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
     {
         For<TEntityAttachment, TEntityAttachmentKey, TSearchObject>(e =>
         {
-            e.AddTransient<
-                IFileIdentifierGenerator<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>,
-                DefaultFileIdentifierGenerator<TObject, TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>
-            >();
             e.Includes((query, _) => query.Include(x => x.Attachment));
             e.AddQueryFilter<EntityAttachmentFilteredQueryBuilder<TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>>();
             e.Process<EntityAttachmentProcessor<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>>();
@@ -122,9 +123,14 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
 
     // Related
     public EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment> RelatedAttachments(
-        Expression<Func<TObject, ICollection<TEntityAttachment>?>> navigationExpression, Action<TObject>? prepareFunc = null)
+        Expression<Func<TObject, ICollection<TEntityAttachment>?>> navigationExpression, Action<TObject>? prepareFunc = null, bool isStrictRelation = true)
     {
-        Services.AddPrepper(p => new RelatedAttachmentsPrepper<TContext, TObject, TEntityAttachment, TObjectKey, TEntityAttachmentKey, TAttachmentKey, TAttachment>(p.GetRequiredService<TContext>(), navigationExpression));
+        Services.AddPrepper(p => new RelatedAttachmentsPrepper<TContext, TObject, TEntityAttachment, TObjectKey, TEntityAttachmentKey, TAttachmentKey, TAttachment>(
+            p.GetRequiredService<TContext>(),
+            navigationExpression,
+            new RelatedAttachmentsPrepper<TContext, TObject, TEntityAttachment, TObjectKey, TEntityAttachmentKey, TAttachmentKey, TAttachment>.Options { IsStrictRelation = isStrictRelation })
+        );
+
         if (prepareFunc != null)
         {
             Services.AddPrepper(prepareFunc);

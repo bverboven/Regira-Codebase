@@ -3,7 +3,6 @@ using Entities.Testing.Infrastructure.Primers;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework.Legacy;
 using Regira.Entities.DependencyInjection.Primers;
 using Regira.Entities.EFcore.Extensions;
 using Regira.Entities.EFcore.Primers;
@@ -81,7 +80,7 @@ public class InterceptorTests
 
         await dbContext.SaveChangesAsync();
 
-        ClassicAssert.IsNotNull(account.EncryptedPassword);
+        Assert.That(account.EncryptedPassword, Is.Not.Null);
         Assert.That(account.EncryptedPassword, Is.EqualTo(account.Password.Base64Encode()));
         Assert.That(account.EncryptedPassword!.Base64Decode(), Is.EqualTo(account.Password));
     }

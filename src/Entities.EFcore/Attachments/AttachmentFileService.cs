@@ -57,12 +57,12 @@ public class AttachmentFileService<TAttachment, TKey>(IFileService fileService) 
     }
     public async Task RemoveFile(TAttachment item)
     {
-        if (string.IsNullOrWhiteSpace(item.Identifier))
+        if (string.IsNullOrWhiteSpace(item.Path))
         {
-            throw new ArgumentNullException(nameof(item.Identifier));
+            throw new ArgumentNullException(nameof(item.Path));
         }
 
-        await fileService.Delete(item.Identifier);
+        await fileService.Delete(item.Path);
     }
 
     public string GetIdentifier(string fileName)

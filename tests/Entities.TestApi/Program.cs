@@ -58,6 +58,7 @@ builder.Services
     .AddDbContext<ContosoContext>((sp, db) =>
     {
         db.UseSqlite(ApiConfiguration.ConnectionString)
+            .EnableSensitiveDataLogging()
             .AddPrimerInterceptors(sp)
             .AddNormalizerInterceptors(sp)
             .AddAutoTruncateInterceptors();

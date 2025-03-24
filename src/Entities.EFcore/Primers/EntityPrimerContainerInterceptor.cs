@@ -29,14 +29,16 @@ public class EntityPrimerContainerInterceptor(IServiceProvider serviceProvider, 
 
             if (primers.Any() && groupedEntries.Any())
             {
-                foreach (var entriesGroup in groupedEntries)
+                // execute primers in same order than they were registered
+                foreach (var primer in primers)
                 {
-                    var matchingPrimers = primers.FindMatchingServices(entriesGroup.Key);
-
-                    foreach (var primer in matchingPrimers)
+                    foreach (var entriesGroup in groupedEntries)
                     {
-                        logger?.LogDebug($"Priming {entriesGroup.Count()} {entriesGroup.Key.FullName} entries using {primer.GetType().FullName}");
-                        await primer.PrepareManyAsync(entriesGroup.ToArray());
+                        if (primer.IsMatch(entriesGroup.Key))
+                        {
+                            logger?.LogDebug($"Priming {entriesGroup.Count()} {entriesGroup.Key.FullName} entries using {primer.GetType().FullName}");
+                            await primer.PrepareManyAsync(entriesGroup.ToArray());
+                        }
                     }
                 }
             }

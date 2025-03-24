@@ -238,32 +238,33 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         return WithAttachments<Attachment, int, AttachmentSearchObject<int>>(factory, configure);
     }
 
-    public EntityServiceCollection<TContext> WithAttachments<TAttachment, TKey, TAttachmentSearchObject>(
+    public EntityServiceCollection<TContext> WithAttachments<TAttachment, TAttachmentKey, TAttachmentSearchObject>(
         Func<IServiceProvider, IFileService> factory,
-        Action<EntitySearchObjectServiceBuilder<TContext, TAttachment, TKey, TAttachmentSearchObject>>? configure = null
+        Action<EntitySearchObjectServiceBuilder<TContext, TAttachment, TAttachmentKey, TAttachmentSearchObject>>? configure = null
     )
-        where TAttachment : class, IAttachment<TKey>, new()
-        where TAttachmentSearchObject : AttachmentSearchObject<TKey>, new()
+        where TAttachment : class, IAttachment<TAttachmentKey>, new()
+        where TAttachmentSearchObject : AttachmentSearchObject<TAttachmentKey>, new()
     {
-        var builder = new EntitySearchObjectServiceBuilder<TContext, TAttachment, TKey, TAttachmentSearchObject>(this);
+        var builder = new EntitySearchObjectServiceBuilder<TContext, TAttachment, TAttachmentKey, TAttachmentSearchObject>(this);
 
         builder.AddPrimer<EntityAttachmentPrimer>();
 
-        builder.For<TAttachment, TKey, TAttachmentSearchObject>(e =>
+        builder.For<TAttachment, TAttachmentKey, TAttachmentSearchObject>(e =>
         {
-            Services.AddTransient<IAttachmentFileService<TAttachment, TKey>>(p => new AttachmentFileService<TAttachment, TKey>(factory(p)));
-            e.AddQueryFilter<AttachmentFilteredQueryBuilder<TAttachment, TKey, TAttachmentSearchObject>>();
-            e.Process<AttachmentProcessor<TAttachment, TKey>>();
+            e.AddQueryFilter<AttachmentFilteredQueryBuilder<TAttachment, TAttachmentKey, TAttachmentSearchObject>>();
+            e.Process<AttachmentProcessor<TAttachment, TAttachmentKey>>();
             e.AddPrimer<AttachmentPrimer>();
+            e.AddTransient<IFileIdentifierGenerator, DefaultFileIdentifierGenerator<TAttachmentKey, TAttachment>>();
+            e.AddTransient<IAttachmentFileService<TAttachment, TAttachmentKey>>(p => new AttachmentFileService<TAttachment, TAttachmentKey>(factory(p)));
             configure?.Invoke(e);
         });
 
         Services
             .AddAutoMapper(cfg =>
             {
-                cfg.CreateMap<TAttachment, AttachmentDto<TKey>>()
+                cfg.CreateMap<TAttachment, AttachmentDto<TAttachmentKey>>()
                     .ReverseMap();
-                cfg.CreateMap<AttachmentInputDto<TKey>, TAttachment>();
+                cfg.CreateMap<AttachmentInputDto<TAttachmentKey>, TAttachment>();
             });
         return this;
     }

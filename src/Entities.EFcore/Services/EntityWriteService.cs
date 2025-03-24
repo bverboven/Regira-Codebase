@@ -78,5 +78,12 @@ public class EntityWriteService<TContext, TEntity, TKey>(
     }
 
     public virtual Task<int> SaveChanges(CancellationToken token = default)
-        => DbContext.SaveChangesAsync(token);
+    {
+#if DEBUG
+#if NET6_0_OR_GREATER
+        Logger?.LogDebug(DbContext.ChangeTracker.DebugView.ShortView);
+#endif
+#endif
+        return DbContext.SaveChangesAsync(token);
+    }
 }
