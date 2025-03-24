@@ -220,9 +220,7 @@ public class CourseAttachmentsControllerTests : IDisposable
             Attachments = attachments
         };
 
-        var jsonInput = System.Text.Json.JsonSerializer.Serialize(courseInput);
         var updateResponse = await client.PutAsJsonAsync($"/courses/{courseInput.Id}", courseInput);
-        var responseMessage = await updateResponse.Content.ReadAsStringAsync();
         updateResponse.EnsureSuccessStatusCode();
 
         var detailsResponse3 = await client.GetAsync($"/courses/{courseId}");
@@ -449,7 +447,6 @@ public class CourseAttachmentsControllerTests : IDisposable
 
         course.Attachments = course.Attachments!.Where(a => a.Id != insertResult!.Item.Id).ToList();
         var updateResponse = await client.PutAsJsonAsync($"/courses/{courseId}", course);
-        var responseMessage = await updateResponse.Content.ReadAsStringAsync();
         updateResponse.EnsureSuccessStatusCode();
         var courseSavedResult = await updateResponse.Content.ReadFromJsonAsync<SaveResult<CourseDto>>();
 
