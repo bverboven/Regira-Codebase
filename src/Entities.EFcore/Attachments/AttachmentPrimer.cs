@@ -35,6 +35,12 @@ public class AttachmentPrimer<TAttachment, TKey>(IAttachmentFileService<TAttachm
         // delete file if entity is marked as deleted
         if (entry.State == EntityState.Deleted)
         {
+            if (string.IsNullOrWhiteSpace(entity.Path))
+            {
+                // make sure Path is known to physically delete the file
+                entity = (await entry.Context.Set<TAttachment>().SingleAsync(x => x.Id!.Equals(entity.Id)))!;
+            }
+
             await fileService.RemoveFile(entity);
         }
     }

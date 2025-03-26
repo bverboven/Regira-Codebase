@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.EFcore.Preppers.Abstractions;
+using Regira.Entities.Extensions;
 using Regira.Entities.Models.Abstractions;
 using Regira.IO.Extensions;
 using System.Linq.Expressions;
@@ -47,6 +48,37 @@ public class RelatedAttachmentsPrepper<TContext, TEntity, TEntityAttachment, TEn
                     dbContext.Entry(entity).State = EntityState.Added;
                 }
             }
+            var relatedItemsToModify = modifiedItems.Except(relatedItemsToAdd).Where(m => m.Id != null && !m.Id.Equals(default(TEntityAttachmentKey)));
+            foreach (var entity in relatedItemsToModify)
+            {
+                var originalEntity = originalItems.Single(p => p.Id!.Equals(entity.Id));
+
+                if (entity.Attachment != null)
+                {
+                    if (entity.Attachment.IsNew())
+                    {
+                        dbContext.Entry(entity.Attachment).State = EntityState.Added;
+                        if (_options.IsStrictRelation && entity.AttachmentId?.Equals(originalEntity.AttachmentId) != true)
+                        {
+                            var originalAttachment = originalEntity.Attachment;
+                            if (originalAttachment != null)
+                            {
+                                // mark original Attachment entity as deleted
+                                dbContext.Entry(originalAttachment).State = EntityState.Deleted;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        dbContext.Entry(entity.Attachment).State = EntityState.Modified;
+                    }
+                }
+
+                dbContext.Entry(originalEntity).State = EntityState.Detached;
+                dbContext.Attach(entity);
+                dbContext.Entry(entity).OriginalValues.SetValues(originalEntity);
+                dbContext.Update(entity);
+            }
             foreach (var entity in relatedItemsToDelete)
             {
                 dbContext.Entry(entity).State = EntityState.Deleted;
@@ -55,15 +87,6 @@ public class RelatedAttachmentsPrepper<TContext, TEntity, TEntityAttachment, TEn
                 {
                     dbContext.Entry(entity.Attachment ?? new TAttachment { Id = entity.AttachmentId }).State = EntityState.Deleted;
                 }
-            }
-            var relatedItemsToModify = modifiedItems.Except(relatedItemsToAdd).Where(m => m.Id != null && !m.Id.Equals(default(TEntityAttachmentKey)));
-            foreach (var entity in relatedItemsToModify)
-            {
-                var originalEntity = originalItems.Single(p => p.Id!.Equals(entity.Id));
-                dbContext.Entry(originalEntity).State = EntityState.Detached;
-                dbContext.Attach(entity);
-                dbContext.Entry(entity).OriginalValues.SetValues(originalEntity);
-                dbContext.Update(entity);
             }
         }
 

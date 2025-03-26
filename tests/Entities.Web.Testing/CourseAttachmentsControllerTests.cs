@@ -170,7 +170,7 @@ public class CourseAttachmentsControllerTests : IDisposable
     }
 
     [Fact]
-    public async Task Update_Entity_With_New_Attachment()
+    public async Task Update_Entity_With_New_EntityAttachment()
     {
         var app = new WebApplicationFactory<Program>();
         using var client = app.CreateClient();
@@ -228,6 +228,56 @@ public class CourseAttachmentsControllerTests : IDisposable
         Assert.Equal(2, detailsResult3!.Item.Attachments!.Count);
         var firstAttachment = detailsResult3.Item.Attachments.First();
         Assert.Equal(detailsResult.Item.Attachments!.Last().Id, firstAttachment.Id);
+    }
+
+    [Fact]
+    public async Task Update_Entity_And_Replace_Attachment()
+    {
+        var app = new WebApplicationFactory<Program>();
+        using var client = app.CreateClient();
+
+        var courseId = 3;
+        var attachmentFileName1 = "test-attachment1.txt";
+        await using var fileStream1 = FileUtility.GetStreamFromString(attachmentFileName1);
+        var inputContent1 = new MultipartFormDataContent{
+            { new StreamContent(fileStream1), "file", attachmentFileName1 }
+        };
+        var inputResponse1 = await client.PostAsync($"/courses/{courseId}/files", inputContent1);
+        Assert.Equal(HttpStatusCode.OK, inputResponse1.StatusCode);
+
+        var detailsResponse = await client.GetAsync($"/courses/{courseId}");
+        detailsResponse.EnsureSuccessStatusCode();
+        var detailsResult = await detailsResponse.Content.ReadFromJsonAsync<DetailsResult<CourseDto>>();
+
+        var attachmentFileName2 = "test-attachment2.txt";
+
+        var entityAttachment = detailsResult!.Item.Attachments!.First();
+        var courseInput = new CourseInputDto
+        {
+            Id = detailsResult.Item.Id,
+            Title = detailsResult.Item.Title,
+            DepartmentId = detailsResult.Item.DepartmentId,
+            Credits = detailsResult.Item.Credits,
+            Attachments = [new CourseAttachmentInputDto
+            {
+                Id = entityAttachment.Id,
+                Description = entityAttachment.Description,
+                AttachmentId = entityAttachment.AttachmentId,
+                ObjectId = entityAttachment.ObjectId,
+                Attachment = new AttachmentInputDto
+                {
+                    FileName = attachmentFileName2,
+                    Bytes = FileUtility.GetBytesFromString(attachmentFileName2)
+                }
+            }]
+        };
+
+        var updateResponse = await client.PutAsJsonAsync($"/courses/{courseInput.Id}", courseInput);
+        updateResponse.EnsureSuccessStatusCode();
+
+        var bytesResponse = await client.GetAsync($"/courses/{courseId}/files/{attachmentFileName2}");
+        var bytesResult = await bytesResponse.Content.ReadAsByteArrayAsync();
+        Assert.Equal(courseInput.Attachments.First().Attachment!.Bytes, bytesResult);
     }
     [Fact]
     public async Task Delete()
