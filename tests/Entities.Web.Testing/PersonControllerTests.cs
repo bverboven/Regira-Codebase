@@ -1,6 +1,4 @@
-﻿using System.Net;
-using System.Net.Http.Json;
-using Entities.TestApi;
+﻿using Entities.TestApi;
 using Entities.TestApi.Infrastructure;
 using Entities.TestApi.Infrastructure.Courses;
 using Entities.TestApi.Infrastructure.Departments;
@@ -10,6 +8,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Web.Models;
 using Regira.Utilities;
+using System.Net;
+using System.Net.Http.Json;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
@@ -314,7 +314,7 @@ public class PersonControllerTests : IDisposable
         };
         _dbContext.Persons.AddRange(persons);
         await _dbContext.SaveChangesAsync();
-        
+
         var listResponse = await client.GetAsync("/persons/?q=wise fool");
         var listResult = await listResponse.Content.ReadFromJsonAsync<ListResult<PersonDto>>();
         Assert.Equal(2, listResult!.Items.Count);
@@ -410,12 +410,30 @@ public class PersonControllerTests : IDisposable
         }
     }
 
+    [Fact]
+    public async Task OrderBy_IdDesc()
+    {
+        var app = new WebApplicationFactory<Program>();
+        using var client = app.CreateClient();
+
+        var inputItems = await CreateTestItems(_dbContext);
+
+        var listResponse = await client.GetAsync("/persons?sortBy=IdDesc");
+        var listResult = await listResponse.Content.ReadFromJsonAsync<ListResult<PersonDto>>();
+        var resultCount = listResult!.Items.Count;
+        Assert.Equal(inputItems.Count, resultCount);
+        for (var i = 0; i < inputItems.Count; i++)
+        {
+            Assert.Equal(inputItems[i].Id, listResult.Items[resultCount - i - 1].Id);
+        }
+    }
+
     static async Task<IList<Person>> CreateTestItems(ContosoContext dbContext)
     {
         var items = new Person[]
         {
-            new () { GivenName = "John", LastName = "Doe" },
             new () { GivenName = "Jane", LastName = "Doe" },
+            new () { GivenName = "John", LastName = "Doe" },
             new () { GivenName = "Bart", LastName = "Simpson" }
         };
         dbContext.Persons.AddRange(items);

@@ -1,11 +1,11 @@
-﻿using System.Net;
-using System.Net.Http.Json;
-using Entities.TestApi;
+﻿using Entities.TestApi;
 using Entities.TestApi.Infrastructure;
 using Entities.TestApi.Infrastructure.Courses;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Web.Models;
+using System.Net;
+using System.Net.Http.Json;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 

@@ -15,7 +15,7 @@ public abstract class PasswordControllerBase<TUser>(UserManager<TUser> userManag
     where TUser : IdentityUser
 {
     [HttpPost]
-    public async virtual Task<IActionResult> UpdatePassword([FromBody] ChangePasswordInput model)
+    public virtual async Task<IActionResult> UpdatePassword([FromBody] ChangePasswordInput model)
     {
         var username = User.Identity!.Name;
         var user = await userManager.FindByNameAsync(username!);
@@ -36,7 +36,7 @@ public abstract class PasswordControllerBase<TUser>(UserManager<TUser> userManag
 
     [AllowAnonymous]
     [HttpPost("recover")]
-    public async virtual Task<IActionResult> RecoverPassword([FromBody] RecoverPasswordInput model, [FromServices] IEmailSender mailer)
+    public virtual async Task<IActionResult> RecoverPassword([FromBody] RecoverPasswordInput model, [FromServices] IEmailSender mailer)
     {
         var user = await userManager.FindByNameAsync(model.Username);
 
@@ -62,7 +62,7 @@ Token: {token}
 
     [AllowAnonymous]
     [HttpPost("reset")]
-    public async virtual Task<IActionResult> ResetPassword([FromBody] ResetPasswordInput input)
+    public virtual async Task<IActionResult> ResetPassword([FromBody] ResetPasswordInput input)
     {
         var tokenModel = serializer.Deserialize<UserTokenModel>(input.Token.Base64Decode())!;
         var user = await userManager.FindByNameAsync(tokenModel.Username);

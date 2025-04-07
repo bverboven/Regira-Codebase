@@ -21,7 +21,7 @@ public abstract class AccountControllerBase<TUser>(ITokenHelper tokenHelper, Use
     [AllowAnonymous]
     [HttpPost]
     [Route("", Name = RouteNames.Authenticate)]
-    public async virtual Task<IActionResult> Authenticate([FromBody] AuthenticateInput model, [FromQuery] string clientApp)
+    public virtual async Task<IActionResult> Authenticate([FromBody] AuthenticateInput model, [FromQuery] string clientApp)
     {
         bool? isLockedOut = null;
         DateTimeOffset? lockedOutEnd = null;
@@ -52,7 +52,7 @@ public abstract class AccountControllerBase<TUser>(ITokenHelper tokenHelper, Use
     }
 
     [HttpPost("validate")]
-    public async virtual Task<IActionResult> Validate()
+    public virtual async Task<IActionResult> Validate()
     {
         if (User.Identity?.IsAuthenticated ?? false)
         {
@@ -64,7 +64,7 @@ public abstract class AccountControllerBase<TUser>(ITokenHelper tokenHelper, Use
         return Unauthorized();
     }
     [HttpPost("refresh")]
-    public async virtual Task<IActionResult> Refresh()
+    public virtual async Task<IActionResult> Refresh()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrWhiteSpace(userId))
@@ -88,7 +88,7 @@ public abstract class AccountControllerBase<TUser>(ITokenHelper tokenHelper, Use
 
 
     [HttpGet("personal-data")]
-    public async virtual Task<IActionResult> GetPersonalData()
+    public virtual async Task<IActionResult> GetPersonalData()
     {
         var user = await userManager.FindByIdAsync(User.FindUserId()!);
         if (user == null)

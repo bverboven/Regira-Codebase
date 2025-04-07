@@ -16,7 +16,7 @@ public abstract class UserControllerBase<TUser>(UserManager<TUser> userManager, 
   where TUser : IdentityUser<string>, new()
 {
     [HttpPost]
-    public async virtual Task<IActionResult> Create(UserInput model, [FromServices] IEmailSender mailer)
+    public virtual async Task<IActionResult> Create(UserInput model, [FromServices] IEmailSender mailer)
     {
         var user = await userManager.FindByNameAsync(model.Username);
         if (user == null)
@@ -52,7 +52,7 @@ Token: {token}
 
     [AllowAnonymous]
     [HttpPost("confirm-email", Name = RouteNames.ConfirmEmail)]
-    public async virtual Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailInput model)
+    public virtual async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailInput model)
     {
         var tokenModel = serializer.Deserialize<ConfirmEmailInput>(model.Token.Base64Decode())!;
         var user = await userManager.FindByNameAsync(tokenModel.UserName);

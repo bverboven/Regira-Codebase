@@ -12,7 +12,7 @@ public abstract class MailerTestsBase
     // ReSharper disable AssignNullToNotNullAttribute
     // ReSharper restore AssignNullToNotNullAttribute
 
-    public async virtual Task Send_Without_Attachment()
+    public virtual async Task Send_Without_Attachment()
     {
         var msg = new MessageObject
         {
@@ -25,7 +25,7 @@ public abstract class MailerTestsBase
 
         Assert.That(response.Success, Is.True);
     }
-    public async virtual Task Send_With_Attachment()
+    public virtual async Task Send_With_Attachment()
     {
         var attachment = new BinaryFileItem
         {
