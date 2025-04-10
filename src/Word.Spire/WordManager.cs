@@ -42,31 +42,34 @@ public class WordManager : IWordManager
     private int _insertDocumentCounter;
     private static readonly Regex ParamRegex = new("{{ *[a-zA-Z0-9._]+ *}}");
 
-    public IMemoryFile Create(WordTemplateInput input)
+    public Task<IMemoryFile> Create(WordTemplateInput input)
     {
         using var doc = CreateDocument(input);
-        return ToMemoryFile(doc);
+        var file = ToMemoryFile(doc);
+        return Task.FromResult(file);
     }
-    public IMemoryFile Merge(params WordTemplateInput[] inputs)
+    public async Task<IMemoryFile> Merge(params WordTemplateInput[] inputs)
     {
-        using var doc = MergeDocuments(inputs);
+        using var doc = await MergeDocuments(inputs);
         return ToMemoryFile(doc);
     }
-    public IMemoryFile Convert(WordTemplateInput input, RegiraFileFormat format)
+    public Task<IMemoryFile> Convert(WordTemplateInput input, RegiraFileFormat format)
     {
         return Convert(input, new ConversionOptions { OutputFormat = format });
     }
-    public IMemoryFile Convert(WordTemplateInput input, ConversionOptions options)
+    public Task<IMemoryFile> Convert(WordTemplateInput input, ConversionOptions options)
     {
         using var doc = CreateDocument(input);
         var convertedStream = ConvertDocument(doc, options);
-        return convertedStream.ToMemoryFile(options.OutputFormat == RegiraFileFormat.Doc ? ContentTypes.DOC : ContentTypes.DOCX);
+        var file = convertedStream.ToMemoryFile(options.OutputFormat == RegiraFileFormat.Doc ? ContentTypes.DOC : ContentTypes.DOCX);
+        return Task.FromResult(file);
     }
 
-    public string GetText(WordTemplateInput input)
+    public Task<string> GetText(WordTemplateInput input)
     {
         using var doc = CreateDocument(input);
-        return doc.GetText();
+        var contents = doc.GetText();
+        return Task.FromResult(contents);
     }
     public IEnumerable<WordImage> GetImages(WordTemplateInput input)
     {
@@ -83,7 +86,6 @@ public class WordManager : IWordManager
             };
         }
     }
-
     public IEnumerable<IImageFile> ToImages(WordTemplateInput input)
     {
         //throw new NotSupportedException("https://www.e-iceblue.com/forum/missingmethodexception-when-converting-document-to-images-t9466.html");
@@ -106,7 +108,7 @@ public class WordManager : IWordManager
 
     protected internal IMemoryFile ToMemoryFile(Document doc, SpireFileFormat format = SpireFileFormat.Docx)
         => doc.ToStream(format).ToMemoryFile(format == SpireFileFormat.Doc ? ContentTypes.DOC : ContentTypes.DOCX);
-    protected internal Document MergeDocuments(IEnumerable<WordTemplateInput> inputs)
+    protected internal async Task<Document> MergeDocuments(IEnumerable<WordTemplateInput> inputs)
     {
         var doc = new Document();
 
@@ -114,8 +116,12 @@ public class WordManager : IWordManager
         Document? firstDoc = null;
         foreach (var input in inputList)
         {
-            using var newFile = Create(input);
+            using var newFile = await Create(input);
+#if NET8_0_OR_GREATER
+            await using var newStream = newFile.GetStream();
+#else
             using var newStream = newFile.GetStream();
+#endif
             var options = input.Options;
             if (options != null)
             {
@@ -123,7 +129,11 @@ public class WordManager : IWordManager
                 firstDoc ??= inputDoc;
                 inputDoc = ProcessInputOptions(inputDoc, options, firstDoc);
 
+#if NET8_0_OR_GREATER
+                await using var processedDocStream = inputDoc.ToStream();
+#else
                 using var processedDocStream = inputDoc.ToStream();
+#endif
                 doc.InsertTextFromStream(processedDocStream, SpireFileFormat.Auto);
             }
             else

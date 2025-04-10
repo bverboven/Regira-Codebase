@@ -51,11 +51,11 @@ public class DocumentBuilder(WordManager manager)
     }
 
 
-    public IMemoryFile Build()
+    public async Task<IMemoryFile> Build()
     {
         // Create Document
         using var doc = _inputs != null
-            ? manager.MergeDocuments(_inputs)
+            ? await manager.MergeDocuments(_inputs)
             : new Document();
 
         // PageSettings

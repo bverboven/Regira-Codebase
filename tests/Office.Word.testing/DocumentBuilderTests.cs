@@ -59,7 +59,7 @@ public class DocumentBuilderTests
 
         var manager = new WordManager();
         var builder = new DocumentBuilder(manager);
-        using var docFile = builder.WithParagraphs(paragraphs)
+        using var docFile = await builder.WithParagraphs(paragraphs)
             .AddHeader(new WordHeaderFooterInput { Template = fpHeader, Type = HeaderFooterType.FirstPage })
             .AddHeader(new WordHeaderFooterInput { Template = header })
             .Build();
@@ -68,7 +68,7 @@ public class DocumentBuilderTests
         Assert.That(file.Exists, Is.True);
         Assert.That(file.Length > 0, Is.True);
 
-        var content = manager.GetText(new WordTemplateInput { Template = docFile });
+        var content =await manager.GetText(new WordTemplateInput { Template = docFile });
         Assert.That(content.Contains(headingParagraph.Text), Is.True);
     }
 }

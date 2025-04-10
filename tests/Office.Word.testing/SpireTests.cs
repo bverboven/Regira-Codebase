@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using System.Text.Json;
-using NUnit.Framework.Legacy;
+﻿using NUnit.Framework.Legacy;
 using Regira.Collections;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
@@ -8,16 +6,18 @@ using Regira.Office.Models;
 using Regira.Office.Word.Models;
 using Regira.Office.Word.Spire;
 using Regira.Utilities;
+using System.Globalization;
+using System.Text.Json;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 
 namespace Office.Word.testing;
 
 [TestFixture]
-public class WordTests
+public class SpireTests
 {
     private readonly string _assetsDir;
-    public WordTests()
+    public SpireTests()
     {
         var assemblyDir = AssemblyUtility.GetAssemblyDirectory()!;
         _assetsDir = Path.Combine(assemblyDir, "../../../", "Assets");
@@ -44,7 +44,7 @@ public class WordTests
             Template = inputFile.ToBinaryFile()
         };
         var mgr = new WordManager();
-        using var outputFile = mgr.Create(input);
+        using var outputFile = (await mgr.Create(input));
 
         var file = await outputFile.SaveAs(outputPath);
         Assert.That(file.Exists, Is.True);
@@ -70,13 +70,13 @@ public class WordTests
         };
         input.GlobalParameters.Add("rs_Pi", pi);
         var mgr = new WordManager();
-        using var outputFile = mgr.Create(input);
+        using var outputFile = (await mgr.Create(input));
 
         var file = await outputFile.SaveAs(outputPath);
         Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
-        var hasPi = HasContent(outputFile.ToBinaryFile(), pi);
+        var hasPi = await HasContent(outputFile.ToBinaryFile(), pi);
         Assert.That(hasPi, Is.True);
     }
     [Test]
@@ -100,14 +100,14 @@ public class WordTests
             })
             .ToArray();
         var mgr = new WordManager();
-        using var mergedFile = mgr.Merge(mergedInputs);
+        using var mergedFile = await mgr.Merge(mergedInputs);
         var headerFooterInput = new WordTemplateInput
         {
             Template = mergedFile.ToBinaryFile()
         };
         headerFooterInput.Footers!.Add(new WordHeaderFooterInput { Template = new WordTemplateInput { Template = File.OpenRead(srcHeaderFooter).ToBinaryFile() } });
         headerFooterInput.Headers!.Add(new WordHeaderFooterInput { Template = new WordTemplateInput { Template = File.OpenRead(srcHeaderFooter).ToBinaryFile() } });
-        using var outputFile = mgr.Create(headerFooterInput)
+        using var outputFile = (await mgr.Create(headerFooterInput))
             .ToBinaryFile();
 
         var file = await outputFile.SaveAs(outputPath);
@@ -119,9 +119,9 @@ public class WordTests
         Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
-        var hasDoc1Content = HasContent(outputFile, "Vertical images");
+        var hasDoc1Content = await HasContent(outputFile, "Vertical images");
         Assert.That(hasDoc1Content, Is.True);
-        var hasDoc2Content = HasContent(outputFile, "Some text in Arial");
+        var hasDoc2Content = await HasContent(outputFile, "Some text in Arial");
         Assert.That(hasDoc2Content, Is.True);
     }
     [Test]
@@ -147,7 +147,7 @@ public class WordTests
         input.Headers!.Add(new WordHeaderFooterInput { Template = new WordTemplateInput { Template = headerTemplate } });
 
         var mgr = new WordManager();
-        using var outputFile = mgr.Create(input)
+        using var outputFile = (await mgr.Create(input))
             .ToBinaryFile();
 
         input.Headers.Concat(input.Footers).Select(x => x.Template.Template).Dispose();
@@ -156,11 +156,11 @@ public class WordTests
         Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
-        var hasHeader = HasContent(outputFile, "Header");
+        var hasHeader = await HasContent(outputFile, "Header");
         Assert.That(hasHeader, Is.True);
-        var hasFooter = HasContent(outputFile, "Testing by");
+        var hasFooter = await HasContent(outputFile, "Testing by");
         Assert.That(hasFooter, Is.True);
-        var hasJibberisch = HasContent(outputFile, "Jibberisch");
+        var hasJibberisch = await HasContent(outputFile, "Jibberisch");
         ClassicAssert.IsFalse(hasJibberisch);
     }
     [Test]
@@ -185,7 +185,7 @@ public class WordTests
         input.Footers!.Add(new WordHeaderFooterInput { Template = new WordTemplateInput { Template = footerTemplate }, Type = HeaderFooterType.FirstPage });
         input.Headers!.Add(new WordHeaderFooterInput { Template = new WordTemplateInput { Template = headerTemplate }, Type = HeaderFooterType.FirstPage });
         var mgr = new WordManager();
-        using var outputFile = mgr.Create(input)
+        using var outputFile = (await mgr.Create(input))
             .ToBinaryFile();
         input.Headers.Concat(input.Footers).Select(x => x.Template.Template).Dispose();
 
@@ -193,11 +193,11 @@ public class WordTests
         Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
-        var hasHeader = HasContent(outputFile, "Header");
+        var hasHeader = await HasContent(outputFile, "Header");
         Assert.That(hasHeader, Is.True);
-        var hasFooter = HasContent(outputFile, "Testing by");
+        var hasFooter = await HasContent(outputFile, "Testing by");
         Assert.That(hasFooter, Is.True);
-        var hasJibberisch = HasContent(outputFile, "Jibberisch");
+        var hasJibberisch = await HasContent(outputFile, "Jibberisch");
         ClassicAssert.IsFalse(hasJibberisch);
     }
     [Test]
@@ -220,7 +220,7 @@ public class WordTests
             GlobalParameters = parameters
         };
         var mgr = new WordManager();
-        using var outputFile = mgr.Create(input)
+        using var outputFile = (await mgr.Create(input))
             .ToBinaryFile();
 
         var file = await outputFile.SaveAs(outputPath);
@@ -229,7 +229,7 @@ public class WordTests
 
         foreach (var parameterValue in parameters.Values)
         {
-            var hasParameter = HasContent(outputFile, parameterValue.ToString()!);
+            var hasParameter = await HasContent(outputFile, parameterValue.ToString()!);
             Assert.That(hasParameter, Is.True);
         }
     }
@@ -251,12 +251,13 @@ public class WordTests
             Template = inputFile,
             Images = new List<WordImage>()
         };
-        input.Images.Add(new() {
+        input.Images.Add(new()
+        {
             Name = "placeholder",// Alt Text
             Bytes = await File.ReadAllBytesAsync(imgFile)
         });
         var mgr = new WordManager();
-        using var outputFile = mgr.Create(input)
+        using var outputFile = (await mgr.Create(input))
             .ToBinaryFile();
 
         var file = await outputFile.SaveAs(outputPath);
@@ -275,9 +276,9 @@ public class WordTests
         }
 
         var list = new List<object>();
-        list.Add(new {Id = "10", Title = "Item #10", Price = 100});
-        list.Add(new {Id = "12", Title = "Item #12", Price = 200});
-        list.Add(new {Id = "31", Title = "Item #31", Price = 350});
+        list.Add(new { Id = "10", Title = "Item #10", Price = 100 });
+        list.Add(new { Id = "12", Title = "Item #12", Price = 200 });
+        list.Add(new { Id = "31", Title = "Item #31", Price = 350 });
         var data = list.Select(x => DictionaryUtility.ToDictionary(x))
             .ToList();
         using var inputFile = File.OpenRead(srcPath).ToBinaryFile();
@@ -288,7 +289,7 @@ public class WordTests
         };
         input.CollectionParameters.Add("Template_Table", data!);
         var mgr = new WordManager();
-        using var outputFile = mgr.Create(input)
+        using var outputFile = (await mgr.Create(input))
             .ToBinaryFile();
 
         var file = await outputFile.SaveAs(outputPath);
@@ -296,9 +297,9 @@ public class WordTests
         Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
-        var hasContent = HasContent(outputFile, "Item #12");
+        var hasContent = await HasContent(outputFile, "Item #12");
         Assert.That(hasContent, Is.True);
-        var hasTitleParameter = HasContent(outputFile, "{{ title }}");
+        var hasTitleParameter = await HasContent(outputFile, "{{ title }}");
         ClassicAssert.IsFalse(hasTitleParameter);
     }
     [Test]
@@ -316,7 +317,7 @@ public class WordTests
             Template = inputFile
         };
         var mgr = new WordManager();
-        using var outputFile = mgr.Convert(input, FileFormat.Pdf);
+        using var outputFile = await mgr.Convert(input, FileFormat.Pdf);
 
         var file = await outputFile.SaveAs(outputPath);
         Assert.That(file.Exists, Is.True);
@@ -337,7 +338,7 @@ public class WordTests
             Template = inputFile
         };
         var mgr = new WordManager();
-        using var outputFile = mgr.Convert(input, FileFormat.Pdf);
+        using var outputFile = await mgr.Convert(input, FileFormat.Pdf);
 
         var file = await outputFile.SaveAs(outputPath);
         Assert.That(file.Exists, Is.True);
@@ -363,7 +364,7 @@ public class WordTests
             Settings = new() { PageSize = PageSize.A3 }
         };
         var mgr = new WordManager();
-        using var outputFile = mgr.Convert(input, options);
+        using var outputFile = await mgr.Convert(input, options);
 
         var file = await outputFile.SaveAs(outputPath);
         Assert.That(file.Exists, Is.True);
@@ -384,7 +385,7 @@ public class WordTests
             Template = inputFile
         };
         var mgr = new WordManager();
-        using var outputFile = mgr.Convert(input, FileFormat.Html);
+        using var outputFile = await mgr.Convert(input, FileFormat.Html);
 
         var file = await outputFile.SaveAs(outputPath);
         Assert.That(file.Exists, Is.True);
@@ -405,7 +406,7 @@ public class WordTests
             Template = inputFile
         };
         var mgr = new WordManager();
-        using var outputFile = mgr.Convert(input, FileFormat.Rtf);
+        using var outputFile = await mgr.Convert(input, FileFormat.Rtf);
 
         var file = await outputFile.SaveAs(outputPath);
         Assert.That(file.Exists, Is.True);
@@ -426,7 +427,7 @@ public class WordTests
             Template = inputFile
         };
         var mgr = new WordManager();
-        using var outputFile = mgr.Convert(input, FileFormat.EPub);
+        using var outputFile = await mgr.Convert(input, FileFormat.EPub);
 
         var file = await outputFile.SaveAs(outputPath);
         Assert.That(file.Exists, Is.True);
@@ -447,7 +448,7 @@ public class WordTests
             Template = inputFile
         };
         var mgr = new WordManager();
-        using var outputFile = mgr.Convert(input, FileFormat.Odt);
+        using var outputFile = await mgr.Convert(input, FileFormat.Odt);
 
         var file = await outputFile.SaveAs(outputPath);
         Assert.That(file.Exists, Is.True);
@@ -488,9 +489,9 @@ public class WordTests
         // doc1
         var doc1Src = Path.Combine(_assetsDir, "Input", "template_row.docx");
         var list = new List<object>();
-        list.Add(new {Id = "10", Title = "Item #10", Price = 100});
-        list.Add(new {Id = "12", Title = "Item #12", Price = 200});
-        list.Add(new {Id = "31", Title = "Item #31", Price = 350});
+        list.Add(new { Id = "10", Title = "Item #10", Price = 100 });
+        list.Add(new { Id = "12", Title = "Item #12", Price = 200 });
+        list.Add(new { Id = "31", Title = "Item #31", Price = 350 });
         var data = list
             .Select(x => DictionaryUtility.ToDictionary(x))
             .ToList();
@@ -511,7 +512,8 @@ public class WordTests
             Images = new List<WordImage>(),
             Options = new() { InheritFont = true }
         };
-        doc2Input.Images.Add(new () {
+        doc2Input.Images.Add(new()
+        {
             Name = "placeholder", // Alt Text
             Bytes = await File.ReadAllBytesAsync(imgFile)
         });
@@ -527,16 +529,16 @@ public class WordTests
             DocumentParameters = docParams
         };
         var mgr = new WordManager();
-        using var outputFile = mgr.Create(input)
+        using var outputFile = (await mgr.Create(input))
             .ToBinaryFile();
 
         var file = await outputFile.SaveAs(outputPath);
         Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
-        var hasContent = HasContent(outputFile, "Item #12");
+        var hasContent = await HasContent(outputFile, "Item #12");
         Assert.That(hasContent, Is.True);
-        var hasDoc2Parameter = HasContent(outputFile, "<{ doc2  }>");
+        var hasDoc2Parameter = await HasContent(outputFile, "<{ doc2  }>");
         ClassicAssert.IsFalse(hasDoc2Parameter);
     }
     [Test]
@@ -568,7 +570,7 @@ public class WordTests
             DocumentParameters = docParams
         };
         var mgr = new WordManager();
-        using var outputFile = mgr.Create(input);
+        using var outputFile = (await mgr.Create(input));
 
         var file = await outputFile.SaveAs(outputPath);
         Assert.That(file.Exists, Is.True);
@@ -594,16 +596,16 @@ public class WordTests
         var input = JsonSerializer.Deserialize<WordTemplateInput>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
         input.Template = inputFile;
         var mgr = new WordManager();
-        using var outputFile = mgr.Create(input)
+        using var outputFile = (await mgr.Create(input))
             .ToBinaryFile();
 
         var file = await outputFile.SaveAs(outputPath);
         Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
-        var hasContent = HasContent(outputFile, "Item #31");
+        var hasContent = await HasContent(outputFile, "Item #31");
         Assert.That(hasContent, Is.True);
-        var hasTitleParameter = HasContent(outputFile, "{{ title }}");
+        var hasTitleParameter = await HasContent(outputFile, "{{ title }}");
         ClassicAssert.IsFalse(hasTitleParameter);
     }
 
@@ -628,7 +630,7 @@ public class WordTests
         };
 
         var mgr = new WordManager();
-        using var outputFile = mgr.Create(input)
+        using var outputFile = (await mgr.Create(input))
             .ToBinaryFile();
 
         var file = await outputFile.SaveAs(outputPath);
@@ -694,25 +696,25 @@ public class WordTests
         };
         input.CollectionParameters.Add("invoiceLines", invoiceLines!);
         var mgr = new WordManager();
-        using var outputFile = mgr.Create(input)
+        using var outputFile = (await mgr.Create(input))
             .ToBinaryFile();
         var file = await outputFile.SaveAs(outputPath);
         Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
         // pdf
-        using var pdfFile = mgr.Convert(new WordTemplateInput { Template = outputFile }, FileFormat.Pdf);
+        using var pdfFile = await mgr.Convert(new WordTemplateInput { Template = outputFile }, FileFormat.Pdf);
         var pdfPath = Path.Combine(_assetsDir, "Output", "Factuur", "factuur.pdf");
         await pdfFile.SaveAs(pdfPath);
 
-        var hasCustomerTitleValue = HasContent(outputFile, invoice.customer.title);
+        var hasCustomerTitleValue = await HasContent(outputFile, invoice.customer.title);
         Assert.That(hasCustomerTitleValue, Is.True);
-        var hasCustomerTitleParameter = HasContent(outputFile, "{{ customer.title }}");
+        var hasCustomerTitleParameter = await HasContent(outputFile, "{{ customer.title }}");
         ClassicAssert.IsFalse(hasCustomerTitleParameter);
 
-        var hasInvoiceLineTitleValue = HasContent(outputFile, invoiceLines[1]["invoiceLineTitle"]!.ToString()!);
+        var hasInvoiceLineTitleValue = await HasContent(outputFile, invoiceLines[1]["invoiceLineTitle"]!.ToString()!);
         Assert.That(hasInvoiceLineTitleValue, Is.True);
-        var hasInvoiceLineTitleParameter = HasContent(outputFile, "{{invoiceLineTitle}}");
+        var hasInvoiceLineTitleParameter = await HasContent(outputFile, "{{invoiceLineTitle}}");
         ClassicAssert.IsFalse(hasInvoiceLineTitleParameter);
     }
     [Test]
@@ -819,23 +821,23 @@ public class WordTests
         input.DocumentParameters.Add("invoice-summary.dotx", invoiceSummaryInput);
         input.CollectionParameters.Add("invoiceLines", invoiceLines!);
         var mgr = new WordManager();
-        using var outputFile = mgr.Create(input)
+        using var outputFile = (await mgr.Create(input))
             .ToBinaryFile();
         var file = await outputFile.SaveAs(outputPath);
         Assert.That(file.Exists, Is.True);
         ClassicAssert.Greater(file.Length, 0);
 
         // pdf
-        using var pdfFile = mgr.Convert(new WordTemplateInput { Template = outputFile }, FileFormat.Pdf);
+        using var pdfFile = await mgr.Convert(new WordTemplateInput { Template = outputFile }, FileFormat.Pdf);
         var pdfPath = Path.Combine(_assetsDir, "Output", "Factuur", "invoice.pdf");
         await pdfFile.SaveAs(pdfPath);
     }
 
 
-    private bool HasContent(IBinaryFile file, string s)
+    private async Task<bool> HasContent(IBinaryFile file, string s)
     {
         var mgr = new WordManager();
-        var content = mgr.GetText(new WordTemplateInput
+        var content = await mgr.GetText(new WordTemplateInput
         {
             Template = file
         });
