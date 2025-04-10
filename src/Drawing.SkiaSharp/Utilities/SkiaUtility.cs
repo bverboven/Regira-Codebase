@@ -12,16 +12,20 @@ public static class SkiaUtility
 {
     // https://docs.microsoft.com/en-us/xamarin/xamarin-forms/user-interface/graphics/skiasharp/bitmaps/drawing
 
-    public static SKFilterQuality ToFilterQuality(int quality)
+    public static SKSamplingOptions ToFilterQuality(int quality)
     {
-        var skiaQuality = SKFilterQuality.Medium;
-        if (quality < 100 * (1 / 3))
+#if NETCOREAPP3_0_OR_GREATER
+        quality = Math.Clamp(quality, 0, 100);
+#endif
+
+        var skiaQuality = new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear);
+        if (quality < 100 * 0.3333)
         {
-            skiaQuality = SKFilterQuality.Low;
+            skiaQuality = new SKSamplingOptions(SKFilterMode.Nearest, SKMipmapMode.None);
         }
-        else if (quality > 100 * (2 / 3))
+        else if (quality > 100 * 0.6667)
         {
-            skiaQuality = SKFilterQuality.High;
+            skiaQuality = new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.None);
         }
 
         return skiaQuality;

@@ -2,16 +2,19 @@
 
 public enum ImageFormat
 {
+    Png,
     Bmp,
     Gif,
+    Heif,
     Ico,
     Jpeg,
-    Png,
-    Wbmp,
-    Webp,
-    Pkm,
+    Jp2,
     Ktx,
-    Astc,
-    Dng,
-    Heif,
+    Pbm,
+    Pkm,
+    Qoi,
+    Tga,
+    Tiff,
+    Wbmp,
+    Webp
 }

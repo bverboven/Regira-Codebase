@@ -1,7 +1,7 @@
-using System.Drawing;
 using Regira.Dimensions;
 using Regira.Drawing.GDI.Utilities;
 using Regira.Media.Drawing.Core;
+using System.Drawing;
 
 namespace Regira.Drawing.GDI.Helpers;
 
@@ -48,7 +48,7 @@ public class ImageBuilder
 
     public Image Build()
     {
-        var target = _target ?? (_targetSize != null ? GdiUtility.Create((int)_targetSize.Value.Width, (int)_targetSize.Value.Height) : _helper.CalculateTarget(_images));
+        var target = _target ?? (_targetSize != null ? GdiUtility.Create((int)_targetSize.Value.Width, (int)_targetSize.Value.Height) : _helper.CreateSizedCanvas(_images));
         return _helper.Draw(_images, target, _dpi ?? ImageConstants.DEFAULT_DPI);
     }
 }

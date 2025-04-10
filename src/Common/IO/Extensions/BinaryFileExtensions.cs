@@ -5,9 +5,9 @@ namespace Regira.IO.Extensions;
 
 public static class BinaryFileExtensions
 {
-    public static IBinaryFile ToBinaryFile(this byte[] bytes, string? contentType = null)
+    public static IBinaryFile ToBinaryFile(this byte[]? bytes, string? contentType = null)
         => new BinaryFileItem { Bytes = bytes, Length = bytes?.Length ?? 0, ContentType = contentType };
-    public static IBinaryFile ToBinaryFile(this Stream stream, string? contentType = null)
+    public static IBinaryFile ToBinaryFile(this Stream? stream, string? contentType = null)
         => new BinaryFileItem { Stream = stream, Length = stream?.Length ?? 0, ContentType = contentType };
     /// <summary>
     /// Retains the source file's properties (no stream copy is created)

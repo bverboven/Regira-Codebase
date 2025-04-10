@@ -1,4 +1,3 @@
-using System.Drawing;
 using Regira.Dimensions;
 using Regira.Drawing.GDI.Abstractions;
 using Regira.Drawing.GDI.Utilities;
@@ -7,6 +6,7 @@ using Regira.Media.Drawing.Core;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Utilities;
 using Regira.Utilities;
+using System.Drawing;
 
 namespace Regira.Drawing.GDI.Helpers;
 
@@ -15,10 +15,8 @@ internal class DrawHelper : IImageHelper
     public Image Draw(IEnumerable<ImageToAdd> imagesToAdd, Image? target = null, int dpi = ImageConstants.DEFAULT_DPI)
     {
         var images = imagesToAdd.AsList();
-        if (target == null)
-        {
-            target = CalculateTarget(images);
-        }
+        target ??= CreateSizedCanvas(images);
+
         if (!images.Any())
         {
             return target;
@@ -33,7 +31,7 @@ internal class DrawHelper : IImageHelper
         return target;
     }
 
-    public Image CalculateTarget(IEnumerable<ImageToAdd> imagesToAdd)
+    public Image CreateSizedCanvas(IEnumerable<ImageToAdd> imagesToAdd)
     {
         var images = imagesToAdd.AsList();
         var size = new Size(
@@ -88,11 +86,11 @@ internal class DrawHelper : IImageHelper
         using var resizedImage = rotatedImage.Width != width || rotatedImage.Height != height ? GdiUtility.Resize(rotatedImage, new Size(width, height)) : new Bitmap(rotatedImage);
         //Position
         double left = 0;
-        if (((int)img.Position & (int)ImagePosition.HCenter) == (int)ImagePosition.HCenter)
+        if (img.Position.HasFlag(ImagePosition.HCenter))
         {
             left = (targetSize.Width / 2) - (resizedImage.Width / 2f);
         }
-        else if (((int)img.Position & (int)ImagePosition.Right) == (int)ImagePosition.Right)
+        else if (img.Position.HasFlag(ImagePosition.Right))
         {
             left = targetSize.Width - resizedImage.Width;
         }
@@ -102,11 +100,11 @@ internal class DrawHelper : IImageHelper
         }
 
         double top = 0;
-        if (((int)img.Position & (int)ImagePosition.VCenter) == (int)ImagePosition.VCenter)
+        if (img.Position.HasFlag(ImagePosition.VCenter))
         {
             top = (targetSize.Height / 2) - (resizedImage.Height / 2f);
         }
-        else if (((int)img.Position & (int)ImagePosition.Bottom) == (int)ImagePosition.Bottom)
+        else if (img.Position.HasFlag(ImagePosition.Bottom))
         {
             top = targetSize.Height - resizedImage.Height;
         }

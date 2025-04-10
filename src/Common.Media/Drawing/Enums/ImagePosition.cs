@@ -1,5 +1,6 @@
 ﻿namespace Regira.Media.Drawing.Enums;
 
+[Flags]
 public enum ImagePosition
 {
     Absolute = 0,
