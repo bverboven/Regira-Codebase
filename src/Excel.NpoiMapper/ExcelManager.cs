@@ -9,18 +9,12 @@ using Regira.Utilities;
 
 namespace Regira.Office.Excel.NpoiMapper;
 
-public class ExcelManager : IExcelManager
+public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
 {
+    private readonly Options _options = options ?? new Options();
     public class Options
     {
         public string DateFormat { get; set; } = "yyyy-MM-dd hh:mm:ss";
-    }
-
-    private readonly string _dateFormat;
-    public ExcelManager(Options? options = null)
-    {
-        options ??= new Options();
-        _dateFormat = options.DateFormat;
     }
 
 
@@ -38,11 +32,6 @@ public class ExcelManager : IExcelManager
                 Data = mapper.Take<object>(i).Select(r => r.Value).ToList()
             };
         }
-    }
-
-    public IMemoryFile Create(ExcelSheet sheet)
-    {
-        return Create([sheet]);
     }
     public IMemoryFile Create(IEnumerable<ExcelSheet> sheets)
     {
@@ -112,7 +101,7 @@ public class ExcelManager : IExcelManager
                             if (dateCellStyle == null)
                             {
                                 dateCellStyle = sheet.Workbook.CreateCellStyle();
-                                dateCellStyle.DataFormat = sheet.Workbook.CreateDataFormat().GetFormat(_dateFormat);
+                                dateCellStyle.DataFormat = sheet.Workbook.CreateDataFormat().GetFormat(_options.DateFormat);
                             }
                             cell.CellStyle = dateCellStyle;
                             cell.SetCellValue((DateTime)value);
@@ -133,5 +122,36 @@ public class ExcelManager : IExcelManager
                 }
             }
         }
+    }
+}
+
+public class ExcelManager<T> : IExcelManager<T>
+    where T : class
+{
+    public IEnumerable<ExcelSheet<T>> Read(IBinaryFile input, string[]? headers = null)
+    {
+        using var ms = input.GetStream();
+        var mapper = new Mapper(ms);
+        var sheetCount = mapper.Workbook.NumberOfSheets;
+        for (var i = 0; i < sheetCount; i++)
+        {
+            var sheetName = mapper.Workbook.GetSheetName(i);
+            yield return new ExcelSheet<T>
+            {
+                Name = sheetName,
+                Data = mapper.Take<T>(i).Select(r => r.Value).ToList()
+            };
+        }
+    }
+    public IMemoryFile Create(IEnumerable<ExcelSheet<T>> sheets)
+    {
+        var mapper = new Mapper();
+        foreach (var sheet in sheets)
+        {
+            mapper.Put(sheet.Data, sheet.Name, true);
+        }
+        var ms = new MemoryStream();
+        mapper.Save(ms);
+        return ms.ToMemoryFile(ContentTypes.XLSX);
     }
 }

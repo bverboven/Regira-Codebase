@@ -30,9 +30,9 @@ public class TextPlainInputFormatter : InputFormatter
         var content = await reader.ReadToEndAsync();
         return await InputFormatterResult.SuccessAsync(content);
     }
-    public override bool CanRead(InputFormatterContext context)
+
+    protected override bool CanReadType(Type type)
     {
-        var contentType = context.HttpContext.Request.ContentType;
-        return contentType.StartsWith(ContentType);
+        return type == typeof(string);
     }
 }

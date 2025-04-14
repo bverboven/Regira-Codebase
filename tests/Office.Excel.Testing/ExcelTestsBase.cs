@@ -1,10 +1,10 @@
-using System.Text.Json;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
 using Regira.Office.Excel;
 using Regira.Office.Excel.Abstractions;
 using Regira.Utilities;
+using System.Text.Json;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 
@@ -200,7 +200,7 @@ public abstract class ExcelTestsBase
         where T : class
     {
         var sheet = new ExcelSheet { Data = input.Cast<object>().ToList() };
-        return ExcelManager.Create(sheet);
+        return ExcelManager.Create([sheet]);
     }
 
     async Task<FileInfo> SaveOutput(string fileName, IMemoryFile file)
