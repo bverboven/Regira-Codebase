@@ -145,13 +145,19 @@ public class ExcelManager<T> : IExcelManager<T>
     }
     public IMemoryFile Create(IEnumerable<ExcelSheet<T>> sheets)
     {
+        var ms = new MemoryStream();
         var mapper = new Mapper();
+        var sheetIndex = 0;
         foreach (var sheet in sheets)
         {
-            mapper.Put(sheet.Data, sheet.Name, true);
+            var sheetName = sheet.Name ?? $"Sheet-{++sheetIndex}";
+            mapper.Put(sheet.Data, sheetName);
         }
-        var ms = new MemoryStream();
+#if NET6_0_OR_GREATER
+        mapper.Save(ms, true);
+#else
         mapper.Save(ms);
+#endif
         return ms.ToMemoryFile(ContentTypes.XLSX);
     }
 }
