@@ -126,7 +126,7 @@ public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
 }
 
 public class ExcelManager<T> : IExcelManager<T>
-    where T : class
+    where T : class, new()
 {
     public IEnumerable<ExcelSheet<T>> Read(IBinaryFile input, string[]? headers = null)
     {

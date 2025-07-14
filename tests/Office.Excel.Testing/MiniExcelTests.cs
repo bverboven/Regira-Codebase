@@ -1,12 +1,12 @@
 using Office.Excel.Testing.Models;
 using Regira.Office.Excel.Abstractions;
-using Regira.Office.Excel.NpoiMapper;
+using Regira.Office.Excel.MiniExcel;
 
 namespace Office.Excel.Testing;
 
 [TestFixture]
 [Parallelizable(ParallelScope.Self)]
-public class NpoiMapperTests
+public class MiniExcelTests
 {
     IExcelManager CreateExcelManager() => new ExcelManager();
     IExcelManager<ExcelCountry> CreateTypedExcelManager() => new ExcelManager<ExcelCountry>();
