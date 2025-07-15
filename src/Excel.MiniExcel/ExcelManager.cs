@@ -1,8 +1,10 @@
 ﻿using MiniExcelLibs;
+using MiniExcelLibs.OpenXml;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Office.Excel.Abstractions;
 using Regira.Office.MimeTypes;
+using Regira.Utilities;
 
 namespace Regira.Office.Excel.MiniExcel;
 
@@ -26,13 +28,31 @@ public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
                 .Cast<IDictionary<string, object>>();
             // ReSharper disable once PossibleMultipleEnumeration
             var miniHeaders = rows.First();
+            var duplicateHeaders = miniHeaders
+                .GroupBy(v => v.Value)
+                .Where(g => g.Count() > 1);
+            foreach (var duplicateHeader in duplicateHeaders)
+            {
+                var duplicateHeaderItems = duplicateHeader.ToList();
+                for (var i = 0; i < duplicateHeaderItems.Count(); i++)
+                {
+                    if (i > 0)
+                    {
+                        miniHeaders[duplicateHeaderItems[i].Key] = $"{duplicateHeaderItems[i].Value} #{i + 1}";
+                    }
+                }
+            }
             yield return new ExcelSheet
             {
                 Name = sheetName,
                 // ReSharper disable once PossibleMultipleEnumeration
                 Data = rows
                     .Skip(1)
-                    .Select(d => d.Keys.ToDictionary(key => miniHeaders[key].ToString()!, key => d[key]) as object)
+                    .Select(d =>
+                    {
+                        var keys = d.Keys.ToArray();
+                        return d.Keys.ToDictionary(key => miniHeaders[key].ToString()!, key => d[key]) as object;
+                    })
                     .ToList()
             };
         }
@@ -46,10 +66,33 @@ public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
         foreach (var sheet in sheets)
         {
             var sheetName = sheet.Name ?? $"Sheet-{++sheetIndex}";
-            miniSheets.Add(sheetName, sheet.Data ?? []);
+            var dics = sheet.Data
+                !.Select(x => DictionaryUtility.ToDictionary(x))
+                .ToArray();
+            var dicSize = dics.Max(d => d.Count);
+            var dicHeaders = dics
+                .First(d => d.Count == dicSize)
+                .Keys;
+            var rightDics = dics
+                .Select(d =>
+                {
+                    if (d.Count < dicSize)
+                    {
+                        // make sure all dictionaries have the same keys (or MiniExcel.Save will throw an exception)
+                        return dicHeaders.ToDictionary(h => h, h => d.TryGetValue(h, out var value) ? value : null);
+                    }
+
+                    return d;
+                });
+            miniSheets.Add(sheetName, rightDics);
         }
 
-        ms.SaveAs(miniSheets);
+        var config = new OpenXmlConfiguration()
+        {
+            EnableWriteNullValueCell = true,
+            IgnoreTemplateParameterMissing = true
+        };
+        ms.SaveAs(miniSheets, configuration: config);
 
         return ms.ToMemoryFile(ContentTypes.XLSX);
     }
