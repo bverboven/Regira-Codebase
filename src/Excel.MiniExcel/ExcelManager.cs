@@ -34,11 +34,11 @@ public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
             foreach (var duplicateHeader in duplicateHeaders)
             {
                 var duplicateHeaderItems = duplicateHeader.ToList();
-                for (var i = 0; i < duplicateHeaderItems.Count(); i++)
+                for (var i = 0; i < duplicateHeaderItems.Count; i++)
                 {
                     if (i > 0)
                     {
-                        miniHeaders[duplicateHeaderItems[i].Key] = $"{duplicateHeaderItems[i].Value} #{i + 1}";
+                        miniHeaders[duplicateHeaderItems[i].Key] = $"{duplicateHeaderItems[i].Value}_{i + 1}";
                     }
                 }
             }

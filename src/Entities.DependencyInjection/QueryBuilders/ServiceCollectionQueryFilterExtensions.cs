@@ -77,9 +77,9 @@ public static class ServiceCollectionQueryFilterExtensions
     /// <summary>
     /// Adds default filtered query builders
     /// <list type="bullet">
-    /// <item>Id(s)</item>
-    /// <item>Timestamps</item>
-    /// <item>Archivable</item>
+    /// <item><see cref="FilterIdsQueryBuilder">Id(s)</see></item>
+    /// <item><see cref="FilterArchivablesQueryBuilder">Archivable</see></item>
+    /// <item>Timestamps: <see cref="FilterHasCreatedQueryBuilder">Created</see> &amp; <see cref="FilterHasLastModifiedQueryBuilder">LastModified</see></item>
     /// </list>
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
