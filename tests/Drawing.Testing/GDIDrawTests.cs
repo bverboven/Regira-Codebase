@@ -1,21 +1,22 @@
-﻿using Regira.Drawing.GDI.Helpers;
+﻿using System.Drawing;
+using Regira.Drawing.GDI.Helpers;
 using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Abstractions;
 using Regira.Media.Drawing.Core;
+using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Utilities;
 using Regira.Utilities;
-using System.Drawing;
-using System.Drawing.Imaging;
+using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
 namespace Drawing.Testing;
 
+#pragma warning disable CA1416
 [TestFixture]
-[Parallelizable(ParallelScope.All)]
 public class GDIDrawTests
 {
-    protected readonly string _inputDir;
-    protected readonly string _outputDir;
+    private readonly string _inputDir;
+    private readonly string _outputDir;
     public GDIDrawTests()
     {
         var assemblyDir = AssemblyUtility.GetAssemblyDirectory()!;
@@ -67,32 +68,349 @@ public class GDIDrawTests
     }
 
     [Test]
-    public async Task AddImage()
+    public async Task AddImage_No_Params()
     {
-
         using var target = await ReadImage("white-400x300.jpg");
         var builder = new ImageBuilder();
         builder.SetTarget(target);
-        builder.Add(new ImageToAdd
+        var imgToAdd = new ImageToAdd
         {
             Image = await ReadImage("yellow-200x150.jpg")
-        });
+        };
+        builder.Add(imgToAdd);
 
-        var resultImg = builder.Build();
-        _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image.jpg"));
-        var testImage = resultImg.ToBitmap();
-        
-        var yellowPx = ((Bitmap)testImage).GetPixel(10, 10);
-        Assert.That(yellowPx.R, Is.EqualTo(255));
-        Assert.That(yellowPx.G, Is.EqualTo(255));
-        Assert.That(yellowPx.B, Is.EqualTo(1));// Blue seems to be 1 instead of 0
+        using var resultImg = builder.Build();
+        _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-no-params.jpg"));
+        using var testImage = resultImg.ToBitmap();
 
-        var whitePx = ((Bitmap)testImage).GetPixel(210, 160);
-        Assert.That(whitePx.R, Is.EqualTo(255));
-        Assert.That(whitePx.G, Is.EqualTo(255));
-        Assert.That(whitePx.B, Is.EqualTo(255));
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(190, 140));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(210, 150));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(200, 160));
+    }
+    [Test]
+    public async Task AddImage_Top_Left()
+    {
+        using var target = await ReadImage("white-400x300.jpg");
+        var builder = new ImageBuilder();
+        builder.SetTarget(target);
+        var imgToAdd = new ImageToAdd
+        {
+            Image = await ReadImage("yellow-200x150.jpg"),
+            Position = ImagePosition.Top | ImagePosition.Left
+        };
+        builder.Add(imgToAdd);
+
+        using var resultImg = builder.Build();
+        _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-top-left.jpg"));
+        using var testImage = resultImg.ToBitmap();
+
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(190, 140));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(210, 150));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(200, 160));
+    }
+    [Test]
+    public async Task AddImage_Bottom_Left()
+    {
+        using var target = await ReadImage("white-400x300.jpg");
+        var builder = new ImageBuilder();
+        builder.SetTarget(target);
+        var imgToAdd = new ImageToAdd
+        {
+            Image = await ReadImage("yellow-200x150.jpg"),
+            Position = ImagePosition.Bottom | ImagePosition.Left
+        };
+        builder.Add(imgToAdd);
+
+        using var resultImg = builder.Build();
+        _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-bottom-left.jpg"));
+        using var testImage = resultImg.ToBitmap();
+
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(10, 160));
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(190, 290));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(210, 290));
+    }
+    [Test]
+    public async Task AddImage_Top_Right()
+    {
+        using var target = await ReadImage("white-400x300.jpg");
+        var builder = new ImageBuilder();
+        builder.SetTarget(target);
+        var imgToAdd = new ImageToAdd
+        {
+            Image = await ReadImage("green-50x100.jpg"),
+            Position = ImagePosition.Top | ImagePosition.Right
+        };
+        builder.Add(imgToAdd);
+
+        using var resultImg = builder.Build();
+        _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-top-right.jpg"));
+        using var testImage = resultImg.ToBitmap();
+
+        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(360, 10));
+        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(390, 90));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(340, 10));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(360, 110));
+    }
+    [Test]
+    public async Task AddImage_Bottom_Right()
+    {
+        using var target = await ReadImage("white-400x300.jpg");
+        var builder = new ImageBuilder();
+        builder.SetTarget(target);
+        var imgToAdd = new ImageToAdd
+        {
+            Image = await ReadImage("green-50x100.jpg"),
+            Position = ImagePosition.Bottom | ImagePosition.Right
+        };
+        builder.Add(imgToAdd);
+
+        using var resultImg = builder.Build();
+        _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-bottom-right.jpg"));
+        using var testImage = resultImg.ToBitmap();
+
+        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(360, 260));
+        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(390, 290));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 290));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(390, 10));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(390, 190));
+    }
+    
+    [Test]
+    public async Task AddImage_Top_HCenter()
+    {
+        using var target = await ReadImage("white-400x300.jpg");
+        var builder = new ImageBuilder();
+        builder.SetTarget(target);
+        var imgToAdd = new ImageToAdd
+        {
+            Image = await ReadImage("yellow-200x150.jpg"),
+            Position = ImagePosition.Top | ImagePosition.HCenter
+        };
+        builder.Add(imgToAdd);
+
+        using var resultImg = builder.Build();
+        _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-top-hcenter.jpg"));
+        using var testImage = resultImg.ToBitmap();
+
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(110, 10));
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(290, 140));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 290));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(200, 160));
+    }
+    [Test]
+    public async Task AddImage_Bottom_HCenter()
+    {
+        using var target = await ReadImage("white-400x300.jpg");
+        var builder = new ImageBuilder();
+        builder.SetTarget(target);
+        var imgToAdd = new ImageToAdd
+        {
+            Image = await ReadImage("yellow-200x150.jpg"),
+            Position = ImagePosition.Bottom | ImagePosition.HCenter
+        };
+        builder.Add(imgToAdd);
+
+        using var resultImg = builder.Build();
+        _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-bottom-hcenter.jpg"));
+        using var testImage = resultImg.ToBitmap();
+
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(110, 160));
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(290, 290));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 290));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(90, 290));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(310, 290));
+    }
+    [Test]
+    public async Task AddImage_Left_VCenter()
+    {
+        using var target = await ReadImage("white-400x300.jpg");
+        var builder = new ImageBuilder();
+        builder.SetTarget(target);
+        var imgToAdd = new ImageToAdd
+        {
+            Image = await ReadImage("green-50x100.jpg"),
+            Position = ImagePosition.VCenter | ImagePosition.Left
+        };
+        builder.Add(imgToAdd);
+
+        using var resultImg = builder.Build();
+        _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-right-vcenter.jpg"));
+        using var testImage = resultImg.ToBitmap();
+
+        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(10, 110));
+        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(10, 190));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 90));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(60, 150));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 290));
+    }
+    [Test]
+    public async Task AddImage_Right_VCenter()
+    {
+        using var target = await ReadImage("white-400x300.jpg");
+        var builder = new ImageBuilder();
+        builder.SetTarget(target);
+        var imgToAdd = new ImageToAdd
+        {
+            Image = await ReadImage("green-50x100.jpg"),
+            Position = ImagePosition.VCenter | ImagePosition.Right
+        };
+        builder.Add(imgToAdd);
+
+        using var resultImg = builder.Build();
+        _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-right-vcenter.jpg"));
+        using var testImage = resultImg.ToBitmap();
+
+        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(360, 110));
+        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(390, 190));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(390, 10));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(340, 150));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(390, 290));
+    }
+    [Test]
+    public async Task AddImage_Middle()
+    {
+        using var target = await ReadImage("white-400x300.jpg");
+        var builder = new ImageBuilder();
+        builder.SetTarget(target);
+        var imgToAdd = new ImageToAdd
+        {
+            Image = await ReadImage("yellow-200x150.jpg"),
+            Position = ImagePosition.VCenter | ImagePosition.HCenter
+        };
+        builder.Add(imgToAdd);
+
+        using var resultImg = builder.Build();
+        _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-middle.jpg"));
+        using var testImage = resultImg.ToBitmap();
+
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(110, 85));
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(200, 150));
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(290, 175));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 150));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 290));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 200));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(90, 150));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(310, 150));
     }
 
+    [Test]
+    public async Task AddImage_Absolute_Top_Left()
+    {
+        using var target = await ReadImage("white-400x300.jpg");
+        var builder = new ImageBuilder();
+        builder.SetTarget(target);
+        var imgToAdd = new ImageToAdd
+        {
+            Image = await ReadImage("yellow-200x150.jpg"),
+            Position = ImagePosition.Absolute,
+            Top = 50,
+            Left = 50
+        };
+        builder.Add(imgToAdd);
+
+        using var resultImg = builder.Build();
+        _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-abs-top-left.jpg"));
+        using var testImage = resultImg.ToBitmap();
+
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(60, 60));
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(240, 190));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(40, 40));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(260, 210));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(390, 290));
+    }
+    [Test]
+    public async Task AddImage_Absolute_Top_Right()
+    {
+        using var target = await ReadImage("white-400x300.jpg");
+        var builder = new ImageBuilder();
+        builder.SetTarget(target);
+        var imgToAdd = new ImageToAdd
+        {
+            Image = await ReadImage("yellow-200x150.jpg"),
+            Position = ImagePosition.Absolute,
+            Top = 50,
+            Right = 50
+        };
+        builder.Add(imgToAdd);
+
+        using var resultImg = builder.Build();
+        _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-abs-top-right.jpg"));
+        using var testImage = resultImg.ToBitmap();
+
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(160, 60));
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(240, 190));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(140, 10));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(140, 60));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(360, 60));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(360, 190));
+    }
+    [Test]
+    public async Task AddImage_Absolute_Bottom_Left()
+    {
+        using var target = await ReadImage("white-400x300.jpg");
+        var builder = new ImageBuilder();
+        builder.SetTarget(target);
+        var imgToAdd = new ImageToAdd
+        {
+            Image = await ReadImage("yellow-200x150.jpg"),
+            Position = ImagePosition.Absolute,
+            Bottom = 50,
+            Left = 50
+        };
+        builder.Add(imgToAdd);
+
+        using var resultImg = builder.Build();
+        _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-abs-bottom-left.jpg"));
+        using var testImage = resultImg.ToBitmap();
+
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(60, 160));
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(240, 240));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(40, 140));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(260, 260));
+    }
+    [Test]
+    public async Task AddImage_Absolute_Bottom_Right()
+    {
+        using var target = await ReadImage("white-400x300.jpg");
+        var builder = new ImageBuilder();
+        builder.SetTarget(target);
+        var imgToAdd = new ImageToAdd
+        {
+            Image = await ReadImage("yellow-200x150.jpg"),
+            Position = ImagePosition.Absolute,
+            Bottom = 50,
+            Right = 50
+        };
+        builder.Add(imgToAdd);
+
+        using var resultImg = builder.Build();
+        _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-abs-bottom-right.jpg"));
+        using var testImage = resultImg.ToBitmap();
+
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(160, 160));
+        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(240, 240));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(140, 140));
+        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(360, 260));
+    }
+
+
+    protected void AssertColor(Color expected, Color actual)
+    {
+        Assert.That(Math.Abs(actual.R - expected.R), Is.LessThan(10));
+        Assert.That(Math.Abs(actual.G - expected.G), Is.LessThan(10));
+        Assert.That(Math.Abs(actual.B - expected.B), Is.LessThan(10));
+    }
 
     protected async Task<IImageFile> ReadImage(string filename)
     {
@@ -100,3 +418,4 @@ public class GDIDrawTests
         return bytes.ToBinaryFile().ToImageFile();
     }
 }
+#pragma warning restore CA1416
