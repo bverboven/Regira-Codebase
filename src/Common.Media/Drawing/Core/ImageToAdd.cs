@@ -1,4 +1,5 @@
 ﻿using Regira.Dimensions;
+using Regira.Media.Drawing.Abstractions;
 using Regira.Media.Drawing.Enums;
 
 namespace Regira.Media.Drawing.Core;
@@ -6,7 +7,7 @@ namespace Regira.Media.Drawing.Core;
 public class ImageToAdd
 {
     public string? Path { get; set; }
-    public ImageFile? Image { get; set; }
+    public IImageFile? Image { get; set; }
     public double Width { get; set; }
     public double Height { get; set; }
     public double Left { get; set; }

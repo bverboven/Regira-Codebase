@@ -1,5 +1,6 @@
 using Regira.Dimensions;
 using Regira.Drawing.GDI.Utilities;
+using Regira.Media.Drawing.Abstractions;
 using Regira.Media.Drawing.Core;
 using System.Drawing;
 
@@ -27,13 +28,14 @@ public class ImageBuilder
         }
         return this;
     }
-    public ImageBuilder SetTarget(Image target)
+    public ImageBuilder SetTarget(IImageFile target)
     {
         if (_targetSize != null)
         {
             throw new Exception("SetTarget cannot be combined with SetTargetSize");
         }
-        _target = target;
+
+        _target = target.ToBitmap();
         return this;
     }
     public ImageBuilder SetTargetSize(Size2D size)
@@ -46,9 +48,14 @@ public class ImageBuilder
         return this;
     }
 
-    public Image Build()
+    public IImageFile Build()
     {
-        var target = _target ?? (_targetSize != null ? GdiUtility.Create((int)_targetSize.Value.Width, (int)_targetSize.Value.Height) : _helper.CreateSizedCanvas(_images));
-        return _helper.Draw(_images, target, _dpi ?? ImageConstants.DEFAULT_DPI);
+        var target = _target ?? (
+            _targetSize != null
+                ? GdiUtility.Create((int)_targetSize.Value.Width, (int)_targetSize.Value.Height)
+                : _helper.CreateSizedCanvas(_images)
+        );
+        var resultImg = _helper.Draw(_images, target, _dpi ?? ImageConstants.DEFAULT_DPI);
+        return resultImg.ToImageFile(resultImg.RawFormat);
     }
 }
