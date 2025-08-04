@@ -18,13 +18,14 @@ public class PdfManager(PdfManager.Options? options = null) : IHtmlToPdfService
     public event Action<HtmlInput, string?>? OnPrint = options?.OnPrint;
 
 
-    public IMemoryFile Create(HtmlInput template)
+    public Task<IMemoryFile> Create(HtmlInput template)
     {
         var doc = GetPdfDocument(template);
         var ms = new MemoryStream();
         doc.Save(ms);
         doc.Close();
-        return ms.ToMemoryFile(ContentTypes.PDF);
+        var pdf = ms.ToMemoryFile(ContentTypes.PDF);
+        return Task.FromResult(pdf);
     }
 
     protected PdfDocument GetPdfDocument(HtmlInput template)

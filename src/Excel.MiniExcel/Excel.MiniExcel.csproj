@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -6,17 +6,20 @@
     <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>B.Verboven</Authors>
-    <RootNamespace>Regira.Entities</RootNamespace>
-    <PackageId>Regira.Entities</PackageId>
-    <AssemblyName>Regira.Entities</AssemblyName>
+    <RootNamespace>Regira.Office.Excel.MiniExcel</RootNamespace>
+    <PackageId>Regira.Office.Excel.MiniExcel</PackageId>
+    <AssemblyName>Regira.Office.Excel.MiniExcel</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.6.8</Version>
+    <Version>4.0.0</Version>
   </PropertyGroup>
-  <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
-    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-  </ItemGroup>
+  
   <ItemGroup>
-    <ProjectReference Include="..\Common.IO.Storage\Common.IO.Storage.csproj" />
+    <PackageReference Include="MiniExcel" Version="1.41.3" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
+  </ItemGroup>
+
 </Project>

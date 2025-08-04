@@ -1,18 +1,19 @@
+using Office.Excel.Testing.Models;
 using Regira.Office.Excel.Abstractions;
-using Regira.Office.Excel.EPPlus;
+using Regira.Office.Excel.MiniExcel;
 
 namespace Office.Excel.Testing;
 
 [TestFixture]
 [Parallelizable(ParallelScope.Self)]
-public class EPPlustTests
+public class MiniExcelTests
 {
     IExcelManager CreateExcelManager() => new ExcelManager();
-    //IExcelManager<ExcelCountry> CreateTypedExcelManager() => new ExcelManager<ExcelCountry>();
+    IExcelManager<ExcelCountry> CreateTypedExcelManager() => new ExcelManager<ExcelCountry>();
 
-    //[Test]
-    //public Task List_To_Excel() => CreateTypedExcelManager()
-    //    .Run_List_To_Excel();
+    [Test]
+    public Task List_To_Excel() => CreateTypedExcelManager()
+        .Run_List_To_Excel();
     [Test]
     public Task Compare_DictionaryCollection_Input_With_Output() => CreateExcelManager()
         .Run_Compare_DictionaryCollection_Input_With_Output();
@@ -29,9 +30,9 @@ public class EPPlustTests
     public Task Export_Countries_As_Dictionary() => CreateExcelManager()
         .Run_Export_Countries_As_Dictionary();
 
-    //[Test]
-    //public Task Export_Countries() => CreateTypedExcelManager()
-    //    .Run_Export_Countries();
+    [Test]
+    public Task Export_Countries() => CreateTypedExcelManager()
+        .Run_Export_Countries();
 
     [Test]
     public Task Export_Countries_As_Sheet() => CreateExcelManager()

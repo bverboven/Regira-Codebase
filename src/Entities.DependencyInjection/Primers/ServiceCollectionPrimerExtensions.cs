@@ -46,6 +46,16 @@ public static class ServiceCollectionPrimerExtensions
 
 
     // EntityServiceCollectionOptions
+    /// <summary> 
+    /// Add default Primers
+    /// <list type="bullet">
+    ///     <item><see cref="HasCreatedDbPrimer"/></item>
+    ///     <item><see cref="HasLastModifiedDbPrimer"/></item>
+    ///     <item><see cref="ArchivablePrimer"/></item>
+    /// </list>
+    /// </summary>
+    /// <param name="options"></param>
+    /// <returns></returns>
     public static EntityServiceCollectionOptions AddDefaultPrimers(this EntityServiceCollectionOptions options)
     {
         // add ArchivablePrimer first since it modifies the entry state

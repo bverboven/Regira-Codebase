@@ -10,7 +10,7 @@ using System.Drawing;
 
 namespace Regira.Drawing.GDI.Helpers;
 
-internal class DrawHelper : IImageHelper
+public class DrawHelper : IImageHelper
 {
     public Image Draw(IEnumerable<ImageToAdd> imagesToAdd, Image? target = null, int dpi = ImageConstants.DEFAULT_DPI)
     {
@@ -83,7 +83,7 @@ internal class DrawHelper : IImageHelper
             height = (int)(targetSize.Height * 0.95);
         }
 
-        using var resizedImage = rotatedImage.Width != width || rotatedImage.Height != height ? GdiUtility.Resize(rotatedImage, new Size(width, height)) : new Bitmap(rotatedImage);
+        using var resizedImage = (width != 0 && rotatedImage.Width != width) || (height != 0 && rotatedImage.Height != height) ? GdiUtility.Resize(rotatedImage, new Size(width, height)) : new Bitmap(rotatedImage);
         //Position
         double left = 0;
         if (img.Position.HasFlag(ImagePosition.HCenter))

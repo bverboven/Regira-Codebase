@@ -3,7 +3,7 @@ using Regira.Media.Drawing.Core;
 
 namespace Regira.Drawing.GDI.Abstractions;
 
-internal interface IImageHelper
+public interface IImageHelper
 {
     Image Draw(IEnumerable<ImageToAdd> images, Image? target = null, int dpi = ImageConstants.DEFAULT_DPI);
 }

@@ -40,8 +40,33 @@ public static class ServiceCollectionNormalizerExtensions
 
 
     // EntityServiceCollectionOptions
+
+    /// <summary> 
+    /// Adds default normalizing services
+    /// <list type="bullet">
+    ///     <item><see cref="DefaultNormalizer"/></item>
+    ///     <item><see cref="QKeywordHelper"/></item>
+    ///     <item><see cref="ObjectNormalizer"/></item>
+    ///     <item><see cref="DefaultEntityNormalizer"/></item>
+    /// </list>
+    /// </summary>
+    /// <param name="options"></param>
+    /// <param name="configure"></param>
+    /// <returns></returns>
     public static EntityServiceCollectionOptions AddDefaultEntityNormalizer(this EntityServiceCollectionOptions options, Action<NormalizeOptions> configure)
         => options.AddDefaultEntityNormalizer((_, o) => configure.Invoke(o));
+    /// <summary> 
+    /// Adds default normalizing services
+    /// <list type="bullet">
+    ///     <item><see cref="DefaultNormalizer"/></item>
+    ///     <item><see cref="QKeywordHelper"/></item>
+    ///     <item><see cref="ObjectNormalizer"/></item>
+    ///     <item><see cref="DefaultEntityNormalizer"/></item>
+    /// </list>
+    /// </summary>
+    /// <param name="options"></param>
+    /// <param name="configure"></param>
+    /// <returns></returns>
     public static EntityServiceCollectionOptions AddDefaultEntityNormalizer(this EntityServiceCollectionOptions options, Action<IServiceProvider, NormalizeOptions>? configure = null)
     {
         if (configure == null)
@@ -71,6 +96,7 @@ public static class ServiceCollectionNormalizerExtensions
 
         return options;
     }
+
     public static EntityServiceCollectionOptions AddNormalizer<TNormalizer>(this EntityServiceCollectionOptions options)
         where TNormalizer : class, IEntityNormalizer
     {

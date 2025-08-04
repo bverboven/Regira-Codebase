@@ -126,7 +126,7 @@ public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
 }
 
 public class ExcelManager<T> : IExcelManager<T>
-    where T : class
+    where T : class, new()
 {
     public IEnumerable<ExcelSheet<T>> Read(IBinaryFile input, string[]? headers = null)
     {
@@ -145,13 +145,15 @@ public class ExcelManager<T> : IExcelManager<T>
     }
     public IMemoryFile Create(IEnumerable<ExcelSheet<T>> sheets)
     {
+        var ms = new MemoryStream();
         var mapper = new Mapper();
+        var sheetIndex = 0;
         foreach (var sheet in sheets)
         {
-            mapper.Put(sheet.Data, sheet.Name, true);
+            var sheetName = sheet.Name ?? $"Sheet-{++sheetIndex}";
+            mapper.Put(sheet.Data, sheetName);
         }
-        var ms = new MemoryStream();
-#if NET8_0_OR_GREATER
+#if NET6_0_OR_GREATER
         mapper.Save(ms, true);
 #else
         mapper.Save(ms);
