@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ProjectsCleanerConsole": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Projects\\Qframe\\BD\\BDFWM\\src"
+    }
+  }
+}

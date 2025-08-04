@@ -151,7 +151,11 @@ public class ExcelManager<T> : IExcelManager<T>
             mapper.Put(sheet.Data, sheet.Name, true);
         }
         var ms = new MemoryStream();
+#if NET8_0_OR_GREATER
+        mapper.Save(ms, true);
+#else
         mapper.Save(ms);
+#endif
         return ms.ToMemoryFile(ContentTypes.XLSX);
     }
 }

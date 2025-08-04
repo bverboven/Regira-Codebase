@@ -1,6 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-var srcDir = Directory.GetCurrentDirectory();
+var srcDir = !string.IsNullOrWhiteSpace(args[0]) ? args[0] : Directory.GetCurrentDirectory();
 string? slnFile;
 do
 {
