@@ -34,7 +34,7 @@ public class SelectPdfTests
     }
 
     [Test]
-    public void CreatePdf()
+    public async Task CreatePdf()
     {
         var html = _htmlParser.Parse(_tableContent, (object?)null).Result;
 
@@ -46,7 +46,7 @@ public class SelectPdfTests
             HtmlContent = html,
             Margins = marginPoints
         };
-        using var pdf = pdfPrinter.Create(template);
+        using var pdf = await pdfPrinter.Create(template);
         using var stream = pdf.GetStream()!;
         ClassicAssert.IsNotNull(stream);
         Assert.That(stream.Length > 0, Is.True);
@@ -54,7 +54,7 @@ public class SelectPdfTests
         File.WriteAllBytes(outputPath, FileUtility.GetBytes(stream)!);
     }
     [Test]
-    public void FillParameters()
+    public async Task FillParameters()
     {
         var date = DateTime.Now;
         var logoBytes = File.ReadAllBytes(_regiraLogoPath);
@@ -75,7 +75,7 @@ public class SelectPdfTests
         };
 
         var pdfPrinter = new PdfManager();
-        using var pdf = pdfPrinter.Create(template);
+        using var pdf = await pdfPrinter.Create(template);
         using var stream = pdf.GetStream()!;
         ClassicAssert.IsNotNull(stream);
         Assert.That(stream.Length > 0, Is.True);
@@ -83,7 +83,7 @@ public class SelectPdfTests
         File.WriteAllBytes(outputPath, FileUtility.GetBytes(stream)!);
     }
     [Test]
-    public void With_Header()
+    public async Task With_Header()
     {
         var date = DateTime.Now;
         var logoBytes = File.ReadAllBytes(_regiraLogoPath);
@@ -107,7 +107,7 @@ public class SelectPdfTests
         };
 
         var pdfPrinter = new PdfManager();
-        using var pdf = pdfPrinter.Create(template);
+        using var pdf = await pdfPrinter.Create(template);
         using var stream = pdf.GetStream()!;
         ClassicAssert.IsNotNull(stream);
         Assert.That(stream.Length > 0, Is.True);

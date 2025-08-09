@@ -14,6 +14,7 @@ public class ImageToAdd
     public double Top { get; set; }
     public double Right { get; set; }
     public double Bottom { get; set; }
+    public double Margin { get; set; }
     public LengthUnit DimensionUnit { get; set; } = LengthUnit.Points;
     public ImagePosition Position { get; set; } = ImagePosition.Absolute;
     public double Rotation { get; set; } = 0;

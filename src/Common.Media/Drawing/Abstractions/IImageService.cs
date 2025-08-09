@@ -1,5 +1,6 @@
 ﻿using Regira.Dimensions;
 using Regira.IO.Abstractions;
+using Regira.Media.Drawing.Core;
 using Regira.Media.Drawing.Enums;
 
 namespace Regira.Media.Drawing.Abstractions;
@@ -23,4 +24,7 @@ public interface IImageService
 
     IImageFile MakeTransparent(IImageFile input, int[]? rgb = null);
     IImageFile RemoveAlpha(IImageFile input);
+
+    IImageFile CreateTextImage(string input, TextImageOptions? options = null);
+    IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int dpi = ImageConstants.DEFAULT_DPI);
 }

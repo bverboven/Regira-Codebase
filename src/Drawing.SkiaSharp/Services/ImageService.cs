@@ -165,4 +165,13 @@ public class ImageService : IImageService
 
         return outputBitmap.ToImageFile();
     }
+
+    public IImageFile CreateTextImage(string input, TextImageOptions? options = null)
+    {
+        throw new NotImplementedException();
+    }
+    public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int dpi = ImageConstants.DEFAULT_DPI)
+    {
+        throw new NotImplementedException();
+    }
 }

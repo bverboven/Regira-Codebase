@@ -1,12 +1,12 @@
-﻿using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.Reflection;
-using Regira.Dimensions;
+﻿using Regira.Dimensions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Abstractions;
 using Regira.Media.Drawing.Core;
 using Regira.Media.Drawing.Utilities;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Reflection;
 using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
 namespace Regira.Drawing.GDI.Utilities;
@@ -450,10 +450,7 @@ public static class GdiUtility
     }
     public static Image CreateTextImage(string text, TextImageOptions? options = null)
     {
-        if (options == null)
-        {
-            options = new TextImageOptions();
-        }
+        options ??= new TextImageOptions();
 
         var font = new Font(FontFamily.Families.First(f => f.Name.Equals(options.FontName)), options.FontSize);
         var textColor = ColorTranslator.FromHtml(options.TextColor);

@@ -1,10 +1,12 @@
-﻿using System.Drawing;
-using Regira.Dimensions;
+﻿using Regira.Dimensions;
+using Regira.Drawing.GDI.Helpers;
 using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Abstractions;
+using Regira.Media.Drawing.Core;
 using Regira.Media.Drawing.Enums;
+using System.Drawing;
 
 namespace Regira.Drawing.GDI.Services;
 
@@ -101,5 +103,18 @@ public class ImageService : IImageService
         using var img = input.ToBitmap();
         using var target = GdiUtility.ChangeOpacity(img, 1);
         return target.ToImageFile(img.RawFormat);
+    }
+
+    public IImageFile CreateTextImage(string input, TextImageOptions? options = null)
+    {
+        using var img = GdiUtility.CreateTextImage(input, options);
+        return img.ToImageFile(img.RawFormat);
+    }
+    public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int dpi = 150)
+    {
+        var imagesCollection = imagesToAdd.ToArray();
+        using var targetImage = target?.ToBitmap() ?? DrawHelper.CreateSizedCanvas(imagesCollection);
+        DrawHelper.Draw(imagesCollection, targetImage, dpi);
+        return targetImage.ToImageFile(targetImage.RawFormat);
     }
 }

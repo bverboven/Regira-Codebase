@@ -2,6 +2,7 @@
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Abstractions;
+using Regira.Media.Drawing.Core;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Utilities;
 using SixLabors.ImageSharp;
@@ -135,6 +136,15 @@ namespace Drawing.ImageSharp.Services
             });
 
             return image.ToImageFile();
+        }
+
+        public IImageFile CreateTextImage(string input, TextImageOptions? options = null)
+        {
+            throw new NotImplementedException();
+        }
+        public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int dpi = ImageConstants.DEFAULT_DPI)
+        {
+            throw new NotImplementedException();
         }
     }
 }

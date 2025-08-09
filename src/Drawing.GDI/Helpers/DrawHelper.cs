@@ -1,5 +1,4 @@
 using Regira.Dimensions;
-using Regira.Drawing.GDI.Abstractions;
 using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Core;
@@ -10,9 +9,9 @@ using System.Drawing;
 
 namespace Regira.Drawing.GDI.Helpers;
 
-public class DrawHelper : IImageHelper
+public static class DrawHelper
 {
-    public Image Draw(IEnumerable<ImageToAdd> imagesToAdd, Image? target = null, int dpi = ImageConstants.DEFAULT_DPI)
+    public static Image Draw(IEnumerable<ImageToAdd> imagesToAdd, Image? target = null, int dpi = ImageConstants.DEFAULT_DPI)
     {
         var images = imagesToAdd.AsList();
         target ??= CreateSizedCanvas(images);
@@ -31,7 +30,7 @@ public class DrawHelper : IImageHelper
         return target;
     }
 
-    public Image CreateSizedCanvas(IEnumerable<ImageToAdd> imagesToAdd)
+    public static Image CreateSizedCanvas(IEnumerable<ImageToAdd> imagesToAdd)
     {
         var images = imagesToAdd.AsList();
         var size = new Size(
@@ -40,7 +39,7 @@ public class DrawHelper : IImageHelper
         );
         return new Bitmap(size.Width, size.Height);
     }
-    public void AddImage(ImageToAdd img, Graphics g1, Size2D targetSize, int dpi = ImageConstants.DEFAULT_DPI)
+    public static void AddImage(ImageToAdd img, Graphics g1, Size2D targetSize, int dpi = ImageConstants.DEFAULT_DPI)
     {
         Image source;
         if (img.Image?.HasStream() == true)
@@ -55,6 +54,7 @@ public class DrawHelper : IImageHelper
 
         using var newImg = GdiUtility.ChangeOpacity(source, img.Opacity);
         using var rotatedImage = Math.Abs(img.Rotation) > double.Epsilon ? GdiUtility.Rotate(newImg, img.Rotation) : new Bitmap(newImg);
+
         var imgWidth = SizeUtility.GetPixels(img.Width, img.DimensionUnit, (int)targetSize.Width, dpi);
         var imgHeight = SizeUtility.GetPixels(img.Height, img.DimensionUnit, (int)targetSize.Height, dpi);
         var imgLeft = SizeUtility.GetPixels(img.Left, img.DimensionUnit, (int)targetSize.Width, dpi);
@@ -84,6 +84,8 @@ public class DrawHelper : IImageHelper
         }
 
         using var resizedImage = (width != 0 && rotatedImage.Width != width) || (height != 0 && rotatedImage.Height != height) ? GdiUtility.Resize(rotatedImage, new Size(width, height)) : new Bitmap(rotatedImage);
+
+
         //Position
         double left = 0;
         if (img.Position.HasFlag(ImagePosition.HCenter))
@@ -92,11 +94,15 @@ public class DrawHelper : IImageHelper
         }
         else if (img.Position.HasFlag(ImagePosition.Right))
         {
-            left = targetSize.Width - resizedImage.Width;
+            left = targetSize.Width - resizedImage.Width - img.Margin;
         }
         else if (Math.Abs(left) < double.Epsilon && img.Right > 0)
         {
-            left = targetSize.Width - resizedImage.Width;
+            left = targetSize.Width - resizedImage.Width - img.Margin;
+        }
+        else
+        {
+            left += img.Margin;
         }
 
         double top = 0;
@@ -106,11 +112,15 @@ public class DrawHelper : IImageHelper
         }
         else if (img.Position.HasFlag(ImagePosition.Bottom))
         {
-            top = targetSize.Height - resizedImage.Height;
+            top = targetSize.Height - resizedImage.Height - img.Margin;
         }
         else if (Math.Abs(top) < double.Epsilon && img.Bottom > 0)
         {
-            top = targetSize.Height - resizedImage.Height;
+            top = targetSize.Height - resizedImage.Height - img.Margin;
+        }
+        else
+        {
+            top += img.Margin;
         }
 
         left += imgLeft - imgRight;
