@@ -508,6 +508,3 @@ public class GDIDrawPositionTests
     }
 }
 #pragma warning restore CA1416
-
-
-#pragma warning disable CA1416

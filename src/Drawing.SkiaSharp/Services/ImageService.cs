@@ -173,6 +173,9 @@ public class ImageService : IImageService
     }
     public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int dpi = ImageConstants.DEFAULT_DPI)
     {
-        throw new NotImplementedException();
+        var imagesCollection = imagesToAdd.ToArray();
+        using var targetImage = target?.ToBitmap() ?? DrawHelper.CreateSizedCanvas(imagesCollection);
+        DrawHelper.Draw(imagesCollection, targetImage, dpi);
+        return targetImage.ToImageFile();
     }
 }

@@ -180,6 +180,28 @@ public static class SkiaUtility
     {
         return pixel.Alpha == 0;
     }
+    public static SKBitmap ChangeOpacity(SKBitmap img, double opacity)
+    {
+        if (Math.Abs(opacity - 1) < double.Epsilon)
+        {
+            return img.Copy();
+        }
+
+        var info = new SKImageInfo(img.Width, img.Height);
+        var newImg = new SKBitmap(info);
+
+        using var canvas = new SKCanvas(newImg);
+
+        canvas.DrawBitmap(img, 0, 0);
+
+        using var paint = new SKPaint();
+        paint.Color = new SKColor(255, 255, 255, (byte)(opacity * 255));
+        paint.BlendMode = SKBlendMode.DstIn;
+
+        canvas.DrawRect(SKRect.Create(img.Width, img.Height), paint);
+
+        return newImg;
+    }
 
 
     public static SKBitmap Create(int width, int height, string? backgroundColor = "#FFFFFF", ImageFormat? format = null)
