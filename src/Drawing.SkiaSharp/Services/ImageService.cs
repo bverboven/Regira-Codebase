@@ -168,7 +168,8 @@ public class ImageService : IImageService
 
     public IImageFile CreateTextImage(string input, TextImageOptions? options = null)
     {
-        throw new NotImplementedException();
+        using var img = SkiaUtility.CreateTextImage(input, options);
+        return img.ToImageFile();
     }
     public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int dpi = ImageConstants.DEFAULT_DPI)
     {

@@ -1,24 +1,21 @@
-﻿using Regira.Drawing.GDI.Utilities;
-using Regira.Media.Drawing.Abstractions;
-using Regira.Media.Drawing.Core;
-using Regira.Media.Drawing.Utilities;
-using Regira.Office.OCR.PaddleOCR;
-using Regira.Utilities;
+﻿#pragma warning disable CA1416
 using System.Drawing;
 using System.Drawing.Imaging;
+using Regira.Drawing.GDI.Utilities;
+using Regira.Media.Drawing.Core;
+using Regira.Office.OCR.PaddleOCR;
+using Regira.Utilities;
 
 namespace Drawing.Testing;
 
 [TestFixture]
 public class GDIDrawTextTests
 {
-    private readonly string _inputDir;
     private readonly string _outputDir;
     public GDIDrawTextTests()
     {
         var assemblyDir = AssemblyUtility.GetAssemblyDirectory()!;
         var assetsDir = Path.Combine(assemblyDir, "../../../", "Assets");
-        _inputDir = Path.Combine(assetsDir, "Input");
         _outputDir = Path.Combine(assetsDir, "Output", typeof(GdiUtility).Assembly.GetName().Name!.Split('.').Last());
         Directory.CreateDirectory(_outputDir);
     }
@@ -26,7 +23,6 @@ public class GDIDrawTextTests
     [Test]
     public async Task Add_Text_No_Params()
     {
-        using var target = CreateCanvas();
         var input = "Hello World!";
         using var testImage = GdiUtility.CreateTextImage(input);
 
@@ -43,7 +39,6 @@ public class GDIDrawTextTests
     [Test]
     public async Task Add_Text_With_Options()
     {
-        using var target = CreateCanvas();
         var input = "Hello World!";
         using var testImage = GdiUtility.CreateTextImage(input, new TextImageOptions
         {
@@ -62,11 +57,6 @@ public class GDIDrawTextTests
         AssertColor(Color.FromArgb(255, 0, 0, 255), ((Bitmap)testImage).GetPixel(5, 4));
     }
 
-    protected IImageFile CreateCanvas()
-    {
-        using var img = GdiUtility.Create(400, 300, null, ImageFormat.Png);
-        return img.ToImageFile(ImageFormat.Png);
-    }
     protected Task<string?> ReadImageText(Image img)
     {
         using var imageFile = img.ToImageFile(ImageFormat.Png);
@@ -80,3 +70,4 @@ public class GDIDrawTextTests
         Assert.That(Math.Abs(actual.B - expected.B), Is.LessThan(10));
     }
 }
+#pragma warning restore CA1416

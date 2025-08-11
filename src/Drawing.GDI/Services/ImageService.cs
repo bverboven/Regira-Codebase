@@ -91,7 +91,6 @@ public class ImageService : IImageService
         using var target = GdiUtility.MakeTransparent(img, rgb);
         return target.ToImageFile(System.Drawing.Imaging.ImageFormat.Png);
     }
-
     /// <summary>
     /// Removes alpha value from pixels
     /// </summary>

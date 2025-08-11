@@ -180,4 +180,53 @@ public static class SkiaUtility
     {
         return pixel.Alpha == 0;
     }
+
+
+    public static SKBitmap Create(int width, int height, string? backgroundColor = "#FFFFFF", ImageFormat? format = null)
+    {
+        var bitmap = new SKBitmap(width, height);
+        using var canvas = new SKCanvas(bitmap);
+        canvas.Clear(SKColor.Parse(backgroundColor));
+        return bitmap;
+    }
+    public static SKBitmap CreateTextImage(string input, TextImageOptions? options = null)
+    {
+        options ??= new TextImageOptions();
+
+        var textColor = SKColor.Parse(options.TextColor);
+        var backgroundColor = SKColor.Parse(options.BackgroundColor);
+
+        // Create SKFont for measuring
+        using var typeface = SKTypeface.FromFamilyName(options.FontName, SKFontStyle.Normal);
+        using var font = new SKFont(typeface, options.FontSize);
+
+        // Measure text width using SKFont
+        float textWidth = font.MeasureText(input);
+        float textHeight = font.Metrics.Descent - font.Metrics.Ascent;
+
+        // Add padding
+        int width = (int)Math.Ceiling(textWidth);
+        int height = (int)Math.Ceiling(textHeight);
+
+        var info = new SKImageInfo(width, height);
+        using var surface = SKSurface.Create(info);
+        var canvas = surface.Canvas;
+        canvas.Clear(backgroundColor);
+
+        // Use SKPaint for styling draw
+        using var paint = new SKPaint();
+        paint.IsAntialias = true;
+        paint.Color = textColor;
+
+        // Baseline-adjusted position
+        float x = 0;
+        float y = - font.Metrics.Ascent;
+
+        canvas.DrawText(input, x, y, font, paint);
+
+        // Step 5: Save to file
+        using var image = surface.Snapshot();
+        using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+        return SKBitmap.Decode(data);
+    }
 }
