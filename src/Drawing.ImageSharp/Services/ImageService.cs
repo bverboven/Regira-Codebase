@@ -1,22 +1,16 @@
 ﻿using Regira.Dimensions;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
-using Regira.Media.Drawing.Abstractions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
+using Regira.Media.Drawing.Models.Abstractions;
+using Regira.Media.Drawing.Services.Abstractions;
 using Regira.Media.Drawing.Utilities;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp.Formats.Bmp;
-using SixLabors.ImageSharp.Formats.Gif;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Formats.Tiff;
-using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Color = Regira.Media.Drawing.Models.Color;
-using ImageFile = Regira.Media.Drawing.Models.ImageFile;
 using SharpImage = SixLabors.ImageSharp.Image;
 
 namespace Drawing.ImageSharp.Services
@@ -68,6 +62,11 @@ namespace Drawing.ImageSharp.Services
             using var image = input.ToSharpImage();
             image.Mutate(x => x.Crop(new Rectangle(rect[0], rect[1], rect[2], rect[3])));
             return image.ToImageFile();
+        }
+
+        public Size2D GetDimensions(IImageFile input)
+        {
+            throw new NotImplementedException();
         }
 
         public IImageFile Resize(IImageFile input, Size2D wantedSize, int quality = 100)
@@ -142,6 +141,11 @@ namespace Drawing.ImageSharp.Services
             return image.ToImageFile();
         }
 
+        public IImageFile Create(int width, int height, Color? backgroundColor = null, ImageFormat? format = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public IImageFile CreateTextImage(string input, TextImageOptions? options = null)
         {
             throw new NotImplementedException();
@@ -150,75 +154,5 @@ namespace Drawing.ImageSharp.Services
         {
             throw new NotImplementedException();
         }
-    }
-}
-
-public static class ImageSharpUtility
-{
-    public static IImageFormat GetFormat(Stream stream)
-    {
-        return SharpImage.DetectFormat(stream);
-    }
-    public static IImageFormat ToImageSharpFormat(this ImageFormat format)
-    {
-        var mgr = new ImageFormatManager();
-        if (mgr.TryFindFormatByFileExtension($".{format}", out var imageSharpFormat))
-        {
-            return imageSharpFormat;
-        }
-
-        return PngFormat.Instance;
-    }
-    public static ImageFormat ToImageFormat(this IImageFormat format)
-    {
-        return Enum.Parse<ImageFormat>(format.Name, true);
-    }
-
-    public static ImageFile ToImageFile(this SharpImage image, Stream? stream = null)
-    {
-        var format = image.Metadata.DecodedImageFormat?.ToImageFormat();
-
-        if (stream == null)
-        {
-            stream = new MemoryStream();
-            image.Save(stream, image.Metadata.DecodedImageFormat!);
-        }
-
-        return new ImageFile
-        {
-            Stream = stream,
-            Size = new[] { image.Width, image.Height },
-            Format = format
-        };
-    }
-    public static ImageFile ToImageFile(this SharpImage image, byte[] bytes)
-    {
-        var format = image.Metadata.DecodedImageFormat?.ToImageFormat();
-
-        return new ImageFile
-        {
-            Bytes = bytes,
-            Size = new[] { image.Width, image.Height },
-            Format = format
-        };
-    }
-    public static SharpImage ToSharpImage(this IImageFile file)
-    {
-        return file.HasStream()
-            ? SharpImage.Load(file.Stream!)
-            : SharpImage.Load(file.GetBytes());
-    }
-
-    public static IImageEncoder GetEncoder(this IImageFormat format)
-    {
-        return format switch
-        {
-            JpegFormat => new JpegEncoder(),
-            BmpFormat => new BmpEncoder(),
-            GifFormat => new GifEncoder(),
-            TiffFormat => new TiffEncoder(),
-            WebpFormat => new WebpEncoder(),
-            _ => new PngEncoder()
-        };
     }
 }

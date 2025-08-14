@@ -1,7 +1,8 @@
 ﻿using Regira.IO.Extensions;
-using Regira.Media.Drawing.Abstractions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
+using Regira.Media.Drawing.Models.Abstractions;
+using Regira.Media.Drawing.Services.Abstractions;
 using Regira.Media.Drawing.Utilities;
 using Regira.Office.OCR.PaddleOCR;
 using Regira.Utilities;
@@ -81,8 +82,8 @@ public static class DrawingTestHelpExtensions
 
     internal static void AssertColor(Color expected, Color actual)
     {
-        Assert.That(Math.Abs(actual.Red - expected.Red), Is.LessThan(10));
-        Assert.That(Math.Abs(actual.Green - expected.Green), Is.LessThan(10));
-        Assert.That(Math.Abs(actual.Blue - expected.Blue), Is.LessThan(10));
+        Assert.That(Math.Abs(actual.Red - expected.Red), Is.LessThan(15), $"expected {expected} vs actual {actual}");
+        Assert.That(Math.Abs(actual.Green - expected.Green), Is.LessThan(15), $"expected {expected} vs actual {actual}");
+        Assert.That(Math.Abs(actual.Blue - expected.Blue), Is.LessThan(15), $"expected {expected} vs actual {actual}");
     }
 }

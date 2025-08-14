@@ -2,8 +2,9 @@
 using Regira.IO.Abstractions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
+using Regira.Media.Drawing.Models.Abstractions;
 
-namespace Regira.Media.Drawing.Abstractions;
+namespace Regira.Media.Drawing.Services.Abstractions;
 
 public interface IImageService
 {

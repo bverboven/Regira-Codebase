@@ -34,8 +34,8 @@ public static class DrawUtility
     {
         var images = imagesToAdd.ToList();
         var size = new System.Drawing.Size(
-            (int)images.Max(x => x.Width > 0 ? x.Width : x.Image?.Size?.Width ?? LoadImage(x.Path!).Width),
-            (int)images.Max(x => x.Height > 0 ? x.Height : x.Image?.Size?.Height ?? LoadImage(x.Path!).Height)
+            (int)images.Max(x => x.Width > 0 ? x.Width : x.Image.Size?.Width ?? 0),
+            (int)images.Max(x => x.Height > 0 ? x.Height : x.Image.Size?.Height ?? 0)
         );
         return new SKBitmap(size.Width, size.Height);
     }
@@ -44,13 +44,13 @@ public static class DrawUtility
     {
         SKBitmap source;
 
-        if (img.Image?.HasStream() == true)
+        if (img.Image.HasStream())
         {
             source = SKBitmap.Decode(img.Image.Stream!);
         }
         else
         {
-            using var ms = new MemoryStream(img.Image?.GetBytes()!);
+            using var ms = new MemoryStream(img.Image.GetBytes()!);
             source = SKBitmap.Decode(ms);
         }
 
@@ -127,11 +127,5 @@ public static class DrawUtility
         top += imgTop - imgBottom;
 
         canvas.DrawBitmap(resizedImage, (float)left, (float)top);
-    }
-
-    private static SKBitmap LoadImage(string path)
-    {
-        using var fs = File.OpenRead(path);
-        return SKBitmap.Decode(fs);
     }
 }

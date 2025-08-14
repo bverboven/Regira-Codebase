@@ -2,7 +2,6 @@
 using System.Text.RegularExpressions;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
-using Regira.Media.Drawing.Abstractions;
 using Regira.Office.MimeTypes;
 using Regira.Office.Word.Abstractions;
 using Regira.Office.Word.Models;
@@ -24,6 +23,8 @@ using SpireHorizontalAlignment = Spire.Doc.Documents.HorizontalAlignment;
 using SpirePageOrientation = Spire.Doc.Documents.PageOrientation;
 using SpirePageSize = Spire.Doc.Documents.PageSize;
 using SpireParagraph = Spire.Doc.Documents.Paragraph;
+using Regira.Media.Drawing.Models.Abstractions;
+
 
 
 #if NETSTANDARD2_0

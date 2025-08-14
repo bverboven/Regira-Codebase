@@ -1,5 +1,5 @@
 ﻿using Regira.IO.Abstractions;
-using Regira.Media.Drawing.Abstractions;
+using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Office.PDF.Models;
 
 namespace Regira.Office.PDF.Abstractions;

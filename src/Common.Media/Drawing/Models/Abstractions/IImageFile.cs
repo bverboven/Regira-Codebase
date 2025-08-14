@@ -2,7 +2,7 @@
 using Regira.IO.Abstractions;
 using Regira.Media.Drawing.Enums;
 
-namespace Regira.Media.Drawing.Abstractions;
+namespace Regira.Media.Drawing.Models.Abstractions;
 
 public interface IImageFile : IMemoryFile
 {

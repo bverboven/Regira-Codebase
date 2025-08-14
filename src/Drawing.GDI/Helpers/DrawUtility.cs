@@ -34,8 +34,8 @@ public static class DrawUtility
     {
         var images = imagesToAdd.AsList();
         var size = new Size(
-            (int)images.Max(x => x.Width > 0 ? x.Width : x.Image?.Size?.Width ?? Image.FromFile(x.Path!).Width),
-            (int)images.Max(x => x.Height > 0 ? x.Height : x.Image?.Size?.Height ?? Image.FromFile(x.Path!).Height)
+            (int)images.Max(x => x.Width > 0 ? x.Width : x.Image.Size?.Width ?? 0),
+            (int)images.Max(x => x.Height > 0 ? x.Height : x.Image.Size?.Height ?? 0)
         );
         return new Bitmap(size.Width, size.Height);
     }

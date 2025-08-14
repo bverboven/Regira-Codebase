@@ -1,5 +1,5 @@
 ﻿using Regira.Drawing.GDI.Services;
-using Regira.Media.Drawing.Abstractions;
+using Regira.Media.Drawing.Services.Abstractions;
 
 namespace Drawing.Testing;
 
@@ -58,5 +58,9 @@ public class GDIDrawPositionTests
     public Task AddImage_Top_Right_Margin10() => _imgService.AddImage_Top_Right_Margin10();
     [Test]
     public Task AddImage_Bottom_Right_Margin10() => _imgService.AddImage_Bottom_Right_Margin10();
+
+    // Builder
+    [Test]
+    public Task Build_Images() => _imgService.Build_Images();
 }
 #pragma warning restore CA1416

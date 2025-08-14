@@ -4,7 +4,7 @@ using System.Text;
 using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
-using Regira.Media.Drawing.Abstractions;
+using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Office.MimeTypes;
 using Regira.Office.PDF.Abstractions;
 using Regira.Office.PDF.Models;

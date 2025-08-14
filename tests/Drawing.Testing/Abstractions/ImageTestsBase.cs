@@ -1,4 +1,4 @@
-﻿using Regira.Media.Drawing.Abstractions;
+﻿using Regira.Media.Drawing.Services.Abstractions;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 

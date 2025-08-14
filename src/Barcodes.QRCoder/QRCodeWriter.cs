@@ -4,7 +4,7 @@ using QRCoder;
 using QRCoder.Exceptions;
 using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Extensions;
-using Regira.Media.Drawing.Abstractions;
+using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Media.Drawing.Utilities;
 using Regira.Office.Barcodes.Abstractions;
 using Regira.Office.Barcodes.Exceptions;

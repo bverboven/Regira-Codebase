@@ -1,6 +1,9 @@
-﻿using Regira.Media.Drawing.Abstractions;
+﻿using Regira.Dimensions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
+using Regira.Media.Drawing.Models.Abstractions;
+using Regira.Media.Drawing.Services;
+using Regira.Media.Drawing.Services.Abstractions;
 using static Drawing.Testing.DrawingTestHelpExtensions;
 
 namespace Drawing.Testing;
@@ -373,6 +376,71 @@ public static class DrawingPositionExtensions
         AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 10, 280));
         AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 330, 10));
         AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 380, 180));
+        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 399, 299));
+    }
+
+    // Builder
+    public static async Task Build_Images(this IImageService service)
+    {
+        using var target = await service.ReadImage("white-400x300.jpg");
+        var imagesToAdd = new IImageToAddOptions[]
+        {
+            new ImageToAdd
+            {
+                Image = await service.ReadImage("yellow-200x150.jpg"),
+                Position = ImagePosition.HCenter | ImagePosition.VCenter,
+                Width = 350,
+                Height = 250,
+                DimensionUnit = LengthUnit.Points
+            },
+            new ImageToAdd
+            {
+                Image = await service.ReadImage("green-50x100.jpg"),
+                Position = ImagePosition.Top | ImagePosition.Right,
+            },
+            new ImageToAdd
+            {
+                Image = await service.ReadImage("blue-50x50.jpg"),
+                Position = ImagePosition.Absolute,
+                Top = 20,
+                Right = 10
+            },
+            new ImageToAdd
+            {
+                Image = await service.ReadImage("red-150x100.jpg"),
+                Position = ImagePosition.Absolute,
+                Bottom = 10,
+                Left = 10
+            },
+            new TextImageToAdd
+            {
+                Text = "Hello World",
+                TextOptions = new TextImageOptions
+                {
+                    FontName = "Arial",
+                    FontSize = 25,
+                    TextColor = "#000000",
+                    BackgroundColor = "#FFFFFF50",
+                    Margin = 5
+                },
+                Position = ImagePosition.HCenter | ImagePosition.VCenter,
+            }
+        };
+
+        var drawBuilder = new ImageBuilder(service);
+        using var resultImg = drawBuilder.Add(imagesToAdd).SetTarget(target).Build();
+        await service.SaveImage(resultImg, "build-images.jpg");
+
+        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 10, 10));
+        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 150, 299));
+        AssertColor("#00FF00", service.GetPixelColor(resultImg, 390, 10));
+        AssertColor("#00FF00", service.GetPixelColor(resultImg, 380, 90));
+        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 45, 35));
+        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 330, 35));
+        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 45, 180));
+        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 350, 260));
+        //AssertColor("#FFFF00", service.GetPixelColor(resultImg, 200, 150));
+        AssertColor("#FF0000", service.GetPixelColor(resultImg, 20, 280));
         AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 399, 299));
     }
 }

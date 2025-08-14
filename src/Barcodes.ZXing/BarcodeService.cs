@@ -1,6 +1,6 @@
 ﻿using Regira.Drawing.SkiaSharp.Utilities;
 using Regira.IO.Extensions;
-using Regira.Media.Drawing.Abstractions;
+using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Office.Barcodes.Abstractions;
 using Regira.Office.Barcodes.Exceptions;
 using Regira.Office.Barcodes.Models;

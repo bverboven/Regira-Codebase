@@ -1,4 +1,5 @@
 ﻿using Regira.Dimensions;
+using Regira.Media.Drawing.Models;
 using Regira.Utilities;
 
 namespace Regira.Media.Drawing.Utilities;
@@ -11,7 +12,7 @@ public static class SizeUtility
     /// <returns></returns>
     public static Size2D CalculateSize(Size2D source, Size2D target)
     {
-        if (target.Width == 0 && target.Height == 0 || source.Equals(target))
+        if (target is { Width: 0, Height: 0 } || source.Equals(target))
         {
             return new Size2D(target.Width, target.Height);
         }
@@ -47,7 +48,15 @@ public static class SizeUtility
         return CalculateSize(new[] { sourceWidth, sourceHeight }, new[] { targetWidth, targetHeight });
     }
 
-    public static int GetPixels(double dimension, LengthUnit unit, int targetDimension, int targetDpi)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="dimension"></param>
+    /// <param name="unit"></param>
+    /// <param name="targetDimension">Only used for relative dimensions (such as percentage)</param>
+    /// <param name="targetDpi"></param>
+    /// <returns></returns>
+    public static int GetPixels(double dimension, LengthUnit unit, int targetDimension = 0, int targetDpi = ImageConstants.DEFAULT_DPI)
     {
         switch (unit)
         {
@@ -55,7 +64,9 @@ public static class SizeUtility
                 return (int)(targetDimension * (dimension / 100));
             case LengthUnit.Millimeters:
                 return (int)DimensionsUtility.MmToPt((float)dimension, targetDpi);
-            default: //case ImageDimensionUnit.Pixel
+            case LengthUnit.Inches:
+                return (int)DimensionsUtility.InToPt((float)dimension, targetDpi);
+            default: //case LengthUnit.Point:
                 return (int)dimension;
         }
     }

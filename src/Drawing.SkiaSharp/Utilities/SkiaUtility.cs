@@ -160,8 +160,8 @@ public static class SkiaUtility
         float textHeight = font.Metrics.Descent - font.Metrics.Ascent;
 
         // Add padding
-        int width = (int)Math.Ceiling(textWidth);
-        int height = (int)Math.Ceiling(textHeight);
+        int width = (int)Math.Ceiling(textWidth + options.Margin * 2);
+        int height = (int)Math.Ceiling(textHeight + options.Margin * 2);
 
         var info = new SKImageInfo(width, height);
         using var surface = SKSurface.Create(info);
@@ -174,8 +174,8 @@ public static class SkiaUtility
         paint.Color = textColor;
 
         // Baseline-adjusted position
-        float x = 0;
-        float y = -font.Metrics.Ascent;
+        float x = options.Margin;
+        float y = options.Margin - font.Metrics.Ascent;
 
         canvas.DrawText(input, x, y, font, paint);
 

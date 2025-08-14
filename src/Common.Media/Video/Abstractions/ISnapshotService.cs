@@ -1,6 +1,6 @@
 ﻿using Regira.Dimensions;
 using Regira.IO.Abstractions;
-using Regira.Media.Drawing.Abstractions;
+using Regira.Media.Drawing.Models.Abstractions;
 
 namespace Regira.Media.Video.Abstractions;
 

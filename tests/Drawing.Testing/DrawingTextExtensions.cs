@@ -1,6 +1,6 @@
-﻿using Regira.Media.Drawing.Abstractions;
-using Regira.Media.Drawing.Enums;
+﻿using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
+using Regira.Media.Drawing.Services.Abstractions;
 
 namespace Drawing.Testing;
 
@@ -36,6 +36,24 @@ public static class DrawingTextExtensions
 
         var content = await testImage.ReadImageText();
 
+        Assert.That(content, Is.EqualTo(input));
+        DrawingTestHelpExtensions.AssertColor("#FFFF00", service.GetPixelColor(testImage, 1, 1));
+    }
+
+    public static async Task Add_Text_With_Margin(this IImageService service)
+    {
+        var input = "Hello World!";
+        using var testImage = service.CreateTextImage(input, new TextImageOptions
+        {
+            FontSize = 25,
+            FontName = "Arial",
+            TextColor = "#00F",
+            BackgroundColor = "#FFFF0099",
+            Margin = 5,
+        });
+        await service.SaveImage(testImage, "hello-world_margin.png");
+        Assert.That(testImage.Format, Is.EqualTo(ImageFormat.Png));
+        var content = await testImage.ReadImageText();
         Assert.That(content, Is.EqualTo(input));
         DrawingTestHelpExtensions.AssertColor("#FFFF00", service.GetPixelColor(testImage, 1, 1));
     }

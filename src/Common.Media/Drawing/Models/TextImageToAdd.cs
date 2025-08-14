@@ -4,9 +4,11 @@ using Regira.Media.Drawing.Models.Abstractions;
 
 namespace Regira.Media.Drawing.Models;
 
-public record ImageToAdd : IImageToAddOptions
+public record TextImageToAdd : IImageToAddOptions
 {
-    public IImageFile Image { get; set; } = null!;
+    public string Text { get; set; } = null!;
+    public TextImageOptions TextOptions { get; set; } = null!;
+
     public double Width { get; set; }
     public double Height { get; set; }
     public double Left { get; set; }

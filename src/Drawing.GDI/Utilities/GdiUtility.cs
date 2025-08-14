@@ -408,12 +408,12 @@ public static class GdiUtility
             textSize = drawing.MeasureString(text, font);
         }
 
-        var img = Create((int)textSize.Width, (int)textSize.Height, options.BackgroundColor.ToGdiColor());
+        var img = Create((int)textSize.Width + options.Margin * 2, (int)textSize.Height + options.Margin * 2, options.BackgroundColor.ToGdiColor());
         using (var drawing = GetGraphics(img))
         {
             drawing.Clear(backgroundColor);
             var brush = new SolidBrush(textColor);
-            drawing.DrawString(text, font, brush, 0, 0);
+            drawing.DrawString(text, font, brush, options.Margin, options.Margin);
             drawing.Save();
             brush.Dispose();
         }

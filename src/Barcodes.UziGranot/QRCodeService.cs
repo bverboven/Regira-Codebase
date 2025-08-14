@@ -1,7 +1,7 @@
 ﻿using QRCodeDecoderLibrary;
 using QRCodeEncoderLibrary;
 using Regira.Drawing.GDI.Utilities;
-using Regira.Media.Drawing.Abstractions;
+using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Office.Barcodes.Abstractions;
 using Regira.Office.Barcodes.Exceptions;
 using Regira.Office.Barcodes.Models;

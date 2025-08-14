@@ -1,4 +1,4 @@
-﻿using Regira.Media.Drawing.Abstractions;
+﻿using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Office.Word.Models;
 
 namespace Regira.Office.Word.Abstractions;

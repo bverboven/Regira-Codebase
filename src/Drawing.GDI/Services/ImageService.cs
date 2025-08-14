@@ -3,9 +3,10 @@ using Regira.Drawing.GDI.Helpers;
 using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
-using Regira.Media.Drawing.Abstractions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
+using Regira.Media.Drawing.Models.Abstractions;
+using Regira.Media.Drawing.Services.Abstractions;
 using System.Drawing;
 using Color = Regira.Media.Drawing.Models.Color;
 
@@ -102,11 +103,11 @@ public class ImageService : IImageService
         using var target = GdiUtility.MakeTransparent(img, rgb);
         return target.ToImageFile(System.Drawing.Imaging.ImageFormat.Png);
     }
+
     /// <summary>
     /// Removes alpha value from pixels
     /// </summary>
     /// <param name="input"></param>
-    /// <param name="color"></param>
     /// <returns></returns>
     public IImageFile RemoveAlpha(IImageFile input)
     {

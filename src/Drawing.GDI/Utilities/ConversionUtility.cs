@@ -1,7 +1,7 @@
 ﻿using Regira.Dimensions;
 using Regira.IO.Extensions;
-using Regira.Media.Drawing.Abstractions;
 using Regira.Media.Drawing.Models;
+using Regira.Media.Drawing.Models.Abstractions;
 using System.Drawing;
 using System.Reflection;
 using GdiColor = System.Drawing.Color;

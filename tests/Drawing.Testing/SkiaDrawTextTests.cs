@@ -1,5 +1,5 @@
 ﻿using Regira.Drawing.SkiaSharp.Services;
-using Regira.Media.Drawing.Abstractions;
+using Regira.Media.Drawing.Services.Abstractions;
 
 namespace Drawing.Testing;
 
@@ -13,4 +13,7 @@ public class SkiaDrawTextTests
 
     [Test]
     public Task Add_Text_With_Options() => _imageService.Add_Text_With_Options();
+
+    [Test]
+    public Task Add_Text_With_Margin() => _imageService.Add_Text_With_Margin();
 }
