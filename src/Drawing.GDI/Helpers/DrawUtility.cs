@@ -1,17 +1,19 @@
-﻿using Regira.Dimensions;
+using Regira.Dimensions;
+using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Extensions;
-using Regira.Media.Drawing.Core;
 using Regira.Media.Drawing.Enums;
+using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
-using SkiaSharp;
+using Regira.Utilities;
+using System.Drawing;
 
-namespace Regira.Drawing.SkiaSharp.Utilities;
+namespace Regira.Drawing.GDI.Helpers;
 
-public static class DrawHelper
+public static class DrawUtility
 {
-    public static SKBitmap Draw(IEnumerable<ImageToAdd> imagesToAdd, SKBitmap? target = null, int dpi = ImageConstants.DEFAULT_DPI)
+    public static Image Draw(IEnumerable<ImageToAdd> imagesToAdd, Image? target = null, int dpi = ImageConstants.DEFAULT_DPI)
     {
-        var images = imagesToAdd.ToList();
+        var images = imagesToAdd.AsList();
         target ??= CreateSizedCanvas(images);
 
         if (!images.Any())
@@ -19,50 +21,40 @@ public static class DrawHelper
             return target;
         }
 
-        var canvas = new SKCanvas(target);
-
+        using var g = GdiUtility.GetGraphics(target);
         foreach (var img in images)
         {
-            AddImage(img, canvas, new Size2D(target.Width, target.Height), dpi);
+            AddImage(img, g, new Size2D(target.Width, target.Height), dpi);
         }
 
-        canvas.Flush();
         return target;
     }
 
-    public static SKBitmap CreateSizedCanvas(IEnumerable<ImageToAdd> imagesToAdd)
+    public static Image CreateSizedCanvas(IEnumerable<ImageToAdd> imagesToAdd)
     {
-        var images = imagesToAdd.ToList();
-        var size = new System.Drawing.Size(
-            (int)images.Max(x => x.Width > 0 ? x.Width : x.Image?.Size?.Width ?? LoadImage(x.Path!).Width),
-            (int)images.Max(x => x.Height > 0 ? x.Height : x.Image?.Size?.Height ?? LoadImage(x.Path!).Height)
+        var images = imagesToAdd.AsList();
+        var size = new Size(
+            (int)images.Max(x => x.Width > 0 ? x.Width : x.Image?.Size?.Width ?? Image.FromFile(x.Path!).Width),
+            (int)images.Max(x => x.Height > 0 ? x.Height : x.Image?.Size?.Height ?? Image.FromFile(x.Path!).Height)
         );
-        return new SKBitmap(size.Width, size.Height);
+        return new Bitmap(size.Width, size.Height);
     }
-
-    public static void AddImage(ImageToAdd img, SKCanvas canvas, Size2D targetSize, int dpi = ImageConstants.DEFAULT_DPI)
+    public static void AddImage(ImageToAdd img, Graphics g1, Size2D targetSize, int dpi = ImageConstants.DEFAULT_DPI)
     {
-        SKBitmap source;
-
+        Image source;
         if (img.Image?.HasStream() == true)
         {
-            source = SKBitmap.Decode(img.Image.Stream!);
+            source = Image.FromStream(img.Image.Stream!);
         }
         else
         {
             using var ms = new MemoryStream(img.Image?.GetBytes()!);
-            source = SKBitmap.Decode(ms);
+            source = Image.FromStream(ms);
         }
 
-        // Change opacity
-        using var opacityImage = SkiaUtility.ChangeOpacity(source, img.Opacity);
+        using var newImg = GdiUtility.ChangeOpacity(source, img.Opacity);
+        using var rotatedImage = Math.Abs(img.Rotation) > double.Epsilon ? GdiUtility.Rotate(newImg, img.Rotation) : new Bitmap(newImg);
 
-        // Rotate if needed
-        using var rotatedImage = Math.Abs(img.Rotation) > double.Epsilon
-            ? SkiaUtility.Rotate(opacityImage, (float)img.Rotation)
-            : opacityImage.Copy();
-
-        // Calculate target width/height
         var imgWidth = SizeUtility.GetPixels(img.Width, img.DimensionUnit, (int)targetSize.Width, dpi);
         var imgHeight = SizeUtility.GetPixels(img.Height, img.DimensionUnit, (int)targetSize.Height, dpi);
         var imgLeft = SizeUtility.GetPixels(img.Left, img.DimensionUnit, (int)targetSize.Width, dpi);
@@ -70,23 +62,31 @@ public static class DrawHelper
         var imgTop = SizeUtility.GetPixels(img.Top, img.DimensionUnit, (int)targetSize.Height, dpi);
         var imgBottom = SizeUtility.GetPixels(img.Bottom, img.DimensionUnit, (int)targetSize.Height, dpi);
 
-        int width = img.Width > 0 ? imgWidth : rotatedImage.Width;
-        int height = img.Height > 0 ? imgHeight : rotatedImage.Height;
+        //Dimensions
+        var width = 0;
+        if (img.Width > 0)
+        {
+            width = imgWidth;
+        }
+        var height = 0;
+        if (img.Height > 0)
+        {
+            height = imgHeight;
+        }
 
-        if (width > targetSize.Width)
+        if ((img.Width > 0 ? img.Width : rotatedImage.Width) > targetSize.Width)
         {
             width = (int)(targetSize.Width * 0.95);
         }
-        if (height > targetSize.Height)
+        if ((img.Height > 0 ? img.Height : rotatedImage.Height) > targetSize.Height)
         {
             height = (int)(targetSize.Height * 0.95);
         }
 
-        using var resizedImage = (width != rotatedImage.Width || height != rotatedImage.Height)
-            ? SkiaUtility.Resize(rotatedImage, new SKSize(width, height), 100)
-            : rotatedImage.Copy();
+        using var resizedImage = (width != 0 && rotatedImage.Width != width) || (height != 0 && rotatedImage.Height != height) ? GdiUtility.Resize(rotatedImage, new Size(width, height)) : new Bitmap(rotatedImage);
 
-        // Position
+
+        //Position
         double left = 0;
         if (img.Position.HasFlag(ImagePosition.HCenter))
         {
@@ -126,12 +126,6 @@ public static class DrawHelper
         left += imgLeft - imgRight;
         top += imgTop - imgBottom;
 
-        canvas.DrawBitmap(resizedImage, (float)left, (float)top);
-    }
-
-    private static SKBitmap LoadImage(string path)
-    {
-        using var fs = File.OpenRead(path);
-        return SKBitmap.Decode(fs);
+        g1.DrawImage(resizedImage, (int)left, (int)top);
     }
 }

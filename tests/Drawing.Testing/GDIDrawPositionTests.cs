@@ -2,12 +2,13 @@
 using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Abstractions;
-using Regira.Media.Drawing.Core;
 using Regira.Media.Drawing.Enums;
+using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
 using Regira.Utilities;
 using System.Drawing;
-using ImageFormat = System.Drawing.Imaging.ImageFormat;
+using GdiColor = System.Drawing.Color;
+using GdiImageFormat = System.Drawing.Imaging.ImageFormat;
 
 namespace Drawing.Testing;
 
@@ -32,38 +33,38 @@ public class GDIDrawPositionTests
         var transparentPath = Path.Combine(_inputDir, "transparent-400x300.jpg");
         if (!File.Exists(transparentPath))
         {
-            var img = GdiUtility.Create(400, 300, null, ImageFormat.Png);
-            await img.ToImageFile(ImageFormat.Jpeg).SaveAs(transparentPath);
+            var img = GdiUtility.Create(400, 300, null, GdiImageFormat.Png);
+            await img.ToImageFile(GdiImageFormat.Jpeg).SaveAs(transparentPath);
         }
         var whitePath = Path.Combine(_inputDir, "white-400x300.jpg");
         if (!File.Exists(whitePath))
         {
-            var img = GdiUtility.Create(400, 300, "#FFFFFF", ImageFormat.Jpeg);
-            await img.ToImageFile(ImageFormat.Jpeg).SaveAs(whitePath);
+            var img = GdiUtility.Create(400, 300, "#FFFFFF", GdiImageFormat.Jpeg);
+            await img.ToImageFile(GdiImageFormat.Jpeg).SaveAs(whitePath);
         }
         var yellowPath = Path.Combine(_inputDir, "yellow-200x150.jpg");
         if (!File.Exists(yellowPath))
         {
-            var img = GdiUtility.Create(200, 150, "#FFFF00", ImageFormat.Jpeg);
-            await img.ToImageFile(ImageFormat.Jpeg).SaveAs(yellowPath);
+            var img = GdiUtility.Create(200, 150, "#FFFF00", GdiImageFormat.Jpeg);
+            await img.ToImageFile(GdiImageFormat.Jpeg).SaveAs(yellowPath);
         }
         var redPath = Path.Combine(_inputDir, "red-150x100.jpg");
         if (!File.Exists(redPath))
         {
-            var img = GdiUtility.Create(150, 100, "#FF0000", ImageFormat.Jpeg);
-            await img.ToImageFile(ImageFormat.Jpeg).SaveAs(redPath);
+            var img = GdiUtility.Create(150, 100, "#FF0000", GdiImageFormat.Jpeg);
+            await img.ToImageFile(GdiImageFormat.Jpeg).SaveAs(redPath);
         }
         var greenPath = Path.Combine(_inputDir, "green-50x100.jpg");
         if (!File.Exists(greenPath))
         {
-            var img = GdiUtility.Create(50, 100, "#00FF00", ImageFormat.Jpeg);
-            await img.ToImageFile(ImageFormat.Jpeg).SaveAs(greenPath);
+            var img = GdiUtility.Create(50, 100, "#00FF00", GdiImageFormat.Jpeg);
+            await img.ToImageFile(GdiImageFormat.Jpeg).SaveAs(greenPath);
         }
         var bluePath = Path.Combine(_inputDir, "blue-50x50.jpg");
         if (!File.Exists(bluePath))
         {
-            var img = GdiUtility.Create(50, 50, "#0000FF", ImageFormat.Jpeg);
-            await img.ToImageFile(ImageFormat.Jpeg).SaveAs(bluePath);
+            var img = GdiUtility.Create(50, 50, "#0000FF", GdiImageFormat.Jpeg);
+            await img.ToImageFile(GdiImageFormat.Jpeg).SaveAs(bluePath);
         }
     }
 
@@ -81,10 +82,10 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-no-params.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(10, 10));
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(190, 140));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(210, 150));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(200, 160));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(190, 140));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(210, 150));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(200, 160));
     }
 
     // Positioned
@@ -103,10 +104,10 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-top-left.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(10, 10));
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(190, 140));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(210, 150));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(200, 160));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(190, 140));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(210, 150));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(200, 160));
     }
     [Test]
     public async Task AddImage_Bottom_Left()
@@ -123,10 +124,10 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-bottom-left.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(10, 160));
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(190, 290));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(210, 290));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(10, 160));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(190, 290));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(210, 290));
     }
     [Test]
     public async Task AddImage_Top_Right()
@@ -143,11 +144,11 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-top-right.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(360, 10));
-        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(390, 90));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(340, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(360, 110));
+        AssertColor(GdiColor.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(360, 10));
+        AssertColor(GdiColor.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(390, 90));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(340, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(360, 110));
     }
     [Test]
     public async Task AddImage_Bottom_Right()
@@ -164,12 +165,12 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-bottom-right.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(360, 210));
-        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(390, 290));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 290));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(390, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(390, 190));
+        AssertColor(GdiColor.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(360, 210));
+        AssertColor(GdiColor.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(390, 290));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 290));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(390, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(390, 190));
     }
 
     // Centered
@@ -188,11 +189,11 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-top-hcenter.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(110, 10));
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(290, 140));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 290));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(200, 160));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(110, 10));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(290, 140));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 290));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(200, 160));
     }
     [Test]
     public async Task AddImage_Bottom_HCenter()
@@ -209,12 +210,12 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-bottom-hcenter.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(110, 160));
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(290, 290));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 290));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(90, 290));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(310, 290));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(110, 160));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(290, 290));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 290));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(90, 290));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(310, 290));
     }
     [Test]
     public async Task AddImage_Left_VCenter()
@@ -231,12 +232,12 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-right-vcenter.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(10, 110));
-        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(10, 190));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 90));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(60, 150));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 290));
+        AssertColor(GdiColor.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(10, 110));
+        AssertColor(GdiColor.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(10, 190));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 90));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(60, 150));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 290));
     }
     [Test]
     public async Task AddImage_Right_VCenter()
@@ -253,12 +254,12 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-right-vcenter.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(360, 110));
-        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(390, 190));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(390, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(340, 150));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(390, 290));
+        AssertColor(GdiColor.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(360, 110));
+        AssertColor(GdiColor.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(390, 190));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(390, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(340, 150));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(390, 290));
     }
     [Test]
     public async Task AddImage_Middle()
@@ -275,15 +276,15 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-middle.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(110, 85));
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(200, 150));
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(290, 175));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 150));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 290));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 200));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(90, 150));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(310, 150));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(110, 85));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(200, 150));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(290, 175));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 150));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 290));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 200));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(90, 150));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(310, 150));
     }
 
     // Absolute
@@ -304,12 +305,12 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-abs-top-left.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 255, 255, 22), ((Bitmap)testImage).GetPixel(60, 60));
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(240, 190));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(40, 40));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(260, 210));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(390, 290));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 22), ((Bitmap)testImage).GetPixel(60, 60));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(240, 190));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(40, 40));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(260, 210));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(390, 290));
     }
     [Test]
     public async Task AddImage_Absolute_Top_Right()
@@ -328,12 +329,12 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-abs-top-right.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(160, 60));
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(240, 190));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(140, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(140, 60));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(360, 60));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(360, 190));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(160, 60));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(240, 190));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(140, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(140, 60));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(360, 60));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(360, 190));
     }
     [Test]
     public async Task AddImage_Absolute_Bottom_Left()
@@ -352,10 +353,10 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-abs-bottom-left.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(60, 160));
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(240, 240));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(40, 140));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(260, 260));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(60, 160));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(240, 240));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(40, 140));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(260, 260));
     }
     [Test]
     public async Task AddImage_Absolute_Bottom_Right()
@@ -374,10 +375,10 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-abs-bottom-right.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(160, 160));
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(240, 240));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(140, 140));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(360, 260));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(160, 160));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(240, 240));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(140, 140));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(360, 260));
     }
 
     // Margins
@@ -396,10 +397,10 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-margin10.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(20, 20));
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(190, 140));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(0, 0));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(220, 170));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(20, 20));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(190, 140));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(0, 0));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(220, 170));
     }
     [Test]
     public async Task AddImage_Top_Left_Margin10()
@@ -417,11 +418,11 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-top-left-margin10.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(20, 20));
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(190, 140));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(0, 0));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(220, 170));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(220, 170));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(20, 20));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(190, 140));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(0, 0));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(220, 170));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(220, 170));
     }
     [Test]
     public async Task AddImage_Bottom_Left_Margin10()
@@ -439,11 +440,11 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-bottom-left-margin10.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(20, 150));
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(200, 280));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 130));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(220, 290));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(0, 299));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(20, 150));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(200, 280));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 130));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(220, 290));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(0, 299));
     }
     [Test]
     public async Task AddImage_Top_Right_Margin10()
@@ -461,12 +462,12 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-top-right-margin10.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(350, 20));
-        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(380, 100));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(330, 20));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(380, 120));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(399, 0));
+        AssertColor(GdiColor.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(350, 20));
+        AssertColor(GdiColor.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(380, 100));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(330, 20));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(380, 120));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(399, 0));
     }
     [Test]
     public async Task AddImage_Bottom_Right_Margin10()
@@ -484,17 +485,17 @@ public class GDIDrawPositionTests
         _ = await resultImg.SaveAs(Path.Combine(_outputDir, "add-image-bottom-right-margin10.jpg"));
         using var testImage = resultImg.ToBitmap();
 
-        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(350, 200));
-        AssertColor(Color.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(380, 280));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(10, 280));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(330, 10));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(380, 180));
-        AssertColor(Color.White, ((Bitmap)testImage).GetPixel(399, 299));
+        AssertColor(GdiColor.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(350, 200));
+        AssertColor(GdiColor.FromArgb(255, 0, 255, 0), ((Bitmap)testImage).GetPixel(380, 280));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(10, 280));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(330, 10));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(380, 180));
+        AssertColor(GdiColor.White, ((Bitmap)testImage).GetPixel(399, 299));
     }
 
 
-    protected void AssertColor(Color expected, Color actual)
+    protected void AssertColor(GdiColor expected, GdiColor actual)
     {
         Assert.That(Math.Abs(actual.R - expected.R), Is.LessThan(10));
         Assert.That(Math.Abs(actual.G - expected.G), Is.LessThan(10));

@@ -1,7 +1,7 @@
 ﻿using Regira.Drawing.SkiaSharp.Utilities;
 using Regira.IO.Extensions;
-using Regira.Media.Drawing.Core;
 using Regira.Media.Drawing.Enums;
+using Regira.Media.Drawing.Models;
 using Regira.Office.OCR.PaddleOCR;
 using Regira.Utilities;
 using SkiaSharp;
@@ -33,6 +33,7 @@ public class SkiaDrawTextTests
         var content = await ReadImageText(testImage);
 
         Assert.That(content, Is.EqualTo(input));
+        AssertColor(SKColor.Parse("#FFFFFF"), testImage.GetPixel(1, 1));
     }
 
     [Test]
@@ -41,9 +42,10 @@ public class SkiaDrawTextTests
         var input = "Hello World!";
         using var testImage = SkiaUtility.CreateTextImage(input, new TextImageOptions
         {
-            BackgroundColor = "#FFFF00",
-            TextColor = "#0000FF",
+            FontSize = 25,
             FontName = "Arial",
+            TextColor = "#00F",
+            BackgroundColor = "#FFFF0099",
         });
 
         using var imgFile = testImage.ToImageFile();
@@ -53,13 +55,20 @@ public class SkiaDrawTextTests
         var content = await ReadImageText(testImage);
 
         Assert.That(content, Is.EqualTo(input));
+        AssertColor(SKColor.Parse("#FFFF00"), testImage.GetPixel(1, 1));
     }
-    
-    
+
+
     protected Task<string?> ReadImageText(SKBitmap img)
     {
         using var imageFile = img.ToImageFile();
         var ocrManager = new OcrManager();
         return ocrManager.Read(imageFile);
+    }
+    protected void AssertColor(SKColor expected, SKColor actual)
+    {
+        Assert.That(Math.Abs(actual.Red - expected.Red), Is.LessThan(10));
+        Assert.That(Math.Abs(actual.Green - expected.Green), Is.LessThan(10));
+        Assert.That(Math.Abs(actual.Blue - expected.Blue), Is.LessThan(10));
     }
 }

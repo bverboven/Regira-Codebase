@@ -3,8 +3,8 @@ using Regira.Drawing.SkiaSharp.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Abstractions;
-using Regira.Media.Drawing.Core;
 using Regira.Media.Drawing.Enums;
+using Regira.Media.Drawing.Models;
 using SkiaSharp;
 
 namespace Regira.Drawing.SkiaSharp.Services;
@@ -68,7 +68,7 @@ public class ImageService : IImageService
     {
         if (input.Stream != null && input.Stream != Stream.Null)
         {
-            return SkiaUtility.GetFormat(input.Stream).ToImageFormat();
+            return ConversionUtility.GetFormat(input.Stream).ToImageFormat();
         }
 
         var bytes = input.GetBytes();
@@ -78,7 +78,7 @@ public class ImageService : IImageService
         }
 
         using var ms = new MemoryStream(bytes);
-        return SkiaUtility.GetFormat(ms).ToImageFormat();
+        return ConversionUtility.GetFormat(ms).ToImageFormat();
     }
     public IImageFile ChangeFormat(IImageFile input, ImageFormat targetFormat)
     {
@@ -174,8 +174,8 @@ public class ImageService : IImageService
     public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int dpi = ImageConstants.DEFAULT_DPI)
     {
         var imagesCollection = imagesToAdd.ToArray();
-        using var targetImage = target?.ToBitmap() ?? DrawHelper.CreateSizedCanvas(imagesCollection);
-        DrawHelper.Draw(imagesCollection, targetImage, dpi);
+        using var targetImage = target?.ToBitmap() ?? DrawUtility.CreateSizedCanvas(imagesCollection);
+        DrawUtility.Draw(imagesCollection, targetImage, dpi);
         return targetImage.ToImageFile();
     }
 }

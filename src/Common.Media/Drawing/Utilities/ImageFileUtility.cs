@@ -2,7 +2,7 @@
 using Regira.IO.Extensions;
 using Regira.IO.Utilities;
 using Regira.Media.Drawing.Abstractions;
-using Regira.Media.Drawing.Core;
+using Regira.Media.Drawing.Models;
 using Regira.Utilities;
 
 namespace Regira.Media.Drawing.Utilities;

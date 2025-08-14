@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework.Legacy;
 using Regira.IO.Extensions;
-using Regira.Media.Drawing.Core;
+using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
 using Regira.Office.Barcodes.Abstractions;
 using Regira.Office.Barcodes.Exceptions;

@@ -1,12 +1,9 @@
-﻿using Regira.Dimensions;
-using Regira.IO.Extensions;
-using Regira.Media.Drawing.Abstractions;
-using Regira.Media.Drawing.Core;
+﻿using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Reflection;
+using GdiColor = System.Drawing.Color;
 using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
 namespace Regira.Drawing.GDI.Utilities;
@@ -16,65 +13,6 @@ public static class GdiUtility
     private static readonly KnownImageFormats KnownImageFormats = new();
     private static readonly ImageEncoders Encoders = new();
     private const int EXIF_ORIENTATION_ID = 0x112;
-
-    public static Size ToSize(this Size2D size)
-    {
-        return new Size((int)size.Width, (int)size.Height);
-    }
-    public static IImageFile ToImageFile(this Image img, ImageFormat format)
-    {
-        // keep format required, or filesize will be huge
-        using var stream = new MemoryStream();
-        if (!img.RawFormat.Equals(format))
-        {
-            using var img2 = ChangeFormat(img, format);
-            img2.Save(stream, format);
-        }
-        else
-        {
-            img.Save(stream, format);
-        }
-
-        var bytes = stream.ToArray();
-        var imgFormat = format.ToImageFormat();
-
-        return new ImageFile
-        {
-            Bytes = bytes,
-            Size = new Size2D(img.Width, img.Height),
-            Format = imgFormat,
-            ContentType = $"image/{imgFormat.ToString().ToLower()}",
-            Length = bytes.Length
-        };
-    }
-    public static Image ToBitmap(this IImageFile file)
-    {
-        if (file.HasStream())
-        {
-            return Image.FromStream(file.Stream!);
-        }
-        using var stream = new MemoryStream(file.GetBytes()!);
-        return Image.FromStream(stream);
-    }
-
-    public static Media.Drawing.Enums.ImageFormat ToImageFormat(this ImageFormat format)
-    {
-#if NETSTANDARD2_0
-        return (Media.Drawing.Enums.ImageFormat)Enum.Parse(typeof(Media.Drawing.Enums.ImageFormat), format.ToString());
-#else
-        return Enum.Parse<Media.Drawing.Enums.ImageFormat>(format.ToString());
-#endif
-    }
-    public static ImageFormat ToGdiImageFormat(this Media.Drawing.Enums.ImageFormat format)
-    {
-        // https://stackoverflow.com/questions/45448734/how-can-i-convert-a-string-to-an-imageformat-class-property
-        var prop = typeof(ImageFormat).GetProperty(format.ToString(), BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase);
-        if (prop == null)
-        {
-            throw new NotSupportedException($"Can't parse {format} to System.Drawing.ImageFormat");
-        }
-        return (ImageFormat)prop.GetValue(null)!;
-    }
 
     public static Image ChangeFormat(Image img, ImageFormat format, int quality = 100)
     {
@@ -91,7 +29,7 @@ public static class GdiUtility
         using (var g = GetGraphics(newImg))
         {
             //enforce white background when converting to JPEG
-            g.Clear(ImageFormat.Jpeg.Equals(format) ? Color.White : Color.Transparent);
+            g.Clear(ImageFormat.Jpeg.Equals(format) ? GdiColor.White : GdiColor.Transparent);
 
             g.DrawImage(img, 0, 0, img.Width, img.Height);
         }
@@ -170,13 +108,13 @@ public static class GdiUtility
             throw new ArgumentNullException(nameof(img));
         }
 
-        Color? bkColor = !string.IsNullOrWhiteSpace(background)
+        GdiColor? bkColor = !string.IsNullOrWhiteSpace(background)
             ? ColorTranslator.FromHtml(background)
             : img.RawFormat.Equals(ImageFormat.Png)
-                ? Color.Transparent
-                : Color.White;
+                ? GdiColor.Transparent
+                : GdiColor.White;
 
-        var pf = bkColor.Value == Color.Transparent ? PixelFormat.Format32bppArgb : img.PixelFormat;
+        var pf = bkColor.Value == GdiColor.Transparent ? PixelFormat.Format32bppArgb : img.PixelFormat;
 
         const double pi2 = Math.PI / 2.0;
 
@@ -405,7 +343,7 @@ public static class GdiUtility
             throw new ArgumentException($"{nameof(rgb)} should have 3 values (red, green, blue)");
         }
 
-        var color = Color.FromArgb(rgb[0], rgb[1], rgb[2]);
+        var color = GdiColor.FromArgb(rgb[0], rgb[1], rgb[2]);
 
         var target = new Bitmap(img);
         target.MakeTransparent(color);
@@ -420,7 +358,7 @@ public static class GdiUtility
 
         var newImg = new Bitmap(img.Width, img.Height);
         using var g = GetGraphics(newImg);
-        g.Clear(Color.Transparent);
+        g.Clear(GdiColor.Transparent);
         var attributes = new ImageAttributes();
         var matrix = new ColorMatrix { Matrix33 = (float)opacity };
         attributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
@@ -435,7 +373,7 @@ public static class GdiUtility
 
         var backColor = !string.IsNullOrWhiteSpace(backgroundColor)
             ? ColorTranslator.FromHtml(backgroundColor)
-            : Color.White;
+            : GdiColor.Transparent;
 
         var backgroundBrush = new SolidBrush(backColor);
 
@@ -453,8 +391,8 @@ public static class GdiUtility
         options ??= new TextImageOptions();
 
         var font = new Font(FontFamily.Families.First(f => f.Name.Equals(options.FontName)), options.FontSize);
-        var textColor = ColorTranslator.FromHtml(options.TextColor);
-        var backgroundColor = ColorTranslator.FromHtml(options.BackgroundColor);
+        var textColor = options.TextColor.ToGdiColor();
+        var backgroundColor = options.BackgroundColor.ToGdiColor();
 
         SizeF textSize;
         using (var dummy = new Bitmap(1, 1))

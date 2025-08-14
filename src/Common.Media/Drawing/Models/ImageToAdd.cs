@@ -2,7 +2,7 @@
 using Regira.Media.Drawing.Abstractions;
 using Regira.Media.Drawing.Enums;
 
-namespace Regira.Media.Drawing.Core;
+namespace Regira.Media.Drawing.Models;
 
 public class ImageToAdd
 {

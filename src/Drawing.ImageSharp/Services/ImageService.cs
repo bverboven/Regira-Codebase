@@ -2,8 +2,8 @@
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Abstractions;
-using Regira.Media.Drawing.Core;
 using Regira.Media.Drawing.Enums;
+using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
@@ -15,7 +15,7 @@ using SixLabors.ImageSharp.Formats.Tiff;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using ImageFile = Regira.Media.Drawing.Core.ImageFile;
+using ImageFile = Regira.Media.Drawing.Models.ImageFile;
 using SharpImage = SixLabors.ImageSharp.Image;
 
 namespace Drawing.ImageSharp.Services

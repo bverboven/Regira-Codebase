@@ -1,8 +1,5 @@
-﻿using Regira.Dimensions;
-using Regira.IO.Extensions;
-using Regira.Media.Drawing.Abstractions;
-using Regira.Media.Drawing.Core;
-using Regira.Media.Drawing.Enums;
+﻿using Regira.Media.Drawing.Enums;
+using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
 using SkiaSharp;
 
@@ -12,84 +9,6 @@ public static class SkiaUtility
 {
     // https://docs.microsoft.com/en-us/xamarin/xamarin-forms/user-interface/graphics/skiasharp/bitmaps/drawing
 
-    public static SKSamplingOptions ToFilterQuality(int quality)
-    {
-#if NETCOREAPP3_0_OR_GREATER
-        quality = Math.Clamp(quality, 0, 100);
-#endif
-
-        var skiaQuality = new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear);
-        if (quality < 100 * 0.3333)
-        {
-            skiaQuality = new SKSamplingOptions(SKFilterMode.Nearest, SKMipmapMode.None);
-        }
-        else if (quality > 100 * 0.6667)
-        {
-            skiaQuality = new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.None);
-        }
-
-        return skiaQuality;
-    }
-    public static SKSize ToSkiaSize(this Size2D size)
-    {
-        return new SKSize(size.Width, size.Height);
-    }
-
-    public static SKEncodedImageFormat GetFormat(Stream stream)
-    {
-        var codec = SKCodec.Create(stream);
-        stream.Position = 0;
-        return codec.EncodedFormat;
-    }
-    public static SKEncodedImageFormat ToSkiaFormat(this ImageFormat format)
-    {
-#if NETSTANDARD2_0
-            return (SKEncodedImageFormat)Enum.Parse(typeof(SKEncodedImageFormat), format.ToString());
-#else
-        return Enum.Parse<SKEncodedImageFormat>(format.ToString());
-#endif
-    }
-    public static ImageFormat ToImageFormat(this SKEncodedImageFormat format)
-    {
-#if NETSTANDARD2_0
-            return (ImageFormat)Enum.Parse(typeof(ImageFormat), format.ToString());
-#else
-        return Enum.Parse<ImageFormat>(format.ToString());
-#endif
-    }
-    public static SKBitmap ChangeFormat(SKBitmap src, SKEncodedImageFormat targetFormat)
-    {
-        var info = new SKImageInfo(src.Width, src.Height, src.ColorType, SKAlphaType.Premul);
-        var converted = new SKBitmap(info);
-        using (var canvas = new SKCanvas(converted))
-        {
-            canvas.Clear(SKColors.White);
-            canvas.DrawBitmap(src, new SKPoint());
-        }
-        using var img = SKImage.FromBitmap(converted);
-        var data = img.Encode(targetFormat, 100);
-        return SKBitmap.Decode(data);
-    }
-
-    public static IImageFile ToImageFile(this SKBitmap src, SKEncodedImageFormat format = SKEncodedImageFormat.Png)
-    {
-        using var img = SKImage.FromBitmap(src);
-        using var data = img.Encode(format, 100);
-        return new ImageFile
-        {
-            Bytes = data.ToArray(),
-            Size = new(src.Width, src.Height),
-            Format = ToImageFormat(format),
-            Length = data.Size
-        };
-    }
-    public static SKBitmap ToBitmap(this IImageFile file)
-    {
-        return file.HasStream()
-            ? SKBitmap.Decode(file.Stream)
-            : SKBitmap.Decode(file.GetBytes());
-    }
-
     public static SKBitmap CropRectangle(SKBitmap src, SKRect rect)
     {
         var target = new SKBitmap(new SKImageInfo((int)rect.Width, (int)rect.Height, src.ColorType, src.AlphaType));
@@ -97,7 +16,6 @@ public static class SkiaUtility
         canvas.DrawBitmap(src, rect, new SKRect(0, 0, rect.Width, rect.Height));
         return target;
     }
-
 
     public static SKBitmap Resize(SKBitmap src, SKSize wantedSize, int quality = 80)
     {
@@ -107,7 +25,7 @@ public static class SkiaUtility
     public static SKBitmap ResizeFixed(SKBitmap src, SKSize wantedSize, int quality = 80)
     {
         var target = new SKBitmap(new SKImageInfo((int)wantedSize.Width, (int)wantedSize.Height, src.ColorType, src.AlphaType));
-        src.ScalePixels(target, ToFilterQuality(quality));
+        src.ScalePixels(target, ConversionUtility.ToFilterQuality(quality));
         if (quality < 100)
         {
             using var data = target.Encode(SKEncodedImageFormat.Jpeg, quality);
@@ -146,6 +64,20 @@ public static class SkiaUtility
         canvas.Scale(1, -1, 0, source.Height / 2f);
         canvas.DrawBitmap(source, new SKPoint());
         return flippedBitmap;
+    }
+
+    public static SKBitmap ChangeFormat(SKBitmap src, SKEncodedImageFormat targetFormat)
+    {
+        var info = new SKImageInfo(src.Width, src.Height, src.ColorType, SKAlphaType.Premul);
+        var converted = new SKBitmap(info);
+        using (var canvas = new SKCanvas(converted))
+        {
+            canvas.Clear(SKColors.White);
+            canvas.DrawBitmap(src, new SKPoint());
+        }
+        using var img = SKImage.FromBitmap(converted);
+        var data = img.Encode(targetFormat, 100);
+        return SKBitmap.Decode(data);
     }
 
     public static SKBitmap MakeTransparent(SKBitmap src, int[]? rgb = null)
@@ -204,19 +136,19 @@ public static class SkiaUtility
     }
 
 
-    public static SKBitmap Create(int width, int height, string? backgroundColor = "#FFFFFF", ImageFormat? format = null)
+    public static SKBitmap Create(int width, int height, Color? backgroundColor = null, ImageFormat? format = null)
     {
         var bitmap = new SKBitmap(width, height);
         using var canvas = new SKCanvas(bitmap);
-        canvas.Clear(SKColor.Parse(backgroundColor));
+        canvas.Clear((backgroundColor ?? new Color()).ToSkiaColor());
         return bitmap;
     }
     public static SKBitmap CreateTextImage(string input, TextImageOptions? options = null)
     {
         options ??= new TextImageOptions();
 
-        var textColor = SKColor.Parse(options.TextColor);
-        var backgroundColor = SKColor.Parse(options.BackgroundColor);
+        var textColor = options.TextColor.ToSkiaColor();
+        var backgroundColor = options.BackgroundColor.ToSkiaColor();
 
         // Create SKFont for measuring
         using var typeface = SKTypeface.FromFamilyName(options.FontName, SKFontStyle.Normal);
@@ -242,7 +174,7 @@ public static class SkiaUtility
 
         // Baseline-adjusted position
         float x = 0;
-        float y = - font.Metrics.Ascent;
+        float y = -font.Metrics.Ascent;
 
         canvas.DrawText(input, x, y, font, paint);
 

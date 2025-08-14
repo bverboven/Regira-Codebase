@@ -1,38 +1,40 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
-using System.Text;
-using QRCodeDecoderLibrary;
+﻿using QRCodeDecoderLibrary;
 using QRCodeEncoderLibrary;
 using Regira.Drawing.GDI.Utilities;
 using Regira.Media.Drawing.Abstractions;
 using Regira.Office.Barcodes.Abstractions;
 using Regira.Office.Barcodes.Exceptions;
 using Regira.Office.Barcodes.Models;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Text;
 using ErrorCorrection = QRCodeEncoderLibrary.ErrorCorrection;
 
 namespace Regira.Office.Barcodes.UziGranot;
 
-public class QRCodeService() : IQRCodeService
+public class QRCodeService : IQRCodeService
 {
     public IImageFile Create(QRCodeInput input)
     {
         var moduleSize = 4;
 
-        var encoder = new QRCodeEncoder();
-        encoder.ErrorCorrection = ErrorCorrection.M;
-        encoder.ModuleSize = moduleSize;
-        encoder.QuietZone = moduleSize * 4;
-        encoder.EciAssignValue = -1;
+        var encoder = new QRCodeEncoder
+        {
+            ErrorCorrection = ErrorCorrection.M,
+            ModuleSize = moduleSize,
+            QuietZone = moduleSize * 4,
+            EciAssignValue = -1
+        };
 
         try
         {
-            encoder.Encode(input.Content!);
+            encoder.Encode(input.Content);
         }
         catch (ApplicationException ex)
         {
             if (ex.Message == "Input data string is too long")
             {
-                throw new InputException(input.Content!, ex);
+                throw new InputException(input.Content, ex);
             }
         }
 
@@ -47,7 +49,7 @@ public class QRCodeService() : IQRCodeService
     public BarcodeReadResult Read(IImageFile qrCode)
     {
         var decoder = new QRDecoder();
-        using var img = GdiUtility.ToBitmap(qrCode);
+        using var img = qrCode.ToBitmap();
         using var bitmap = new Bitmap(img);
         var data = decoder.ImageDecoder(bitmap);
         var contents = QRCodeResult(data);
@@ -60,7 +62,7 @@ public class QRCodeService() : IQRCodeService
     }
 
 
-    private static string[] QRCodeResult(byte[][] dataByteArray)
+    private static string[] QRCodeResult(byte[][]? dataByteArray)
     {
         // no QR code
         if (dataByteArray == null)
@@ -79,44 +81,44 @@ public class QRCodeService() : IQRCodeService
     }
     private static string ForDisplay(string result)
     {
-        int Index;
-        for (Index = 0; Index < result.Length && (result[Index] >= ' ' && result[Index] <= '~' || result[Index] >= 160); Index++)
+        int index;
+        for (index = 0; index < result.Length && (result[index] >= ' ' && result[index] <= '~' || result[index] >= 160); index++)
         {
             // continue;
         }
-        if (Index == result.Length)
+        if (index == result.Length)
         {
             return result;
         }
 
-        var Display = new StringBuilder(result.Substring(0, Index));
-        for (; Index < result.Length; Index++)
+        var display = new StringBuilder(result.Substring(0, index));
+        for (; index < result.Length; index++)
         {
-            var OneChar = result[Index];
-            if (OneChar >= ' ' && OneChar <= '~' || OneChar >= 160)
+            var oneChar = result[index];
+            if (oneChar >= ' ' && oneChar <= '~' || oneChar >= 160)
             {
-                Display.Append(OneChar);
+                display.Append(oneChar);
                 continue;
             }
 
-            if (OneChar == '\r')
+            if (oneChar == '\r')
             {
-                Display.Append("\r\n");
-                if (Index + 1 < result.Length && result[Index + 1] == '\n')
+                display.Append("\r\n");
+                if (index + 1 < result.Length && result[index + 1] == '\n')
                 {
-                    Index++;
+                    index++;
                 }
                 continue;
             }
 
-            if (OneChar == '\n')
+            if (oneChar == '\n')
             {
-                Display.Append("\r\n");
+                display.Append("\r\n");
                 continue;
             }
 
-            Display.Append('¿');
+            display.Append('¿');
         }
-        return Display.ToString();
+        return display.ToString();
     }
 }

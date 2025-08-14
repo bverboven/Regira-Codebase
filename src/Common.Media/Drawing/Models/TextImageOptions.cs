@@ -1,4 +1,4 @@
-﻿namespace Regira.Media.Drawing.Core;
+﻿namespace Regira.Media.Drawing.Models;
 
 public class TextImageOptions
 {
@@ -7,6 +7,6 @@ public class TextImageOptions
 
     public string FontName { get; set; } = DEFAULT_FONT_NAME;
     public int FontSize { get; set; } = DEFAULT_FONT_SIZE;
-    public string TextColor { get; set; } = "#000000";
-    public string BackgroundColor { get; set; } = "#FFFFFF";
+    public Color TextColor { get; set; } = "#000000FF";
+    public Color BackgroundColor { get; set; } = "#FFFFFFFF";
 }

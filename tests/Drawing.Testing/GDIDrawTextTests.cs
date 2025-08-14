@@ -1,10 +1,11 @@
 ﻿#pragma warning disable CA1416
-using System.Drawing;
-using System.Drawing.Imaging;
 using Regira.Drawing.GDI.Utilities;
-using Regira.Media.Drawing.Core;
+using Regira.Media.Drawing.Models;
 using Regira.Office.OCR.PaddleOCR;
 using Regira.Utilities;
+using System.Drawing;
+using System.Drawing.Imaging;
+using GdiColor = System.Drawing.Color;
 
 namespace Drawing.Testing;
 
@@ -32,8 +33,8 @@ public class GDIDrawTextTests
         var content = await ReadImageText(testImage);
 
         Assert.That(content, Is.EqualTo(input));
-        AssertColor(Color.FromArgb(255, 255, 255, 255), ((Bitmap)testImage).GetPixel(0, 0));
-        AssertColor(Color.FromArgb(255, 0, 0, 0), ((Bitmap)testImage).GetPixel(5, 4));
+        AssertColor(GdiColor.FromArgb(255, 255, 255, 255), ((Bitmap)testImage).GetPixel(0, 0));
+        AssertColor(GdiColor.FromArgb(255, 0, 0, 0), ((Bitmap)testImage).GetPixel(5, 4));
     }
 
     [Test]
@@ -42,9 +43,10 @@ public class GDIDrawTextTests
         var input = "Hello World!";
         using var testImage = GdiUtility.CreateTextImage(input, new TextImageOptions
         {
-            BackgroundColor = "#FFFF00",
-            TextColor = "#0000FF",
+            FontSize = 25,
             FontName = "Arial",
+            TextColor = "#00F",
+            BackgroundColor = "#FFFF0099",
         });
 
         testImage.Save(Path.Combine(_outputDir, "hello-world_options.png"));
@@ -53,8 +55,8 @@ public class GDIDrawTextTests
         var content = await ReadImageText(testImage);
 
         Assert.That(content, Is.EqualTo(input));
-        AssertColor(Color.FromArgb(255, 255, 255, 0), ((Bitmap)testImage).GetPixel(0, 0));
-        AssertColor(Color.FromArgb(255, 0, 0, 255), ((Bitmap)testImage).GetPixel(5, 4));
+        AssertColor(GdiColor.FromArgb(153, 255, 255, 0), ((Bitmap)testImage).GetPixel(0, 0));
+        AssertColor(GdiColor.FromArgb(255, 0, 0, 255), ((Bitmap)testImage).GetPixel(10, 10));
     }
 
     protected Task<string?> ReadImageText(Image img)
@@ -63,7 +65,7 @@ public class GDIDrawTextTests
         var ocrManager = new OcrManager();
         return ocrManager.Read(imageFile);
     }
-    protected void AssertColor(Color expected, Color actual)
+    protected void AssertColor(GdiColor expected, GdiColor actual)
     {
         Assert.That(Math.Abs(actual.R - expected.R), Is.LessThan(10));
         Assert.That(Math.Abs(actual.G - expected.G), Is.LessThan(10));

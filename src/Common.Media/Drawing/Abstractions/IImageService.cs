@@ -1,7 +1,7 @@
 ﻿using Regira.Dimensions;
 using Regira.IO.Abstractions;
-using Regira.Media.Drawing.Core;
 using Regira.Media.Drawing.Enums;
+using Regira.Media.Drawing.Models;
 
 namespace Regira.Media.Drawing.Abstractions;
 

@@ -4,8 +4,8 @@ using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Abstractions;
-using Regira.Media.Drawing.Core;
 using Regira.Media.Drawing.Enums;
+using Regira.Media.Drawing.Models;
 using System.Drawing;
 
 namespace Regira.Drawing.GDI.Services;
@@ -112,8 +112,8 @@ public class ImageService : IImageService
     public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int dpi = 150)
     {
         var imagesCollection = imagesToAdd.ToArray();
-        using var targetImage = target?.ToBitmap() ?? DrawHelper.CreateSizedCanvas(imagesCollection);
-        DrawHelper.Draw(imagesCollection, targetImage, dpi);
+        using var targetImage = target?.ToBitmap() ?? DrawUtility.CreateSizedCanvas(imagesCollection);
+        DrawUtility.Draw(imagesCollection, targetImage, dpi);
         return targetImage.ToImageFile(targetImage.RawFormat);
     }
 }

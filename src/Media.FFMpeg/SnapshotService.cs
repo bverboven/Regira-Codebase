@@ -3,7 +3,7 @@ using Regira.Dimensions;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Abstractions;
-using Regira.Media.Drawing.Core;
+using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
 using Regira.System;
 using Regira.System.Abstractions;
@@ -24,7 +24,7 @@ public class SnapshotService(IImageService imageService, IProcessHelper? process
         }
 
         var tempFile = $"{Path.GetTempFileName()}.bmp";
-        var ss = time?.ToString()?.Substring(0, 12);
+        var ss = time?.ToString().Substring(0, 12);
         var cmd = $@"ffmpeg -i ""{inputPath}"" -ss {ss} -update 1 -frames:v 1 ""{tempFile}""";
         var result = _processHelper.ExecuteCommand(cmd);
 
@@ -40,7 +40,7 @@ public class SnapshotService(IImageService imageService, IProcessHelper? process
             throw new Exception("Empty file");
         }
         using var jpeg = imageService.ChangeFormat(img, Drawing.Enums.ImageFormat.Jpeg);
-        using var resized = imageService.Resize(jpeg, size.Value);
+        var resized = imageService.Resize(jpeg, size.Value);
 
         File.Delete(tempFile);
 
