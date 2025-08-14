@@ -1,0 +1,42 @@
+﻿using Regira.Media.Drawing.Abstractions;
+using Regira.Media.Drawing.Enums;
+using Regira.Media.Drawing.Models;
+
+namespace Drawing.Testing;
+
+public static class DrawingTextExtensions
+{
+    public static async Task Add_Text_No_Params(this IImageService service)
+    {
+        var input = "Hello World!";
+        using var testImage = service.CreateTextImage(input);
+
+        await service.SaveImage(testImage, "hello-world.png");
+        Assert.That(testImage.Format, Is.EqualTo(ImageFormat.Png));
+
+        var content = await testImage.ReadImageText();
+
+        Assert.That(content, Is.EqualTo(input));
+        DrawingTestHelpExtensions.AssertColor("#FFFFFF", service.GetPixelColor(testImage, 1, 1));
+    }
+
+    public static async Task Add_Text_With_Options(this IImageService service)
+    {
+        var input = "Hello World!";
+        using var testImage = service.CreateTextImage(input, new TextImageOptions
+        {
+            FontSize = 25,
+            FontName = "Arial",
+            TextColor = "#00F",
+            BackgroundColor = "#FFFF0099",
+        });
+
+        await service.SaveImage(testImage, "hello-world_options.png");
+        Assert.That(testImage.Format, Is.EqualTo(ImageFormat.Png));
+
+        var content = await testImage.ReadImageText();
+
+        Assert.That(content, Is.EqualTo(input));
+        DrawingTestHelpExtensions.AssertColor("#FFFF00", service.GetPixelColor(testImage, 1, 1));
+    }
+}

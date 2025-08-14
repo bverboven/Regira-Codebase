@@ -348,3 +348,5 @@ healthchecksdb
 **/ffmpeg.exe
 
 nuget-push.txt
+/tests/Drawing.Testing/Assets/Input/GDI
+/tests/Drawing.Testing/Assets/Input/SkiaSharp

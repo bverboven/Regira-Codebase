@@ -68,11 +68,16 @@ public static class MemoryFileExtensions
     public static async Task<FileInfo> SaveAs(this IMemoryFile file, string path)
     {
         var bytes = file.GetBytes() ?? throw new NullReferenceException("File has no content");
+        var dir = Path.GetDirectoryName(path);
+        if (!string.IsNullOrWhiteSpace(dir))
+        {
+            Directory.CreateDirectory(dir);
+        }
 
-#if NET5_0_OR_GREATER
+#if NET6_0_OR_GREATER
         await File.WriteAllBytesAsync(path, bytes);
 #else
-            File.WriteAllBytes(path, bytes);
+        File.WriteAllBytes(path, bytes);
 #endif
         return new FileInfo(path);
     }

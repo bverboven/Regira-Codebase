@@ -19,7 +19,7 @@ public static class ConversionUtility
     }
     public static IImageFile ToImageFile(this Image img, GdiImageFormat format)
     {
-        // keep format required, or filesize will be huge
+        // keep format required, or file size will be huge
         using var stream = new MemoryStream();
         if (!img.RawFormat.Equals(format))
         {
@@ -73,6 +73,8 @@ public static class ConversionUtility
     }
 
     // Color
-    public static GdiColor ToGdiColor(this RegiraColor color) 
+    public static RegiraColor ToColor(this GdiColor color)
+        => new(color.R, color.G, color.B, color.A);
+    public static GdiColor ToGdiColor(this RegiraColor color)
         => GdiColor.FromArgb(color.Alpha, color.Red, color.Green, color.Blue);
 }

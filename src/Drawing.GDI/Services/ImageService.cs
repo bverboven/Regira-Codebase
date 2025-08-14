@@ -7,6 +7,7 @@ using Regira.Media.Drawing.Abstractions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
 using System.Drawing;
+using Color = Regira.Media.Drawing.Models.Color;
 
 namespace Regira.Drawing.GDI.Services;
 
@@ -53,6 +54,11 @@ public class ImageService : IImageService
         return cropped.ToImageFile(img.RawFormat);
     }
 
+    public Size2D GetDimensions(IImageFile input)
+    {
+        using var img = input.ToBitmap();
+        return new Size2D(img.Width, img.Height);
+    }
     public IImageFile Resize(IImageFile input, Size2D wantedSize, int quality = 100)
     {
         using var img = input.ToBitmap();
@@ -85,6 +91,11 @@ public class ImageService : IImageService
         return flipped.ToImageFile(img.RawFormat);
     }
 
+    public Color GetPixelColor(IImageFile input, int x, int y)
+    {
+        using var img = input.ToBitmap();
+        return GdiUtility.GetPixelColor(img, x, y).ToColor();
+    }
     public IImageFile MakeTransparent(IImageFile input, int[]? rgb = null)
     {
         using var img = input.ToBitmap();
@@ -104,6 +115,11 @@ public class ImageService : IImageService
         return target.ToImageFile(img.RawFormat);
     }
 
+    public IImageFile Create(int width, int height, Color? backgroundColor = null, ImageFormat? format = null)
+    {
+        using var img = GdiUtility.Create(width, height, backgroundColor?.ToGdiColor(), format?.ToGdiImageFormat());
+        return img.ToImageFile(img.RawFormat);
+    }
     public IImageFile CreateTextImage(string input, TextImageOptions? options = null)
     {
         using var img = GdiUtility.CreateTextImage(input, options);

@@ -15,6 +15,7 @@ using SixLabors.ImageSharp.Formats.Tiff;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using Color = Regira.Media.Drawing.Models.Color;
 using ImageFile = Regira.Media.Drawing.Models.ImageFile;
 using SharpImage = SixLabors.ImageSharp.Image;
 
@@ -103,6 +104,10 @@ namespace Drawing.ImageSharp.Services
             return image.ToImageFile();
         }
 
+        public Color GetPixelColor(IImageFile input, int x, int y)
+        {
+            throw new NotImplementedException();
+        }
         public IImageFile MakeTransparent(IImageFile input, int[]? rgb = null)
         {
             using var image = input.ToSharpImage();
@@ -122,7 +127,6 @@ namespace Drawing.ImageSharp.Services
 
             return image.ToImageFile();
         }
-
         public IImageFile RemoveAlpha(IImageFile input)
         {
             using var image = input.ToSharpImage();

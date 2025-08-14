@@ -95,6 +95,11 @@ public class ImageService : IImageService
         return croppedBitmap.ToImageFile(format.ToSkiaFormat());
     }
 
+    public Size2D GetDimensions(IImageFile input)
+    {
+        using var img = input.ToBitmap();
+        return new Size2D(img.Width, img.Height);
+    }
     public IImageFile Resize(IImageFile input, Size2D wantedSize, int quality = 80)
     {
         var format = GetFormat(input);
@@ -133,6 +138,11 @@ public class ImageService : IImageService
         return flippedBitmap.ToImageFile(format.ToSkiaFormat());
     }
 
+    public Color GetPixelColor(IImageFile input, int x, int y)
+    {
+        using var image = input.ToBitmap();
+        return SkiaUtility.GetPixelColor(image, x, y).ToColor();
+    }
     public IImageFile MakeTransparent(IImageFile input, int[]? rgb = null)
     {
         using var sourceBitmap = input.ToBitmap();
@@ -166,6 +176,11 @@ public class ImageService : IImageService
         return outputBitmap.ToImageFile();
     }
 
+    public IImageFile Create(int width, int height, Color? backgroundColor = null, ImageFormat? format = null)
+    {
+        using var img = SkiaUtility.Create(width, height, backgroundColor, format);
+        return img.ToImageFile();
+    }
     public IImageFile CreateTextImage(string input, TextImageOptions? options = null)
     {
         using var img = SkiaUtility.CreateTextImage(input, options);

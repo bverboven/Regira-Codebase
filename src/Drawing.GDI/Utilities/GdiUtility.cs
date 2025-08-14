@@ -366,21 +366,28 @@ public static class GdiUtility
 
         return newImg;
     }
+    public static GdiColor GetPixelColor(Image img, int x, int y)
+    {
+        if (img is Bitmap bitmap)
+        {
+            return bitmap.GetPixel(x, y);
+        }
 
-    public static Image Create(int width, int height, string? backgroundColor = null, ImageFormat? format = null)
+        using var tempBitmap = new Bitmap(img);
+        return tempBitmap.GetPixel(x, y);
+    }
+
+    public static Image Create(int width, int height, GdiColor? backgroundColor = null, ImageFormat? format = null)
     {
         format ??= ImageFormat.Png;
+        var gdiBgColor = backgroundColor ?? GdiColor.Transparent;
 
-        var backColor = !string.IsNullOrWhiteSpace(backgroundColor)
-            ? ColorTranslator.FromHtml(backgroundColor)
-            : GdiColor.Transparent;
-
-        var backgroundBrush = new SolidBrush(backColor);
+        var backgroundBrush = new SolidBrush(gdiBgColor);
 
         var untypedImage = new Bitmap(width, height);
         using (var g = GetGraphics(untypedImage))
         {
-            g.Clear(backColor);
+            g.Clear(gdiBgColor);
             g.FillRectangle(backgroundBrush, 0, 0, width, height);
         }
 
@@ -401,7 +408,7 @@ public static class GdiUtility
             textSize = drawing.MeasureString(text, font);
         }
 
-        var img = Create((int)textSize.Width, (int)textSize.Height, options.BackgroundColor);
+        var img = Create((int)textSize.Width, (int)textSize.Height, options.BackgroundColor.ToGdiColor());
         using (var drawing = GetGraphics(img))
         {
             drawing.Clear(backgroundColor);

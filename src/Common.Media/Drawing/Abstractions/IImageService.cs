@@ -15,6 +15,7 @@ public interface IImageService
     IImageFile ChangeFormat(IImageFile input, ImageFormat targetFormat);
 
     IImageFile CropRectangle(IImageFile input, int[] rect);
+    Size2D GetDimensions(IImageFile input);
     IImageFile Resize(IImageFile input, Size2D wantedSize, int quality = 100);
     IImageFile ResizeFixed(IImageFile input, Size2D size, int quality = 100);
     IImageFile Rotate(IImageFile input, double angle, string? background = null);
@@ -22,9 +23,11 @@ public interface IImageService
     IImageFile FlipHorizontal(IImageFile input);
     IImageFile FlipVertical(IImageFile input);
 
+    Color GetPixelColor(IImageFile input, int x, int y);
     IImageFile MakeTransparent(IImageFile input, int[]? rgb = null);
     IImageFile RemoveAlpha(IImageFile input);
 
+    IImageFile Create(int width, int height, Color? backgroundColor = null, ImageFormat? format = null);
     IImageFile CreateTextImage(string input, TextImageOptions? options = null);
     IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int dpi = ImageConstants.DEFAULT_DPI);
 }

@@ -134,6 +134,7 @@ public static class SkiaUtility
 
         return newImg;
     }
+    public static SKColor GetPixelColor(SKBitmap img, int x, int y) => img.GetPixel(x, y);
 
 
     public static SKBitmap Create(int width, int height, Color? backgroundColor = null, ImageFormat? format = null)
