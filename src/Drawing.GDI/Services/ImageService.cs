@@ -1,14 +1,16 @@
-﻿using Regira.Dimensions;
-using Regira.Drawing.GDI.Helpers;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
+using Regira.Dimensions;
 using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
-using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Media.Drawing.Services.Abstractions;
-using System.Drawing;
 using Color = Regira.Media.Drawing.Models.Color;
+using ImageFormat = Regira.Media.Drawing.Enums.ImageFormat;
+#pragma warning disable CA1416
 
 namespace Regira.Drawing.GDI.Services;
 
@@ -33,6 +35,18 @@ public class ImageService : IImageService
 
         using var stream = new MemoryStream(bytes);
         return Parse(stream);
+    }
+    public IImageFile Parse(byte[] rawBytes, int width, int height, ImageFormat? format = null)
+    {
+        using var bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+        var rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
+
+        var bmpData = bmp.LockBits(rect, ImageLockMode.WriteOnly, bmp.PixelFormat);
+        var pNative = bmpData.Scan0;
+
+        Marshal.Copy(rawBytes, 0, pNative, rawBytes.Length);
+        bmp.UnlockBits(bmpData);
+        return bmp.ToImageFile((format ?? ImageFormat.Jpeg).ToGdiImageFormat());
     }
     public IImageFile? Parse(IMemoryFile file) => file.HasStream() ? Parse(file.Stream) : Parse(file.GetBytes());
 

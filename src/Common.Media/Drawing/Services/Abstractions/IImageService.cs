@@ -8,8 +8,9 @@ namespace Regira.Media.Drawing.Services.Abstractions;
 
 public interface IImageService
 {
-    IImageFile? Parse(Stream? stream);
-    IImageFile? Parse(byte[]? bytes);
+    IImageFile? Parse(Stream stream);
+    IImageFile? Parse(byte[] bytes);
+    IImageFile? Parse(byte[] rawBytes, int width, int height, ImageFormat? format = null);
     IImageFile? Parse(IMemoryFile file);
 
     ImageFormat GetFormat(IImageFile input);

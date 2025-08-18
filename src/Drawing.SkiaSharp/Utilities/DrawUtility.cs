@@ -57,11 +57,6 @@ public static class DrawUtility
         // Change opacity
         using var opacityImage = SkiaUtility.ChangeOpacity(source, img.Opacity);
 
-        // Rotate if needed
-        using var rotatedImage = Math.Abs(img.Rotation) > double.Epsilon
-            ? SkiaUtility.Rotate(opacityImage, (float)img.Rotation)
-            : opacityImage.Copy();
-
         // Calculate target width/height
         var imgWidth = SizeUtility.GetPixels(img.Width, img.DimensionUnit, (int)targetSize.Width, dpi);
         var imgHeight = SizeUtility.GetPixels(img.Height, img.DimensionUnit, (int)targetSize.Height, dpi);
@@ -70,8 +65,8 @@ public static class DrawUtility
         var imgTop = SizeUtility.GetPixels(img.Top, img.DimensionUnit, (int)targetSize.Height, dpi);
         var imgBottom = SizeUtility.GetPixels(img.Bottom, img.DimensionUnit, (int)targetSize.Height, dpi);
 
-        int width = img.Width > 0 ? imgWidth : rotatedImage.Width;
-        int height = img.Height > 0 ? imgHeight : rotatedImage.Height;
+        int width = img.Width > 0 ? imgWidth : opacityImage.Width;
+        int height = img.Height > 0 ? imgHeight : opacityImage.Height;
 
         if (width > targetSize.Width)
         {
@@ -82,9 +77,15 @@ public static class DrawUtility
             height = (int)(targetSize.Height * 0.95);
         }
 
-        using var resizedImage = (width != rotatedImage.Width || height != rotatedImage.Height)
-            ? SkiaUtility.Resize(rotatedImage, new SKSize(width, height), 100)
-            : rotatedImage.Copy();
+        // Resize if needed
+        using var resizedImage = width != opacityImage.Width || height != opacityImage.Height
+            ? SkiaUtility.Resize(opacityImage, new SKSize(width, height), 100)
+            : opacityImage.Copy();
+
+        // Rotate if needed
+        using var rotatedImage = Math.Abs(img.Rotation) > double.Epsilon
+            ? SkiaUtility.Rotate(resizedImage, (float)img.Rotation)
+            : resizedImage.Copy();
 
         // Position
         double left = 0;
@@ -92,11 +93,7 @@ public static class DrawUtility
         {
             left = (targetSize.Width / 2) - (resizedImage.Width / 2f);
         }
-        else if (img.Position.HasFlag(ImagePosition.Right))
-        {
-            left = targetSize.Width - resizedImage.Width - img.Margin;
-        }
-        else if (Math.Abs(left) < double.Epsilon && img.Right > 0)
+        else if (img.Position.HasFlag(ImagePosition.Right) || Math.Abs(left) < double.Epsilon && img.Right > 0)
         {
             left = targetSize.Width - resizedImage.Width - img.Margin;
         }
@@ -110,11 +107,7 @@ public static class DrawUtility
         {
             top = (targetSize.Height / 2) - (resizedImage.Height / 2f);
         }
-        else if (img.Position.HasFlag(ImagePosition.Bottom))
-        {
-            top = targetSize.Height - resizedImage.Height - img.Margin;
-        }
-        else if (Math.Abs(top) < double.Epsilon && img.Bottom > 0)
+        else if (img.Position.HasFlag(ImagePosition.Bottom) || Math.Abs(top) < double.Epsilon && img.Bottom > 0)
         {
             top = targetSize.Height - resizedImage.Height - img.Margin;
         }

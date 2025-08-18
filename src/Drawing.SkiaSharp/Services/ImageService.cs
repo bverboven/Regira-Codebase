@@ -63,6 +63,25 @@ public class ImageService : IImageService
         };
         return img;
     }
+    public IImageFile? Parse(byte[] rawBytes, int width, int height, ImageFormat? format = null)
+    {
+        format ??= ImageFormat.Jpeg;
+        
+        using var skImg = SKImage.FromPixels(
+            new SKImageInfo(width, height, SKColorType.Bgra8888, SKAlphaType.Premul),
+            SKData.CreateCopy(rawBytes)
+        );
+        
+        using var skBitmap = SKBitmap.FromImage(skImg);
+        if (skBitmap == null)
+        {
+            return null;
+        }
+        
+        using var img = SkiaUtility.ChangeFormat(skBitmap, format.Value.ToSkiaFormat());
+        return img.ToImageFile(format.Value.ToSkiaFormat());
+    }
+
     public IImageFile? Parse(IMemoryFile file) => file.HasStream() ? Parse(file.Stream) : Parse(file.GetBytes());
 
     public ImageFormat GetFormat(IImageFile input)

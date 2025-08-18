@@ -1,11 +1,7 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
-using Docnet.Core;
+﻿using Docnet.Core;
 using Docnet.Core.Editors;
 using Docnet.Core.Models;
 using Regira.Collections;
-using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Models.Abstractions;
@@ -13,10 +9,11 @@ using Regira.Media.Drawing.Services.Abstractions;
 using Regira.Office.MimeTypes;
 using Regira.Office.PDF.Abstractions;
 using Regira.Office.PDF.Models;
+using ImageFormat = Regira.Media.Drawing.Enums.ImageFormat;
 
 namespace Regira.Office.PDF.DocNET;
 
-public class PdfManager(IImageService? imageService = null) : IPdfService
+public class PdfManager(IImageService imageService) : IPdfService
 {
     public int GetPageCount(IBinaryFile pdf)
     {
@@ -166,11 +163,12 @@ public class PdfManager(IImageService? imageService = null) : IPdfService
                 {
                     var imageFile = imageService.Parse(imgBytes)!;
                     var resized = imageService.Resize(imageFile, maxDim);
+                    var jpeg = imageService.ChangeFormat(resized, ImageFormat.Jpeg);
                     return new JpegImage
                     {
-                        Bytes = resized.Bytes,
-                        Width = (int)(resized.Size?.Width ?? 0),
-                        Height = (int)(resized.Size?.Height ?? 0)
+                        Bytes = jpeg.Bytes,
+                        Width = (int)(jpeg.Size?.Width ?? 0),
+                        Height = (int)(jpeg.Size?.Height ?? 0)
                     };
                 }
             )
@@ -187,25 +185,12 @@ public class PdfManager(IImageService? imageService = null) : IPdfService
         for (var pageIndex = 0; pageIndex < pageCount; pageIndex++)
         {
             using var pr = docReader.GetPageReader(pageIndex);
-            var width = pr.GetPageWidth();
-            var height = pr.GetPageHeight();
             var imgBytes = pr.GetImage();
 
-            using var img = new Bitmap(width, height, PixelFormat.Format32bppArgb);
-            AddBytes(img, imgBytes);
-            yield return img.ToImageFile((options?.Format ?? Media.Drawing.Enums.ImageFormat.Jpeg).ToGdiImageFormat());
+            var width = pr.GetPageWidth();
+            var height = pr.GetPageHeight();
+
+            yield return imageService.Parse(imgBytes, width, height, options?.Format)!;
         }
-    }
-
-
-    private static void AddBytes(Bitmap bmp, byte[] rawBytes)
-    {
-        var rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
-
-        var bmpData = bmp.LockBits(rect, ImageLockMode.WriteOnly, bmp.PixelFormat);
-        var pNative = bmpData.Scan0;
-
-        Marshal.Copy(rawBytes, 0, pNative, rawBytes.Length);
-        bmp.UnlockBits(bmpData);
     }
 }

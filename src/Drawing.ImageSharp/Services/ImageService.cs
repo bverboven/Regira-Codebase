@@ -41,6 +41,12 @@ namespace Drawing.ImageSharp.Services
             //var format = options.Configuration.ImageFormatsManager.ImageFormats.FirstOrDefault()?.ToImageFormat();
             return image.ToImageFile(bytes);
         }
+
+        public IImageFile? Parse(byte[] rawBytes, int width, int height, ImageFormat? format = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public IImageFile? Parse(IMemoryFile file) => file.HasStream() ? Parse(file.Stream) : Parse(file.GetBytes());
 
         public ImageFormat GetFormat(IImageFile input)

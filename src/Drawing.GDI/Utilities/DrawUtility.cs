@@ -1,13 +1,13 @@
+using System.Drawing;
 using Regira.Dimensions;
-using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
 using Regira.Utilities;
-using System.Drawing;
+#pragma warning disable CA1416
 
-namespace Regira.Drawing.GDI.Helpers;
+namespace Regira.Drawing.GDI.Utilities;
 
 public static class DrawUtility
 {
@@ -53,7 +53,6 @@ public static class DrawUtility
         }
 
         using var newImg = GdiUtility.ChangeOpacity(source, img.Opacity);
-        using var rotatedImage = Math.Abs(img.Rotation) > double.Epsilon ? GdiUtility.Rotate(newImg, img.Rotation) : new Bitmap(newImg);
 
         var imgWidth = SizeUtility.GetPixels(img.Width, img.DimensionUnit, (int)targetSize.Width, dpi);
         var imgHeight = SizeUtility.GetPixels(img.Height, img.DimensionUnit, (int)targetSize.Height, dpi);
@@ -74,23 +73,26 @@ public static class DrawUtility
             height = imgHeight;
         }
 
-        if ((img.Width > 0 ? img.Width : rotatedImage.Width) > targetSize.Width)
+        if ((img.Width > 0 ? img.Width : newImg.Width) > targetSize.Width)
         {
             width = (int)(targetSize.Width * 0.95);
         }
-        if ((img.Height > 0 ? img.Height : rotatedImage.Height) > targetSize.Height)
+        if ((img.Height > 0 ? img.Height : newImg.Height) > targetSize.Height)
         {
             height = (int)(targetSize.Height * 0.95);
         }
 
-        using var resizedImage = (width != 0 && rotatedImage.Width != width) || (height != 0 && rotatedImage.Height != height) ? GdiUtility.Resize(rotatedImage, new Size(width, height)) : new Bitmap(rotatedImage);
+        // Resize?
+        using var resizedImage = width != 0 && newImg.Width != width || height != 0 && newImg.Height != height ? GdiUtility.Resize(newImg, new Size(width, height)) : new Bitmap(newImg);
 
+        // Rotate?
+        using var rotatedImage = Math.Abs(img.Rotation) > double.Epsilon ? GdiUtility.Rotate(resizedImage, img.Rotation) : new Bitmap(resizedImage);
 
-        //Position
+        // Position
         double left = 0;
         if (img.Position.HasFlag(ImagePosition.HCenter))
         {
-            left = (targetSize.Width / 2) - (resizedImage.Width / 2f);
+            left = targetSize.Width / 2 - resizedImage.Width / 2f;
         }
         else if (img.Position.HasFlag(ImagePosition.Right))
         {
@@ -108,7 +110,7 @@ public static class DrawUtility
         double top = 0;
         if (img.Position.HasFlag(ImagePosition.VCenter))
         {
-            top = (targetSize.Height / 2) - (resizedImage.Height / 2f);
+            top = targetSize.Height / 2 - resizedImage.Height / 2f;
         }
         else if (img.Position.HasFlag(ImagePosition.Bottom))
         {

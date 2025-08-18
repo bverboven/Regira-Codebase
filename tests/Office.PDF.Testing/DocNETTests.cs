@@ -118,7 +118,7 @@ Simple PDF File 2
         => PdfTestHelper.ToImages(_pdfService);
 
     [Test]
-    public async Task ImagesToPdf()
+    public async Task JpegImagesToPdf()
     {
         var images = await Task.WhenAll(
             Enumerable.Range(1, 4)
@@ -128,7 +128,21 @@ Simple PDF File 2
         var input = new ImagesInput { Images = images };
         using var pdf = _pdfService.ImagesToPdf(input);
 
-        var outputPath = Path.Combine(_outputDir, "images.pdf");
+        var outputPath = Path.Combine(_outputDir, "jpg-images.pdf");
+        await FileSystemUtility.SaveStream(outputPath, pdf.GetStream()!);
+    }
+
+    [Test]
+    public async Task PngImagesToPdf()
+    {
+        var images = await Task.WhenAll("lion,horse".Split(",")
+            .Select(img => File.ReadAllBytesAsync(Path.Combine(_inputDir, $"{img}.png")))
+        );
+
+        var input = new ImagesInput { Images = images };
+        using var pdf = _pdfService.ImagesToPdf(input);
+
+        var outputPath = Path.Combine(_outputDir, "png-images.pdf");
         await FileSystemUtility.SaveStream(outputPath, pdf.GetStream()!);
     }
 }
