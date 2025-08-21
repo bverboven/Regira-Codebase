@@ -11,10 +11,10 @@
     <AssemblyName>Regira.Office.Excel.NpoiMapper</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.4.1</Version>
+    <Version>4.5.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="BouncyCastle.Cryptography" Version="2.5.1" />
+    <PackageReference Include="BouncyCastle.Cryptography" Version="2.6.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
@@ -27,8 +27,8 @@
   </ItemGroup>
   <ItemGroup>
     <!-- Upgraded for vulnerabilities -->
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
-    <PackageReference Include="System.Drawing.Common" Version="9.0.2" />
-    <PackageReference Include="System.Formats.Asn1" Version="9.0.2" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.8" />
+    <PackageReference Include="System.Formats.Asn1" Version="9.0.8" />
   </ItemGroup>
 </Project>

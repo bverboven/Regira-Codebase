@@ -11,10 +11,10 @@
     <AssemblyName>Regira.Caching.Runtime</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.4.0</Version>
+    <Version>4.5.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.Runtime.Caching" Version="9.0.2" />
+    <PackageReference Include="System.Runtime.Caching" Version="9.0.8" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />

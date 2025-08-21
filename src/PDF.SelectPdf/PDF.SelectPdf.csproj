@@ -11,16 +11,16 @@
     <AssemblyName>Regira.Office.PDF.SelectPdf</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.4.1</Version>
+    <Version>4.5.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Select.HtmlToPdf.NetCore" Version="24.1.0" />
+    <PackageReference Include="Select.HtmlToPdf.NetCore" Version="25.2.0" />
   </ItemGroup>
   <ItemGroup>
     <!-- Upgraded for vulnerabilities -->
-    <PackageReference Include="System.Drawing.Common" Version="9.0.2" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.8" />
   </ItemGroup>
 </Project>
