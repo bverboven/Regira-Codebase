@@ -21,9 +21,9 @@ public class ZXingBarcodeTests() : BarcodeTestsBase(new BarcodeService(), new Ba
         return base.Create_Barcode(content, format, outputName);
     }
 
-    [TestCase("123456", BarcodeFormat.Code39, new[] { 150, 50 })]
-    [TestCase("123456789", BarcodeFormat.Code93, new[] { 150, 50 })]
-    [TestCase("1234567890", BarcodeFormat.Code128, new[] { 150, 50 })]
+    [TestCase("123456", BarcodeFormat.Code39, new[] { 103, 50 })]
+    [TestCase("123456789", BarcodeFormat.Code93, new[] { 118, 50 })]
+    [TestCase("1234567890", BarcodeFormat.Code128, new[] { 101, 50 })]
     [TestCase("This is a DataMatrix test", BarcodeFormat.DataMatrix, new[] { 150, 150 })]
     public override Task Check_Dimensions(string content, BarcodeFormat format, int[] size)
     {

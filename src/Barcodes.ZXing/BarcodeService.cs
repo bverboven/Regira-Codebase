@@ -80,6 +80,7 @@ public class BarcodeService : IBarcodeService
                 Margin = 0,
                 PureBarcode = true,
                 GS1Format = true,
+                NoPadding = true
             },
             Renderer = new SKBitmapRenderer
             {
