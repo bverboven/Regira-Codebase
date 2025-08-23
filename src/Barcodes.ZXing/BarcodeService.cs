@@ -84,14 +84,17 @@ public class BarcodeService : IBarcodeService
             },
             Renderer = new SKBitmapRenderer
             {
-                Foreground = SKColor.Parse(input.Color),
-                Background = SKColor.Parse("#FFFFFF")
+                Foreground = SKColor.Parse(input.Color.Hex),
+                Background = SKColor.Parse(input.BackgroundColor.Hex)
             }
         };
         try
         {
             using var img = writer.Write(input.Content);
-            using var resizedImg = SkiaUtility.Resize(img, input.Size.ToSkiaSize());
+
+            using var resizedImg = (input.Size.Width > 0 && img.Width != (int)input.Size.Width) || (input.Size.Height > 0 && img.Height != (int)input.Size.Height)
+                ? SkiaUtility.ResizeFixed(img, input.Size.ToSkiaSize())
+                : img;
 
             return resizedImg.ToImageFile(SKEncodedImageFormat.Jpeg);
         }

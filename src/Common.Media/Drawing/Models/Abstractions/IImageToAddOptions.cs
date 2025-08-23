@@ -5,15 +5,11 @@ namespace Regira.Media.Drawing.Models.Abstractions;
 
 public interface IImageToAddOptions
 {
-    double Width { get; set; }
-    double Height { get; set; }
-    double Left { get; set; }
-    double Top { get; set; }
-    double Right { get; set; }
-    double Bottom { get; set; }
-    double Margin { get; set; }
     LengthUnit DimensionUnit { get; set; }
-    ImagePosition Position { get; set; }
+    Size2D? Size { get; set; }
+    double Margin { get; set; }
+    ImagePosition PositionType { get; set; }
+    Position2D? Position { get; set; }
     double Rotation { get; set; }
     double Opacity { get; set; }
 }

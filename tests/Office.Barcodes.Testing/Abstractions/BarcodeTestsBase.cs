@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework.Legacy;
 using Regira.Drawing.SkiaSharp.Services;
 using Regira.IO.Extensions;
-using Regira.Media.Drawing.Models;
+using Regira.IO.Models;
 using Regira.Media.Drawing.Utilities;
 using Regira.Office.Barcodes.Abstractions;
 using Regira.Office.Barcodes.Exceptions;
@@ -83,7 +83,7 @@ public class BarcodeTestsBase
             return;
         }
 
-        var input = Convert.ToBase64String(Enumerable.Range(0, 5000).Select((_, i) => (byte)(i % 8)).ToArray());
+        var input = Convert.ToBase64String(Enumerable.Range(0, 50000).Select((_, i) => (byte)(i % 8)).ToArray());
         Assert.Throws<InputException>(() =>
         {
             Writer.Create(input);
@@ -98,7 +98,7 @@ public class BarcodeTestsBase
             return;
         }
 
-        var input = new ImageFile().Load(Path.Combine(InputDir, inputImg));
+        var input = new BinaryFileItem(Path.Combine(InputDir, inputImg)).ToImageFile();
 
         var content = string.Join(Environment.NewLine, Reader.Read(input)?.Contents!);
         Assert.That(content, Is.EqualTo(expectedContent));

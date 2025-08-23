@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework.Legacy;
 using Regira.IO.Extensions;
-using Regira.Media.Drawing.Models;
+using Regira.IO.Models;
 using Regira.Media.Drawing.Utilities;
 using Regira.Office.Barcodes.Abstractions;
 using Regira.Office.Barcodes.Exceptions;
@@ -65,7 +65,7 @@ public static class QRCodeTestExtensions
             return;
         }
 
-        var inputImg = new ImageFile().Load(inputPath);
+        var inputImg = new BinaryFileItem(inputPath).ToImageFile();
 
         var result = reader.Read(inputImg);
         var content = string.Join(Environment.NewLine, result?.Contents!);

@@ -148,20 +148,21 @@ public static class SkiaUtility
     {
         options ??= new TextImageOptions();
 
-        var textColor = options.TextColor.ToSkiaColor();
-        var backgroundColor = options.BackgroundColor.ToSkiaColor();
+        var textColor = (options.TextColor??TextImageOptions.DEFAULT_TEXT_COLOR).ToSkiaColor();
+        var backgroundColor = (options.BackgroundColor??TextImageOptions.DEFAULT_BACKGROUND_COLOR).ToSkiaColor();
 
         // Create SKFont for measuring
         using var typeface = SKTypeface.FromFamilyName(options.FontName, SKFontStyle.Normal);
-        using var font = new SKFont(typeface, options.FontSize);
+        using var font = new SKFont(typeface, options.FontSize ?? TextImageOptions.DEFAULT_FONT_SIZE);
 
         // Measure text width using SKFont
         float textWidth = font.MeasureText(input);
         float textHeight = font.Metrics.Descent - font.Metrics.Ascent;
 
         // Add padding
-        int width = (int)Math.Ceiling(textWidth + options.Margin * 2);
-        int height = (int)Math.Ceiling(textHeight + options.Margin * 2);
+        var padding = options.Padding ?? 0;
+        int width = (int)Math.Ceiling(textWidth + padding * 2);
+        int height = (int)Math.Ceiling(textHeight + padding * 2);
 
         var info = new SKImageInfo(width, height);
         using var surface = SKSurface.Create(info);
@@ -174,8 +175,8 @@ public static class SkiaUtility
         paint.Color = textColor;
 
         // Baseline-adjusted position
-        float x = options.Margin;
-        float y = options.Margin - font.Metrics.Ascent;
+        float x = padding;
+        float y = padding - font.Metrics.Ascent;
 
         canvas.DrawText(input, x, y, font, paint);
 

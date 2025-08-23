@@ -30,8 +30,8 @@ public class ImageBuilder(IImageService service)
     {
         var dpi = _dpi ?? ImageConstants.DEFAULT_DPI;
         var target = _target ?? service.Create(
-            _items.Max(x => SizeUtility.GetPixels(x.Width, x.DimensionUnit, 0, dpi)),
-            _items.Max(x => SizeUtility.GetPixels(x.Height, x.DimensionUnit, 0, dpi))
+            _items.Max(x => SizeUtility.GetPixels(x.Size?.Width ?? 0, x.DimensionUnit, 0, dpi)),
+            _items.Max(x => SizeUtility.GetPixels(x.Size?.Height ?? 0, x.DimensionUnit, 0, dpi))
         );
 
         foreach (var item in _items)
@@ -62,16 +62,12 @@ public class ImageBuilder(IImageService service)
         new()
         {
             Image = service.CreateTextImage(item.Text, item.TextOptions),
-            Margin = item.Margin,
-            Bottom = item.Bottom,
             DimensionUnit = item.DimensionUnit,
-            Height = item.Height,
-            Left = item.Left,
-            Opacity = item.Opacity,
+            Size = item.Size,
+            Margin = item.Margin,
+            PositionType = item.PositionType,
             Position = item.Position,
-            Right = item.Right,
+            Opacity = item.Opacity,
             Rotation = item.Rotation,
-            Top = item.Top,
-            Width = item.Width
         };
 }

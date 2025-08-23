@@ -49,7 +49,7 @@ public static class DrawingTextExtensions
             FontName = "Arial",
             TextColor = "#00F",
             BackgroundColor = "#FFFF0099",
-            Margin = 5,
+            Padding = 5,
         });
         await service.SaveImage(testImage, "hello-world_margin.png");
         Assert.That(testImage.Format, Is.EqualTo(ImageFormat.Png));

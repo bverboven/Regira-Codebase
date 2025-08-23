@@ -2,7 +2,7 @@
 using Regira.Dimensions;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
-using Regira.Media.Drawing.Models;
+using Regira.IO.Models;
 using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Media.Drawing.Services.Abstractions;
 using Regira.Media.Drawing.Utilities;
@@ -24,9 +24,9 @@ public class SnapshotService(IImageService imageService, IProcessHelper? process
             size = new Size2D(mediaInfo.PrimaryVideoStream!.Width, mediaInfo.PrimaryVideoStream!.Height);
         }
 
-        var tempFile = $"{Path.GetTempFileName()}.bmp";
+        var tempPath = $"{Path.GetTempFileName()}.bmp";
         var ss = time?.ToString().Substring(0, 12);
-        var cmd = $@"ffmpeg -i ""{inputPath}"" -ss {ss} -update 1 -frames:v 1 ""{tempFile}""";
+        var cmd = $@"ffmpeg -i ""{inputPath}"" -ss {ss} -update 1 -frames:v 1 ""{tempPath}""";
         var result = _processHelper.ExecuteCommand(cmd);
 
         //var success = await FFMegService.SnapshotAsync(inputPath, tempFile, new Size((int)size.Value.Width, (int)size.Value.Height), time);
@@ -34,8 +34,9 @@ public class SnapshotService(IImageService imageService, IProcessHelper? process
         {
             throw new Exception("Internal error while creating snapshot");
         }
-        using var img = new ImageFile();
-        img.Load(tempFile);
+
+        using var tempFile = new BinaryFileItem(tempPath);
+        using var img = tempFile.ToImageFile();
         if (img.Length <= 0)
         {
             throw new Exception("Empty file");
@@ -43,7 +44,7 @@ public class SnapshotService(IImageService imageService, IProcessHelper? process
         using var jpeg = imageService.ChangeFormat(img, Drawing.Enums.ImageFormat.Jpeg);
         var resized = imageService.Resize(jpeg, size.Value);
 
-        File.Delete(tempFile);
+        File.Delete(tempPath);
 
         return resized;
     }

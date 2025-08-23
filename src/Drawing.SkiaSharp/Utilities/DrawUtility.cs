@@ -34,8 +34,8 @@ public static class DrawUtility
     {
         var images = imagesToAdd.ToList();
         var size = new System.Drawing.Size(
-            (int)images.Max(x => x.Width > 0 ? x.Width : x.Image.Size?.Width ?? 0),
-            (int)images.Max(x => x.Height > 0 ? x.Height : x.Image.Size?.Height ?? 0)
+            (int)images.Max(x => x.Size?.Width ?? (x.Image.Size?.Width ?? 0)),
+            (int)images.Max(x => x.Size?.Height ?? (x.Image.Size?.Height ?? 0))
         );
         return new SKBitmap(size.Width, size.Height);
     }
@@ -58,15 +58,17 @@ public static class DrawUtility
         using var opacityImage = SkiaUtility.ChangeOpacity(source, img.Opacity);
 
         // Calculate target width/height
-        var imgWidth = SizeUtility.GetPixels(img.Width, img.DimensionUnit, (int)targetSize.Width, dpi);
-        var imgHeight = SizeUtility.GetPixels(img.Height, img.DimensionUnit, (int)targetSize.Height, dpi);
-        var imgLeft = SizeUtility.GetPixels(img.Left, img.DimensionUnit, (int)targetSize.Width, dpi);
-        var imgRight = SizeUtility.GetPixels(img.Right, img.DimensionUnit, (int)targetSize.Width, dpi);
-        var imgTop = SizeUtility.GetPixels(img.Top, img.DimensionUnit, (int)targetSize.Height, dpi);
-        var imgBottom = SizeUtility.GetPixels(img.Bottom, img.DimensionUnit, (int)targetSize.Height, dpi);
+        var inputSize = img.Size ?? new Size2D();
+        var inputPosition = img.Position ?? new Position2D();
+        var imgWidth = SizeUtility.GetPixels(inputSize.Width, img.DimensionUnit, (int)targetSize.Width, dpi);
+        var imgHeight = SizeUtility.GetPixels(inputSize.Height, img.DimensionUnit, (int)targetSize.Height, dpi);
+        int? imgLeft = inputPosition.Left.HasValue ? SizeUtility.GetPixels(inputPosition.Left.Value, img.DimensionUnit, (int)targetSize.Width, dpi) : null;
+        int? imgRight = inputPosition.Right.HasValue ? SizeUtility.GetPixels(inputPosition.Right.Value, img.DimensionUnit, (int)targetSize.Width, dpi) : null;
+        int? imgTop = inputPosition.Top.HasValue ? SizeUtility.GetPixels(inputPosition.Top.Value, img.DimensionUnit, (int)targetSize.Height, dpi) : null;
+        int? imgBottom = inputPosition.Bottom.HasValue ? SizeUtility.GetPixels(inputPosition.Bottom.Value, img.DimensionUnit, (int)targetSize.Height, dpi) : null;
 
-        int width = img.Width > 0 ? imgWidth : opacityImage.Width;
-        int height = img.Height > 0 ? imgHeight : opacityImage.Height;
+        int width = inputSize.Width > 0 ? imgWidth : opacityImage.Width;
+        int height = inputSize.Height > 0 ? imgHeight : opacityImage.Height;
 
         if (width > targetSize.Width)
         {
@@ -89,11 +91,11 @@ public static class DrawUtility
 
         // Position
         double left = 0;
-        if (img.Position.HasFlag(ImagePosition.HCenter))
+        if (img.PositionType.HasFlag(ImagePosition.HCenter))
         {
             left = (targetSize.Width / 2) - (resizedImage.Width / 2f);
         }
-        else if (img.Position.HasFlag(ImagePosition.Right) || Math.Abs(left) < double.Epsilon && img.Right > 0)
+        else if (img.PositionType.HasFlag(ImagePosition.Right) || Math.Abs(left) < double.Epsilon && inputPosition.Right.HasValue)
         {
             left = targetSize.Width - resizedImage.Width - img.Margin;
         }
@@ -103,11 +105,11 @@ public static class DrawUtility
         }
 
         double top = 0;
-        if (img.Position.HasFlag(ImagePosition.VCenter))
+        if (img.PositionType.HasFlag(ImagePosition.VCenter))
         {
             top = (targetSize.Height / 2) - (resizedImage.Height / 2f);
         }
-        else if (img.Position.HasFlag(ImagePosition.Bottom) || Math.Abs(top) < double.Epsilon && img.Bottom > 0)
+        else if (img.PositionType.HasFlag(ImagePosition.Bottom) || Math.Abs(top) < double.Epsilon && inputPosition.Bottom.HasValue)
         {
             top = targetSize.Height - resizedImage.Height - img.Margin;
         }
@@ -116,8 +118,8 @@ public static class DrawUtility
             top += img.Margin;
         }
 
-        left += imgLeft - imgRight;
-        top += imgTop - imgBottom;
+        left += (imgLeft ?? 0) - (imgRight ?? 0);
+        top += (imgTop ?? 0) - (imgBottom ?? 0);
 
         canvas.DrawBitmap(resizedImage, (float)left, (float)top);
     }

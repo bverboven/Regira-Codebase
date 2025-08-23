@@ -9,21 +9,22 @@ namespace Regira.Media.Drawing.Utilities;
 
 public static class ImageFileUtility
 {
-    public static IImageFile Load(this IImageFile img, string path)
+    public static void Load(IImageFile img, string path)
     {
         var bytes = File.ReadAllBytes(path);
         img.Bytes = bytes;
         img.Length = bytes.Length;
         img.ContentType = ContentTypeUtility.GetContentType(path);
-        return img;
     }
-    public static IImageFile ToImageFile(this IBinaryFile file)
+    public static ImageFile ToImageFile(this IBinaryFile file)
     {
         if (!file.HasBytes() && !file.HasStream())
         {
             if (file.HasPath())
             {
-                return new ImageFile().Load(file.Path!);
+                var img = new ImageFile();
+                Load(img, file.Path!);
+                return img;
             }
         }
         return new ImageFile
@@ -47,7 +48,7 @@ public static class ImageFileUtility
         contentType ??= file.ContentType ?? "image/png";
         return $"data:{contentType};base64,{bytes.GetBase64String()}";
     }
-    public static IImageFile FromBase64(string contents)
+    public static ImageFile FromBase64(string contents)
     {
         string? contentType = null;
         var firstChars = contents.Truncate(64)!;

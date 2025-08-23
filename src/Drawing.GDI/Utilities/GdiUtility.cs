@@ -397,9 +397,9 @@ public static class GdiUtility
     {
         options ??= new TextImageOptions();
 
-        var font = new Font(FontFamily.Families.First(f => f.Name.Equals(options.FontName)), options.FontSize);
-        var textColor = options.TextColor.ToGdiColor();
-        var backgroundColor = options.BackgroundColor.ToGdiColor();
+        var font = new Font(FontFamily.Families.First(f => f.Name.Equals(options.FontName ?? TextImageOptions.DEFAULT_FONT_NAME)), options.FontSize ?? TextImageOptions.DEFAULT_FONT_SIZE);
+        var textColor = (options.TextColor ?? TextImageOptions.DEFAULT_TEXT_COLOR).ToGdiColor();
+        var backgroundColor = (options.BackgroundColor ?? TextImageOptions.DEFAULT_BACKGROUND_COLOR).ToGdiColor();
 
         SizeF textSize;
         using (var dummy = new Bitmap(1, 1))
@@ -408,12 +408,13 @@ public static class GdiUtility
             textSize = drawing.MeasureString(text, font);
         }
 
-        var img = Create((int)textSize.Width + options.Margin * 2, (int)textSize.Height + options.Margin * 2, options.BackgroundColor.ToGdiColor());
+        var padding = options.Padding ?? 0;
+        var img = Create((int)textSize.Width + padding * 2, (int)textSize.Height + padding * 2, backgroundColor);
         using (var drawing = GetGraphics(img))
         {
             drawing.Clear(backgroundColor);
             var brush = new SolidBrush(textColor);
-            drawing.DrawString(text, font, brush, options.Margin, options.Margin);
+            drawing.DrawString(text, font, brush, padding, padding);
             drawing.Save();
             brush.Dispose();
         }

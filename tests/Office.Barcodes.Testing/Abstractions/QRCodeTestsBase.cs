@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework.Legacy;
 using Regira.Drawing.SkiaSharp.Services;
 using Regira.IO.Extensions;
-using Regira.Media.Drawing.Models;
+using Regira.IO.Models;
 using Regira.Media.Drawing.Utilities;
 using Regira.Office.Barcodes.Abstractions;
 using Regira.Office.Barcodes.Exceptions;
@@ -62,7 +62,7 @@ public abstract class QRCodeTestsBase
             Size = size
         };
         using var barCodeImg = QRWriter.Create(input);
-        await barCodeImg.SaveAs(Path.Combine(OutputDir, $"barcode-{input.Size.Width}x{input.Size.Height}-zxing.jpg"));
+        await barCodeImg.SaveAs(Path.Combine(OutputDir, $"qrcode-{input.Size.Width}x{input.Size.Height}.jpg"));
         ClassicAssert.IsNotNull(barCodeImg.GetBytes());
         Assert.That(barCodeImg.GetLength() > 0, Is.True);
         Assert.That(barCodeImg.Size?.Width, Is.EqualTo(input.Size.Width));
@@ -90,7 +90,7 @@ public abstract class QRCodeTestsBase
             return;
         }
 
-        var inputImg = new ImageFile().Load(Path.Combine(InputDir, filename));
+        var inputImg = new BinaryFileItem(Path.Combine(InputDir, filename)).ToImageFile();
 
         var result = QRReader.Read(inputImg);
         var content = string.Join(Environment.NewLine, result?.Contents!);
@@ -106,8 +106,9 @@ public abstract class QRCodeTestsBase
         }
 
         var input = "This is a test";
-        var inputBytes = QRWriter?.Create(input);
-        var content = QRReader.Read(inputBytes!)?.Contents?.FirstOrDefault();
+        var qrImage = QRWriter?.Create(input);
+        qrImage!.SaveAs(Path.Combine(OutputDir, $"qrcode-{input.Length}.jpg")).Wait();
+        var content = QRReader.Read(qrImage!)?.Contents?.FirstOrDefault();
         Assert.That(content, Is.EqualTo(input));
         return Task.CompletedTask;
     }
