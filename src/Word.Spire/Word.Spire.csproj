@@ -11,7 +11,7 @@
     <AssemblyName>Regira.Office.Word.Spire</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.5.0</Version>
+    <Version>4.6.0</Version>
   </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
     <PackageReference Include="FreeSpire.Doc" Version="9.9.7" />
