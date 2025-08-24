@@ -1,33 +1,32 @@
-﻿namespace Regira.Media.Drawing.Models;
+﻿using Regira.Media.Drawing.Constants;
+using System.Diagnostics;
 
-public class Color(byte red = byte.MaxValue, byte green = byte.MaxValue, byte blue = byte.MaxValue, byte alpha = ImageConstants.DEFAULT_ALPHA)
+namespace Regira.Media.Drawing.Models;
+
+[DebuggerDisplay("Color = [{Red},{Green},{Blue},{Alpha}]")]
+public readonly struct Color(byte red = byte.MaxValue, byte green = byte.MaxValue, byte blue = byte.MaxValue, byte? alpha = null) : IEquatable<Color>
 {
     public byte Red { get; } = red;
     public byte Green { get; } = green;
     public byte Blue { get; } = blue;
-    public byte Alpha { get; } = alpha;
+    public byte Alpha { get; } = alpha ?? ImageDefaults.Alpha;
 
     /// <summary>
     /// Gets the hexadecimal color code representation of the RGB color (without alpha).
     /// </summary>
     public string Hex => $"#{Red:X2}{Green:X2}{Blue:X2}";
+    /// <summary>
+    /// Gets the hexadecimal color code representation of the RGBA color.
+    /// </summary>
+    public string HexA => $"#{Red:X2}{Green:X2}{Blue:X2}{Alpha:X2}";
 
     // ReSharper disable RedundantArgumentDefaultValue
     public static Color Transparent => new(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MinValue);
-    public static Color White => new(byte.MaxValue, byte.MaxValue, byte.MaxValue);
-    public static Color Black => new(byte.MinValue, byte.MinValue, byte.MinValue);
+    public static Color White => new(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
+    public static Color Black => new(byte.MinValue, byte.MinValue, byte.MinValue, byte.MaxValue);
     // ReSharper restore RedundantArgumentDefaultValue
 
-    public override string ToString()
-        => $"#{Red:X2}{Green:X2}{Blue:X2}{Alpha:X2}";
-    public override bool Equals(object? obj)
-    {
-        if (!(obj is Color color))
-        {
-            return false;
-        }
-        return Red == color.Red && Green == color.Green && Blue == color.Blue && Alpha == color.Alpha;
-    }
+    public override string ToString() => HexA;
 
     public static implicit operator Color(byte[] array)
     {
@@ -39,7 +38,7 @@ public class Color(byte red = byte.MaxValue, byte green = byte.MaxValue, byte bl
         var r = array[0];
         var g = array[1];
         var b = array[2];
-        var a = array.Length == 4 ? array[3] : ImageConstants.DEFAULT_ALPHA;
+        var a = array.Length == 4 ? array[3] : ImageDefaults.Alpha;
 
         return new Color(r, g, b, a);
     }
@@ -47,7 +46,7 @@ public class Color(byte red = byte.MaxValue, byte green = byte.MaxValue, byte bl
     {
         if (string.IsNullOrWhiteSpace(hex))
         {
-            return new Color();
+            return ImageDefaults.BackgroundColor;
         }
 
         hex = hex.TrimStart('#');
@@ -70,12 +69,29 @@ public class Color(byte red = byte.MaxValue, byte green = byte.MaxValue, byte bl
         var r = Convert.ToByte(hex.Substring(0, 2), 16);
         var g = Convert.ToByte(hex.Substring(2, 2), 16);
         var b = Convert.ToByte(hex.Substring(4, 2), 16);
-        var a = hex.Length == 8 ? Convert.ToByte(hex.Substring(6, 2), 16) : ImageConstants.DEFAULT_ALPHA;
+        var a = hex.Length == 8 ? Convert.ToByte(hex.Substring(6, 2), 16) : ImageDefaults.Alpha;
 
         return new Color(r, g, b, a);
     }
     public static implicit operator byte[](Color? rgba)
-        => [rgba?.Red ?? byte.MaxValue, rgba?.Green ?? byte.MaxValue, rgba?.Blue ?? byte.MaxValue, rgba?.Alpha ?? ImageConstants.DEFAULT_ALPHA];
+        => [rgba?.Red ?? byte.MaxValue, rgba?.Green ?? byte.MaxValue, rgba?.Blue ?? byte.MaxValue, rgba?.Alpha ?? ImageDefaults.Alpha];
     public static implicit operator string(Color? rgba)
         => (rgba ?? new Color()).ToString();
+
+    // IEquatable
+    public bool Equals(Color other)
+        => Red == other.Red && Green == other.Green && Blue == other.Blue && Alpha == other.Alpha;
+    public override bool Equals(object? obj)
+        => obj is Color other && Equals(other);
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            var hashCode = Red.GetHashCode();
+            hashCode = (hashCode * 397) ^ Green.GetHashCode();
+            hashCode = (hashCode * 397) ^ Blue.GetHashCode();
+            hashCode = (hashCode * 397) ^ Alpha.GetHashCode();
+            return hashCode;
+        }
+    }
 }

@@ -79,7 +79,7 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
             using var image = doc.SaveAsImage(i);
             if (options?.Size.HasValue == true)
             {
-                using var resized = GdiUtility.Resize(image, options.Size.Value.ToSize());
+                using var resized = GdiUtility.Resize(image, options.Size.Value.ToGdiSize());
                 yield return resized.ToImageFile(ImageFormat.Jpeg);
             }
             else
@@ -96,5 +96,4 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
         doc.SaveToStream(ms);
         return ms.ToMemoryFile(ContentTypes.PDF);
     }
-
 }

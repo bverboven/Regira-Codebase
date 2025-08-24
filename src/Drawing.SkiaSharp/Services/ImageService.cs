@@ -2,6 +2,7 @@
 using Regira.Drawing.SkiaSharp.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
+using Regira.Media.Drawing.Constants;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Models.Abstractions;
@@ -63,21 +64,21 @@ public class ImageService : IImageService
         };
         return img;
     }
-    public IImageFile? Parse(byte[] rawBytes, int width, int height, ImageFormat? format = null)
+    public IImageFile? Parse(byte[] rawBytes, Size2D size, ImageFormat? format = null)
     {
         format ??= ImageFormat.Jpeg;
-        
+
         using var skImg = SKImage.FromPixels(
-            new SKImageInfo(width, height, SKColorType.Bgra8888, SKAlphaType.Premul),
+            new SKImageInfo((int)size.Width, (int)size.Height, SKColorType.Bgra8888, SKAlphaType.Premul),
             SKData.CreateCopy(rawBytes)
         );
-        
+
         using var skBitmap = SKBitmap.FromImage(skImg);
         if (skBitmap == null)
         {
             return null;
         }
-        
+
         using var img = SkiaUtility.ChangeFormat(skBitmap, format.Value.ToSkiaFormat());
         return img.ToImageFile(format.Value.ToSkiaFormat());
     }
@@ -107,11 +108,18 @@ public class ImageService : IImageService
         return convertedBitmap.ToImageFile(skiaFormat);
     }
 
-    public IImageFile CropRectangle(IImageFile input, int[] rect)
+    public IImageFile CropRectangle(IImageFile input, Position2D rect)
     {
         var format = GetFormat(input);
         using var sourceBitmap = input.ToBitmap();
-        using var croppedBitmap = SkiaUtility.CropRectangle(sourceBitmap, new SKRect(rect[0], rect[1], rect[0] + rect[2], rect[1] + rect[3]));
+        var skRect = new SKRect(
+           rect.Left!.Value,
+           rect.Top!.Value,
+           // Position2D expects Right and Bottom to be distances from the right/bottom edge
+           sourceBitmap.Width - rect.Right!.Value,
+           sourceBitmap.Height - rect.Bottom!.Value
+        );
+        using var croppedBitmap = SkiaUtility.CropRectangle(sourceBitmap, skRect);
         return croppedBitmap.ToImageFile(format.ToSkiaFormat());
     }
 
@@ -135,11 +143,11 @@ public class ImageService : IImageService
         return scaledBitmap.ToImageFile(format.ToSkiaFormat());
     }
 
-    public IImageFile Rotate(IImageFile input, double angle, string? background = null)
+    public IImageFile Rotate(IImageFile input, float angle, Color? background = null)
     {
         var format = GetFormat(input);
         using var sourceBitmap = input.ToBitmap();
-        using var rotatedBitmap = SkiaUtility.Rotate(sourceBitmap, angle, background);
+        using var rotatedBitmap = SkiaUtility.Rotate(sourceBitmap, angle, (background ?? Color.Transparent).ToSkiaColor());
         return rotatedBitmap.ToImageFile(format.ToSkiaFormat());
     }
 
@@ -163,10 +171,11 @@ public class ImageService : IImageService
         using var image = input.ToBitmap();
         return SkiaUtility.GetPixelColor(image, x, y).ToColor();
     }
-    public IImageFile MakeTransparent(IImageFile input, int[]? rgb = null)
+    public IImageFile MakeTransparent(IImageFile input, Color? color = null)
     {
+        color ??= new Color(245, 245, 245);
         using var sourceBitmap = input.ToBitmap();
-        var transparentBitmap = SkiaUtility.MakeTransparent(sourceBitmap, rgb);
+        var transparentBitmap = SkiaUtility.MakeTransparent(sourceBitmap, color.Value.ToSkiaColor());
         // return as PNG image
         return transparentBitmap.ToImageFile();
     }
@@ -196,21 +205,22 @@ public class ImageService : IImageService
         return outputBitmap.ToImageFile();
     }
 
-    public IImageFile Create(int width, int height, Color? backgroundColor = null, ImageFormat? format = null)
+    public IImageFile Create(Size2D size, Color? backgroundColor = null, ImageFormat? format = null)
     {
-        using var img = SkiaUtility.Create(width, height, backgroundColor, format);
-        return img.ToImageFile();
+        using var img = SkiaUtility.Create(size.ToSkiaSize(), (backgroundColor ?? ImageDefaults.BackgroundColor).ToSkiaColor());
+        return img.ToImageFile((format ?? ImageDefaults.Format).ToSkiaFormat());
     }
     public IImageFile CreateTextImage(string input, TextImageOptions? options = null)
     {
         using var img = SkiaUtility.CreateTextImage(input, options);
         return img.ToImageFile();
     }
-    public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int dpi = ImageConstants.DEFAULT_DPI)
+    public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int? dpi = null)
     {
+        dpi ??= PrintDefaults.Dpi;
         var imagesCollection = imagesToAdd.ToArray();
         using var targetImage = target?.ToBitmap() ?? DrawUtility.CreateSizedCanvas(imagesCollection);
-        DrawUtility.Draw(imagesCollection, targetImage, dpi);
+        DrawUtility.Draw(imagesCollection, targetImage, dpi.Value);
         return targetImage.ToImageFile();
     }
 }

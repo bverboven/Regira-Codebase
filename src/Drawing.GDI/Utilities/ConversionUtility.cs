@@ -13,7 +13,7 @@ namespace Regira.Drawing.GDI.Utilities;
 
 public static class ConversionUtility
 {
-    public static Size ToSize(this Size2D size)
+    public static Size ToGdiSize(this Size2D size)
     {
         return new Size((int)size.Width, (int)size.Height);
     }

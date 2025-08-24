@@ -1,5 +1,6 @@
 ﻿using Regira.Dimensions;
 using Regira.Media.Drawing.Enums;
+using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Services.Abstractions;
 
 namespace Drawing.Testing.Abstractions;
@@ -77,12 +78,12 @@ public static class DrawingImageExtensions
         var halfWidth = (int)image.Size!.Value.Width / 2;
         var halfHeight = (int)image.Size!.Value.Height / 2;
 
-        var rectangles = new Dictionary<string, int[]>()
+        var rectangles = new Dictionary<string, Position2D>
         {
-            ["topleft"] = [0, 0, halfWidth, halfHeight],
-            ["topright"] = [halfWidth, 0, halfWidth, halfHeight],
-            ["bottomleft"] = [0, halfHeight, halfWidth, halfHeight],
-            ["bottomright"] = [halfWidth, halfHeight, halfWidth, halfHeight]
+            ["topleft"] = new(0, 0, halfHeight, halfWidth),
+            ["topright"] = new(0, halfWidth, halfHeight, 0),
+            ["bottomleft"] = new(halfHeight, 0, 0, halfWidth),
+            ["bottomright"] = new(halfHeight, halfWidth, 0, 0)
         };
 
         foreach (var rectangle in rectangles)
@@ -95,7 +96,7 @@ public static class DrawingImageExtensions
     {
         using var image = await service.ReadImage(filename);
 
-        using var rgbImg = service.MakeTransparent(image, [200, 200, 200]);
+        using var rgbImg = service.MakeTransparent(image, new Color(200, 200, 200));
         await service.SaveImage(rgbImg, $"{Path.GetFileNameWithoutExtension(filename)}-transparent.png");
     }
     public static async Task Test_RemoveAlpha(this IImageService service, string filename)

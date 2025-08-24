@@ -1,5 +1,4 @@
 ﻿using Regira.TreeList;
-using Regira.Utilities;
 using Spire.Doc;
 using Spire.Doc.Documents;
 using Spire.Doc.Fields;
@@ -17,9 +16,10 @@ internal static class ParagraphExtensions
         if (!string.IsNullOrWhiteSpace(src.Text))
         {
             var textRange = target.AppendText(src.Text);
-            if (!string.IsNullOrWhiteSpace(src.TextColor))
+            if (src.TextColor.HasValue)
             {
-                textRange.CharacterFormat.TextColor = ColorUtility.FromHex(src.TextColor!);
+                var textColor = src.TextColor!.Value;
+                textRange.CharacterFormat.TextColor = System.Drawing.Color.FromArgb(textColor.Alpha, textColor.Red, textColor.Green, textColor.Blue);
             }
 
             if (!string.IsNullOrWhiteSpace(src.FontName))

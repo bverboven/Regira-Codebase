@@ -60,6 +60,11 @@ public static class ConversionUtility
         => new(color.Red, color.Green, color.Blue, color.Alpha);
 
     // File
+    public static IImageFile ToImageFile(this SKImage src, SKEncodedImageFormat format = SKEncodedImageFormat.Png)
+    {
+        using var skBitmap = SKBitmap.Decode(src.EncodedData);
+        return ToImageFile(skBitmap, format);
+    }
     public static IImageFile ToImageFile(this SKBitmap src, SKEncodedImageFormat format = SKEncodedImageFormat.Png)
     {
         using var img = SKImage.FromBitmap(src);
@@ -68,6 +73,7 @@ public static class ConversionUtility
         {
             Bytes = data.ToArray(),
             Size = new(src.Width, src.Height),
+            ContentType = $"image/{format.ToString().ToLower()}",
             Format = ToImageFormat(format),
             Length = data.Size
         };

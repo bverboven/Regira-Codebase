@@ -42,7 +42,7 @@ public class QRCodeService : IQRCodeService
         encoder.SaveQRCodeToPngFile(ms);
 
         // resize image
-        using var img = GdiUtility.Resize(Image.FromStream(ms), input.Size.ToSize());
+        using var img = GdiUtility.ResizeFixed(Image.FromStream(ms), input.Size.ToGdiSize());
         return img.ToImageFile(ImageFormat.Jpeg);
     }
 

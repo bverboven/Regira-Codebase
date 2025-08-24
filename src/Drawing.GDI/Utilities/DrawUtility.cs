@@ -1,18 +1,22 @@
 using Regira.Dimensions;
 using Regira.IO.Extensions;
+using Regira.Media.Drawing.Constants;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
 using Regira.Utilities;
 using System.Drawing;
+
 #pragma warning disable CA1416
 
 namespace Regira.Drawing.GDI.Utilities;
 
 public static class DrawUtility
 {
-    public static Image Draw(IEnumerable<ImageToAdd> imagesToAdd, Image? target = null, int dpi = ImageConstants.DEFAULT_DPI)
+    public static Image Draw(IEnumerable<ImageToAdd> imagesToAdd, Image? target = null, int? dpi = null)
     {
+        dpi ??= PrintDefaults.Dpi;
+
         var images = imagesToAdd.AsList();
         target ??= CreateSizedCanvas(images);
 
@@ -39,8 +43,10 @@ public static class DrawUtility
         );
         return new Bitmap(size.Width, size.Height);
     }
-    public static void AddImage(ImageToAdd img, Graphics g1, Size2D targetSize, int dpi = ImageConstants.DEFAULT_DPI)
+    public static void AddImage(ImageToAdd img, Graphics g1, Size2D targetSize, int? dpi = null)
     {
+        dpi ??= PrintDefaults.Dpi;
+
         Image source;
         if (img.Image.HasStream())
         {
@@ -89,10 +95,10 @@ public static class DrawUtility
         using var resizedImage = width != 0 && newImg.Width != width || height != 0 && newImg.Height != height ? GdiUtility.Resize(newImg, new Size(width, height)) : new Bitmap(newImg);
 
         // Rotate?
-        using var rotatedImage = Math.Abs(img.Rotation) > double.Epsilon ? GdiUtility.Rotate(resizedImage, img.Rotation) : new Bitmap(resizedImage);
+        using var rotatedImage = Math.Abs(img.Rotation) > float.Epsilon ? GdiUtility.Rotate(resizedImage, img.Rotation, null) : new Bitmap(resizedImage);
 
         // Position
-        double left = 0;
+        float left = 0;
         if (img.PositionType.HasFlag(ImagePosition.HCenter))
         {
             left = targetSize.Width / 2 - resizedImage.Width / 2f;
@@ -101,7 +107,7 @@ public static class DrawUtility
         {
             left = targetSize.Width - resizedImage.Width - img.Margin;
         }
-        else if (Math.Abs(left) < double.Epsilon && inputPosition.Right.HasValue)
+        else if (Math.Abs(left) < float.Epsilon && inputPosition.Right.HasValue)
         {
             left = targetSize.Width - resizedImage.Width - img.Margin;
         }
@@ -110,7 +116,7 @@ public static class DrawUtility
             left += img.Margin;
         }
 
-        double top = 0;
+        float top = 0;
         if (img.PositionType.HasFlag(ImagePosition.VCenter))
         {
             top = targetSize.Height / 2 - resizedImage.Height / 2f;
@@ -119,7 +125,7 @@ public static class DrawUtility
         {
             top = targetSize.Height - resizedImage.Height - img.Margin;
         }
-        else if (Math.Abs(top) < double.Epsilon && inputPosition.Bottom.HasValue)
+        else if (Math.Abs(top) < float.Epsilon && inputPosition.Bottom.HasValue)
         {
             top = targetSize.Height - resizedImage.Height - img.Margin;
         }

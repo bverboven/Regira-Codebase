@@ -1,13 +1,14 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
-using Regira.Dimensions;
+﻿using Regira.Dimensions;
 using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
+using Regira.Media.Drawing.Constants;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Media.Drawing.Services.Abstractions;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 using Color = Regira.Media.Drawing.Models.Color;
 using ImageFormat = Regira.Media.Drawing.Enums.ImageFormat;
 #pragma warning disable CA1416
@@ -36,9 +37,9 @@ public class ImageService : IImageService
         using var stream = new MemoryStream(bytes);
         return Parse(stream);
     }
-    public IImageFile Parse(byte[] rawBytes, int width, int height, ImageFormat? format = null)
+    public IImageFile Parse(byte[] rawBytes, Size2D size, ImageFormat? format = null)
     {
-        using var bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+        using var bmp = new Bitmap((int)size.Width, (int)size.Height, PixelFormat.Format32bppArgb);
         var rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
 
         var bmpData = bmp.LockBits(rect, ImageLockMode.WriteOnly, bmp.PixelFormat);
@@ -62,10 +63,17 @@ public class ImageService : IImageService
         return convertedImg.ToImageFile(targetFormat.ToGdiImageFormat());
     }
 
-    public IImageFile CropRectangle(IImageFile input, int[] rect)
+    public IImageFile CropRectangle(IImageFile input, Position2D rect)
     {
         using var img = input.ToBitmap();
-        using var cropped = GdiUtility.CropRectangle(img, new Rectangle(rect[0], rect[1], rect[2], rect[3]));
+        var gdiRectangle = new Rectangle(
+            (int)rect.Left!,
+            (int)rect.Top!,
+            // Position2D expects Right and Bottom to be distances from the right/bottom edge
+            (int)(img.Width - rect.Right! - rect.Left),
+            (int)(img.Height - rect.Bottom! - rect.Top)
+        );// int x, int y, int width, int height
+        using var cropped = GdiUtility.CropRectangle(img, gdiRectangle);
         return cropped.ToImageFile(img.RawFormat);
     }
 
@@ -87,10 +95,10 @@ public class ImageService : IImageService
         return resized.ToImageFile(img.RawFormat);
     }
 
-    public IImageFile Rotate(IImageFile input, double angle, string? background = null)
+    public IImageFile Rotate(IImageFile input, float angle, Color? background = null)
     {
         using var img = input.ToBitmap();
-        using var rotated = GdiUtility.Rotate(img, angle, background);
+        using var rotated = GdiUtility.Rotate(img, angle, background?.ToGdiColor());
         return rotated.ToImageFile(img.RawFormat);
     }
     public IImageFile FlipHorizontal(IImageFile input)
@@ -111,10 +119,11 @@ public class ImageService : IImageService
         using var img = input.ToBitmap();
         return GdiUtility.GetPixelColor(img, x, y).ToColor();
     }
-    public IImageFile MakeTransparent(IImageFile input, int[]? rgb = null)
+    public IImageFile MakeTransparent(IImageFile input, Color? color = null)
     {
+        color ??= new Color(245, 245, 245);
         using var img = input.ToBitmap();
-        using var target = GdiUtility.MakeTransparent(img, rgb);
+        using var target = GdiUtility.MakeTransparent(img, color.Value.ToGdiColor());
         return target.ToImageFile(System.Drawing.Imaging.ImageFormat.Png);
     }
 
@@ -130,9 +139,9 @@ public class ImageService : IImageService
         return target.ToImageFile(img.RawFormat);
     }
 
-    public IImageFile Create(int width, int height, Color? backgroundColor = null, ImageFormat? format = null)
+    public IImageFile Create(Size2D size, Color? backgroundColor = null, ImageFormat? format = null)
     {
-        using var img = GdiUtility.Create(width, height, backgroundColor?.ToGdiColor(), format?.ToGdiImageFormat());
+        using var img = GdiUtility.Create(size.ToGdiSize(), (backgroundColor ?? ImageDefaults.BackgroundColor).ToGdiColor(), (format ?? ImageDefaults.Format).ToGdiImageFormat());
         return img.ToImageFile(img.RawFormat);
     }
     public IImageFile CreateTextImage(string input, TextImageOptions? options = null)
@@ -140,11 +149,12 @@ public class ImageService : IImageService
         using var img = GdiUtility.CreateTextImage(input, options);
         return img.ToImageFile(img.RawFormat);
     }
-    public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int dpi = 150)
+    public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int? dpi = null)
     {
+        dpi ??= PrintDefaults.Dpi;
         var imagesCollection = imagesToAdd.ToArray();
         using var targetImage = target?.ToBitmap() ?? DrawUtility.CreateSizedCanvas(imagesCollection);
-        DrawUtility.Draw(imagesCollection, targetImage, dpi);
+        DrawUtility.Draw(imagesCollection, targetImage, dpi.Value);
         return targetImage.ToImageFile(targetImage.RawFormat);
     }
 }

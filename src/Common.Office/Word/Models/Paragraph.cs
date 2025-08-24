@@ -1,4 +1,6 @@
-﻿namespace Regira.Office.Word.Models;
+﻿using Regira.Media.Drawing.Models;
+
+namespace Regira.Office.Word.Models;
 
 public class Paragraph
 {
@@ -12,7 +14,7 @@ public class Paragraph
     /// <summary>
     /// Color (hex)
     /// </summary>
-    public string? TextColor { get; set; }
+    public Color? TextColor { get; set; }
     public HorizontalAlignment? HorizontalAlignment { get; set; }
     public ParagraphStyle? Style { get; set; }
 

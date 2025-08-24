@@ -2,6 +2,7 @@
 using Docnet.Core.Editors;
 using Docnet.Core.Models;
 using Regira.Collections;
+using Regira.Dimensions;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Models.Abstractions;
@@ -190,7 +191,7 @@ public class PdfManager(IImageService imageService) : IPdfService
             var width = pr.GetPageWidth();
             var height = pr.GetPageHeight();
 
-            yield return imageService.Parse(imgBytes, width, height, options?.Format)!;
+            yield return imageService.Parse(imgBytes, new Size2D(width, height), options?.Format)!;
         }
     }
 }

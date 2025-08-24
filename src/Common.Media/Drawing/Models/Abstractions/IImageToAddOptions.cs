@@ -7,9 +7,9 @@ public interface IImageToAddOptions
 {
     LengthUnit DimensionUnit { get; set; }
     Size2D? Size { get; set; }
-    double Margin { get; set; }
+    float Margin { get; set; }
     ImagePosition PositionType { get; set; }
     Position2D? Position { get; set; }
-    double Rotation { get; set; }
-    double Opacity { get; set; }
+    float Rotation { get; set; }
+    float Opacity { get; set; }
 }

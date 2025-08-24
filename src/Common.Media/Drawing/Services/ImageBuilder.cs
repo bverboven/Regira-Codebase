@@ -1,3 +1,5 @@
+using Regira.Dimensions;
+using Regira.Media.Drawing.Constants;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Media.Drawing.Services.Abstractions;
@@ -28,10 +30,12 @@ public class ImageBuilder(IImageService service)
     }
     public IImageFile Build()
     {
-        var dpi = _dpi ?? ImageConstants.DEFAULT_DPI;
+        var dpi = _dpi ?? PrintDefaults.Dpi;
         var target = _target ?? service.Create(
-            _items.Max(x => SizeUtility.GetPixels(x.Size?.Width ?? 0, x.DimensionUnit, 0, dpi)),
-            _items.Max(x => SizeUtility.GetPixels(x.Size?.Height ?? 0, x.DimensionUnit, 0, dpi))
+           new Size2D(
+               _items.Max(x => SizeUtility.GetPixels(x.Size?.Width ?? 0, x.DimensionUnit, 0, dpi)),
+               _items.Max(x => SizeUtility.GetPixels(x.Size?.Height ?? 0, x.DimensionUnit, 0, dpi))
+            )
         );
 
         foreach (var item in _items)

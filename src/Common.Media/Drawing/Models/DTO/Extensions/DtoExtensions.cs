@@ -1,4 +1,5 @@
 ﻿using Regira.Dimensions;
+using Regira.Media.Drawing.Constants;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models.Abstractions;
 
@@ -14,13 +15,13 @@ public static class DtoExtensions
             {
                 Bytes = dto.Image
             },
-            DimensionUnit = dto.DimensionUnit ?? LengthUnit.Points,
-            Size = new Size2D((float)(dto.Width ?? 0), (float)(dto.Height ?? 0)),
-            Margin = dto.Margin ?? 0,
+            DimensionUnit = dto.DimensionUnit ?? DrawImageDefaults.DimensionUnit,
+            Size = new Size2D(dto.Width ?? 0, dto.Height ?? 0),
+            Margin = dto.Margin ?? DrawImageDefaults.Margin,
             PositionType = dto.PositionType ?? ImagePosition.Absolute,
-            Position = new Position2D((float?)dto.Top, (float?)dto.Left, (float?)dto.Bottom, (float?)dto.Right),
-            Rotation = dto.Rotation ?? 0,
-            Opacity = dto.Opacity ?? 1
+            Position = new Position2D(dto.Top, dto.Left, dto.Bottom, dto.Right),
+            Rotation = dto.Rotation ?? DrawImageDefaults.Rotation,
+            Opacity = dto.Opacity ?? DrawImageDefaults.Opacity
         };
     }
     public static IImageToAddOptions ToImageToAdd(this TextImageInputDto dto)
@@ -30,17 +31,17 @@ public static class DtoExtensions
             Text = dto.Text,
             TextOptions = new TextImageOptions
             {
-                FontName = dto.Options?.FontName,
-                FontSize = dto.Options?.FontSize,
-                TextColor = dto.Options?.TextColor,
-                BackgroundColor = dto.Options?.BackgroundColor,
-                Padding = dto.Options?.Padding
+                FontName = dto.Options?.FontName ?? TextImageDefaults.FontName,
+                FontSize = dto.Options?.FontSize ?? TextImageDefaults.FontSize,
+                TextColor = dto.Options?.TextColor ?? TextImageDefaults.TextColor,
+                BackgroundColor = dto.Options?.BackgroundColor ?? TextImageDefaults.BackgroundColor,
+                Padding = dto.Options?.Padding ?? TextImageDefaults.Padding
             },
             DimensionUnit = dto.DimensionUnit ?? LengthUnit.Points,
-            Size = new Size2D((float)(dto.Width ?? 0), (float)(dto.Height ?? 0)),
+            Size = new Size2D(dto.Width ?? 0, dto.Height ?? 0),
             Margin = dto.Margin ?? 0,
             PositionType = dto.PositionType ?? ImagePosition.Absolute,
-            Position = new Position2D((float?)dto.Top, (float?)dto.Left, (float?)dto.Bottom, (float?)dto.Right),
+            Position = new Position2D(dto.Top, dto.Left, dto.Bottom, dto.Right),
             Rotation = dto.Rotation ?? 0,
             Opacity = dto.Opacity ?? 1
         };

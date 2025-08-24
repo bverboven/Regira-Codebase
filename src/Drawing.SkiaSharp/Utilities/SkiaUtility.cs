@@ -1,4 +1,4 @@
-﻿using Regira.Media.Drawing.Enums;
+﻿using Regira.Media.Drawing.Constants;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
 using SkiaSharp;
@@ -33,16 +33,15 @@ public static class SkiaUtility
         }
         return target;
     }
-    public static SKBitmap Rotate(SKBitmap src, double degrees, string? background = null)
+    public static SKBitmap Rotate(SKBitmap src, float degrees, SKColor backgroundColor)
     {
         //degrees = (360 + degrees) % 360;
         var newSize = RotateUtility.CalculateSize(new[] { src.Width, src.Height }, degrees);
         var rotated = new SKBitmap(new SKImageInfo((int)newSize.Width, (int)newSize.Height));
         using var canvas = new SKCanvas(rotated);
-        var backgroundColor = string.IsNullOrEmpty(background) ? SKColors.Transparent : SKColor.Parse(background);
         canvas.Clear(backgroundColor);
         canvas.Translate(rotated.Width / 2f, rotated.Height / 2f);
-        canvas.RotateDegrees((float)degrees);
+        canvas.RotateDegrees(degrees);
         canvas.Translate(-src.Width / 2f, -src.Height / 2f);
         canvas.DrawBitmap(src, new SKPoint());
         return rotated;
@@ -80,14 +79,8 @@ public static class SkiaUtility
         return SKBitmap.Decode(data);
     }
 
-    public static SKBitmap MakeTransparent(SKBitmap src, int[]? rgb = null)
+    public static SKBitmap MakeTransparent(SKBitmap src, SKColor color)
     {
-        rgb ??= [245, 245, 245];
-        if (rgb.Length != 3)
-        {
-            throw new ArgumentException($"{nameof(rgb)} should have 3 values (red, green, blue)");
-        }
-
         var transparentImage = new SKBitmap(new SKImageInfo(src.Width, src.Height, src.ColorType, SKAlphaType.Premul));
         using (var canvas = new SKCanvas(transparentImage))
         {
@@ -98,8 +91,8 @@ public static class SkiaUtility
         {
             for (var c = 0; c < transparentImage.Width; c++)
             {
-                var color = transparentImage.GetPixel(c, r);
-                if (color.Red > rgb[0] && color.Green > rgb[1] && color.Blue > rgb[2])
+                var imgColor = transparentImage.GetPixel(c, r);
+                if (imgColor.Red > color.Red && imgColor.Green > color.Green && imgColor.Blue > color.Blue)
                 {
                     transparentImage.SetPixel(c, r, SKColors.Transparent);
                 }
@@ -112,9 +105,9 @@ public static class SkiaUtility
     {
         return pixel.Alpha == 0;
     }
-    public static SKBitmap ChangeOpacity(SKBitmap img, double opacity)
+    public static SKBitmap ChangeOpacity(SKBitmap img, float opacity)
     {
-        if (Math.Abs(opacity - 1) < double.Epsilon)
+        if (Math.Abs(opacity - 1) < float.Epsilon)
         {
             return img.Copy();
         }
@@ -137,30 +130,30 @@ public static class SkiaUtility
     public static SKColor GetPixelColor(SKBitmap img, int x, int y) => img.GetPixel(x, y);
 
 
-    public static SKBitmap Create(int width, int height, Color? backgroundColor = null, ImageFormat? format = null)
+    public static SKBitmap Create(SKSize size, SKColor backgroundColor)
     {
-        var bitmap = new SKBitmap(width, height);
+        var bitmap = new SKBitmap((int)size.Width, (int)size.Height);
         using var canvas = new SKCanvas(bitmap);
-        canvas.Clear((backgroundColor ?? new Color()).ToSkiaColor());
+        canvas.Clear(backgroundColor);
         return bitmap;
     }
     public static SKBitmap CreateTextImage(string input, TextImageOptions? options = null)
     {
         options ??= new TextImageOptions();
 
-        var textColor = (options.TextColor??TextImageOptions.DEFAULT_TEXT_COLOR).ToSkiaColor();
-        var backgroundColor = (options.BackgroundColor??TextImageOptions.DEFAULT_BACKGROUND_COLOR).ToSkiaColor();
+        var textColor = (options.TextColor ?? TextImageDefaults.TextColor).ToSkiaColor();
+        var backgroundColor = (options.BackgroundColor ?? TextImageDefaults.BackgroundColor).ToSkiaColor();
 
         // Create SKFont for measuring
-        using var typeface = SKTypeface.FromFamilyName(options.FontName, SKFontStyle.Normal);
-        using var font = new SKFont(typeface, options.FontSize ?? TextImageOptions.DEFAULT_FONT_SIZE);
+        using var typeface = SKTypeface.FromFamilyName(options.FontName ?? TextImageDefaults.FontName, SKFontStyle.Normal);
+        using var font = new SKFont(typeface, options.FontSize ?? TextImageDefaults.FontSize);
 
         // Measure text width using SKFont
         float textWidth = font.MeasureText(input);
         float textHeight = font.Metrics.Descent - font.Metrics.Ascent;
 
         // Add padding
-        var padding = options.Padding ?? 0;
+        var padding = options.Padding ?? TextImageDefaults.Padding;
         int width = (int)Math.Ceiling(textWidth + padding * 2);
         int height = (int)Math.Ceiling(textHeight + padding * 2);
 

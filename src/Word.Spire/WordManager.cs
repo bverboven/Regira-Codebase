@@ -95,8 +95,7 @@ public class WordManager : IWordManager
         {
 #if NETSTANDARD2_0
             var skImg = doc.SaveToImages(i, ImageType.Bitmap);
-            using var skBitmap = SKBitmap.Decode(skImg.EncodedData);
-            yield return skBitmap.ToImageFile(SKEncodedImageFormat.Jpeg);
+            yield return skImg.ToImageFile(SKEncodedImageFormat.Jpeg);
 #else
             var img = doc.SaveToImages(i, ImageType.Bitmap);
 #pragma warning disable CA1416

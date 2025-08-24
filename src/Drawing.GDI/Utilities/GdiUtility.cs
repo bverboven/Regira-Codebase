@@ -1,4 +1,6 @@
-﻿using Regira.Media.Drawing.Models;
+﻿using Regira.Dimensions;
+using Regira.Media.Drawing.Constants;
+using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -53,8 +55,8 @@ public static class GdiUtility
         var width = maxSize.Width;
         var height = maxSize.Height;
 
-        var size = SizeUtility.CalculateSize(img.Width, img.Height, width, height);
-        return ResizeFixed(img, new Size((int)size.Width, (int)size.Height), quality);
+        var size = SizeUtility.CalculateSize(new Size2D(img.Width, img.Height), new Size2D(width, height));
+        return ResizeFixed(img, size.ToGdiSize(), quality);
     }
     public static Image ResizeFixed(Image img, Size size, int quality = 80)
     {
@@ -100,7 +102,7 @@ public static class GdiUtility
         return result;
     }
 
-    public static Image Rotate(Image img, double degrees, string? background = null)
+    public static Image Rotate(Image img, float degrees, GdiColor? background)
     {
         // https://www.codeproject.com/Articles/3319/Image-Rotation-in-NET
         if (img == null)
@@ -108,20 +110,19 @@ public static class GdiUtility
             throw new ArgumentNullException(nameof(img));
         }
 
-        GdiColor? bkColor = !string.IsNullOrWhiteSpace(background)
-            ? ColorTranslator.FromHtml(background)
-            : img.RawFormat.Equals(ImageFormat.Png)
-                ? GdiColor.Transparent
-                : GdiColor.White;
+        GdiColor bkColor = background
+                           ?? (img.RawFormat.Equals(ImageFormat.Png)
+                               ? GdiColor.Transparent
+                               : GdiColor.White);
 
-        var pf = bkColor.Value == GdiColor.Transparent ? PixelFormat.Format32bppArgb : img.PixelFormat;
+        var pf = bkColor == GdiColor.Transparent ? PixelFormat.Format32bppArgb : img.PixelFormat;
 
-        const double pi2 = Math.PI / 2.0;
+        var pi2 = (float)(Math.PI / 2.0);
 
         // Why can't C# allow these to be const, or at least readonly
         // *sigh*  I'm starting to talk like Christian Graus :omg:
-        double oldWidth = img.Width;
-        double oldHeight = img.Height;
+        float oldWidth = img.Width;
+        float oldHeight = img.Height;
 
         // Convert degrees to radians
         double theta = degrees * Math.PI / 180.0;
@@ -216,14 +217,13 @@ public static class GdiUtility
 
         var rotatedBmp = new Bitmap(nWidth, nHeight, pf);
 
-        using (Graphics g = Graphics.FromImage(rotatedBmp))
-        {
-            g.Clear(bkColor.Value);
-            // This array will be used to pass in the three points that 
-            // make up the rotated image
-            Point[] points;
+        using Graphics g = Graphics.FromImage(rotatedBmp);
+        g.Clear(bkColor);
+        // This array will be used to pass in the three points that 
+        // make up the rotated image
+        Point[] points;
 
-            /*
+        /*
              * The values of opposite/adjacentTop/Bottom are referring to 
              * fixed locations instead of in relation to the
              * rotating image so I need to change which values are used
@@ -236,46 +236,45 @@ public static class GdiUtility
              * then the bitmap we are drawing on WOULDN'T be the bounding box
              * as required.
              */
-            if (locked_theta >= 0.0 && locked_theta < pi2)
-            {
-                points =
-                [
-                    new Point( (int) oppositeBottom, 0 ),
-                    new Point( nWidth, (int) oppositeTop ),
-                    new Point( 0, (int) adjacentBottom )
-                ];
+        if (locked_theta >= 0.0 && locked_theta < pi2)
+        {
+            points =
+            [
+                new Point( (int) oppositeBottom, 0 ),
+                new Point( nWidth, (int) oppositeTop ),
+                new Point( 0, (int) adjacentBottom )
+            ];
 
-            }
-            else if (locked_theta >= pi2 && locked_theta < Math.PI)
-            {
-                points =
-                [
-                    new Point( nWidth, (int) oppositeTop ),
-                    new Point( (int) adjacentTop, nHeight ),
-                    new Point( (int) oppositeBottom, 0 )
-                ];
-            }
-            else if (locked_theta >= Math.PI && locked_theta < (Math.PI + pi2))
-            {
-                points =
-                [
-                    new Point( (int) adjacentTop, nHeight ),
-                    new Point( 0, (int) adjacentBottom ),
-                    new Point( nWidth, (int) oppositeTop )
-                ];
-            }
-            else
-            {
-                points =
-                [
-                    new Point( 0, (int) adjacentBottom ),
-                    new Point( (int) oppositeBottom, 0 ),
-                    new Point( (int) adjacentTop, nHeight )
-                ];
-            }
-
-            g.DrawImage(img, points);
         }
+        else if (locked_theta >= pi2 && locked_theta < Math.PI)
+        {
+            points =
+            [
+                new Point( nWidth, (int) oppositeTop ),
+                new Point( (int) adjacentTop, nHeight ),
+                new Point( (int) oppositeBottom, 0 )
+            ];
+        }
+        else if (locked_theta >= Math.PI && locked_theta < (Math.PI + pi2))
+        {
+            points =
+            [
+                new Point( (int) adjacentTop, nHeight ),
+                new Point( 0, (int) adjacentBottom ),
+                new Point( nWidth, (int) oppositeTop )
+            ];
+        }
+        else
+        {
+            points =
+            [
+                new Point( 0, (int) adjacentBottom ),
+                new Point( (int) oppositeBottom, 0 ),
+                new Point( (int) adjacentTop, nHeight )
+            ];
+        }
+
+        g.DrawImage(img, points);
 
         return rotatedBmp;
     }
@@ -335,23 +334,15 @@ public static class GdiUtility
         }
     }
 
-    public static Image MakeTransparent(Image img, int[]? rgb = null)
+    public static Image MakeTransparent(Image img, GdiColor color)
     {
-        rgb ??= [245, 245, 245];
-        if (rgb.Length != 3)
-        {
-            throw new ArgumentException($"{nameof(rgb)} should have 3 values (red, green, blue)");
-        }
-
-        var color = GdiColor.FromArgb(rgb[0], rgb[1], rgb[2]);
-
         var target = new Bitmap(img);
         target.MakeTransparent(color);
         return target;
     }
-    public static Image ChangeOpacity(Image img, double opacity)
+    public static Image ChangeOpacity(Image img, float opacity)
     {
-        if (Math.Abs(opacity - 1) < double.Epsilon)
+        if (Math.Abs(opacity - 1) < float.Epsilon)
         {
             return new Bitmap(img);
         }
@@ -360,7 +351,7 @@ public static class GdiUtility
         using var g = GetGraphics(newImg);
         g.Clear(GdiColor.Transparent);
         var attributes = new ImageAttributes();
-        var matrix = new ColorMatrix { Matrix33 = (float)opacity };
+        var matrix = new ColorMatrix { Matrix33 = opacity };
         attributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
         g.DrawImage(img, new Rectangle(0, 0, img.Width, img.Height), 0, 0, img.Width, img.Height, GraphicsUnit.Pixel, attributes);
 
@@ -377,10 +368,12 @@ public static class GdiUtility
         return tempBitmap.GetPixel(x, y);
     }
 
-    public static Image Create(int width, int height, GdiColor? backgroundColor = null, ImageFormat? format = null)
+    public static Image Create(Size size, GdiColor? backgroundColor = null, ImageFormat? format = null)
     {
-        format ??= ImageFormat.Png;
-        var gdiBgColor = backgroundColor ?? GdiColor.Transparent;
+        var width = size.Width;
+        var height = size.Height;
+        format ??= ImageDefaults.Format.ToGdiImageFormat();
+        var gdiBgColor = backgroundColor ?? ImageDefaults.BackgroundColor.ToGdiColor();
 
         var backgroundBrush = new SolidBrush(gdiBgColor);
 
@@ -397,9 +390,9 @@ public static class GdiUtility
     {
         options ??= new TextImageOptions();
 
-        var font = new Font(FontFamily.Families.First(f => f.Name.Equals(options.FontName ?? TextImageOptions.DEFAULT_FONT_NAME)), options.FontSize ?? TextImageOptions.DEFAULT_FONT_SIZE);
-        var textColor = (options.TextColor ?? TextImageOptions.DEFAULT_TEXT_COLOR).ToGdiColor();
-        var backgroundColor = (options.BackgroundColor ?? TextImageOptions.DEFAULT_BACKGROUND_COLOR).ToGdiColor();
+        var font = new Font(FontFamily.Families.First(f => f.Name.Equals(options.FontName ?? TextImageDefaults.FontName)), options.FontSize ?? TextImageDefaults.FontSize);
+        var textColor = (options.TextColor ?? TextImageDefaults.TextColor).ToGdiColor();
+        var backgroundColor = (options.BackgroundColor ?? TextImageDefaults.BackgroundColor).ToGdiColor();
 
         SizeF textSize;
         using (var dummy = new Bitmap(1, 1))
@@ -408,8 +401,8 @@ public static class GdiUtility
             textSize = drawing.MeasureString(text, font);
         }
 
-        var padding = options.Padding ?? 0;
-        var img = Create((int)textSize.Width + padding * 2, (int)textSize.Height + padding * 2, backgroundColor);
+        var padding = options.Padding ?? TextImageDefaults.Padding;
+        var img = Create(new Size((int)textSize.Width + padding * 2, (int)textSize.Height + padding * 2), backgroundColor);
         using (var drawing = GetGraphics(img))
         {
             drawing.Clear(backgroundColor);

@@ -9,7 +9,7 @@ namespace Regira.Drawing.SkiaSharp.Utilities;
 
 public static class DrawUtility
 {
-    public static SKBitmap Draw(IEnumerable<ImageToAdd> imagesToAdd, SKBitmap? target = null, int dpi = ImageConstants.DEFAULT_DPI)
+    public static SKBitmap Draw(IEnumerable<ImageToAdd> imagesToAdd, SKBitmap? target = null, int? dpi = null)
     {
         var images = imagesToAdd.ToList();
         target ??= CreateSizedCanvas(images);
@@ -40,7 +40,7 @@ public static class DrawUtility
         return new SKBitmap(size.Width, size.Height);
     }
 
-    public static void AddImage(ImageToAdd img, SKCanvas canvas, Size2D targetSize, int dpi = ImageConstants.DEFAULT_DPI)
+    public static void AddImage(ImageToAdd img, SKCanvas canvas, Size2D targetSize, int? dpi = null)
     {
         SKBitmap source;
 
@@ -85,17 +85,17 @@ public static class DrawUtility
             : opacityImage.Copy();
 
         // Rotate if needed
-        using var rotatedImage = Math.Abs(img.Rotation) > double.Epsilon
-            ? SkiaUtility.Rotate(resizedImage, (float)img.Rotation)
+        using var rotatedImage = Math.Abs(img.Rotation) > float.Epsilon
+            ? SkiaUtility.Rotate(resizedImage, img.Rotation, SKColor.Empty)
             : resizedImage.Copy();
 
         // Position
-        double left = 0;
+        float left = 0;
         if (img.PositionType.HasFlag(ImagePosition.HCenter))
         {
             left = (targetSize.Width / 2) - (resizedImage.Width / 2f);
         }
-        else if (img.PositionType.HasFlag(ImagePosition.Right) || Math.Abs(left) < double.Epsilon && inputPosition.Right.HasValue)
+        else if (img.PositionType.HasFlag(ImagePosition.Right) || Math.Abs(left) < float.Epsilon && inputPosition.Right.HasValue)
         {
             left = targetSize.Width - resizedImage.Width - img.Margin;
         }
@@ -104,12 +104,12 @@ public static class DrawUtility
             left += img.Margin;
         }
 
-        double top = 0;
+        float top = 0;
         if (img.PositionType.HasFlag(ImagePosition.VCenter))
         {
             top = (targetSize.Height / 2) - (resizedImage.Height / 2f);
         }
-        else if (img.PositionType.HasFlag(ImagePosition.Bottom) || Math.Abs(top) < double.Epsilon && inputPosition.Bottom.HasValue)
+        else if (img.PositionType.HasFlag(ImagePosition.Bottom) || Math.Abs(top) < float.Epsilon && inputPosition.Bottom.HasValue)
         {
             top = targetSize.Height - resizedImage.Height - img.Margin;
         }
@@ -121,6 +121,6 @@ public static class DrawUtility
         left += (imgLeft ?? 0) - (imgRight ?? 0);
         top += (imgTop ?? 0) - (imgBottom ?? 0);
 
-        canvas.DrawBitmap(resizedImage, (float)left, (float)top);
+        canvas.DrawBitmap(resizedImage, left, top);
     }
 }

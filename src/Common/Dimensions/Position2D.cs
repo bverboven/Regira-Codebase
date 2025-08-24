@@ -5,14 +5,24 @@ namespace Regira.Dimensions;
 [DebuggerDisplay("Position2D = [{Top},{Left},{Bottom},{Right}]")]
 public struct Position2D(float? top, float? left, float? bottom, float? right) : IEquatable<Position2D>
 {
+    /// <summary>
+    /// Sets the distance from the top edge.
+    /// </summary>
     public float? Top { get; set; } = top;
+    /// <summary>
+    /// Sets the distance from the left edge.
+    /// </summary>
     public float? Left { get; set; } = left;
+    /// <summary>
+    /// Sets the distance from the bottom edge.
+    /// </summary>
     public float? Bottom { get; set; } = bottom;
+    /// <summary>
+    /// Sets the distance from the right edge.
+    /// </summary>
     public float? Right { get; set; } = right;
 
-    public Position2D(double? top, double? left, double? bottom, double? right) : this((float?)top, (float?)left, (float?)bottom, (float?)right) { }
     public Position2D(float top, float left) : this(top, left, null, null) { }
-    public Position2D(double top, double left) : this(top, left, null, null) { }
     public Position2D() : this(0, 0) { }
 
     public static implicit operator Position2D(int[] pos)
