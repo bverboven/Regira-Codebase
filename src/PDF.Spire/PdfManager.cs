@@ -1,7 +1,4 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
-using System.Text;
-using Regira.Drawing.GDI.Utilities;
+﻿using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Models.Abstractions;
@@ -10,6 +7,10 @@ using Regira.Office.PDF.Abstractions;
 using Regira.Office.PDF.Models;
 using Spire.Pdf;
 using Spire.Pdf.Graphics;
+using Spire.Pdf.Texts;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Text;
 
 namespace Regira.Office.PDF.Spire;
 
@@ -65,7 +66,9 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
         var text = new StringBuilder(doc.Pages.Count);
         foreach (PdfPageBase page in doc.Pages)
         {
-            text.Append(page.ExtractText());
+            var extractor = new PdfTextExtractor(page);
+            var content = extractor.ExtractText(new PdfTextExtractOptions());
+            text.Append(content);
         }
 
         return text.ToString();
@@ -88,8 +91,7 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
             }
         }
     }
-
-
+    
     public IMemoryFile ToMemoryFile(PdfDocument doc)
     {
         var ms = new MemoryStream();
