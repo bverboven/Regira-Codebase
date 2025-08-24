@@ -10,7 +10,7 @@
     <AssemblyName>Regira.Office.Excel.ClosedXML</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.6.0</Version>
+    <Version>4.7.0</Version>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
