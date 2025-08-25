@@ -1,13 +1,12 @@
-﻿using Regira.IO.Extensions;
+﻿using System.IO.Compression;
 using Regira.IO.Models;
 using Regira.IO.Storage;
 using Regira.IO.Storage.Abstractions;
 using Regira.IO.Storage.Compression;
-using Regira.IO.Storage.FileSystem;
 
 namespace Regira.ProjectBackupConsole;
 
-public class BackupManager(IFileService fileService, ZipBuilder zipBuilder)
+public class BackupManager(IFileService fileService, string slnDir)
 {
     private readonly string _executingFilename = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName!;
     private string? _outputDir;
@@ -18,19 +17,13 @@ public class BackupManager(IFileService fileService, ZipBuilder zipBuilder)
         var fso = new FileSearchObject
         {
             Type = FileEntryTypes.Files,
+            FolderUri = slnDir,
             Recursive = true
         };
 
         var outputDir = new DirectoryInfo(_outputDir ?? Environment.CurrentDirectory);
-        var outputFilename = $"{outputDir.Name}-{{DateStamp}}.zip";
-        var solutionFile = Directory.GetFiles(outputDir.FullName, "*.sln").FirstOrDefault();
-        if (solutionFile != null)
-        {
-            outputFilename = $"{Path.GetFileNameWithoutExtension(solutionFile)}-{{DateStamp}}.zip";
-        }
-
-        var zipFilename = outputFilename
-            .Replace("{DateStamp}", DateTime.Now.ToString("yyyyMMdd"));
+        var outputFilename = Path.Combine(outputDir.FullName, $"{outputDir.Name}-{{DateStamp}}.zip");
+        var zipFilename = outputFilename.Replace("{DateStamp}", DateTime.Now.ToString("yyyyMMdd"));
 
         var files = (await fileService.List(fso))
             .Where(file => !IgnoreFile(file))
@@ -38,13 +31,24 @@ public class BackupManager(IFileService fileService, ZipBuilder zipBuilder)
             {
                 FileName = file.Replace('\\', '/').Trim('/'),
                 Path = Path.Combine(fileService.Root, file)
-            });
+            })
+            .ToArray();
 
-        using var zipFile = await zipBuilder
-            .For(files)
-            .Build();
-        await using var zipStream = zipFile.GetStream();
-        await FileSystemUtility.SaveStream(zipFilename, zipStream!);
+        var zipStream = new MemoryStream();
+        if (await fileService.Exists(zipFilename))
+        {
+            await using var ts = await fileService.GetStream(zipFilename);
+            await ts!.CopyToAsync(zipStream);
+        }
+
+        using (var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Update, true))
+        {
+            zipArchive.AddFiles(files);
+            // !!! stream is updated when disposing zipArchive !!!
+        }
+
+        zipStream.Position = 0;
+        await fileService.Save(zipFilename, zipStream);
     }
 
     public BackupManager ToDir(string outputDir)
@@ -56,25 +60,25 @@ public class BackupManager(IFileService fileService, ZipBuilder zipBuilder)
     {
         return
             // ignore self
-            _executingFilename.EndsWith(path, StringComparison.CurrentCultureIgnoreCase)
+            _executingFilename.EndsWith(path, StringComparison.InvariantCultureIgnoreCase)
             // assets (input)
-            || path.Contains("\\assets\\input", StringComparison.CurrentCultureIgnoreCase)
+            //|| path.Contains("\\assets\\input", StringComparison.InvariantCultureIgnoreCase)
             // assets (output)
-            || path.Contains("\\assets\\output", StringComparison.CurrentCultureIgnoreCase)
+            //|| path.Contains("\\assets\\output", StringComparison.InvariantCultureIgnoreCase)
             // bin & obj
-            || path.Contains("\\bin\\", StringComparison.CurrentCultureIgnoreCase)
-            || path.Contains("\\obj\\", StringComparison.CurrentCultureIgnoreCase)
+            || path.Contains("\\bin\\", StringComparison.InvariantCultureIgnoreCase)
+            || path.Contains("\\obj\\", StringComparison.InvariantCultureIgnoreCase)
             // node_modules
-            || path.Contains("node_modules\\", StringComparison.CurrentCultureIgnoreCase)
+            || path.Contains("\\node_modules\\", StringComparison.InvariantCultureIgnoreCase)
             // packages
-            || path.Contains("packages\\", StringComparison.CurrentCultureIgnoreCase)
+            || path.Contains("\\packages\\", StringComparison.InvariantCultureIgnoreCase)
             // git
-            || path.StartsWith(".git\\", StringComparison.CurrentCultureIgnoreCase)
-            || path.Contains("\\.git\\", StringComparison.CurrentCultureIgnoreCase)
+            //|| path.StartsWith(".git\\", StringComparison.InvariantCultureIgnoreCase)
+            //|| path.Contains("\\.git\\", StringComparison.InvariantCultureIgnoreCase)
             // .vs
-            || path.StartsWith(".vs\\", StringComparison.CurrentCultureIgnoreCase)
-            || path.Contains("\\.vs\\", StringComparison.CurrentCultureIgnoreCase)
+            || path.StartsWith(".vs\\", StringComparison.InvariantCultureIgnoreCase)
+            || path.Contains("\\.vs\\", StringComparison.InvariantCultureIgnoreCase)
             // .user
-            || path.EndsWith(".user", StringComparison.CurrentCultureIgnoreCase);
+            || path.EndsWith(".user", StringComparison.InvariantCultureIgnoreCase);
     }
 }

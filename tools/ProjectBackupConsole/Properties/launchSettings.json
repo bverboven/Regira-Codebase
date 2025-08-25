@@ -2,7 +2,7 @@
     "profiles": {
         "ProjectBackupConsole": {
             "commandName": "Project",
-            "commandLineArgs": "-root \"C:\\Projects\\Regira (next)\\Common\""
+            "commandLineArgs": "-root \"C:\\Projects"
         }
     }
 }

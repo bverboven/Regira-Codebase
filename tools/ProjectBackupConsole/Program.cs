@@ -1,31 +1,38 @@
-﻿using Regira.IO.Storage.Compression;
-using Regira.IO.Storage.FileSystem;
+﻿using Regira.IO.Storage.FileSystem;
 using Regira.ProjectBackupConsole;
-using static Regira.IO.Storage.FileSystem.BinaryFileService;
 
 var rootIndex = Array.IndexOf(args, "-root");
-var rootPath = Environment.CurrentDirectory;
+var srcDir = Environment.CurrentDirectory;
 if (rootIndex != -1 && rootIndex + 1 < args.Length)
 {
-    rootPath = args[rootIndex + 1];
+    srcDir = args[rootIndex + 1];
 }
-var outputDir = rootPath;
+var outputDir = srcDir;
 var outputDirIndex = Array.IndexOf(args, "-output-dir");
 if (outputDirIndex != -1 && outputDirIndex + 1 < args.Length)
 {
     outputDir = args[outputDirIndex + 1];
 }
 
-var rootDir = new DirectoryInfo(rootPath);
+var slnFiles = Directory.GetFiles(srcDir, "*.sln", SearchOption.AllDirectories);
+var pkgJsonFiles = Directory.GetFiles(srcDir, "*.json", SearchOption.AllDirectories)
+    .Where(f => Path.GetFileNameWithoutExtension(f) == "package");
+var backupFolders = slnFiles.Concat(pkgJsonFiles)
+    .Select(f => Path.GetDirectoryName(f)!)
+    .Distinct()
+    .OrderBy(x => x)
+    .ToArray();
 
-var fileService = new BinaryFileService(new FileServiceOptions { RootFolder = rootDir.FullName });
-var zipBuilder = new ZipBuilder();
+var fileService = new BinaryFileService(new FileSystemOptions { RootFolder = srcDir });
+foreach (var backupFolder in backupFolders)
+{
+    Console.WriteLine($"Zipping {backupFolder}");
 
-Console.WriteLine($"Zipping {rootDir.FullName}");
+    var bm = new BackupManager(fileService, backupFolder);
+    await bm
+        .ToDir(outputDir)
+        .Process();
+}
 
-var bm = new BackupManager(fileService, zipBuilder);
-await bm
-    .ToDir(outputDir)
-    .Process();
 
 Console.WriteLine("Finished");
