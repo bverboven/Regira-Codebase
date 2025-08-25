@@ -1,41 +1,35 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-var srcDir = !string.IsNullOrWhiteSpace(args[0]) ? args[0] : Directory.GetCurrentDirectory();
-string? slnFile;
-do
+var srcDir = args.Any() && !string.IsNullOrWhiteSpace(args[0]) ? args[0] : Directory.GetCurrentDirectory();
+
+var slnFiles = Directory.GetFiles(srcDir, "*.sln", SearchOption.AllDirectories);
+
+foreach (var slnFile in slnFiles)
 {
-    if (string.IsNullOrWhiteSpace(srcDir))
-    {
-        break;
-    }
-    slnFile = Directory.GetFiles(srcDir, "*.sln", SearchOption.TopDirectoryOnly).FirstOrDefault();
-    if (string.IsNullOrWhiteSpace(slnFile))
-    {
-        srcDir = Directory.GetParent(srcDir)?.FullName;
-    }
-} while (string.IsNullOrWhiteSpace(slnFile));
+    var slnDir = Directory.GetParent(slnFile)!.FullName;
 
-var files = Directory.GetFiles(srcDir, "*.csproj", SearchOption.AllDirectories)
-    .Where(f => f.Contains("\\src\\") || f.Contains("\\tests\\"))
-    .ToArray();
+    var files = Directory.GetFiles(slnDir, "*.csproj", SearchOption.AllDirectories)
+        .Where(f => f.Contains("\\src\\") || f.Contains("\\tests\\"))
+        .ToArray();
 
-CleanUp(files);
+    CleanUp(files);
 
-static void CleanUp(IEnumerable<string> projectPaths)
-{
-    var projectDirs = projectPaths.Select(Path.GetDirectoryName!).Distinct();
-    foreach (var dir in projectDirs)
+    static void CleanUp(IEnumerable<string> projectPaths)
     {
-        Console.WriteLine($"Processing '{dir}'");
-        var binDir = Path.Combine(dir!, "bin");
-        if (Directory.Exists(binDir))
+        var projectDirs = projectPaths.Select(Path.GetDirectoryName!).Distinct();
+        foreach (var dir in projectDirs)
         {
-            Directory.Delete(binDir, true);
-        }
-        var objDir = Path.Combine(dir!, "obj");
-        if (Directory.Exists(objDir))
-        {
-            Directory.Delete(objDir, true);
+            Console.WriteLine($"Processing '{dir}'");
+            var binDir = Path.Combine(dir!, "bin");
+            if (Directory.Exists(binDir))
+            {
+                Directory.Delete(binDir, true);
+            }
+            var objDir = Path.Combine(dir!, "obj");
+            if (Directory.Exists(objDir))
+            {
+                Directory.Delete(objDir, true);
+            }
         }
     }
 }
