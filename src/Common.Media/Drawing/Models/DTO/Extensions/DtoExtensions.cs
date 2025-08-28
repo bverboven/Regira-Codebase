@@ -28,12 +28,12 @@ public static class DtoExtensions
             {
                 Bytes = dto.Image
             },
-            Options = dto.Options?.ToImageToAddOptions(),
+            Options = dto.DrawOptions?.ToImageToAddOptions(),
         };
     }
     public static IImageToAdd ToImageToAdd(this TextImageInputDto dto)
     {
-        return new TextImageToAdd
+        return new ImageToAdd<TextImageOptions>
         {
             Source = new TextImageOptions
             {
@@ -43,6 +43,20 @@ public static class DtoExtensions
                 TextColor = dto.TextOptions?.TextColor ?? TextImageDefaults.TextColor,
                 BackgroundColor = dto.TextOptions?.BackgroundColor ?? TextImageDefaults.BackgroundColor,
                 Padding = dto.TextOptions?.Padding ?? TextImageDefaults.Padding
+            },
+            Options = dto.DrawOptions?.ToImageToAddOptions()
+        };
+    }
+
+    public static IImageToAdd ToImageToAdd(this CanvasImageInputDto dto)
+    {
+        return new ImageToAdd<CanvasImageOptions>
+        {
+            Source = new CanvasImageOptions
+            {
+                Size = new Size2D(dto.Width, dto.Height),
+                BackgroundColor = dto.CanvasOptions?.BackgroundColor ?? ImageDefaults.BackgroundColor,
+                ImageFormat = dto.CanvasOptions?.ImageFormat ?? ImageDefaults.Format
             },
             Options = dto.DrawOptions?.ToImageToAddOptions()
         };

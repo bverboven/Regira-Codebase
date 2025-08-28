@@ -12,7 +12,7 @@ public class AggregateImageCreator(IImageService service, IEnumerable<IImageCrea
         
         if (input.Target != null)
         {
-            builder.SetTarget(input.Target);
+            builder.SetTargetObject(input.Target);
         }
 
         builder.Add(input.ImagesToAdd.ToArray());

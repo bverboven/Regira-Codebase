@@ -6,7 +6,7 @@ public abstract class ImageCreatorBase<T> : IImageCreator<T>
     where T : class
 {
     bool IImageCreator.CanCreate(object input)
-        => CanCreate((T)input);
+        => input is T item && CanCreate(item);
     public virtual bool CanCreate(T input) => true;
 
     IImageFile? IImageCreator.Create(object input)

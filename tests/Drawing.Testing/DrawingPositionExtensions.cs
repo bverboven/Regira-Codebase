@@ -470,7 +470,7 @@ public static class DrawingPositionExtensions
                     Position = new Position2D(null, 10, 20, null)
                 }
             },
-            new TextImageToAdd
+            new ImageToAdd<TextImageOptions>
             {
                 Source = new TextImageOptions
                 {
@@ -490,14 +490,14 @@ public static class DrawingPositionExtensions
 
         var imageCreators = new List<IImageCreator>
         {
-            new TextImageCreator(service),
-            new CanvasImageCreator(service)
+            new CanvasImageCreator(service),
+            new TextImageCreator(service)
         };
         imageCreators.Add(new AggregateImageCreator(service, imageCreators));
 
 
         var drawBuilder = new ImageBuilder(service, imageCreators);
-        using var resultImg = drawBuilder.Add(imagesToAdd).SetTarget(target).Build();
+        using var resultImg = drawBuilder.Add(imagesToAdd).SetTargetImage(target).Build();
         await service.SaveImage(resultImg, "build-images.jpg");
 
         AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 10, 10));
