@@ -144,9 +144,9 @@ public class ImageService : IImageService
         using var img = GdiUtility.Create(size.ToGdiSize(), (backgroundColor ?? ImageDefaults.BackgroundColor).ToGdiColor(), (format ?? ImageDefaults.Format).ToGdiImageFormat());
         return img.ToImageFile(img.RawFormat);
     }
-    public IImageFile CreateTextImage(string input, TextImageOptions? options = null)
+    public IImageFile CreateTextImage(TextImageOptions? options = null)
     {
-        using var img = GdiUtility.CreateTextImage(input, options);
+        using var img = GdiUtility.CreateTextImage(options);
         return img.ToImageFile(img.RawFormat);
     }
     public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int? dpi = null)

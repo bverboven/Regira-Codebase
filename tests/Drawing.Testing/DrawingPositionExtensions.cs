@@ -15,7 +15,7 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("yellow-200x150.jpg")
+            Source = await service.ReadImage("yellow-200x150.jpg")
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -33,8 +33,11 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("yellow-200x150.jpg"),
-            PositionType = ImagePosition.Top | ImagePosition.Left
+            Source = await service.ReadImage("yellow-200x150.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.Top | ImagePosition.Left
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -50,8 +53,11 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("yellow-200x150.jpg"),
-            PositionType = ImagePosition.Bottom | ImagePosition.Left
+            Source = await service.ReadImage("yellow-200x150.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.Bottom | ImagePosition.Left
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -67,8 +73,11 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("green-50x100.jpg"),
-            PositionType = ImagePosition.Top | ImagePosition.Right
+            Source = await service.ReadImage("green-50x100.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.Top | ImagePosition.Right
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -85,8 +94,11 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("green-50x100.jpg"),
-            PositionType = ImagePosition.Bottom | ImagePosition.Right
+            Source = await service.ReadImage("green-50x100.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.Bottom | ImagePosition.Right
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -106,8 +118,11 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("yellow-200x150.jpg"),
-            PositionType = ImagePosition.Top | ImagePosition.HCenter
+            Source = await service.ReadImage("yellow-200x150.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.Top | ImagePosition.HCenter
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -124,8 +139,11 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("yellow-200x150.jpg"),
-            PositionType = ImagePosition.Bottom | ImagePosition.HCenter
+            Source = await service.ReadImage("yellow-200x150.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.Bottom | ImagePosition.HCenter
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -143,8 +161,11 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("green-50x100.jpg"),
-            PositionType = ImagePosition.VCenter | ImagePosition.Left
+            Source = await service.ReadImage("green-50x100.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.VCenter | ImagePosition.Left
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -162,8 +183,11 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("green-50x100.jpg"),
-            PositionType = ImagePosition.VCenter | ImagePosition.Right
+            Source = await service.ReadImage("green-50x100.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.VCenter | ImagePosition.Right
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -181,8 +205,11 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("yellow-200x150.jpg"),
-            PositionType = ImagePosition.VCenter | ImagePosition.HCenter
+            Source = await service.ReadImage("yellow-200x150.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.VCenter | ImagePosition.HCenter
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -205,9 +232,12 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("yellow-200x150.jpg"),
-            PositionType = ImagePosition.Absolute,
-            Position = new Position2D(50, 50)
+            Source = await service.ReadImage("yellow-200x150.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.Absolute,
+                Position = new Position2D(50, 50)
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -225,9 +255,12 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("yellow-200x150.jpg"),
-            PositionType = ImagePosition.Absolute,
-            Position = new Position2D(50, null, null, 50)
+            Source = await service.ReadImage("yellow-200x150.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.Absolute,
+                Position = new Position2D(50, null, null, 50)
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -245,9 +278,12 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("yellow-200x150.jpg"),
-            PositionType = ImagePosition.Absolute,
-            Position = new Position2D(null, 50, 50, null)
+            Source = await service.ReadImage("yellow-200x150.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.Absolute,
+                Position = new Position2D(null, 50, 50, null)
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -263,9 +299,12 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("yellow-200x150.jpg"),
-            PositionType = ImagePosition.Absolute,
-            Position = new Position2D(null, null, 50, 50)
+            Source = await service.ReadImage("yellow-200x150.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.Absolute,
+                Position = new Position2D(null, null, 50, 50)
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -283,8 +322,11 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("yellow-200x150.jpg"),
-            Margin = 10
+            Source = await service.ReadImage("yellow-200x150.jpg"),
+            Options = new()
+            {
+                Margin = 10
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -292,7 +334,7 @@ public static class DrawingPositionExtensions
 
         AssertColor("#FFFF00", service.GetPixelColor(resultImg, 20, 20));
         AssertColor("#FFFF00", service.GetPixelColor(resultImg, 190, 140));
-        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 0, 0));
+        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 1, 1));
         AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 220, 170));
     }
     public static async Task AddImage_Top_Left_Margin10(this IImageService service)
@@ -300,9 +342,12 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("yellow-200x150.jpg"),
-            PositionType = ImagePosition.Top | ImagePosition.Left,
-            Margin = 10
+            Source = await service.ReadImage("yellow-200x150.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.Top | ImagePosition.Left,
+                Margin = 10
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -310,7 +355,7 @@ public static class DrawingPositionExtensions
 
         AssertColor("#FFFF00", service.GetPixelColor(resultImg, 20, 20));
         AssertColor("#FFFF00", service.GetPixelColor(resultImg, 190, 140));
-        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 0, 0));
+        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 1, 1));
         AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 220, 170));
         AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 220, 170));
     }
@@ -319,9 +364,12 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("yellow-200x150.jpg"),
-            PositionType = ImagePosition.Bottom | ImagePosition.Left,
-            Margin = 10
+            Source = await service.ReadImage("yellow-200x150.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.Bottom | ImagePosition.Left,
+                Margin = 10
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -338,9 +386,12 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("green-50x100.jpg"),
-            PositionType = ImagePosition.Top | ImagePosition.Right,
-            Margin = 10
+            Source = await service.ReadImage("green-50x100.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.Top | ImagePosition.Right,
+                Margin = 10
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -358,9 +409,12 @@ public static class DrawingPositionExtensions
         using var target = await service.ReadImage("white-400x300.jpg");
         var imgToAdd = new ImageToAdd
         {
-            Image = await service.ReadImage("green-50x100.jpg"),
-            PositionType = ImagePosition.Bottom | ImagePosition.Right,
-            Margin = 10
+            Source = await service.ReadImage("green-50x100.jpg"),
+            Options = new()
+            {
+                PositionType = ImagePosition.Bottom | ImagePosition.Right,
+                Margin = 10
+            }
         };
 
         using var resultImg = service.Draw([imgToAdd], target);
@@ -379,48 +433,70 @@ public static class DrawingPositionExtensions
     public static async Task Build_Images(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imagesToAdd = new IImageToAddOptions[]
+        var imagesToAdd = new IImageToAdd[]
         {
             new ImageToAdd
             {
-                Image = await service.ReadImage("yellow-200x150.jpg"),
-                PositionType = ImagePosition.HCenter | ImagePosition.VCenter,
-                Size = new Size2D(350, 250),
-                DimensionUnit = LengthUnit.Points
+                Source = await service.ReadImage("yellow-200x150.jpg"),
+                Options = new()
+                {
+                    PositionType = ImagePosition.HCenter | ImagePosition.VCenter,
+                    Size = new Size2D(350, 250)
+                }
             },
             new ImageToAdd
             {
-                Image = await service.ReadImage("green-50x100.jpg"),
-                PositionType = ImagePosition.Top | ImagePosition.Right,
+                Source = await service.ReadImage("green-50x100.jpg"),
+                Options = new()
+                {
+                    PositionType = ImagePosition.Top | ImagePosition.Right,
+                }
             },
             new ImageToAdd
             {
-                Image = await service.ReadImage("blue-50x50.jpg"),
-                PositionType = ImagePosition.Absolute,
-                Position = new Position2D(20,null,null,10)
+                Source = await service.ReadImage("blue-50x50.jpg"),
+                Options = new()
+                {
+                    PositionType = ImagePosition.Absolute,
+                    Position = new Position2D(20, null, null, 10)
+                }
             },
             new ImageToAdd
             {
-                Image = await service.ReadImage("red-150x100.jpg"),
-                PositionType = ImagePosition.Absolute,
-                Position = new Position2D(null,10,20,null)
+                Source = await service.ReadImage("red-150x100.jpg"),
+                Options = new()
+                {
+                    PositionType = ImagePosition.Absolute,
+                    Position = new Position2D(null, 10, 20, null)
+                }
             },
             new TextImageToAdd
             {
-                Text = "Hello World",
-                TextOptions = new TextImageOptions
+                Source = new TextImageOptions
                 {
+                    Text = "Hello World!",
                     FontName = "Arial",
                     FontSize = 25,
                     TextColor = "#000000",
                     BackgroundColor = "#FFFFFF50",
                     Padding = 5
                 },
-                PositionType = ImagePosition.HCenter | ImagePosition.VCenter,
+                Options = new()
+                {
+                    PositionType = ImagePosition.HCenter | ImagePosition.VCenter
+                }
             }
         };
 
-        var drawBuilder = new ImageBuilder(service);
+        var imageCreators = new List<IImageCreator>
+        {
+            new TextImageCreator(service),
+            new CanvasImageCreator(service)
+        };
+        imageCreators.Add(new AggregateImageCreator(service, imageCreators));
+
+
+        var drawBuilder = new ImageBuilder(service, imageCreators);
         using var resultImg = drawBuilder.Add(imagesToAdd).SetTarget(target).Build();
         await service.SaveImage(resultImg, "build-images.jpg");
 

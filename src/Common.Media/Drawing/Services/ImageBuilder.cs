@@ -1,19 +1,16 @@
-using Regira.Dimensions;
-using Regira.Media.Drawing.Constants;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Media.Drawing.Services.Abstractions;
-using Regira.Media.Drawing.Utilities;
 
 namespace Regira.Media.Drawing.Services;
 
-public class ImageBuilder(IImageService service)
+public class ImageBuilder(IImageService service, IEnumerable<IImageCreator> imageCreators)
 {
-    private readonly List<IImageToAddOptions> _items = new();
+    private readonly List<IImageToAdd> _items = new();
     private int? _dpi;
     private IImageFile? _target;
 
-    public ImageBuilder Add(params IImageToAddOptions[] items)
+    public ImageBuilder Add(params IImageToAdd[] items)
     {
         _items.AddRange(items);
         return this;
@@ -30,48 +27,33 @@ public class ImageBuilder(IImageService service)
     }
     public IImageFile Build()
     {
-        var dpi = _dpi ?? PrintDefaults.Dpi;
-        var target = _target ?? service.Create(
-           new Size2D(
-               _items.Max(x => SizeUtility.GetPixels(x.Size?.Width ?? 0, x.DimensionUnit, 0, dpi)),
-               _items.Max(x => SizeUtility.GetPixels(x.Size?.Height ?? 0, x.DimensionUnit, 0, dpi))
-            )
-        );
+        var target = _target;
 
         foreach (var item in _items)
         {
-            var disposeImg = false;
-            ImageToAdd image;
-            if (item is TextImageToAdd textImage)
+            ImageToAdd? imageToAdd = item as ImageToAdd;
+            if (imageToAdd == null)
             {
-                image = GetTextImage(textImage);
-                disposeImg = true;
-            }
-            else
-            {
-                image = (ImageToAdd)item;
-            }
-            target = service.Draw([image], target, dpi);
+                var imageCreator = imageCreators.FirstOrDefault(s => s.CanCreate(item.Source));
+                if (imageCreator == null)
+                {
+                    throw new Exception($"ImageCreator not found for type {item.Source.GetType()}");
+                }
+                var image = imageCreator.Create(item.Source);
+                if (image == null)
+                {
+                    throw new Exception($"Could not create IImageFile from {item.Source.GetType()}");
+                }
 
-            if (disposeImg)
-            {
-                image.Image.Dispose();
+                imageToAdd = new ImageToAdd
+                {
+                    Source = image,
+                    Options = item.Options
+                };
             }
+            target = service.Draw([imageToAdd], target, _dpi);
         }
 
-        return target;
+        return target!;
     }
-
-    ImageToAdd GetTextImage(TextImageToAdd item) =>
-        new()
-        {
-            Image = service.CreateTextImage(item.Text, item.TextOptions),
-            DimensionUnit = item.DimensionUnit,
-            Size = item.Size,
-            Margin = item.Margin,
-            PositionType = item.PositionType,
-            Position = item.Position,
-            Opacity = item.Opacity,
-            Rotation = item.Rotation,
-        };
 }

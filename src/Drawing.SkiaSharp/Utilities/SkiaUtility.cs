@@ -137,7 +137,7 @@ public static class SkiaUtility
         canvas.Clear(backgroundColor);
         return bitmap;
     }
-    public static SKBitmap CreateTextImage(string input, TextImageOptions? options = null)
+    public static SKBitmap CreateTextImage(TextImageOptions? options = null)
     {
         options ??= new TextImageOptions();
 
@@ -149,7 +149,7 @@ public static class SkiaUtility
         using var font = new SKFont(typeface, options.FontSize ?? TextImageDefaults.FontSize);
 
         // Measure text width using SKFont
-        float textWidth = font.MeasureText(input);
+        float textWidth = font.MeasureText(options.Text);
         float textHeight = font.Metrics.Descent - font.Metrics.Ascent;
 
         // Add padding
@@ -171,7 +171,7 @@ public static class SkiaUtility
         float x = padding;
         float y = padding - font.Metrics.Ascent;
 
-        canvas.DrawText(input, x, y, font, paint);
+        canvas.DrawText(options.Text, x, y, font, paint);
 
         // Step 5: Save to file
         using var image = surface.Snapshot();

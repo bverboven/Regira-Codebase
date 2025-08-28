@@ -2,7 +2,7 @@
     "profiles": {
         "ProjectBackupConsole": {
             "commandName": "Project",
-            "commandLineArgs": "-root \"C:\\Projects"
+            "commandLineArgs": "-root \"C:\\Projects\""
         }
     }
 }

@@ -16,7 +16,7 @@ if (outputDirIndex != -1 && outputDirIndex + 1 < args.Length)
 
 var slnFiles = Directory.GetFiles(srcDir, "*.sln", SearchOption.AllDirectories);
 var pkgJsonFiles = Directory.GetFiles(srcDir, "*.json", SearchOption.AllDirectories)
-    .Where(f => Path.GetFileNameWithoutExtension(f) == "package");
+    .Where(f => "package".Equals(Path.GetFileNameWithoutExtension(f), StringComparison.InvariantCultureIgnoreCase) && !f.Contains("\\node_modules\\", StringComparison.InvariantCultureIgnoreCase));
 var backupFolders = slnFiles.Concat(pkgJsonFiles)
     .Select(f => Path.GetDirectoryName(f)!)
     .Distinct()

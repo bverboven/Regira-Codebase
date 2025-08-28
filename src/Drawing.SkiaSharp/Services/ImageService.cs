@@ -210,9 +210,9 @@ public class ImageService : IImageService
         using var img = SkiaUtility.Create(size.ToSkiaSize(), (backgroundColor ?? ImageDefaults.BackgroundColor).ToSkiaColor());
         return img.ToImageFile((format ?? ImageDefaults.Format).ToSkiaFormat());
     }
-    public IImageFile CreateTextImage(string input, TextImageOptions? options = null)
+    public IImageFile CreateTextImage(TextImageOptions? options = null)
     {
-        using var img = SkiaUtility.CreateTextImage(input, options);
+        using var img = SkiaUtility.CreateTextImage(options);
         return img.ToImageFile();
     }
     public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int? dpi = null)

@@ -38,37 +38,28 @@ public static class DrawUtility
     {
         var images = imagesToAdd.AsList();
         var size = new Size(
-            (int)images.Max(x => x.Size?.Width ?? (x.Image.Size?.Width ?? 0)),
-            (int)images.Max(x => x.Size?.Height ?? (x.Image.Size?.Height ?? 0))
+            (int)images.Max(x => x.Options?.Size?.Width ?? (x.Source.Size?.Width ?? 0)),
+            (int)images.Max(x => x.Options?.Size?.Height ?? (x.Source.Size?.Height ?? 0))
         );
         return new Bitmap(size.Width, size.Height);
     }
-    public static void AddImage(ImageToAdd img, Graphics g1, Size2D targetSize, int? dpi = null)
+    public static void AddImage(ImageToAdd imageToAdd, Graphics g1, Size2D targetSize, int? dpi = null)
     {
-        dpi ??= PrintDefaults.Dpi;
+        var img = imageToAdd.Source;
+        var options = imageToAdd.Options ?? new ImageToAddOptions();
 
-        Image source;
-        if (img.Image.HasStream())
-        {
-            source = Image.FromStream(img.Image.Stream!);
-        }
-        else
-        {
-            using var ms = new MemoryStream(img.Image.GetBytes()!);
-            source = Image.FromStream(ms);
-        }
+        Image source = img.ToBitmap();
 
+        using var newImg = GdiUtility.ChangeOpacity(source, options.Opacity);
 
-        using var newImg = GdiUtility.ChangeOpacity(source, img.Opacity);
-
-        var inputSize = img.Size ?? new Size2D();
-        var inputPosition = img.Position ?? new Position2D();
-        var imgWidth = SizeUtility.GetPixels(inputSize.Width, img.DimensionUnit, (int)targetSize.Width, dpi);
-        var imgHeight = SizeUtility.GetPixels(inputSize.Height, img.DimensionUnit, (int)targetSize.Height, dpi);
-        int? imgLeft = inputPosition.Left.HasValue ? SizeUtility.GetPixels(inputPosition.Left.Value, img.DimensionUnit, (int)targetSize.Width, dpi) : null;
-        int? imgRight = inputPosition.Right.HasValue ? SizeUtility.GetPixels(inputPosition.Right.Value, img.DimensionUnit, (int)targetSize.Width, dpi) : null;
-        int? imgTop = inputPosition.Top.HasValue ? SizeUtility.GetPixels(inputPosition.Top.Value, img.DimensionUnit, (int)targetSize.Height, dpi) : null;
-        int? imgBottom = inputPosition.Bottom.HasValue ? SizeUtility.GetPixels(inputPosition.Bottom.Value, img.DimensionUnit, (int)targetSize.Height, dpi) : null;
+        var inputSize = options.Size ?? new Size2D();
+        var inputPosition = options.Position ?? new Position2D();
+        var imgWidth = SizeUtility.GetPixels(inputSize.Width, options.DimensionUnit, (int)targetSize.Width, dpi);
+        var imgHeight = SizeUtility.GetPixels(inputSize.Height, options.DimensionUnit, (int)targetSize.Height, dpi);
+        int? imgLeft = inputPosition.Left.HasValue ? SizeUtility.GetPixels(inputPosition.Left.Value, options.DimensionUnit, (int)targetSize.Width, dpi) : null;
+        int? imgRight = inputPosition.Right.HasValue ? SizeUtility.GetPixels(inputPosition.Right.Value, options.DimensionUnit, (int)targetSize.Width, dpi) : null;
+        int? imgTop = inputPosition.Top.HasValue ? SizeUtility.GetPixels(inputPosition.Top.Value, options.DimensionUnit, (int)targetSize.Height, dpi) : null;
+        int? imgBottom = inputPosition.Bottom.HasValue ? SizeUtility.GetPixels(inputPosition.Bottom.Value, options.DimensionUnit, (int)targetSize.Height, dpi) : null;
 
         //Dimensions
         var width = 0;
@@ -95,43 +86,43 @@ public static class DrawUtility
         using var resizedImage = width != 0 && newImg.Width != width || height != 0 && newImg.Height != height ? GdiUtility.Resize(newImg, new Size(width, height)) : new Bitmap(newImg);
 
         // Rotate?
-        using var rotatedImage = Math.Abs(img.Rotation) > float.Epsilon ? GdiUtility.Rotate(resizedImage, img.Rotation, null) : new Bitmap(resizedImage);
+        using var rotatedImage = Math.Abs(options.Rotation) > float.Epsilon ? GdiUtility.Rotate(resizedImage, options.Rotation, null) : new Bitmap(resizedImage);
 
         // Position
         float left = 0;
-        if (img.PositionType.HasFlag(ImagePosition.HCenter))
+        if (options.PositionType.HasFlag(ImagePosition.HCenter))
         {
             left = targetSize.Width / 2 - resizedImage.Width / 2f;
         }
-        else if (img.PositionType.HasFlag(ImagePosition.Right))
+        else if (options.PositionType.HasFlag(ImagePosition.Right))
         {
-            left = targetSize.Width - resizedImage.Width - img.Margin;
+            left = targetSize.Width - resizedImage.Width - options.Margin;
         }
         else if (Math.Abs(left) < float.Epsilon && inputPosition.Right.HasValue)
         {
-            left = targetSize.Width - resizedImage.Width - img.Margin;
+            left = targetSize.Width - resizedImage.Width - options.Margin;
         }
         else
         {
-            left += img.Margin;
+            left += options.Margin;
         }
 
         float top = 0;
-        if (img.PositionType.HasFlag(ImagePosition.VCenter))
+        if (options.PositionType.HasFlag(ImagePosition.VCenter))
         {
             top = targetSize.Height / 2 - resizedImage.Height / 2f;
         }
-        else if (img.PositionType.HasFlag(ImagePosition.Bottom))
+        else if (options.PositionType.HasFlag(ImagePosition.Bottom))
         {
-            top = targetSize.Height - resizedImage.Height - img.Margin;
+            top = targetSize.Height - resizedImage.Height - options.Margin;
         }
         else if (Math.Abs(top) < float.Epsilon && inputPosition.Bottom.HasValue)
         {
-            top = targetSize.Height - resizedImage.Height - img.Margin;
+            top = targetSize.Height - resizedImage.Height - options.Margin;
         }
         else
         {
-            top += img.Margin;
+            top += options.Margin;
         }
 
         left += (imgLeft ?? 0) - (imgRight ?? 0);

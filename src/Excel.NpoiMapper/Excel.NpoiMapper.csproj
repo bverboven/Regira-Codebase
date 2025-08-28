@@ -11,7 +11,7 @@
     <AssemblyName>Regira.Office.Excel.NpoiMapper</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.7.0</Version>
+    <Version>4.8.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="BouncyCastle.Cryptography" Version="2.6.2" />

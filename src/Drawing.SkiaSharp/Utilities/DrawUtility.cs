@@ -1,5 +1,5 @@
 ﻿using Regira.Dimensions;
-using Regira.IO.Extensions;
+using Regira.Media.Drawing.Constants;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
@@ -34,38 +34,31 @@ public static class DrawUtility
     {
         var images = imagesToAdd.ToList();
         var size = new System.Drawing.Size(
-            (int)images.Max(x => x.Size?.Width ?? (x.Image.Size?.Width ?? 0)),
-            (int)images.Max(x => x.Size?.Height ?? (x.Image.Size?.Height ?? 0))
+            (int)images.Max(x => x.Options?.Size?.Width ?? (x.Source.Size?.Width ?? 0)),
+            (int)images.Max(x => x.Options?.Size?.Height ?? (x.Source.Size?.Height ?? 0))
         );
         return new SKBitmap(size.Width, size.Height);
     }
 
-    public static void AddImage(ImageToAdd img, SKCanvas canvas, Size2D targetSize, int? dpi = null)
+    public static void AddImage(ImageToAdd imageToAdd, SKCanvas canvas, Size2D targetSize, int? dpi = null)
     {
-        SKBitmap source;
+        var img = imageToAdd.Source;
+        var options = imageToAdd.Options ?? new ImageToAddOptions();
 
-        if (img.Image.HasStream())
-        {
-            source = SKBitmap.Decode(img.Image.Stream!);
-        }
-        else
-        {
-            using var ms = new MemoryStream(img.Image.GetBytes()!);
-            source = SKBitmap.Decode(ms);
-        }
+        var source = img.ToBitmap();
 
         // Change opacity
-        using var opacityImage = SkiaUtility.ChangeOpacity(source, img.Opacity);
+        using var opacityImage = SkiaUtility.ChangeOpacity(source, options.Opacity);
 
         // Calculate target width/height
-        var inputSize = img.Size ?? new Size2D();
-        var inputPosition = img.Position ?? new Position2D();
-        var imgWidth = SizeUtility.GetPixels(inputSize.Width, img.DimensionUnit, (int)targetSize.Width, dpi);
-        var imgHeight = SizeUtility.GetPixels(inputSize.Height, img.DimensionUnit, (int)targetSize.Height, dpi);
-        int? imgLeft = inputPosition.Left.HasValue ? SizeUtility.GetPixels(inputPosition.Left.Value, img.DimensionUnit, (int)targetSize.Width, dpi) : null;
-        int? imgRight = inputPosition.Right.HasValue ? SizeUtility.GetPixels(inputPosition.Right.Value, img.DimensionUnit, (int)targetSize.Width, dpi) : null;
-        int? imgTop = inputPosition.Top.HasValue ? SizeUtility.GetPixels(inputPosition.Top.Value, img.DimensionUnit, (int)targetSize.Height, dpi) : null;
-        int? imgBottom = inputPosition.Bottom.HasValue ? SizeUtility.GetPixels(inputPosition.Bottom.Value, img.DimensionUnit, (int)targetSize.Height, dpi) : null;
+        var inputSize = options.Size ?? new Size2D();
+        var inputPosition = options.Position ?? new Position2D();
+        var imgWidth = SizeUtility.GetPixels(inputSize.Width, options.DimensionUnit, (int)targetSize.Width, dpi);
+        var imgHeight = SizeUtility.GetPixels(inputSize.Height, options.DimensionUnit, (int)targetSize.Height, dpi);
+        int? imgLeft = inputPosition.Left.HasValue ? SizeUtility.GetPixels(inputPosition.Left.Value, options.DimensionUnit, (int)targetSize.Width, dpi) : null;
+        int? imgRight = inputPosition.Right.HasValue ? SizeUtility.GetPixels(inputPosition.Right.Value, options.DimensionUnit, (int)targetSize.Width, dpi) : null;
+        int? imgTop = inputPosition.Top.HasValue ? SizeUtility.GetPixels(inputPosition.Top.Value, options.DimensionUnit, (int)targetSize.Height, dpi) : null;
+        int? imgBottom = inputPosition.Bottom.HasValue ? SizeUtility.GetPixels(inputPosition.Bottom.Value, options.DimensionUnit, (int)targetSize.Height, dpi) : null;
 
         int width = inputSize.Width > 0 ? imgWidth : opacityImage.Width;
         int height = inputSize.Height > 0 ? imgHeight : opacityImage.Height;
@@ -85,37 +78,37 @@ public static class DrawUtility
             : opacityImage.Copy();
 
         // Rotate if needed
-        using var rotatedImage = Math.Abs(img.Rotation) > float.Epsilon
-            ? SkiaUtility.Rotate(resizedImage, img.Rotation, SKColor.Empty)
+        using var rotatedImage = Math.Abs(options.Rotation) > float.Epsilon
+            ? SkiaUtility.Rotate(resizedImage, options.Rotation, SKColor.Empty)
             : resizedImage.Copy();
 
         // Position
         float left = 0;
-        if (img.PositionType.HasFlag(ImagePosition.HCenter))
+        if (options.PositionType.HasFlag(ImagePosition.HCenter))
         {
             left = (targetSize.Width / 2) - (resizedImage.Width / 2f);
         }
-        else if (img.PositionType.HasFlag(ImagePosition.Right) || Math.Abs(left) < float.Epsilon && inputPosition.Right.HasValue)
+        else if (options.PositionType.HasFlag(ImagePosition.Right) || Math.Abs(left) < float.Epsilon && inputPosition.Right.HasValue)
         {
-            left = targetSize.Width - resizedImage.Width - img.Margin;
+            left = targetSize.Width - resizedImage.Width - options.Margin;
         }
         else
         {
-            left += img.Margin;
+            left += options.Margin;
         }
 
         float top = 0;
-        if (img.PositionType.HasFlag(ImagePosition.VCenter))
+        if (options.PositionType.HasFlag(ImagePosition.VCenter))
         {
             top = (targetSize.Height / 2) - (resizedImage.Height / 2f);
         }
-        else if (img.PositionType.HasFlag(ImagePosition.Bottom) || Math.Abs(top) < float.Epsilon && inputPosition.Bottom.HasValue)
+        else if (options.PositionType.HasFlag(ImagePosition.Bottom) || Math.Abs(top) < float.Epsilon && inputPosition.Bottom.HasValue)
         {
-            top = targetSize.Height - resizedImage.Height - img.Margin;
+            top = targetSize.Height - resizedImage.Height - options.Margin;
         }
         else
         {
-            top += img.Margin;
+            top += options.Margin;
         }
 
         left += (imgLeft ?? 0) - (imgRight ?? 0);

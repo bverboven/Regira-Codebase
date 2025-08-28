@@ -30,6 +30,6 @@ public interface IImageService
     IImageFile RemoveAlpha(IImageFile input);
 
     IImageFile Create(Size2D size, Color? backgroundColor = null, ImageFormat? format = null);
-    IImageFile CreateTextImage(string input, TextImageOptions? options = null);
+    IImageFile CreateTextImage(TextImageOptions? options = null);
     IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int? dpi = null);
 }

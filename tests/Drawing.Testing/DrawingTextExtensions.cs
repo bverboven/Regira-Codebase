@@ -23,8 +23,9 @@ public static class DrawingTextExtensions
     public static async Task Add_Text_With_Options(this IImageService service)
     {
         var input = "Hello World!";
-        using var testImage = service.CreateTextImage(input, new TextImageOptions
+        using var testImage = service.CreateTextImage(new TextImageOptions
         {
+            Text = input,
             FontSize = 25,
             FontName = "Arial",
             TextColor = "#00F",
@@ -43,8 +44,9 @@ public static class DrawingTextExtensions
     public static async Task Add_Text_With_Margin(this IImageService service)
     {
         var input = "Hello World!";
-        using var testImage = service.CreateTextImage(input, new TextImageOptions
+        using var testImage = service.CreateTextImage(new TextImageOptions
         {
+            Text = input,
             FontSize = 25,
             FontName = "Arial",
             TextColor = "#00F",

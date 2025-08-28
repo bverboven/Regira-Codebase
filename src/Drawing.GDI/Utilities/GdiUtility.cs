@@ -386,7 +386,7 @@ public static class GdiUtility
 
         return ChangeFormat(untypedImage, format);
     }
-    public static Image CreateTextImage(string text, TextImageOptions? options = null)
+    public static Image CreateTextImage(TextImageOptions? options = null)
     {
         options ??= new TextImageOptions();
 
@@ -398,7 +398,7 @@ public static class GdiUtility
         using (var dummy = new Bitmap(1, 1))
         {
             using var drawing = GetGraphics(dummy);
-            textSize = drawing.MeasureString(text, font);
+            textSize = drawing.MeasureString(options.Text, font);
         }
 
         var padding = options.Padding ?? TextImageDefaults.Padding;
@@ -407,7 +407,7 @@ public static class GdiUtility
         {
             drawing.Clear(backgroundColor);
             var brush = new SolidBrush(textColor);
-            drawing.DrawString(text, font, brush, padding, padding);
+            drawing.DrawString(options.Text, font, brush, padding, padding);
             drawing.Save();
             brush.Dispose();
         }
