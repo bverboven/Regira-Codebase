@@ -1,10 +1,12 @@
-﻿using Regira.Drawing.SkiaSharp.Services;
+﻿using Drawing.Testing.Extensions;
+using Regira.Drawing.GDI.Services;
 using Regira.Media.Drawing.Services.Abstractions;
 
-namespace Drawing.Testing;
+namespace Drawing.Testing.GDI;
 
+#pragma warning disable CA1416
 [TestFixture]
-public class SkiaDrawTextTests
+public class GdiDrawTextTests
 {
     readonly IImageService _imageService = new ImageService();
 
@@ -17,3 +19,4 @@ public class SkiaDrawTextTests
     [Test]
     public Task Add_Text_With_Margin() => _imageService.Add_Text_With_Margin();
 }
+#pragma warning restore CA1416

@@ -6,6 +6,9 @@ namespace Regira.Media.Drawing.Services;
 
 public class ImageBuilder(IImageService service, IEnumerable<IImageCreator> imageCreators)
 {
+    // ReSharper disable PossibleMultipleEnumeration
+    private readonly IImageCreator[] _imageCreators = imageCreators.Concat([AggregateImageCreator.Create(service, imageCreators)]).ToArray();
+    // ReSharper restore PossibleMultipleEnumeration
     private readonly List<IImageToAdd> _items = new();
     private int? _dpi;
     private object? _target;
@@ -75,7 +78,7 @@ public class ImageBuilder(IImageService service, IEnumerable<IImageCreator> imag
 
         if (image == null)
         {
-            var imageCreator = imageCreators.FirstOrDefault(s => s.CanCreate(item.Source));
+            var imageCreator = _imageCreators.FirstOrDefault(s => s.CanCreate(item.Source));
             if (imageCreator == null)
             {
                 throw new Exception($"ImageCreator not found for type {item.Source.GetType()}");

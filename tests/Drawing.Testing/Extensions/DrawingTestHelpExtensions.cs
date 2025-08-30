@@ -8,7 +8,7 @@ using Regira.Media.Drawing.Utilities;
 using Regira.Office.OCR.PaddleOCR;
 using Regira.Utilities;
 
-namespace Drawing.Testing;
+namespace Drawing.Testing.Extensions;
 
 public static class DrawingTestHelpExtensions
 {
@@ -81,10 +81,10 @@ public static class DrawingTestHelpExtensions
     internal static async Task SaveImage(this IImageService service, IImageFile file, string filename)
         => await file.SaveAs(Path.Combine(service.GetOutputDir(), filename));
 
-    internal static void AssertColor(Color expected, Color actual)
+    internal static void AssertColor(Color expected, Color actual, Position2D? pos = null)
     {
-        Assert.That(Math.Abs(actual.Red - expected.Red), Is.LessThan(15), $"expected {expected} vs actual {actual}");
-        Assert.That(Math.Abs(actual.Green - expected.Green), Is.LessThan(15), $"expected {expected} vs actual {actual}");
-        Assert.That(Math.Abs(actual.Blue - expected.Blue), Is.LessThan(15), $"expected {expected} vs actual {actual}");
+        Assert.That(Math.Abs(actual.Red - expected.Red), Is.LessThan(15), $"expected {expected} vs actual {actual} at {pos}");
+        Assert.That(Math.Abs(actual.Green - expected.Green), Is.LessThan(15), $"expected {expected} vs actual {actual} at {pos}");
+        Assert.That(Math.Abs(actual.Blue - expected.Blue), Is.LessThan(15), $"expected {expected} vs actual {actual} at {pos}");
     }
 }

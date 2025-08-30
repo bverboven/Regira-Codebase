@@ -1,4 +1,5 @@
-﻿using Regira.Dimensions;
+﻿using Drawing.Testing.Extensions;
+using Regira.Dimensions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Services.Abstractions;

@@ -79,7 +79,9 @@ public static class ConversionUtility
         };
     }
     public static SKBitmap ToBitmap(this IImageFile file)
-        => file.HasStream()
+        => !file.HasContent()
+        ? throw new NullReferenceException("Cannot convert an Image file without content")
+        : file.HasStream()
             ? SKBitmap.Decode(file.Stream)
             : SKBitmap.Decode(file.GetBytes());
 }

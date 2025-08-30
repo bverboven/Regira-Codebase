@@ -1,12 +1,10 @@
 ﻿using Regira.Dimensions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
-using Regira.Media.Drawing.Models.Abstractions;
-using Regira.Media.Drawing.Services;
 using Regira.Media.Drawing.Services.Abstractions;
-using static Drawing.Testing.DrawingTestHelpExtensions;
+using static Drawing.Testing.Extensions.DrawingTestHelpExtensions;
 
-namespace Drawing.Testing;
+namespace Drawing.Testing.Extensions;
 
 public static class DrawingPositionExtensions
 {
@@ -426,90 +424,6 @@ public static class DrawingPositionExtensions
         AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 10, 280));
         AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 330, 10));
         AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 380, 180));
-        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 399, 299));
-    }
-
-    // Builder
-    public static async Task Build_Images(this IImageService service)
-    {
-        using var target = await service.ReadImage("white-400x300.jpg");
-        var imagesToAdd = new IImageToAdd[]
-        {
-            new ImageToAdd
-            {
-                Source = await service.ReadImage("yellow-200x150.jpg"),
-                Options = new()
-                {
-                    PositionType = ImagePosition.HCenter | ImagePosition.VCenter,
-                    Size = new Size2D(350, 250)
-                }
-            },
-            new ImageToAdd
-            {
-                Source = await service.ReadImage("green-50x100.jpg"),
-                Options = new()
-                {
-                    PositionType = ImagePosition.Top | ImagePosition.Right,
-                }
-            },
-            new ImageToAdd
-            {
-                Source = await service.ReadImage("blue-50x50.jpg"),
-                Options = new()
-                {
-                    PositionType = ImagePosition.Absolute,
-                    Position = new Position2D(20, null, null, 10)
-                }
-            },
-            new ImageToAdd
-            {
-                Source = await service.ReadImage("red-150x100.jpg"),
-                Options = new()
-                {
-                    PositionType = ImagePosition.Absolute,
-                    Position = new Position2D(null, 10, 20, null)
-                }
-            },
-            new ImageToAdd<TextImageOptions>
-            {
-                Source = new TextImageOptions
-                {
-                    Text = "Hello World!",
-                    FontName = "Arial",
-                    FontSize = 25,
-                    TextColor = "#000000",
-                    BackgroundColor = "#FFFFFF50",
-                    Padding = 5
-                },
-                Options = new()
-                {
-                    PositionType = ImagePosition.HCenter | ImagePosition.VCenter
-                }
-            }
-        };
-
-        var imageCreators = new List<IImageCreator>
-        {
-            new CanvasImageCreator(service),
-            new TextImageCreator(service)
-        };
-        imageCreators.Add(new AggregateImageCreator(service, imageCreators));
-
-
-        var drawBuilder = new ImageBuilder(service, imageCreators);
-        using var resultImg = drawBuilder.Add(imagesToAdd).SetTargetImage(target).Build();
-        await service.SaveImage(resultImg, "build-images.jpg");
-
-        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 10, 10));
-        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 150, 299));
-        AssertColor("#00FF00", service.GetPixelColor(resultImg, 390, 10));
-        AssertColor("#00FF00", service.GetPixelColor(resultImg, 360, 90));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 45, 35));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 330, 35));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 45, 160));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 350, 260));
-        //AssertColor("#FFFF00", service.GetPixelColor(resultImg, 200, 150));
-        AssertColor("#FF0000", service.GetPixelColor(resultImg, 20, 270));
         AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 399, 299));
     }
 }

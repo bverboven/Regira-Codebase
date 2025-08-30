@@ -58,4 +58,7 @@ public struct Position2D(float? top, float? left, float? bottom, float? right) :
             return hashCode;
         }
     }
+
+    public override string ToString()
+        => $"[{Top}, {Left}, {Bottom}, {Right}]";
 }

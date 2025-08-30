@@ -1,11 +1,11 @@
-﻿using Regira.Drawing.GDI.Services;
+﻿using Drawing.Testing.Extensions;
+using Regira.Drawing.GDI.Services;
 using Regira.Media.Drawing.Services.Abstractions;
 
-namespace Drawing.Testing;
+namespace Drawing.Testing.GDI;
 
-#pragma warning disable CA1416
 [TestFixture]
-public class GDIDrawPositionTests
+public class GdiDrawPositionTests
 {
     readonly IImageService _imgService = new ImageService();
 
@@ -63,4 +63,3 @@ public class GDIDrawPositionTests
     [Test]
     public Task Build_Images() => _imgService.Build_Images();
 }
-#pragma warning restore CA1416

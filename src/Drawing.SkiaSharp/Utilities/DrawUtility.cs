@@ -20,7 +20,6 @@ public static class DrawUtility
         }
 
         var canvas = new SKCanvas(target);
-
         foreach (var img in images)
         {
             AddImage(img, canvas, new Size2D(target.Width, target.Height), dpi);
@@ -33,11 +32,11 @@ public static class DrawUtility
     public static SKBitmap CreateSizedCanvas(IEnumerable<ImageToAdd> imagesToAdd)
     {
         var images = imagesToAdd.ToList();
-        var size = new System.Drawing.Size(
+        var size = new SKSize(
             (int)images.Max(x => x.Options?.Size?.Width ?? (x.Source.Size?.Width ?? 0)),
             (int)images.Max(x => x.Options?.Size?.Height ?? (x.Source.Size?.Height ?? 0))
         );
-        return new SKBitmap(size.Width, size.Height);
+        return SkiaUtility.Create(size, ImageDefaults.BackgroundColor.ToSkiaColor());
     }
 
     public static void AddImage(ImageToAdd imageToAdd, SKCanvas canvas, Size2D targetSize, int? dpi = null)
@@ -50,39 +49,28 @@ public static class DrawUtility
         // Change opacity
         using var opacityImage = SkiaUtility.ChangeOpacity(source, options.Opacity);
 
-        // Calculate target width/height
-        var inputSize = options.Size ?? new Size2D();
+        // Resize if needed
+        using var resizedImage = options.Size is { Width: > 0, Height: > 0 }
+            ? SkiaUtility.ResizeFixed(opacityImage, options.Size.Value.ToSkiaSize(), 100)
+            : options.Size?.Width > 0 || options.Size?.Height > 0
+                ? SkiaUtility.Resize(opacityImage, new SKSize(
+                    SizeUtility.GetPixels(options.Size.Value.Width, options.DimensionUnit, (int)targetSize.Width, dpi),
+                    SizeUtility.GetPixels(options.Size.Value.Height, options.DimensionUnit, (int)targetSize.Height, dpi)
+                    ))
+                : opacityImage;
+
+        // Rotate if needed
+        using var rotatedImage = Math.Abs(options.Rotation) > float.Epsilon
+            ? SkiaUtility.Rotate(resizedImage, options.Rotation, SKColor.Empty)
+            : resizedImage;
+
+        // Position
         var inputPosition = options.Position ?? new Position2D();
-        var imgWidth = SizeUtility.GetPixels(inputSize.Width, options.DimensionUnit, (int)targetSize.Width, dpi);
-        var imgHeight = SizeUtility.GetPixels(inputSize.Height, options.DimensionUnit, (int)targetSize.Height, dpi);
         int? imgLeft = inputPosition.Left.HasValue ? SizeUtility.GetPixels(inputPosition.Left.Value, options.DimensionUnit, (int)targetSize.Width, dpi) : null;
         int? imgRight = inputPosition.Right.HasValue ? SizeUtility.GetPixels(inputPosition.Right.Value, options.DimensionUnit, (int)targetSize.Width, dpi) : null;
         int? imgTop = inputPosition.Top.HasValue ? SizeUtility.GetPixels(inputPosition.Top.Value, options.DimensionUnit, (int)targetSize.Height, dpi) : null;
         int? imgBottom = inputPosition.Bottom.HasValue ? SizeUtility.GetPixels(inputPosition.Bottom.Value, options.DimensionUnit, (int)targetSize.Height, dpi) : null;
 
-        int width = inputSize.Width > 0 ? imgWidth : opacityImage.Width;
-        int height = inputSize.Height > 0 ? imgHeight : opacityImage.Height;
-
-        if (width > targetSize.Width)
-        {
-            width = (int)(targetSize.Width * 0.95);
-        }
-        if (height > targetSize.Height)
-        {
-            height = (int)(targetSize.Height * 0.95);
-        }
-
-        // Resize if needed
-        using var resizedImage = width != opacityImage.Width || height != opacityImage.Height
-            ? SkiaUtility.Resize(opacityImage, new SKSize(width, height), 100)
-            : opacityImage.Copy();
-
-        // Rotate if needed
-        using var rotatedImage = Math.Abs(options.Rotation) > float.Epsilon
-            ? SkiaUtility.Rotate(resizedImage, options.Rotation, SKColor.Empty)
-            : resizedImage.Copy();
-
-        // Position
         float left = 0;
         if (options.PositionType.HasFlag(ImagePosition.HCenter))
         {

@@ -45,10 +45,16 @@ public static class ConversionUtility
     }
     public static Image ToBitmap(this IImageFile file)
     {
+        if (!file.HasContent())
+        {
+            throw new NullReferenceException("Cannot convert an Image file without content");
+        }
+
         if (file.HasStream())
         {
             return Image.FromStream(file.Stream!);
         }
+
         using var stream = new MemoryStream(file.GetBytes()!);
         return Image.FromStream(stream);
     }

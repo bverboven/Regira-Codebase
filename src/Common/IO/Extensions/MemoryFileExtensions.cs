@@ -29,7 +29,7 @@ public static class MemoryFileExtensions
     /// <param name="file"></param>
     /// <returns></returns>
     public static byte[]? GetBytes(this IMemoryFile file)
-        => file.Bytes ?? (file.HasStream() ? FileUtility.GetBytes(GetStream(file)) : null);
+        => file.Bytes ?? (file.HasStream() ? GetStream(file).GetBytes() : null);
     /// <summary>
     /// Always creates a new stream for this file
     /// </summary>
@@ -47,7 +47,7 @@ public static class MemoryFileExtensions
             ms.Position = currentPos;
             return ms;
         }
-        return file.Bytes != null ? FileUtility.GetStream(file.Bytes) : null;
+        return file.Bytes?.GetStream();
     }
 
     /// <summary>

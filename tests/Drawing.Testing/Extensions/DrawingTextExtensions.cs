@@ -2,7 +2,7 @@
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Services.Abstractions;
 
-namespace Drawing.Testing;
+namespace Drawing.Testing.Extensions;
 
 public static class DrawingTextExtensions
 {
