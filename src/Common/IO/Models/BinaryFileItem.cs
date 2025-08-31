@@ -2,6 +2,10 @@
 
 namespace Regira.IO.Models;
 
+/// <summary>
+/// Represents a binary file item that provides support for both byte and stream representations,
+/// along with additional metadata such as identifier, file name, prefix, content type, and path.
+/// </summary>
 public class BinaryFileItem : IBinaryFile
 {
     /// <summary>

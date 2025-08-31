@@ -18,10 +18,14 @@ public class PropertyUtility
     private readonly Action<object, object?> _valueSetter;
 
     /// <summary>
-    /// Initializes a fast property helper. 
-    /// 
-    /// This constructor does not cache the helper. For caching, use GetProperties.
+    /// Initializes a new instance of the <see cref="PropertyUtility"/> class using the specified property.
     /// </summary>
+    /// <param name="property">The <see cref="PropertyInfo"/> representing the property to be accessed.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="property"/> is <c>null</c>.</exception>
+    /// <remarks>
+    /// This constructor sets up fast accessors for the specified property, enabling efficient
+    /// retrieval and assignment of property values.
+    /// </remarks>
     public PropertyUtility(PropertyInfo property)
     {
         Contract.Assert(property != null);
@@ -31,11 +35,38 @@ public class PropertyUtility
         _valueSetter = property.SetValue;
     }
 
+    /// <summary>
+    /// Gets the name of the property represented by this instance of <see cref="PropertyUtility"/>.
+    /// </summary>
+    /// <value>
+    /// A <see cref="string"/> containing the name of the property.
+    /// </value>
+    /// <remarks>
+    /// This property is initialized during the construction of the <see cref="PropertyUtility"/> instance
+    /// and corresponds to the <see cref="PropertyInfo.Name"/> of the provided property.
+    /// </remarks>
     public string Name { get; protected set; }
-
+    /// <summary>
+    /// Retrieves the value of the property from the specified instance.
+    /// </summary>
+    /// <param name="instance">The object instance from which to retrieve the property value.</param>
+    /// <returns>The value of the property, or <c>null</c> if the property value is <c>null</c>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="instance"/> is <c>null</c>.</exception>
+    /// <remarks>
+    /// This method uses a precompiled delegate to efficiently access the property value.
+    /// </remarks>
     public object? GetValue(object instance)
         => _valueGetter(instance);
 
+    /// <summary>
+    /// Sets the value of the property on the specified instance.
+    /// </summary>
+    /// <param name="instance">The object instance on which to set the property value.</param>
+    /// <param name="value">The value to assign to the property. Can be <c>null</c> if the property type allows it.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="instance"/> is <c>null</c>.</exception>
+    /// <remarks>
+    /// This method uses a precompiled delegate to efficiently assign the property value.
+    /// </remarks>
     public void SetValue(object instance, object? value)
         => _valueSetter(instance, value);
 
@@ -51,13 +82,17 @@ public class PropertyUtility
     }
 
     /// <summary>
-    /// Creates a single fast property getter. The result is not cached.
+    /// Creates a fast property getter for the specified <see cref="PropertyInfo"/>.
     /// </summary>
-    /// <param name="propertyInfo">propertyInfo to extract the getter for.</param>
-    /// <returns>a fast getter.</returns>
+    /// <param name="propertyInfo">The <see cref="PropertyInfo"/> representing the property to create a getter for.</param>
+    /// <returns>A delegate that provides fast access to the property's value.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="propertyInfo"/> is <c>null</c>.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the property does not have a getter, is static, or has parameters.
+    /// </exception>
     /// <remarks>
-    /// This method is more memory efficient than a dynamically compiled lambda, and about the 
-    /// same speed.
+    /// This method generates a delegate that enables efficient retrieval of property values. 
+    /// It is more memory-efficient than dynamically compiled lambdas while maintaining comparable speed.
     /// </remarks>
     public static Func<object, object?> MakeFastPropertyGetter(PropertyInfo propertyInfo)
     {

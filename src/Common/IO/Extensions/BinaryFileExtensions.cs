@@ -5,8 +5,25 @@ namespace Regira.IO.Extensions;
 
 public static class BinaryFileExtensions
 {
+    /// <summary>
+    /// Converts a byte array to an <see cref="IBinaryFile"/> instance.
+    /// </summary>
+    /// <param name="bytes">The byte array to convert. Can be <c>null</c>.</param>
+    /// <param name="contentType">
+    /// The content type of the binary file, such as "application/pdf" or "image/png". 
+    /// This parameter is optional and can be <c>null</c>.
+    /// </param>
+    /// <returns>
+    /// An instance of <see cref="IBinaryFile"/> representing the provided byte array.
+    /// </returns>
     public static IBinaryFile ToBinaryFile(this byte[]? bytes, string? contentType = null)
         => new BinaryFileItem { Bytes = bytes, Length = bytes?.Length ?? 0, ContentType = contentType };
+    /// <summary>
+    /// Converts the specified <see cref="Stream"/> to an <see cref="IBinaryFile"/> instance.
+    /// </summary>
+    /// <param name="stream">The input stream to be converted. Can be <c>null</c>.</param>
+    /// <param name="contentType">The content type of the binary file. Optional and can be <c>null</c>.</param>
+    /// <returns>An <see cref="IBinaryFile"/> instance representing the provided stream.</returns>
     public static IBinaryFile ToBinaryFile(this Stream? stream, string? contentType = null)
         => new BinaryFileItem { Stream = stream, Length = stream?.Length ?? 0, ContentType = contentType };
     /// <summary>
@@ -40,11 +57,44 @@ public static class BinaryFileExtensions
         return item;
     }
 
+    /// <summary>
+    /// Determines whether the specified <see cref="IBinaryFile"/> has a valid, non-empty path.
+    /// </summary>
+    /// <param name="file">The <see cref="IBinaryFile"/> instance to check.</param>
+    /// <returns>
+    /// <c>true</c> if the <see cref="IBinaryFile"/> has a non-null, non-whitespace path; otherwise, <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    /// This method checks the <see cref="IBinaryFile.Path"/> property to determine if it contains a valid path.
+    /// </remarks>
     public static bool HasPath(this IBinaryFile file)
         => !string.IsNullOrWhiteSpace(file.Path);
 
+    /// <summary>
+    /// Retrieves the byte array representation of the specified <see cref="IBinaryFile"/>.
+    /// </summary>
+    /// <param name="file">The <see cref="IBinaryFile"/> instance from which to retrieve the bytes.</param>
+    /// <returns>
+    /// A byte array containing the file's data if available; otherwise, <c>null</c>.
+    /// </returns>
+    /// <remarks>
+    /// If the <see cref="IBinaryFile"/> has an associated path, the method attempts to read the file's bytes from the path.
+    /// Otherwise, it delegates the retrieval to <see cref="MemoryFileExtensions.GetBytes(IMemoryFile)"/>.
+    /// </remarks>
     public static byte[]? GetBytes(this IBinaryFile file)
         => MemoryFileExtensions.GetBytes(file) ?? (file.HasPath() ? File.ReadAllBytes(file.Path!) : null);
+    /// <summary>
+    /// Retrieves a <see cref="Stream"/> representation of the specified <see cref="IBinaryFile"/>.
+    /// <br />It will always create a new Stream.
+    /// </summary>
+    /// <param name="file">The binary file from which to obtain the stream.</param>
+    /// <returns>
+    /// A <see cref="Stream"/> containing the data of the binary file, or <c>null</c> if the file has no associated stream or path.
+    /// </returns>
+    /// <remarks>
+    /// If the binary file has an associated stream, it will be returned. Otherwise, if the file has a valid path, 
+    /// the method will attempt to open and return a stream from the file at the specified path.
+    /// </remarks>
     public static Stream? GetStream(this IBinaryFile file)
         => MemoryFileExtensions.GetStream(file) ?? (file.HasPath() ? File.OpenRead(file.Path!) : null);
     /// <summary>
@@ -64,6 +114,19 @@ public static class BinaryFileExtensions
         return path;
     }
 
+    /// <summary>
+    /// Retrieves the length of the specified <see cref="IBinaryFile"/>.
+    /// </summary>
+    /// <param name="file">The <see cref="IBinaryFile"/> instance whose length is to be determined.</param>
+    /// <returns>
+    /// The length of the binary file. If the file has a memory-based representation, 
+    /// its length is returned. Otherwise, the length is determined from the file's path if available.
+    /// </returns>
+    /// <remarks>
+    /// This method first attempts to retrieve the length from the memory representation of the file.
+    /// If the memory representation is unavailable or has a length of 0, it checks the file's path
+    /// and retrieves the length from the file system.
+    /// </remarks>
     public static long GetLength(this IBinaryFile file)
     {
         var length = MemoryFileExtensions.GetLength(file);

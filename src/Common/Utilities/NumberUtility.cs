@@ -8,6 +8,21 @@ public static class NumberUtility
     private static List<string> Romans => ["M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"];
     private static List<int> Numerals => [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
 
+    /// <summary>
+    /// Converts a Roman numeral string to its equivalent integer value.
+    /// </summary>
+    /// <param name="roman">
+    /// The Roman numeral string to convert. The string is case-insensitive and may contain valid Roman numeral characters.
+    /// </param>
+    /// <returns>
+    /// The integer value corresponding to the provided Roman numeral string.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if the <paramref name="roman"/> parameter is <c>null</c>.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown if the <paramref name="roman"/> parameter contains invalid characters or is not a valid Roman numeral.
+    /// </exception>
     public static int FromRomanNumeral(string roman) {
         // https://stackoverflow.com/questions/14900228/roman-numerals-to-integers/27976977#answer-26667855
 
@@ -30,6 +45,18 @@ public static class NumberUtility
 
         return result;
     }
+    /// <summary>
+    /// Converts an integer to its equivalent Roman numeral representation.
+    /// </summary>
+    /// <param name="number">
+    /// The integer value to convert. Must be a positive number greater than zero.
+    /// </param>
+    /// <returns>
+    /// A string representing the Roman numeral equivalent of the provided integer.
+    /// </returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown if the <paramref name="number"/> parameter is less than or equal to zero.
+    /// </exception>
     public static string ToRomanNumeral(int number) {
         // https://stackoverflow.com/questions/22392810/integer-to-roman-format#answer-22393404
         var roman = string.Empty;

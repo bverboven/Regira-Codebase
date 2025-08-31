@@ -1,5 +1,8 @@
 ﻿namespace Regira.IO.Abstractions;
 
+/// <summary>
+/// Represents a storage file abstraction that extends the capabilities of a named file.
+/// </summary>
 public interface IStorageFile : INamedFile
 {
     /// <summary>

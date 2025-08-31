@@ -2,7 +2,15 @@ using System.Collections;
 
 namespace Regira.Caching.Abstractions;
 
-public abstract class CacheProvider : ICacheProvider
+/// <summary>
+/// Serves as the base class for implementing caching providers.
+/// </summary>
+/// <remarks>
+/// This abstract class provides a foundational structure for caching mechanisms, defining common operations
+/// such as retrieving, adding, removing, and clearing cached items. Derived classes must implement the
+/// abstract members to provide specific caching functionality.
+/// </remarks>
+public abstract class CacheProviderBase : ICacheProvider
 {
     public abstract IList<string> Keys { get; }
 

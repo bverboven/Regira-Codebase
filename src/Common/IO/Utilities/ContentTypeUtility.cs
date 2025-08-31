@@ -2,6 +2,14 @@
 
 namespace Regira.IO.Utilities;
 
+/// <summary>
+/// Provides utility methods for handling content types and file type detection.
+/// </summary>
+/// <remarks>
+/// This class includes methods for identifying content types based on file extensions or byte sequences,
+/// extending MIME type mappings, and retrieving file extensions from MIME types.
+/// It is designed to assist in scenarios where content type determination is required, such as file uploads or processing.
+/// </remarks>
 public static class ContentTypeUtility
 {
     public static IDictionary<string, byte[]> MimeTypeByteSequences => new ConcurrentDictionary<string, byte[]>(new Dictionary<string, byte[]>
@@ -258,6 +266,14 @@ public static class ContentTypeUtility
         }
     }
 
+    /// <summary>
+    /// Determines the MIME type of a file based on its file name.
+    /// </summary>
+    /// <param name="fileName">The name of the file, including its extension.</param>
+    /// <returns>
+    /// A string representing the MIME type of the file. 
+    /// If the file extension is not recognized, returns "application/octet-stream".
+    /// </returns>
     public static string GetContentType(string? fileName)
     {
         if (!string.IsNullOrWhiteSpace(fileName))
@@ -271,6 +287,33 @@ public static class ContentTypeUtility
 
         return "application/octet-stream";
     }
+    /// <summary>
+    /// Determines the MIME content type of a file based on its byte sequence and optional filename.
+    /// </summary>
+    /// <param name="bytes">The byte array representing the file content.</param>
+    /// <param name="filename">
+    /// An optional parameter specifying the file name, which is used to refine the content type detection
+    /// when multiple matches are found or when no byte sequence match is identified.
+    /// </param>
+    /// <returns>
+    /// A string representing the MIME content type of the file. If no match is found, the method attempts
+    /// to determine the content type using the provided filename. If both methods fail, the result may be null or a default value.
+    /// </returns>
+    /// <remarks>
+    /// This method first attempts to match the file's byte sequence against known patterns in 
+    /// <see cref="MimeTypeByteSequences"/>. If multiple matches are found, the filename (if provided) is used to 
+    /// prioritize the most appropriate MIME type. If no matches are found, the method falls back to 
+    /// <see cref="GetContentType(string?)"/> to determine the MIME type based on the file name.
+    /// </remarks>
+    /// <exception cref="ArgumentNullException">Thrown if both <paramref name="bytes"/> and <paramref name="filename"/> are null.</exception>
+    /// <example>
+    /// Example usage:
+    /// <code>
+    /// byte[] fileBytes = File.ReadAllBytes("example.pdf");
+    /// string contentType = ContentTypeUtility.GetContentType(fileBytes, "example.pdf");
+    /// Console.WriteLine(contentType); // Outputs "application/pdf"
+    /// </code>
+    /// </example>
     public static string GetContentType(byte[] bytes, string? filename = null)
     {
         var matches = MimeTypeByteSequences

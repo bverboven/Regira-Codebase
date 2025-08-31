@@ -3,6 +3,14 @@ using Regira.DAL.Abstractions;
 
 namespace Regira.DAL.Models;
 
+/// <summary>
+/// Represents a database communicator that provides functionality for managing database connections 
+/// and executing operations using a specific type of database connection.
+/// </summary>
+/// <typeparam name="TDbConnection">
+/// The type of database connection used by this communicator. This type must implement 
+/// <see cref="System.Data.IDbConnection"/> and have a parameterless constructor.
+/// </typeparam>
 public class DbCommunicator<TDbConnection> : IDbCommunicator
     where TDbConnection : class, IDbConnection, new()
 {
@@ -45,7 +53,7 @@ public class DbCommunicator<TDbConnection> : IDbCommunicator
         DbConnection.Close();
         return DbConnection;
     }
-        
+
 
     public void Dispose()
     {

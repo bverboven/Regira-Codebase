@@ -50,6 +50,14 @@ public class TableArrayOptions
 
 public static class DictionaryUtility
 {
+    /// <summary>
+    /// Converts a <see cref="NameValueCollection"/> to a dictionary where the keys are strings and the values are nullable strings.
+    /// </summary>
+    /// <param name="collection">The <see cref="NameValueCollection"/> to convert.</param>
+    /// <returns>
+    /// A dictionary containing the keys and values from the <paramref name="collection"/>.
+    /// If the collection contains duplicate keys, only the first occurrence is included in the resulting dictionary.
+    /// </returns>
     public static IDictionary<string, string?> ToDictionary(this NameValueCollection collection)
     {
         IDictionary<string, string?> dic = new Dictionary<string, string?>();
@@ -100,11 +108,57 @@ public static class DictionaryUtility
     }
 
     /// <summary>
-    /// Converts an object to a dictionary
+    /// Converts an <see cref="IEnumerable{T}"/> to a dictionary using the specified key and element selectors.
     /// </summary>
-    /// <param name="source">object source</param>
-    /// <param name="options">Dictionary options</param>
-    /// <returns>IDictionary&lt;string, object&gt;</returns>
+    /// <typeparam name="TSource">The type of the elements in the source collection.</typeparam>
+    /// <typeparam name="TElement">The type of the elements in the resulting dictionary.</typeparam>
+    /// <param name="source">The source collection to convert to a dictionary.</param>
+    /// <param name="keySelector">A function to extract the key for each element.</param>
+    /// <param name="elementSelector">A function to extract the value for each element.</param>
+    /// <param name="renameDuplicateKeys">
+    /// A boolean value indicating whether duplicate keys should be renamed by appending an index to make them unique.
+    /// </param>
+    /// <returns>
+    /// A dictionary containing keys and values extracted from the source collection.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if <paramref name="source"/>, <paramref name="keySelector"/>, or <paramref name="elementSelector"/> is <c>null</c>.
+    /// </exception>
+    public static IDictionary<string, TElement> ToDictionary<TSource, TElement>(this IEnumerable<TSource> source, Func<TSource, string> keySelector, Func<TSource, TElement> elementSelector, bool renameDuplicateKeys)
+    {
+        var pairs = source.Select(x => new KeyValuePair<string, TElement>(keySelector(x), elementSelector(x)));
+        var dic = new Dictionary<string, TElement>();
+        foreach (var kvp in pairs)
+        {
+            var key = kvp.Key;
+            var value = kvp.Value;
+            var index = 2;
+            while (renameDuplicateKeys && dic.ContainsKey(key))
+            {
+                key = $"{kvp.Key}{index}";
+            }
+            dic[key] = value;
+        }
+        return dic;
+    }
+    /// <summary>
+    /// Converts the specified object into a dictionary representation.
+    /// </summary>
+    /// <param name="source">
+    /// The object to be converted into a dictionary. Can be <c>null</c>.
+    /// </param>
+    /// <param name="options">
+    /// Options for customizing the dictionary creation process, such as case sensitivity.
+    /// If <c>null</c>, default options will be used.
+    /// </param>
+    /// <returns>
+    /// A dictionary containing the properties of the object as key-value pairs.
+    /// If <paramref name="options"/> specifies case-insensitivity, the keys will be case-insensitive.
+    /// </returns>
+    /// <remarks>
+    /// This method is useful for scenarios where an object's properties need to be represented
+    /// as a dictionary for further processing, such as serialization or filtering.
+    /// </remarks>
     public static IDictionary<string, object?> ToDictionary(object? source, DictionaryOptions? options = null)
     {
         options ??= new DictionaryOptions();
@@ -173,6 +227,23 @@ public static class DictionaryUtility
         }
         return dic;
     }
+    
+    /// <summary>
+    /// Retrieves the processed value of an object, with optional recursion and customization for null handling and duplicate key renaming.
+    /// </summary>
+    /// <param name="value">The object whose value is to be processed.</param>
+    /// <param name="recursive">
+    /// A boolean indicating whether to recursively process nested objects or collections.
+    /// </param>
+    /// <param name="includeNulls">
+    /// A boolean indicating whether to include null values in the processed result.
+    /// </param>
+    /// <param name="renameDuplicateKeys">
+    /// A boolean indicating whether to rename duplicate keys when processing objects into dictionaries.
+    /// </param>
+    /// <returns>
+    /// The processed value, which could be a primitive type, a collection, or a dictionary, depending on the input and options provided.
+    /// </returns>
     public static object? GetValue(object? value, bool recursive, bool includeNulls, bool renameDuplicateKeys)
     {
         var valueType = value?.GetType();
@@ -196,9 +267,28 @@ public static class DictionaryUtility
 
         return value;
     }
+    /// <summary>
+    /// Filters out entries with null values from the provided dictionary and returns a new dictionary with non-null values.
+    /// </summary>
+    /// <param name="source">The source dictionary to filter.</param>
+    /// <returns>A new dictionary containing only the entries with non-null values from the source dictionary.</returns>
     public static IDictionary<string, object> NonNullable(this IDictionary<string, object?> source)
         => source.Where(x => x.Value != null).ToDictionary(x => x.Key, x => x.Value!);
 
+    /// <summary>
+    /// Flattens a nested dictionary into a single-level dictionary with concatenated keys.
+    /// </summary>
+    /// <param name="source">The source dictionary to flatten.</param>
+    /// <param name="options">
+    /// Optional <see cref="FlattenOptions"/> to configure the flattening behavior, such as key separator or collection handling.
+    /// </param>
+    /// <returns>
+    /// A flattened dictionary where nested keys are concatenated using the specified separator.
+    /// </returns>
+    /// <remarks>
+    /// This method supports flattening nested dictionaries, collections of dictionaries, and simple collections.
+    /// It can also handle scenarios where collections are ignored based on the provided options.
+    /// </remarks>
     public static IDictionary<string, object?> Flatten(this IDictionary<string, object?> source, FlattenOptions? options = null)
     {
         options ??= new FlattenOptions();
@@ -258,6 +348,24 @@ public static class DictionaryUtility
         ParseRoot(source);
         return target;
     }
+    /// <summary>
+    /// Converts a flattened dictionary structure into a hierarchical dictionary structure.
+    /// </summary>
+    /// <param name="source">
+    /// The source dictionary containing flattened key-value pairs.
+    /// Keys are expected to represent hierarchical paths, separated by a delimiter.
+    /// </param>
+    /// <param name="options">
+    /// Optional configuration for unflattening, such as the delimiter used to separate key segments.
+    /// If not provided, default options will be used.
+    /// </param>
+    /// <returns>
+    /// A hierarchical dictionary representation of the input flattened dictionary.
+    /// </returns>
+    /// <remarks>
+    /// This method processes keys in the source dictionary to reconstruct nested structures,
+    /// supporting both dictionaries and lists as intermediate or final values.
+    /// </remarks>
     public static IDictionary<string, object?> Unflatten(this IDictionary<string, object?> source, FlattenOptions? options = null)
     {
         options ??= new FlattenOptions();
@@ -369,6 +477,20 @@ public static class DictionaryUtility
         return ParseRoot(source);
     }
 
+    /// <summary>
+    /// Converts a collection of dictionaries into a two-dimensional array (table format).
+    /// </summary>
+    /// <param name="listOfDictionaries">
+    /// The collection of dictionaries to be converted. Each dictionary represents a row in the resulting table.
+    /// </param>
+    /// <param name="options">
+    /// Optional configuration for the table generation, such as whether to include headers in the first row
+    /// and whether to ignore null values.
+    /// </param>
+    /// <returns>
+    /// A two-dimensional array where each row corresponds to a dictionary and each column corresponds to a unique key
+    /// from the dictionaries. If <paramref name="options"/> specifies headers, the first row contains the keys.
+    /// </returns>
     public static object?[,] ToTableArray(this IEnumerable<IDictionary<string, object?>> listOfDictionaries, TableArrayOptions? options = null)
     {
         options ??= new TableArrayOptions();
@@ -404,6 +526,21 @@ public static class DictionaryUtility
 
         return table;
     }
+    /// <summary>
+    /// Converts a two-dimensional array into a collection of dictionaries, where each dictionary represents a row in the array.
+    /// </summary>
+    /// <param name="table">
+    /// A two-dimensional array of objects to be converted. The array must have exactly two dimensions.
+    /// </param>
+    /// <param name="options">
+    /// Options for customizing the conversion process, such as whether the first row contains headers and whether to ignore null values.
+    /// </param>
+    /// <returns>
+    /// An enumerable collection of dictionaries, where each dictionary represents a row in the array.
+    /// </returns>
+    /// <exception cref="NotSupportedException">
+    /// Thrown if the provided array does not have exactly two dimensions.
+    /// </exception>
     public static IEnumerable<IDictionary<string, object?>> FromTableArray(object?[,] table, TableArrayOptions? options = null)
     {
         options ??= new TableArrayOptions();
@@ -455,6 +592,15 @@ public static class DictionaryUtility
         return dicList;
     }
 
+    /// <summary>
+    /// Ensures that the values in the dictionary are type-safe by converting them to match the property types of the specified class.
+    /// </summary>
+    /// <typeparam name="T">The target class type whose properties will be used for type conversion.</typeparam>
+    /// <param name="dic">The dictionary whose values will be type-checked and converted.</param>
+    /// <param name="properties">
+    /// An optional array of <see cref="PropertyInfo"/> objects representing the properties of the target class.
+    /// If not provided, the properties of the type <typeparamref name="T"/> will be used.
+    /// </param>
     public static void MakeTypeSafe<T>(this IDictionary<string, object?> dic, PropertyInfo[]? properties = null)
         where T : class, new()
     {
@@ -468,6 +614,20 @@ public static class DictionaryUtility
             }
         }
     }
+    /// <summary>
+    /// Converts a collection of dictionaries into type-safe objects of type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The type to which the dictionaries will be converted. 
+    /// Must be a class with a parameterless constructor.
+    /// </typeparam>
+    /// <param name="collection">
+    /// The collection of dictionaries to be converted. Each dictionary represents the properties of an object of type <typeparamref name="T"/>.
+    /// </param>
+    /// <remarks>
+    /// This method ensures that the dictionaries in the collection are transformed into objects of the specified type <typeparamref name="T"/>.
+    /// It uses reflection to map dictionary keys to the properties of the target type.
+    /// </remarks>
     public static void MakeTypeSafe<T>(this IEnumerable<IDictionary<string, object?>> collection)
         where T : class, new()
     {
@@ -479,48 +639,18 @@ public static class DictionaryUtility
         }
     }
 
-    public static bool TryGetValue<T, TResult>(this IDictionary<string, T> dic, string key, out TResult? value)
-    {
-        if (dic.ContainsKey(key))
-        {
-            if (dic[key] is TResult result)
-            {
-                value = result;
-                return true;
-            }
-
-            try
-            {
-                value = (TResult?)Convert.ChangeType(dic[key], typeof(TResult));
-                return true;
-            }
-            catch
-            {
-                // continue below and return false
-            }
-        }
-
-        value = default;
-        return false;
-    }
-    public static IDictionary<string, TElement> ToDictionary<TSource, TElement>(this IEnumerable<TSource> source, Func<TSource, string> keySelector, Func<TSource, TElement> elementSelector, bool renameDuplicateKeys)
-    {
-        var pairs = source.Select(x => new KeyValuePair<string, TElement>(keySelector(x), elementSelector(x)));
-        var dic = new Dictionary<string, TElement>();
-        foreach (var kvp in pairs)
-        {
-            var key = kvp.Key;
-            var value = kvp.Value;
-            var index = 2;
-            while (renameDuplicateKeys && dic.ContainsKey(key))
-            {
-                key = $"{kvp.Key}{index}";
-            }
-            dic[key] = value;
-        }
-        return dic;
-    }
-
+    /// <summary>
+    /// Populates the properties of the specified target object of type <typeparamref name="T"/> 
+    /// using the key-value pairs from the provided dictionary.
+    /// </summary>
+    /// <typeparam name="T">The type of the target object to populate.</typeparam>
+    /// <param name="input">The dictionary containing property names as keys and their corresponding values.</param>
+    /// <param name="target">The target object whose properties will be populated.</param>
+    /// <returns>The populated target object of type <typeparamref name="T"/>.</returns>
+    /// <remarks>
+    /// The method performs a case-insensitive match between dictionary keys and the property names of the target object.
+    /// Only writable properties without index parameters are considered for population.
+    /// </remarks>
     public static T ToObject<T>(this IDictionary<string, object?> input, T target)
     {
         var caseInsensitiveInput = new Dictionary<string, object?>(input, StringComparer.InvariantCultureIgnoreCase);
@@ -536,19 +666,80 @@ public static class DictionaryUtility
 
         return target;
     }
+    /// <summary>
+    /// Converts the specified dictionary into an object of type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the object to create and populate.</typeparam>
+    /// <param name="input">The dictionary containing property names as keys and their corresponding values.</param>
+    /// <returns>A new instance of type <typeparamref name="T"/> with its properties populated from the dictionary.</returns>
+    /// <remarks>
+    /// The method performs a case-insensitive match between dictionary keys and the property names of the target object.
+    /// Only writable properties without index parameters are considered for population.
+    /// </remarks>
     public static T ToObject<T>(this IDictionary<string, object?> input)
         where T : new()
         => ToObject(input, new T());
 
     /// <summary>
-    /// Returns the first value for the given key
+    /// Attempts to retrieve the value associated with the specified key from the dictionary
+    /// and converts it to the specified type if possible.
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <param name="values"></param>
-    /// <param name="key"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
+    /// <typeparam name="T">The type of the values in the dictionary.</typeparam>
+    /// <typeparam name="TResult">The type to which the value should be converted.</typeparam>
+    /// <param name="dic">The dictionary to search for the key.</param>
+    /// <param name="key">The key whose value to retrieve.</param>
+    /// <param name="value">
+    /// When this method returns, contains the value associated with the specified key, 
+    /// converted to the specified type, if the key is found and the conversion is successful; 
+    /// otherwise, the default value for the type of the <typeparamref name="TResult"/> parameter.
+    /// This parameter is passed uninitialized.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if the dictionary contains an element with the specified key 
+    /// and the value can be successfully converted to the specified type; otherwise, <see langword="false"/>.
+    /// </returns>
+    public static bool TryGetValue<T, TResult>(this IDictionary<string, T> dic, string key, out TResult? value)
+    {
+        if (dic.TryGetValue(key, out var result))
+        {
+            // try direct cast first
+            if (result is TResult typedResult)
+            {
+                value = typedResult;
+                return true;
+            }
+
+            try
+            {
+                // try convert
+                value = (TResult?)Convert.ChangeType(result, typeof(TResult));
+                return true;
+            }
+            catch
+            {
+                // continue below and return false
+            }
+        }
+
+        // not found or cannot convert
+        value = default;
+        return false;
+    }
+    /// <summary>
+    /// Attempts to retrieve the first value associated with the specified key from the given <see cref="ILookup{TKey, TValue}"/>.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the keys in the lookup.</typeparam>
+    /// <typeparam name="TValue">The type of the values in the lookup.</typeparam>
+    /// <param name="values">The <see cref="ILookup{TKey, TValue}"/> to search.</param>
+    /// <param name="key">The key to locate in the lookup.</param>
+    /// <param name="value">
+    /// When this method returns, contains the first value associated with the specified key, 
+    /// if the key is found; otherwise, the default value for the type of the value parameter.
+    /// This parameter is passed uninitialized.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if the lookup contains an element with the specified key; otherwise, <see langword="false"/>.
+    /// </returns>
     public static bool TryGetValue<TKey, TValue>(this ILookup<TKey, TValue> values, TKey key, out TValue? value)
     {
         var items = values.FirstOrDefault(x => x.Key!.Equals(key));

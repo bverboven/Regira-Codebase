@@ -2,6 +2,14 @@
 
 namespace Regira.Dimensions;
 
+/// <summary>
+/// Represents a two-dimensional size with width and height components.
+/// </summary>
+/// <remarks>
+/// This struct provides functionality for performing mathematical operations on dimensions,
+/// such as rounding, flooring, and scaling. It also supports implicit conversions from and to
+/// various data types, including arrays and integers, for ease of use in different scenarios.
+/// </remarks>
 [DebuggerDisplay("Size2D = [{Width},{Height}]")]
 public struct Size2D(float width = 0, float height = 0) : IEquatable<Size2D>
 {

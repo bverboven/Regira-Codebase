@@ -2,8 +2,32 @@
 
 public static class QueryExtensions
 {
+    /// <summary>
+    /// Applies paging to the specified query based on the provided <see cref="PagingInfo"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the query.</typeparam>
+    /// <param name="query">The query to which paging will be applied.</param>
+    /// <param name="info">The paging information containing the page size and page number. If <c>null</c>, no paging is applied.</param>
+    /// <returns>
+    /// A query with paging applied if <paramref name="info"/> is not <c>null</c>;
+    /// otherwise, the original query.
+    /// </returns>
     public static IQueryable<T> PageQuery<T>(this IQueryable<T> query, PagingInfo? info)
         => info == null ? query : query.PageQuery(info.PageSize, info.Page);
+    /// <summary>
+    /// Applies paging to the specified query based on the provided page size and page number.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the query.</typeparam>
+    /// <param name="query">The query to which paging will be applied.</param>
+    /// <param name="pageSize">The number of items per page. If less than or equal to 0, no paging is applied.</param>
+    /// <param name="page">
+    /// The page number to retrieve. If less than 1, it defaults to 1.
+    /// Pages are 1-based, meaning the first page is page 1.
+    /// </param>
+    /// <returns>
+    /// A query with paging applied if <paramref name="pageSize"/> is greater than 0;
+    /// otherwise, the original query.
+    /// </returns>
     public static IQueryable<T> PageQuery<T>(this IQueryable<T> query, int pageSize, int page = 1)
     {
         // make sure page is greater than 0

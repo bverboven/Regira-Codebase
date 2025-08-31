@@ -2,6 +2,9 @@
 
 namespace Regira.Dimensions;
 
+/// <summary>
+/// Represents a two-dimensional position with optional top, left, bottom, and right coordinates.
+/// </summary>
 [DebuggerDisplay("Position2D = [{Top},{Left},{Bottom},{Right}]")]
 public struct Position2D(float? top, float? left, float? bottom, float? right) : IEquatable<Position2D>
 {

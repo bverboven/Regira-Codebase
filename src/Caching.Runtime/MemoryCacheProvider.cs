@@ -3,7 +3,17 @@ using Regira.Caching.Abstractions;
 
 namespace Regira.Caching.Runtime;
 
-public class MemoryCacheProvider : CacheProvider
+/// <summary>
+/// Provides an in-memory caching implementation using <see cref="MemoryCache"/>.
+/// </summary>
+/// <remarks>
+/// This class extends <see cref="CacheProviderBase"/> to offer caching functionality
+/// backed by the .NET <see cref="MemoryCache"/>. It supports operations such as retrieving,
+/// adding, removing, and clearing cached items. The caching behavior can be customized
+/// using the <see cref="Options"/> class, which allows configuration of a prefix for cache keys
+/// and a default duration for cached items.
+/// </remarks>
+public class MemoryCacheProvider : CacheProviderBase
 {
     public class Options
     {

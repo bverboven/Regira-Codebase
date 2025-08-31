@@ -148,6 +148,18 @@ public static class TypeUtility
         return IsTypeEnumerable(sourceType, type);
     }
 
+    /// <summary>
+    /// Retrieves the generic type argument of a collection type, if applicable.
+    /// </summary>
+    /// <param name="collectionType">The type of the collection to analyze.</param>
+    /// <returns>
+    /// The generic type argument of the collection if it is a generic collection; otherwise, <c>null</c>.
+    /// </returns>
+    /// <remarks>
+    /// This method examines the provided <paramref name="collectionType"/> to determine if it implements
+    /// <see cref="System.Collections.Generic.IEnumerable{T}"/>. If so, it extracts and returns the generic type argument.
+    /// If the collection type is not generic, the method attempts to retrieve the element type.
+    /// </remarks>
     public static Type? GetGenericCollectionType(Type collectionType)
     {
         var enumerableType = collectionType.GetInterface(typeof(IEnumerable<>).FullName!);
@@ -155,6 +167,18 @@ public static class TypeUtility
                ?? enumerableType?.GetElementType();
     }
 
+    /// <summary>
+    /// Retrieves the name of the property referenced in the specified lambda expression.
+    /// </summary>
+    /// <param name="selector">
+    /// A lambda expression that selects a property. For example, <c>() => instance.Property</c>.
+    /// </param>
+    /// <returns>
+    /// The name of the property if the expression references a property; otherwise, <c>null</c>.
+    /// </returns>
+    /// <remarks>
+    /// This method is useful for obtaining property names in a type-safe manner, avoiding the use of string literals.
+    /// </remarks>
     public static string? GetPropertyName(Expression<Func<object>> selector)
     {
         return GetMemberName(selector);
@@ -215,18 +239,50 @@ public static class TypeUtility
             ? interfaces.Contains(implementedInterface)
             : interfaces.Any(x => x == implementedInterface || x.IsGenericType && x.GetGenericTypeDefinition() == implementedInterface);
     }
-
+    
+    /// <summary>
+    /// Determines whether the specified type or any of its base types or interfaces
+    /// contains the specified generic argument type.
+    /// </summary>
+    /// <param name="type">The type to inspect.</param>
+    /// <param name="genericType">The generic argument type to look for.</param>
+    /// <returns>
+    /// <see langword="true"/> if the specified type or any of its base types or interfaces
+    /// contains the specified generic argument type; otherwise, <see langword="false"/>.
+    /// </returns>
     public static bool HasGenericArgument(Type type, Type genericType)
         => type.GetGenericArguments()
             .Union(GetBaseTypes(type).SelectMany(t => t.GetGenericArguments()))
             .Contains(genericType);
 
-
+    /// <summary>
+    /// Creates a generic list type with the specified generic type and list type constraints.
+    /// </summary>
+    /// <typeparam name="TList">The type of the list, which must implement <see cref="IList{TGeneric}"/>.</typeparam>
+    /// <typeparam name="TGeneric">The generic type parameter for the list.</typeparam>
+    /// <returns>A constructed generic list type based on the specified parameters.</returns>
     public static Type CreateGenericListType<TList, TGeneric>()
         where TList : IList<TGeneric>
         => CreateGenericListType(typeof(TGeneric), typeof(TList));
+    /// <summary>
+    /// Creates a generic list type using the specified generic type.
+    /// </summary>
+    /// <typeparam name="TGeneric">The type of elements in the generic list.</typeparam>
+    /// <returns>A <see cref="Type"/> representing a generic list of the specified type.</returns>
     public static Type CreateGenericListType<TGeneric>()
         => CreateGenericListType(typeof(TGeneric));
+    /// <summary>
+    /// Creates a generic list type using the specified generic type and an optional list type.
+    /// </summary>
+    /// <param name="genericType">The type of elements in the generic list.</param>
+    /// <param name="listType">
+    /// The type of the list to create. If <c>null</c>, the default type <see cref="List{T}"/> is used.
+    /// The specified list type must implement <see cref="IList"/>.
+    /// </param>
+    /// <returns>A <see cref="Type"/> representing a generic list of the specified type.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown if the specified <paramref name="listType"/> does not implement <see cref="IList"/>.
+    /// </exception>
     public static Type CreateGenericListType(Type genericType, Type? listType = null)
     {
         listType ??= typeof(List<>);

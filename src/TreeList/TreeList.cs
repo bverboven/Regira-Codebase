@@ -2,6 +2,11 @@
 
 namespace Regira.TreeList;
 
+/// <summary>
+/// Represents a hierarchical collection of tree nodes, where each node can have a value and a collection of child nodes.
+/// Provides functionality for managing and interacting with the tree structure, including adding, removing, and validating nodes.
+/// </summary>
+/// <typeparam name="T">The type of the value stored in each tree node.</typeparam>
 public class TreeList<T> : List<TreeNode<T>>
 {
     public TreeOptions? Options { get; set; }

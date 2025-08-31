@@ -2,6 +2,12 @@ using Regira.TreeList.Abstractions;
 
 namespace Regira.TreeList;
 
+/// <summary>
+/// Represents a node in a tree structure, where each node can have a value, a parent, and multiple children.
+/// </summary>
+/// <typeparam name="T">
+/// The type of the value stored in the tree node.
+/// </typeparam>
 public class TreeNode<T> : TreeNodeBase<T>
 {
     private TreeNode<T>[]? _children;

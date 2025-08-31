@@ -2,13 +2,18 @@ using Regira.DAL.Abstractions;
 
 namespace Regira.DAL.Models;
 
-public abstract class DbSettingsBase(
-    string host,
-    string? databaseName,
-    string port,
-    string? username = null,
-    string? password = null,
-    bool useSecure = true)
+/// <summary>
+/// Represents the base class for database settings, providing common properties and methods 
+/// for configuring and managing database connections.
+/// </summary>
+/// <remarks>
+/// This abstract class is designed to be inherited by specific database settings implementations.
+/// It provides properties such as <see cref="Host"/>, <see cref="DatabaseName"/>, <see cref="Port"/>, 
+/// <see cref="Username"/>, <see cref="Password"/>, and <see cref="UseSecure"/> to define the 
+/// connection details. Additionally, it includes methods for building connection strings, 
+/// comparing connection strings, and cloning settings.
+/// </remarks>
+public abstract class DbSettingsBase(string host, string? databaseName, string port, string? username = null, string? password = null, bool useSecure = true)
     : IDbSettings
 {
     public string Host { get; set; } = host;

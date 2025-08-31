@@ -4,7 +4,15 @@ using Regira.Utilities;
 
 namespace Regira.Caching;
 
-public class DictionaryCacheProvider(string? prefix = null) : CacheProvider
+/// <summary>
+/// Provides an in-memory caching mechanism using a dictionary to store key-value pairs.
+/// </summary>
+/// <remarks>
+/// This class extends the <see cref="CacheProviderBase"/> base class and implements caching functionality
+/// using a static dictionary. It supports operations such as retrieving, adding, removing, and clearing
+/// cached items. The caching mechanism can optionally use a prefix for keys to group related entries.
+/// </remarks>
+public class DictionaryCacheProvider(string? prefix = null) : CacheProviderBase
 {
     protected static readonly IDictionary<string, object?> Items = new ConcurrentDictionary<string, object?>();
     public override IList<string> Keys => Items.Keys
