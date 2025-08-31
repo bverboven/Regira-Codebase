@@ -1,6 +1,6 @@
-using System.Text.Json;
 using NUnit.Framework.Legacy;
 using Regira.Utilities;
+using System.Text.Json;
 
 namespace Common.Testing;
 
@@ -138,7 +138,7 @@ public class DictionaryUtilityTests
         var countries = _countries
             .Select(c => DictionaryUtility.ToDictionary(c))
             .ToList();
-        var table = DictionaryUtility.ToTableArray(countries);
+        var table = countries.ToTableArray();
         // test headers
         Assert.That(table[0, 0], Is.EqualTo("Code"));
         Assert.That(table[0, 1], Is.EqualTo("Title"));
@@ -161,7 +161,7 @@ public class DictionaryUtilityTests
         var countries = _countries
             .Select(c => DictionaryUtility.ToDictionary(c))
             .ToList();
-        var table = DictionaryUtility.ToTableArray(countries);
+        var table = countries.ToTableArray();
         var dicList = DictionaryUtility
             .FromTableArray(table)
             .ToArray();
@@ -187,7 +187,7 @@ public class DictionaryUtilityTests
     public void Flatten_Returns_Dictionary()
     {
         var source = new Dictionary<string, object?>();
-        var target = DictionaryUtility.Flatten(source);
+        var target = source.Flatten();
         Assert.That(target, Is.Not.Null);
         Assert.That(target, Is.InstanceOf<IDictionary<string, object?>>());
     }
@@ -198,12 +198,35 @@ public class DictionaryUtilityTests
             { "factuurNummer", "0123456" },
             { "factuurDatum", "2019-11-19" }
         };
-        var target = DictionaryUtility.Flatten(source);
+        var target = source.Flatten();
         Assert.That(source["factuurNummer"], Is.EqualTo(target["factuurNummer"]));
         Assert.That(source["factuurDatum"], Is.EqualTo(target["factuurDatum"]));
     }
     [Test]
-    public void Flatten_CollectionValues()
+    public void Flatten_Primitive_Collection()
+    {
+        var numbers = new[] { 1, 2, 3, 4, 5 };
+        var source = new Dictionary<string, object?>
+        {
+            ["Numbers"] = numbers,
+            ["MyInt"] = 42,
+            ["MyString"] = "Hello World",
+            ["Date"] = DateTime.Today,
+        };
+        var target = source.Flatten();
+        Assert.That(target, Is.Not.Null);
+        Assert.That(target, Is.InstanceOf<IDictionary<string, object?>>());
+        Assert.That(target.ContainsKey("Numbers"), Is.False);
+        Assert.That(target.ContainsKey("MyInt"), Is.True);
+        Assert.That(target.ContainsKey("MyString"), Is.True);
+        Assert.That(target.ContainsKey("Date"), Is.True);
+        for (var i = 0; i < numbers.Length; i++)
+        {
+            Assert.That(target[$"Numbers.{i}"], Is.EqualTo(numbers[i]));
+        }
+    }
+    [Test]
+    public void Flatten_CollectionObjects()
     {
         var source = new Dictionary<string, object?> {
             { "factuurLijnen", new[] {
@@ -217,7 +240,7 @@ public class DictionaryUtilityTests
                 }
             } }
         };
-        var target = DictionaryUtility.Flatten(source);
+        var target = source.Flatten();
         Assert.That(target.ContainsKey("factuurLijnen"), Is.False);
         Assert.That(target.ContainsKey("factuurLijnen.0.omschrijving"), Is.True);
         var sourceFactuurLijnen = (IDictionary<string, object?>[])source["factuurLijnen"]!;
@@ -226,8 +249,10 @@ public class DictionaryUtilityTests
     [Test]
     public void Flatten_Ignore_CollectionValues()
     {
-        var source = new Dictionary<string, object?> {
-            { "factuurLijnen", new[] {
+        var source = new Dictionary<string, object?>
+        {
+            ["numbers"] = new[] { 1, 2, 3 },
+            ["factuurLijnen"] = new[] {
                 new Dictionary<string, object?> {
                     { "omschrijving", "Vervoer" },
                     { "eenheidsPrijs", 160.50 }
@@ -236,9 +261,11 @@ public class DictionaryUtilityTests
                     { "omschrijving", "Diensten" },
                     { "eenheidsPrijs", 180.50 }
                 }
-            } }
+            }
         };
-        var target = DictionaryUtility.Flatten(source, new FlattenOptions { IgnoreCollections = true });
+        var target = source.Flatten(new FlattenOptions { IgnoreCollections = true });
+        Assert.That(target.ContainsKey("numbers"), Is.True);
+        Assert.That((int[])target["numbers"]!, Is.Not.Empty);
         Assert.That(target.ContainsKey("factuurLijnen"), Is.True);
         Assert.That((IList<IDictionary<string, object?>>)target["factuurLijnen"]!, Is.Not.Empty);
     }
@@ -255,7 +282,7 @@ public class DictionaryUtilityTests
                 }
             } }
         };
-        var target = DictionaryUtility.Flatten(source);
+        var target = source.Flatten();
         var sourceFactuurLijnen = (IDictionary<string, object?>[])source["factuurLijnen"];
         var sourceLijn = sourceFactuurLijnen.First();
         var sourceFirstNested = (IDictionary<string, object?>)sourceLijn["nested"];
@@ -274,7 +301,7 @@ public class DictionaryUtilityTests
                 }
             } }
         };
-        var target = DictionaryUtility.Flatten(source, new FlattenOptions { IgnoreCollections = true });
+        var target = source.Flatten(new FlattenOptions { IgnoreCollections = true });
         var sourceFactuurLijnen = (IDictionary<string, object?>[])source["factuurLijnen"];
         var sourceLijn = sourceFactuurLijnen.First();
         var sourceFirstNested = (IDictionary<string, object?>)sourceLijn["nested"];
@@ -294,7 +321,7 @@ public class DictionaryUtilityTests
         // only works for NewtonSoft.Json for now...
         //var json = _serializer.Serialize(source);
         //source = _serializer.Deserialize<Dictionary<string, object>>(json);
-        var target = DictionaryUtility.Flatten(source);
+        var target = source.Flatten();
         Assert.That(target.ContainsKey("leverancier"), Is.False);
         var sourceLeverancier = (IDictionary<string, object?>)source["leverancier"]!;
         Assert.That(sourceLeverancier["naam"], Is.EqualTo(target["leverancier.naam"]));
@@ -311,7 +338,7 @@ public class DictionaryUtilityTests
                 } }
             } }
         };
-        var target = DictionaryUtility.Flatten(source);
+        var target = source.Flatten();
         var sourceLeverancier = (IDictionary<string, object?>)source["leverancier"]!;
         Assert.That(sourceLeverancier.ContainsKey("adres"), Is.True);
         Assert.That(sourceLeverancier["adres"], Is.InstanceOf<IDictionary<string, object?>>());
@@ -342,7 +369,7 @@ public class DictionaryUtilityTests
                 }
             } }
         };
-        var target = DictionaryUtility.Flatten(source);
+        var target = source.Flatten();
         var sourceFactuurLijnen = ((IEnumerable<IDictionary<string, object?>>)source["factuurLijnen"]).ToArray();
         var sourceLijn2 = sourceFactuurLijnen[1];
         var sourceNestedProp = (IDictionary<string, object?>)sourceLijn2["nested"]!;
@@ -390,8 +417,8 @@ public class DictionaryUtilityTests
                 }
             }
         };
-        source = DictionaryUtility.Unflatten(source);
-        var target = DictionaryUtility.Flatten(source);
+        source = source.Unflatten();
+        var target = source.Flatten();
 
         Assert.That(source["factuurNummer"], Is.EqualTo(target["factuurNummer"]));
         Assert.That(source["factuurDatum"], Is.EqualTo(target["factuurDatum"]));
@@ -463,7 +490,7 @@ public class DictionaryUtilityTests
     public void Unflatten_Returns_Dictionary()
     {
         var source = new Dictionary<string, object?>();
-        var target = DictionaryUtility.Unflatten(source);
+        var target = source.Unflatten();
         Assert.That(target, Is.Not.Null);
         Assert.That(target, Is.InstanceOf<IDictionary<string, object?>>());
     }
@@ -474,13 +501,38 @@ public class DictionaryUtilityTests
             {"factuurNummer", "0123456"},
             {"factuurDatum", "2019-11-19"}
         };
-        var target = DictionaryUtility.Unflatten(source);
+        var target = source.Unflatten();
         Assert.That(source["factuurNummer"], Is.EqualTo(target["factuurNummer"]));
         Assert.That(source["factuurDatum"], Is.EqualTo(target["factuurDatum"]));
     }
     [Test]
-    public void Unflatten_CollectionValues()
+    public void Unflatten_Primitive_Collection()
     {
+        var numbers = new[] { 1, 2, 3, 4, 5 };
+        var source = new Dictionary<string, object?>
+        {
+            ["Numbers.0"] = numbers[0],
+            ["Numbers.1"] = numbers[1],
+            ["Numbers.2"] = numbers[2],
+            ["Numbers.3"] = numbers[3],
+            ["Numbers.4"] = numbers[4],
+            ["MyInt"] = 42,
+            ["MyString"] = "Hello World",
+            ["Date"] = DateTime.Today,
+        };
+        var target = source.Unflatten();
+        Assert.That(target, Is.Not.Null);
+        Assert.That(target, Is.InstanceOf<IDictionary<string, object?>>());
+        Assert.That(target.ContainsKey("Numbers"), Is.True);
+        Assert.That(target.ContainsKey("MyInt"), Is.True);
+        Assert.That(target.ContainsKey("MyString"), Is.True);
+        Assert.That(target.ContainsKey("Date"), Is.True);
+        Assert.That(target["Numbers"], Is.EquivalentTo(numbers));
+    }
+    [Test]
+    public void Unflatten_CollectionObjects()
+    {
+        // testing with non-flattened collection values as well
         var source = new Dictionary<string, object?> {
             {
                 "factuurLijnen", new[] {
@@ -495,7 +547,7 @@ public class DictionaryUtilityTests
                 }
             }
         };
-        var target = DictionaryUtility.Unflatten(source);
+        var target = source.Unflatten();
         var targetFactuurLijnen = target["factuurLijnen"] as IEnumerable<IDictionary<string, object?>>;
         Assert.That(targetFactuurLijnen, Is.InstanceOf<IEnumerable<IDictionary<string, object?>>>());
         // ReSharper disable once AssignNullToNotNullAttribute
@@ -513,7 +565,7 @@ public class DictionaryUtilityTests
             {"factuurLijnen.1.omschrijving", "Diensten"},
             {"factuurLijnen.1.eenheidsPrijs", 180.50}
         };
-        var target = DictionaryUtility.Unflatten(source);
+        var target = source.Unflatten();
         var targetFactuurLijnen = target["factuurLijnen"] as IEnumerable<IDictionary<string, object?>>;
         Assert.That(targetFactuurLijnen, Is.InstanceOf<IEnumerable<IDictionary<string, object?>>>());
         // ReSharper disable once AssignNullToNotNullAttribute
@@ -532,7 +584,7 @@ public class DictionaryUtilityTests
                 }
             } }
         };
-        var target = DictionaryUtility.Unflatten(source);
+        var target = source.Unflatten();
         var sourceFactuurLijnen = (IDictionary<string, object?>[])source["factuurLijnen"]!;
         var sourceLijn = sourceFactuurLijnen[0];
         var targetFactuurLijnen = (IList<IDictionary<string, object?>>)target["factuurLijnen"]!;
@@ -547,7 +599,7 @@ public class DictionaryUtilityTests
             { "leverancier.naam", "LEVERANCIER BVBA" },
             { "leverancier.telefoon", "003239999999" },
         };
-        var target = DictionaryUtility.Unflatten(source);
+        var target = source.Unflatten();
         Assert.That(target.ContainsKey("leverancier"), Is.True);
         Assert.That(target["leverancier"], Is.InstanceOf<IDictionary<string, object?>>());
         var targetLeverancier = (IDictionary<string, object?>)target["leverancier"]!;
@@ -561,7 +613,7 @@ public class DictionaryUtilityTests
             { "leverancier.adres.postcode", "2000" },
             { "leverancier.adres.gemeente", "Antwerpen" }
         };
-        var target = DictionaryUtility.Unflatten(source);
+        var target = source.Unflatten();
         var targetLeverancier = (IDictionary<string, object?>)target["leverancier"]!;
         Assert.That(targetLeverancier.ContainsKey("adres"), Is.True);
         Assert.That(targetLeverancier["adres"], Is.InstanceOf<IDictionary<string, object?>>());
@@ -583,7 +635,7 @@ public class DictionaryUtilityTests
                 }
             } }
         };
-        var target = DictionaryUtility.Unflatten(source);
+        var target = source.Unflatten();
         var targetFactuurLijnen = target["factuurLijnen"] as IEnumerable<IDictionary<string, object?>>;
         Assert.That(targetFactuurLijnen, Is.InstanceOf<IEnumerable<IDictionary<string, object?>>>());
         // ReSharper disable once AssignNullToNotNullAttribute
@@ -612,7 +664,7 @@ public class DictionaryUtilityTests
                 }
             } }
         };
-        var target = DictionaryUtility.Unflatten(source);
+        var target = source.Unflatten();
         var targetFactuurLijnen = ((IEnumerable<IDictionary<string, object?>>)target["factuurLijnen"]!).ToArray();
         var sourceFactuurLijnen = (IDictionary<string, object?>[])source["factuurLijnen"]!;
         var targetLijn2 = targetFactuurLijnen[1];
@@ -653,7 +705,7 @@ public class DictionaryUtilityTests
             { "factuurLijnen:1:nested:second:0:foo:value", "fooValue" },
             { "factuurLijnen:2:nested:nested:third", "3th nested" }
         };
-        var target = DictionaryUtility.Unflatten(source, new FlattenOptions { Separator = ":" });
+        var target = source.Unflatten(new FlattenOptions { Separator = ":" });
 
         var targetLeverancier = (IDictionary<string, object?>)target["leverancier"]!;
         Assert.That(targetLeverancier.ContainsKey("adres"), Is.True);

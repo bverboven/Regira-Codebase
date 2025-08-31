@@ -216,11 +216,13 @@ public static class DictionaryUtility
         void SetItem(string key, object? value, string prefix = "")
         {
             var fullKey = BuildPrefix(prefix, key);
+            // nested dictionary ({a:1, b:{c:2}})
             if (value is IDictionary<string, object?> dic)
             {
                 var newPrefix = fullKey;
                 ParseRoot(dic, newPrefix);
             }
+            // collection of dictionaries ([{a:1},{b:2}])
             else if (value is IEnumerable<IDictionary<string, object?>> collection)
             {
                 var list = collection.ToList();
@@ -236,6 +238,17 @@ public static class DictionaryUtility
                     }
                 }
             }
+            // simple collection ([1,2,3] or ["a","b","c"])
+            else if (value != null && !TypeUtility.IsSimpleType(value.GetType()) && value is IEnumerable simpleCollection && !options.IgnoreCollections)
+            {
+                var arr = simpleCollection.Cast<object?>().ToArray();
+                for (var i = 0; i < arr.Length; i++)
+                {
+                    var indexedKey = BuildPrefix(fullKey, i.ToString());
+                    target[indexedKey] = arr[i];
+                }
+            }
+            // simple value (1, "string", true, null, DateTime, etc)
             else
             {
                 target[fullKey] = value;
@@ -277,20 +290,32 @@ public static class DictionaryUtility
             var newKeyString = NextKeyString(key);
             var nextKey = FirstKeySegment(newKeyString);
 
-            //var isNextKeyAnIndex = int.TryParse(newKeyString, out _);
             var isNextKeyAnIndex = int.TryParse(nextKey, out _);
+            // last segment is an index -> simple array
+            var isSimpleArray = key.Split(options.Separator.ToCharArray()).Last() == nextKey;
 
             if (!target.ContainsKey(parentKey))
             {
-                var parent = isNextKeyAnIndex
-                    ? (object)new List<Dictionary<string, object?>>()
-                    : new Dictionary<string, object?>();
+                object parent = isNextKeyAnIndex switch
+                {
+                    true when isSimpleArray => new List<object>(),
+                    true => new List<Dictionary<string, object?>>(),
+                    _ => new Dictionary<string, object?>()
+                };
+
                 target[parentKey] = parent;
             }
 
             if (isNextKeyAnIndex)
             {
-                SetListItem(newKeyString, value, ((List<Dictionary<string, object?>?>)target[parentKey]!));
+                if (isSimpleArray)
+                {
+                    SetSimpleListItem(newKeyString, value, (List<object?>)target[parentKey]!);
+                }
+                else
+                {
+                    SetListItem(newKeyString, value, (List<Dictionary<string, object?>?>)target[parentKey]!);
+                }
             }
             else
             {
@@ -298,6 +323,12 @@ public static class DictionaryUtility
             }
         }
 
+        void SetSimpleListItem(string key, object? value, List<object?> target)
+        {
+            var index = int.Parse(FirstKeySegment(key));
+            target.EnsureSize(index + 1);
+            target[index] = value;
+        }
         void SetListItem(string key, object? value, List<Dictionary<string, object?>?> target)
         {
             var index = int.Parse(FirstKeySegment(key));
@@ -330,7 +361,7 @@ public static class DictionaryUtility
             else if (target is List<object?> list)
             {
                 var index = int.Parse(key);
-                CollectionUtility.EnsureSize(list, index);
+                list.EnsureSize(index);
                 list[index] = value;
             }
         }
