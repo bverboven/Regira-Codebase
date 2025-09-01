@@ -3,12 +3,12 @@
 namespace Regira.Dimensions;
 
 [DebuggerDisplay("Point2D = [{X},{Y}]")]
-public readonly struct Point2D(float? x, float? y) : IEquatable<Point2D>
+public readonly struct Point2D(float x, float y) : IEquatable<Point2D>
 {
-    public float X { get; } = x ?? 0;
-    public float Y { get; } = y ?? 0;
+    public float X { get; } = x;
+    public float Y { get; } = y;
 
-    public Point2D(int x, int y) : this((float)x, (float)y) { }
+    public Point2D(int x, int y) : this(x, (float)y) { }
     public Point2D() : this(0, 0) { }
 
 
@@ -30,7 +30,7 @@ public readonly struct Point2D(float? x, float? y) : IEquatable<Point2D>
             2 => new Point2D(point[0], point[1]),
             _ => throw new ArgumentOutOfRangeException(nameof(point))
         };
-    public static implicit operator float?[](Point2D point)
+    public static implicit operator float[](Point2D point)
         => [point.X, point.Y];
 
     // comparison

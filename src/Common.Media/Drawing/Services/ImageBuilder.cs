@@ -10,17 +10,11 @@ public class ImageBuilder(IImageService service, IEnumerable<IImageCreator> imag
     private readonly IImageCreator[] _imageCreators = imageCreators.Concat([AggregateImageCreator.Create(service, imageCreators)]).ToArray();
     // ReSharper restore PossibleMultipleEnumeration
     private readonly List<IImageLayer> _items = new();
-    private int? _dpi;
     private object? _target;
 
     public ImageBuilder Add(params IImageLayer[] items)
     {
         _items.AddRange(items);
-        return this;
-    }
-    public ImageBuilder SetDpi(int dpi)
-    {
-        _dpi = dpi;
         return this;
     }
     /// <summary>
@@ -50,16 +44,16 @@ public class ImageBuilder(IImageService service, IEnumerable<IImageCreator> imag
             ? GetImageFile(new ImageLayer<object> { Source = _target })
             : null;
 
-        target = _items.Select(ToImageToAdd)
+        var result = _items.Select(ToImageLayer)
             .Aggregate(
                 target,
-                (img, imageLayer) => service.Draw([imageLayer], img, _dpi)
-            );
+                (img, imageLayer) => service.Draw([imageLayer], img)
+            )!;
 
-        return target!;
+        return result;
     }
 
-    protected ImageLayer ToImageToAdd(IImageLayer item)
+    protected ImageLayer ToImageLayer(IImageLayer item)
     {
         if (item is ImageLayer imageLayer)
         {

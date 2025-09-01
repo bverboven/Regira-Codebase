@@ -1,4 +1,4 @@
-﻿using Regira.Dimensions;
+﻿using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models.Abstractions;
 
@@ -9,7 +9,7 @@ public class ImageFile : IImageFile
     public byte[]? Bytes { get; set; }
     public Stream? Stream { get; set; }
     public long Length { get; set; }
-    public Size2D? Size { get; set; }
+    public ImageSize? Size { get; set; }
     public ImageFormat? Format { get; set; }
     public string? ContentType { get; set; }
 

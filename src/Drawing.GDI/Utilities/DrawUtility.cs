@@ -1,5 +1,4 @@
-using Regira.Dimensions;
-using Regira.Media.Drawing.Constants;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
 using Regira.Utilities;
@@ -11,7 +10,7 @@ namespace Regira.Drawing.GDI.Utilities;
 
 public static class DrawUtility
 {
-    public static Image Draw(IEnumerable<ImageLayer> imageLayers, Image? target = null, int? dpi = null)
+    public static Image Draw(IEnumerable<ImageLayer> imageLayers, Image? target = null)
     {
         var images = imageLayers.AsList();
         target ??= CreateSizedCanvas(images);
@@ -24,7 +23,7 @@ public static class DrawUtility
         using var g = GdiUtility.GetGraphics(target);
         foreach (var img in images)
         {
-            AddImageLayer(img, g, new Size2D(target.Width, target.Height), dpi);
+            AddImageLayer(img, g, new ImageSize(target.Width, target.Height));
         }
 
         return target;
@@ -40,10 +39,8 @@ public static class DrawUtility
         return GdiUtility.Create(size);
     }
 
-    public static void AddImageLayer(ImageLayer imageLayer, Graphics g1, Size2D targetSize, int? dpi = null)
+    public static void AddImageLayer(ImageLayer imageLayer, Graphics g1, ImageSize targetSize)
     {
-        dpi ??= ImageLayerDefaults.Dpi;
-
         var img = imageLayer.Source;
         var options = imageLayer.Options ?? new ImageLayerOptions();
 
@@ -56,10 +53,7 @@ public static class DrawUtility
         using var resizedImage = options.Size is { Width: > 0, Height: > 0 }
             ? GdiUtility.ResizeFixed(opacityImage, options.Size.Value.ToGdiSize(), 100)
             : options.Size?.Width > 0 || options.Size?.Height > 0
-                ? GdiUtility.Resize(opacityImage, new Size(
-                    DimensionsUtility.GetPixels(options.Size.Value.Width, options.DimensionUnit, (int)targetSize.Width, dpi.Value),
-                    DimensionsUtility.GetPixels(options.Size.Value.Height, options.DimensionUnit, (int)targetSize.Height, dpi.Value)
-                ))
+                ? GdiUtility.Resize(opacityImage, options.Size.Value.ToGdiSize())
                 : opacityImage;
 
         // Rotate?
@@ -68,7 +62,7 @@ public static class DrawUtility
             : resizedImage;
 
         // Position
-        var coordinate = DrawImageUtility.GetCoordinate(options, targetSize, new Size2D(resizedImage.Width, resizedImage.Height), dpi);
+        var coordinate = DrawImageUtility.GetCoordinate(options, targetSize, new ImageSize(resizedImage.Width, resizedImage.Height));
 
         g1.DrawImage(resizedImage, coordinate.X, coordinate.Y);
     }

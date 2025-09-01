@@ -1,5 +1,5 @@
-using Regira.Dimensions;
 using Regira.IO.Abstractions;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models.Abstractions;
 
@@ -31,7 +31,7 @@ public interface IImageParsingService
     /// <param name="size">The dimensions of the image.</param>
     /// <param name="format">The image format (optional, defaults to JPEG).</param>
     /// <returns>The parsed image file, or null if parsing fails.</returns>
-    IImageFile? Parse(byte[] rawBytes, Size2D size, ImageFormat? format = null);
+    IImageFile? Parse(byte[] rawBytes, ImageSize size, ImageFormat? format = null);
     /// <summary>
     /// Parses an image from an <see cref="IMemoryFile"/> by using its stream or byte content.
     /// </summary>

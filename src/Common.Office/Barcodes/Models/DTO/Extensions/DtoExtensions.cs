@@ -1,4 +1,4 @@
-﻿using Regira.Dimensions;
+﻿using Regira.Media.Drawing.Dimensions;
 
 namespace Regira.Office.Barcodes.Models.DTO.Extensions;
 
@@ -9,7 +9,7 @@ public static class DtoExtensions
         {
             Format = dto.Format ?? BarcodeFormat.Code128,
             Content = dto.Content,
-            Size = new Size2D(dto.Width ?? 400, dto.Height ?? 50),
+            Size = new ImageSize((int)(dto.Width ?? 400), (int)(dto.Height ?? 50)),
             Color = dto.Color ?? "#000000",
             BackgroundColor = dto.BackgroundColor ?? "#FFFFFF"
         };
@@ -18,7 +18,7 @@ public static class DtoExtensions
         {
             Format = BarcodeFormat.QRCode,
             Content = dto.Content,
-            Size = new Size2D(dto.Width ?? 400, dto.Height ?? 400),
+            Size = new ImageSize((int)(dto.Width ?? 400), (int)(dto.Height ?? 400)),
             Color = dto.Color ?? "#000000",
             BackgroundColor = dto.BackgroundColor ?? "#FFFFFF"
         };

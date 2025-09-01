@@ -1,5 +1,5 @@
-﻿using Regira.Dimensions;
-using Regira.IO.Extensions;
+﻿using Regira.IO.Extensions;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Models.Abstractions;
 using System.Drawing;
@@ -13,9 +13,9 @@ namespace Regira.Drawing.GDI.Utilities;
 
 public static class ConversionUtility
 {
-    public static Size ToGdiSize(this Size2D size)
+    public static Size ToGdiSize(this ImageSize size)
     {
-        return new Size((int)size.Width, (int)size.Height);
+        return new Size(size.Width, size.Height);
     }
     public static IImageFile ToImageFile(this Image img, GdiImageFormat format)
     {
@@ -37,7 +37,7 @@ public static class ConversionUtility
         return new ImageFile
         {
             Bytes = bytes,
-            Size = new Size2D(img.Width, img.Height),
+            Size = new ImageSize(img.Width, img.Height),
             Format = imgFormat,
             ContentType = $"image/{imgFormat.ToString().ToLower()}",
             Length = bytes.Length

@@ -1,8 +1,7 @@
-﻿using Regira.Dimensions;
-using Regira.Media.Drawing.Constants;
+﻿using Regira.Media.Drawing.Constants;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
-using Regira.Utilities;
 using SkiaSharp;
 
 namespace Regira.Drawing.SkiaSharp.Utilities;
@@ -21,7 +20,7 @@ public static class SkiaUtility
 
     public static SKBitmap Resize(SKBitmap src, SKSize wantedSize, int quality = 80)
     {
-        var targetSize = DimensionsUtility.CalculateSize(new Size2D(src.Width, src.Height), new Size2D(wantedSize.Width, wantedSize.Height));
+        var targetSize = DrawImageUtility.CalculateSize(new ImageSize(src.Width, src.Height), new ImageSize((int)wantedSize.Width, (int)wantedSize.Height));
         return ResizeFixed(src, new SKSize(targetSize.Width, targetSize.Height), quality);
     }
     public static SKBitmap ResizeFixed(SKBitmap src, SKSize wantedSize, int quality = 80)

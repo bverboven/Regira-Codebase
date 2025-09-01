@@ -1,5 +1,5 @@
-﻿using Regira.Dimensions;
-using Regira.IO.Extensions;
+﻿using Regira.IO.Extensions;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Models.Abstractions;
@@ -30,7 +30,7 @@ public static class ConversionUtility
     }
 
     // Size
-    public static SKSize ToSkiaSize(this Size2D size)
+    public static SKSize ToSkiaSize(this ImageSize size)
         => new(size.Width, size.Height);
 
     // Format
