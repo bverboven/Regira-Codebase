@@ -1,11 +1,11 @@
-﻿using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Regira.ProjectFilesProcessor;
 using Regira.ProjectFilesProcessor.Services;
 using Serilog;
 using Serilog.Events;
+using System.Reflection;
 
 // basic logger (configuration and services not loaded yet)
 Log.Logger = new LoggerConfiguration()
@@ -37,7 +37,7 @@ try
     foreach (var projectNode in pm.ProjectTree!)
     {
         logger.LogInformation($"{string.Empty.PadLeft(projectNode.Level * 2, '.')}{projectNode.Value.Id}"
-                              + $" {(projectNode.Value.Version > projectNode.Value.PublishedVersion ? $"(v{projectNode.Value.PublishedVersion} -> v{projectNode.Value.Version})" : $"(v{projectNode.Value.Version})")}");
+                              + $" {(projectNode.Value.Version > projectNode.Value.CurrentVersion ? $"(v{projectNode.Value.CurrentVersion} -> v{projectNode.Value.Version})" : $"(v{projectNode.Value.Version})")}");
     }
 
     Console.WriteLine();
@@ -51,6 +51,13 @@ try
     var pendingProjects = pm.GetPendingProjects();
     if (pendingProjects.Any())
     {
+        var pendingTree = pm.ProjectTree.FindAll(pn => pendingProjects.Any(pp => pn.Value.Id == pp.Id));
+        foreach (var projectNode in pendingTree)
+        {
+            logger.LogInformation($"{string.Empty.PadLeft(projectNode.Level * 2, '.')}{projectNode.Value.Id}"
+                                  + $" {(projectNode.Value.Version > projectNode.Value.PublishedVersion ? $"(v{projectNode.Value.PublishedVersion} -> v{projectNode.Value.Version})" : $"(v{projectNode.Value.Version})")}");
+        }
+
         Console.WriteLine($"Push {pendingProjects.Count} NuGet packages? (Y/N)");
         var pushNuGet = "Y".Equals(Console.ReadLine(), StringComparison.InvariantCultureIgnoreCase);
         if (pushNuGet)

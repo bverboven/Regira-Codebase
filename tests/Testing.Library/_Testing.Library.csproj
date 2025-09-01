@@ -1,16 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <RootNamespace>Testing.Library</RootNamespace>
-        <IsPackable>false</IsPackable>
-        <Authors>B.Verboven</Authors>
-    </PropertyGroup>
-    <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\..\src\Common.Entities\Common.Entities.csproj" />
-    </ItemGroup>
+  <PropertyGroup>
+	<TargetFramework>net9.0</TargetFramework>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
+	<RootNamespace>Testing.Library</RootNamespace>
+	<IsPackable>false</IsPackable>
+	<Authors>B.Verboven</Authors>
+	<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <ItemGroup>
+	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
+  </ItemGroup>
+  <ItemGroup>
+	<ProjectReference Include="..\..\src\Common.Entities\Common.Entities.csproj" />
+  </ItemGroup>
 </Project>

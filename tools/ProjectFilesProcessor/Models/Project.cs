@@ -9,6 +9,7 @@ public class Project
     public ICollection<string> TargetFrameworks { get; set; } = new HashSet<string> { "net8.0" };
     public ICollection<string> Authors { get; set; } = new HashSet<string>() { "B. Verboven" };
     public Version Version { get; set; } = new("1.0.0");
+    public Version CurrentVersion { get; set; } = new("1.0.0");
     public Version? PublishedVersion { get; set; }
     public bool? IsClassLibrary { get; set; }
     public bool GeneratePackageOnBuild { get; set; }

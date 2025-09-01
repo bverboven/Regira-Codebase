@@ -1,6 +1,6 @@
-﻿using System.Xml.Linq;
+﻿using Regira.ProjectFilesProcessor.Models;
+using System.Xml.Linq;
 using System.Xml.XPath;
-using Regira.ProjectFilesProcessor.Models;
 
 namespace Regira.ProjectFilesProcessor.Services;
 
@@ -30,6 +30,7 @@ public class ProjectParser
         };
         if (version != null)
         {
+            project.CurrentVersion = version;
             project.Version = version;
         }
         return project;
