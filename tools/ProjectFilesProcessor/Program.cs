@@ -58,6 +58,7 @@ try
                                   + $" {(projectNode.Value.Version > projectNode.Value.PublishedVersion ? $"(v{projectNode.Value.PublishedVersion} -> v{projectNode.Value.Version})" : $"(v{projectNode.Value.Version})")}");
         }
 
+        Console.WriteLine();
         Console.WriteLine($"Push {pendingProjects.Count} NuGet packages? (Y/N)");
         var pushNuGet = "Y".Equals(Console.ReadLine(), StringComparison.InvariantCultureIgnoreCase);
         if (pushNuGet)

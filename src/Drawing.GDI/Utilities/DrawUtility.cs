@@ -11,9 +11,9 @@ namespace Regira.Drawing.GDI.Utilities;
 
 public static class DrawUtility
 {
-    public static Image Draw(IEnumerable<ImageToAdd> imagesToAdd, Image? target = null, int? dpi = null)
+    public static Image Draw(IEnumerable<ImageLayer> imageLayers, Image? target = null, int? dpi = null)
     {
-        var images = imagesToAdd.AsList();
+        var images = imageLayers.AsList();
         target ??= CreateSizedCanvas(images);
 
         if (!images.Any())
@@ -24,27 +24,28 @@ public static class DrawUtility
         using var g = GdiUtility.GetGraphics(target);
         foreach (var img in images)
         {
-            AddImage(img, g, new Size2D(target.Width, target.Height), dpi);
+            AddImageLayer(img, g, new Size2D(target.Width, target.Height), dpi);
         }
 
         return target;
     }
 
-    public static Image CreateSizedCanvas(IEnumerable<ImageToAdd> imagesToAdd)
+    public static Image CreateSizedCanvas(IEnumerable<ImageLayer> imageLayers)
     {
-        var images = imagesToAdd.AsList();
+        var images = imageLayers.AsList();
         var size = new Size(
             (int)images.Max(x => x.Options?.Size?.Width ?? (x.Source.Size?.Width ?? 0)),
             (int)images.Max(x => x.Options?.Size?.Height ?? (x.Source.Size?.Height ?? 0))
         );
         return GdiUtility.Create(size);
     }
-    public static void AddImage(ImageToAdd imageToAdd, Graphics g1, Size2D targetSize, int? dpi = null)
+
+    public static void AddImageLayer(ImageLayer imageLayer, Graphics g1, Size2D targetSize, int? dpi = null)
     {
         dpi ??= DrawImageDefaults.Dpi;
 
-        var img = imageToAdd.Source;
-        var options = imageToAdd.Options ?? new ImageToAddOptions();
+        var img = imageLayer.Source;
+        var options = imageLayer.Options ?? new ImageLayerOptions();
 
         var source = img.ToBitmap();
 

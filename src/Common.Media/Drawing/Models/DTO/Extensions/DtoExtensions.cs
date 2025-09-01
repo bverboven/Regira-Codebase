@@ -9,9 +9,9 @@ namespace Regira.Media.Drawing.Models.DTO.Extensions;
 
 public static class DtoExtensions
 {
-    public static ImageToAddOptions ToImageToAddOptions(this ImageInputOptionsDto dto)
+    public static ImageLayerOptions ToImageLayerOptions(this ImageLayerOptionsDto dto)
     {
-        return new ImageToAddOptions
+        return new ImageLayerOptions
         {
             DimensionUnit = dto.DimensionUnit ?? DrawImageDefaults.DimensionUnit,
             Size = new Size2D(dto.Width ?? 0, dto.Height ?? 0),
@@ -23,16 +23,16 @@ public static class DtoExtensions
         };
     }
     
-    public static ImageToAdd ToImageToAdd(this ImageInputDto dto)
+    public static ImageLayer ToImageLayer(this ImageLayerDto dto)
     {
-        return new ImageToAdd
+        return new ImageLayer
         {
             Source = dto.Image.ToBinaryFile().ToImageFile(),
-            Options = dto.DrawOptions?.ToImageToAddOptions(),
+            Options = dto.DrawOptions?.ToImageLayerOptions(),
         };
     }
 
-    public static LabelImageOptions ToTextImageOptions(this LabelImageInputDto dto)
+    public static LabelImageOptions ToTextImageOptions(this LabelImageLayerDto dto)
         => new()
         {
             Text = dto.Text,
@@ -42,28 +42,28 @@ public static class DtoExtensions
             BackgroundColor = dto.LabelOptions?.BackgroundColor ?? LabelImageDefaults.BackgroundColor,
             Padding = dto.LabelOptions?.Padding ?? LabelImageDefaults.Padding
         };
-    public static IImageToAdd ToImageToAdd(this LabelImageInputDto dto)
+    public static IImageLayer ToImageLayer(this LabelImageLayerDto dto)
     {
-        return new ImageToAdd<LabelImageOptions>
+        return new ImageLayer<LabelImageOptions>
         {
             Source = dto.ToTextImageOptions(),
-            Options = dto.DrawOptions?.ToImageToAddOptions()
+            Options = dto.DrawOptions?.ToImageLayerOptions()
         };
     }
 
-    public static CanvasImageOptions ToCanvasImageOptions(this CanvasImageInputDto dto)
+    public static CanvasImageOptions ToCanvasImageOptions(this CanvasImageLayerDto dto)
         => new()
         {
             Size = new Size2D(dto.Width, dto.Height),
             BackgroundColor = dto.CanvasOptions?.BackgroundColor ?? ImageDefaults.BackgroundColor,
             ImageFormat = dto.CanvasOptions?.ImageFormat ?? ImageDefaults.Format
         };
-    public static IImageToAdd ToImageToAdd(this CanvasImageInputDto dto)
+    public static IImageLayer ToImageLayer(this CanvasImageLayerDto dto)
     {
-        return new ImageToAdd<CanvasImageOptions>
+        return new ImageLayer<CanvasImageOptions>
         {
             Source = dto.ToCanvasImageOptions(),
-            Options = dto.DrawOptions?.ToImageToAddOptions()
+            Options = dto.DrawOptions?.ToImageLayerOptions()
         };
     }
 }

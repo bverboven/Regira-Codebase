@@ -2,7 +2,7 @@
 
 namespace Regira.Media.Drawing.Models.DTO;
 
-public class CanvasImageInputDto
+public class CanvasImageLayerDto
 {
     public class CanvasOptionsDto
     {
@@ -13,5 +13,5 @@ public class CanvasImageInputDto
     public float Width { get; set; }
     public float Height { get; set; }
     public CanvasOptionsDto? CanvasOptions { get; set; }
-    public ImageInputOptionsDto? DrawOptions { get; set; }
+    public ImageLayerOptionsDto? DrawOptions { get; set; }
 }

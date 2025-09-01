@@ -12,9 +12,9 @@ public static class ImageBuilderExtensions
 {
     public static async Task Build_NoTarget(this IImageService service)
     {
-        var imagesToAdd = new IImageToAdd[]
+        var imageLayers = new IImageLayer[]
         {
-            new ImageToAdd
+            new ImageLayer
             {
                 Source = await service.ReadImage("yellow-200x150.jpg"),
                 Options = new()
@@ -23,7 +23,7 @@ public static class ImageBuilderExtensions
                     Size = new Size2D(300, 200)
                 }
             },
-            new ImageToAdd
+            new ImageLayer
             {
                 Source = await service.ReadImage("blue-50x50.jpg"),
                 Options = new()
@@ -31,7 +31,7 @@ public static class ImageBuilderExtensions
                     PositionType = ImagePosition.Top | ImagePosition.Right
                 }
             },
-            new ImageToAdd
+            new ImageLayer
             {
                 Source = await service.ReadImage("red-150x100.jpg"),
                 Options = new()
@@ -44,7 +44,7 @@ public static class ImageBuilderExtensions
 
         var drawBuilder = new ImageBuilder(service, []);
         using var resultImg = drawBuilder
-            .Add(imagesToAdd)
+            .Add(imageLayers)
             .Build();
         await service.SaveImage(resultImg, "build-no-target.jpg");
 
@@ -63,9 +63,9 @@ public static class ImageBuilderExtensions
         {
             Size = new Size2D(400, 300)
         };
-        var imagesToAdd = new IImageToAdd[]
+        var imageLayers = new IImageLayer[]
         {
-            new ImageToAdd
+            new ImageLayer
             {
                 Source = await service.ReadImage("yellow-200x150.jpg"),
                 Options = new()
@@ -74,7 +74,7 @@ public static class ImageBuilderExtensions
                     Size = new Size2D(350, 250)
                 }
             },
-            new ImageToAdd
+            new ImageLayer
             {
                 Source = await service.ReadImage("green-50x100.jpg"),
                 Options = new()
@@ -82,7 +82,7 @@ public static class ImageBuilderExtensions
                     PositionType = ImagePosition.Top | ImagePosition.Right,
                 }
             },
-            new ImageToAdd
+            new ImageLayer
             {
                 Source = await service.ReadImage("blue-50x50.jpg"),
                 Options = new()
@@ -91,7 +91,7 @@ public static class ImageBuilderExtensions
                     Position = new Position2D(20, null, null, 10)
                 }
             },
-            new ImageToAdd
+            new ImageLayer
             {
                 Source = await service.ReadImage("red-150x100.jpg"),
                 Options = new()
@@ -110,7 +110,7 @@ public static class ImageBuilderExtensions
 
 
         var drawBuilder = new ImageBuilder(service, imageCreators);
-        using var resultImg = drawBuilder.Add(imagesToAdd)
+        using var resultImg = drawBuilder.Add(imageLayers)
             .SetTargetObject(target)
             .Build();
         await service.SaveImage(resultImg, "build-with-canvas.jpg");
@@ -130,9 +130,9 @@ public static class ImageBuilderExtensions
     public static async Task Build_WithTargetImage(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imagesToAdd = new IImageToAdd[]
+        var imageLayers = new IImageLayer[]
         {
-            new ImageToAdd
+            new ImageLayer
             {
                 Source = await service.ReadImage("yellow-200x150.jpg"),
                 Options = new()
@@ -141,7 +141,7 @@ public static class ImageBuilderExtensions
                     Size = new Size2D(350, 250)
                 }
             },
-            new ImageToAdd
+            new ImageLayer
             {
                 Source = await service.ReadImage("green-50x100.jpg"),
                 Options = new()
@@ -149,7 +149,7 @@ public static class ImageBuilderExtensions
                     PositionType = ImagePosition.Top | ImagePosition.Right,
                 }
             },
-            new ImageToAdd
+            new ImageLayer
             {
                 Source = await service.ReadImage("blue-50x50.jpg"),
                 Options = new()
@@ -158,7 +158,7 @@ public static class ImageBuilderExtensions
                     Position = new Position2D(20, null, null, 10)
                 }
             },
-            new ImageToAdd
+            new ImageLayer
             {
                 Source = await service.ReadImage("red-150x100.jpg"),
                 Options = new()
@@ -179,7 +179,7 @@ public static class ImageBuilderExtensions
         var drawBuilder = new ImageBuilder(service, imageCreators);
         using var resultImg = drawBuilder
             .SetTargetImage(target)
-            .Add(imagesToAdd)
+            .Add(imageLayers)
             .Build();
         await service.SaveImage(resultImg, "build-with-target.jpg");
 
@@ -198,9 +198,9 @@ public static class ImageBuilderExtensions
     public static async Task Build_Images(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imagesToAdd = new IImageToAdd[]
+        var imageLayers = new IImageLayer[]
         {
-            new ImageToAdd
+            new ImageLayer
             {
                 Source = await service.ReadImage("yellow-200x150.jpg"),
                 Options = new()
@@ -209,7 +209,7 @@ public static class ImageBuilderExtensions
                     Size = new Size2D(350, 250)
                 }
             },
-            new ImageToAdd
+            new ImageLayer
             {
                 Source = await service.ReadImage("green-50x100.jpg"),
                 Options = new()
@@ -217,7 +217,7 @@ public static class ImageBuilderExtensions
                     PositionType = ImagePosition.Top | ImagePosition.Right,
                 }
             },
-            new ImageToAdd
+            new ImageLayer
             {
                 Source = await service.ReadImage("blue-50x50.jpg"),
                 Options = new()
@@ -226,7 +226,7 @@ public static class ImageBuilderExtensions
                     Position = new Position2D(20, null, null, 10)
                 }
             },
-            new ImageToAdd
+            new ImageLayer
             {
                 Source = await service.ReadImage("red-150x100.jpg"),
                 Options = new()
@@ -235,7 +235,7 @@ public static class ImageBuilderExtensions
                     Position = new Position2D(null, 10, 20, null)
                 }
             },
-            new ImageToAdd<LabelImageOptions>
+            new ImageLayer<LabelImageOptions>
             {
                 Source = new LabelImageOptions
                 {
@@ -263,7 +263,7 @@ public static class ImageBuilderExtensions
         var drawBuilder = new ImageBuilder(service, imageCreators);
         using var resultImg = drawBuilder
             .SetTargetImage(target)
-            .Add(imagesToAdd)
+            .Add(imageLayers)
             .Build();
         await service.SaveImage(resultImg, "build-images.jpg");
 

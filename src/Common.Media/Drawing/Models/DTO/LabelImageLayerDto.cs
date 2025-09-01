@@ -1,6 +1,6 @@
 ﻿namespace Regira.Media.Drawing.Models.DTO;
 
-public class LabelImageInputDto
+public class LabelImageLayerDto
 {
     public class LabelOptionsDto
     {
@@ -13,5 +13,5 @@ public class LabelImageInputDto
 
     public string Text { get; set; } = null!;
     public LabelOptionsDto? LabelOptions { get; set; }
-    public ImageInputOptionsDto? DrawOptions { get; set; }
+    public ImageLayerOptionsDto? DrawOptions { get; set; }
 }

@@ -10,14 +10,59 @@ namespace Regira.Media.Drawing.Utilities;
 
 public static class DrawImageUtility
 {
+    /// <summary>
+    /// Creates an <see cref="IImageFile"/> instance using the first <see cref="IImageCreator"/> 
+    /// in the provided <paramref name="services"/> collection that can handle the specified <paramref name="input"/>.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The type of the input object used to create the <see cref="IImageFile"/>. Must be a reference type.
+    /// </typeparam>
+    /// <param name="services">
+    /// A collection of <see cref="IImageCreator"/> instances used to create the <see cref="IImageFile"/>.
+    /// </param>
+    /// <param name="input">
+    /// The input object of type <typeparamref name="T"/> used to create the <see cref="IImageFile"/>.
+    /// </param>
+    /// <returns>
+    /// An <see cref="IImageFile"/> instance if a suitable <see cref="IImageCreator"/> is found and creation succeeds; otherwise, <c>null</c>.
+    /// </returns>
     public static IImageFile? Create<T>(this IEnumerable<IImageCreator> services, T input)
         where T : class
         => services.FirstOrDefault(s => s.CanCreate(input))?.Create(input);
-
-    public static IImageFile? GetImageFile(this IEnumerable<IImageCreator> services, IImageToAdd item)
+    /// <summary>
+    /// Retrieves an <see cref="IImageFile"/> instance from the provided <paramref name="item"/> or creates one using the available <paramref name="services"/>.
+    /// </summary>
+    /// <param name="services">
+    /// A collection of <see cref="IImageCreator"/> instances used to create an <see cref="IImageFile"/> if it cannot be directly retrieved from the <paramref name="item"/>.
+    /// </param>
+    /// <param name="item">
+    /// The <see cref="IImageLayer"/> instance containing the source object to retrieve or create the <see cref="IImageFile"/>.
+    /// </param>
+    /// <returns>
+    /// An <see cref="IImageFile"/> instance if successfully retrieved or created; otherwise, <c>null</c>.
+    /// </returns>
+    public static IImageFile? GetImageFile(this IEnumerable<IImageCreator> services, IImageLayer item)
         => item.Source as IImageFile ?? services.Create(item.Source);
 
-    public static Coordinate2D GetCoordinate(ImageToAddOptions options, Size2D targetSize, Size2D imageSize, int? dpi)
+    /// <summary>
+    /// Calculates the coordinates for positioning an image within a target area based on the provided options, target size, image size, and DPI.
+    /// </summary>
+    /// <param name="options">
+    /// The options specifying how the image should be positioned, including margins, alignment, and dimension units.
+    /// </param>
+    /// <param name="targetSize">
+    /// The size of the target area where the image will be placed.
+    /// </param>
+    /// <param name="imageSize">
+    /// The size of the image to be positioned.
+    /// </param>
+    /// <param name="dpi">
+    /// The dots per inch (DPI) value used for scaling dimensions. If null, a default DPI value is used.
+    /// </param>
+    /// <returns>
+    /// A <see cref="Point2D"/> representing the calculated X and Y coordinates for the image's position.
+    /// </returns>
+    public static Point2D GetCoordinate(ImageLayerOptions options, Size2D targetSize, Size2D imageSize, int? dpi)
     {
         dpi ??= DrawImageDefaults.Dpi;
 

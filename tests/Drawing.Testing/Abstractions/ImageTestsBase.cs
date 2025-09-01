@@ -57,5 +57,5 @@ public abstract class ImageTestsBase(IImageService imageService)
     [TestCase("img-5.png")]
     [TestCase("img-6.png")]
     [TestCase("thumbs-up.jpg")]
-    public Task RemoveAlpha(string filename) => imageService.Test_RemoveAlpha(filename);
+    public Task Test_MakeOpaque(string filename) => imageService.Test_MakeOpaque(filename);
 }

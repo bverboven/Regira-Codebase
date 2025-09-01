@@ -62,6 +62,10 @@ public struct Position2D(float? top, float? left, float? bottom, float? right) :
         }
     }
 
+    /// <summary>
+    /// Formatted as [Top, Left, Bottom, Right]
+    /// </summary>
+    /// <returns></returns>
     public override string ToString()
         => $"[{Top}, {Left}, {Bottom}, {Right}]";
 }

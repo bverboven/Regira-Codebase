@@ -100,11 +100,11 @@ public static class DrawingImageExtensions
         using var rgbImg = service.MakeTransparent(image, new Color(200, 200, 200));
         await service.SaveImage(rgbImg, $"{Path.GetFileNameWithoutExtension(filename)}-transparent.png");
     }
-    public static async Task Test_RemoveAlpha(this IImageService service, string filename)
+    public static async Task Test_MakeOpaque(this IImageService service, string filename)
     {
         using var image = await service.ReadImage(filename);
 
-        using var rgbImg = service.RemoveAlpha(image);
+        using var rgbImg = service.MakeOpaque(image);
         await service.SaveImage(rgbImg, $"{Path.GetFileNameWithoutExtension(filename)}-rgb.png");
     }
 }

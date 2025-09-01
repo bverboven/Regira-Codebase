@@ -179,18 +179,18 @@ public static class DimensionsUtility
     }
 
     /// <summary>
-    /// Calculates the size of a rectangular area defined by two coordinates.
+    /// Calculates the size of a rectangular area defined by two points.
     /// </summary>
     /// <param name="topLeft">
-    /// The top-left coordinate of the rectangle.
+    /// The top-left point of the rectangle.
     /// </param>
     /// <param name="bottomRight">
-    /// The bottom-right coordinate of the rectangle.
+    /// The bottom-right point of the rectangle.
     /// </param>
     /// <returns>
     /// A <see cref="Size2D"/> representing the width and height of the rectangle.
     /// </returns>
-    public static Size2D CalculateSize(Coordinate2D topLeft, Coordinate2D bottomRight)
+    public static Size2D CalculateSize(Point2D topLeft, Point2D bottomRight)
         => new(bottomRight.X - topLeft.X, bottomRight.Y - topLeft.Y);
     /// <summary>
     /// Calculates the scaled size of a source dimension to fit within a target dimension while maintaining the aspect ratio.
@@ -265,39 +265,39 @@ public static class DimensionsUtility
     }
 
     /// <summary>
-    /// Converts a <see cref="Position2D"/> to a pair of coordinates representing the top-left and bottom-right corners
+    /// Converts a <see cref="Position2D"/> to a pair of points representing the top-left and bottom-right corners
     /// within a given total size.
     /// </summary>
     /// <param name="position">
     /// The <see cref="Position2D"/> specifying the position with optional top, left, bottom, and right offsets.
     /// </param>
     /// <param name="totalSize">
-    /// The total size as a <see cref="Size2D"/> within which the coordinates are calculated.
+    /// The total size as a <see cref="Size2D"/> within which the points are calculated.
     /// </param>
     /// <returns>
-    /// A tuple containing the top-left and bottom-right coordinates as <see cref="Coordinate2D"/>.
+    /// A tuple containing the top-left and bottom-right points as <see cref="Point2D"/>.
     /// </returns>
-    public static (Coordinate2D TopLeft, Coordinate2D BottomRight) ToCoordinates(Position2D position, Size2D totalSize)
+    public static (Point2D TopLeft, Point2D BottomRight) ToPoints(Position2D position, Size2D totalSize)
     {
-        var topLeft = new Coordinate2D(position.Left ?? 0, position.Top ?? 0);
-        var bottomRight = new Coordinate2D(totalSize.Width, totalSize.Height) - new Coordinate2D(position.Right, position.Bottom);
+        var topLeft = new Point2D(position.Left ?? 0, position.Top ?? 0);
+        var bottomRight = new Point2D(totalSize.Width, totalSize.Height) - new Point2D(position.Right, position.Bottom);
         return (topLeft, bottomRight);
     }
     /// <summary>
-    /// Converts a given position and total size into a coordinate and size representation.
+    /// Converts a given position and total size into a point and size representation.
     /// </summary>
     /// <param name="position">
     /// The position, defined by its top, left, bottom, and right boundaries.
     /// </param>
     /// <param name="totalSize">
-    /// The total size of the area, used to calculate the resulting coordinate and size.
+    /// The total size of the area, used to calculate the resulting point and size.
     /// </param>
     /// <returns>
     /// A tuple containing:
     /// <list type="bullet">
     /// <item>
     /// <description>
-    /// <see cref="Coordinate2D"/> representing the top-left coordinate of the position.
+    /// <see cref="Point2D"/> representing the top-left point of the position.
     /// </description>
     /// </item>
     /// <item>
@@ -307,26 +307,26 @@ public static class DimensionsUtility
     /// </item>
     /// </list>
     /// </returns>
-    public static (Coordinate2D Coordinate, Size2D Size) ToCoordinateSize(Position2D position, Size2D totalSize)
+    public static (Point2D TopLeft, Size2D Size) ToPointSize(Position2D position, Size2D totalSize)
     {
-        var coordinates = ToCoordinates(position, totalSize);
-        var calculatedSize = CalculateSize(coordinates.TopLeft, coordinates.BottomRight);
-        return (coordinates.TopLeft, calculatedSize);
+        var points = ToPoints(position, totalSize);
+        var calculatedSize = CalculateSize(points.TopLeft, points.BottomRight);
+        return (points.TopLeft, calculatedSize);
     }
     /// <summary>
-    /// Converts the specified top-left and bottom-right coordinates into a <see cref="Position2D"/> object
+    /// Converts the specified top-left and bottom-right points into a <see cref="Position2D"/> object
     /// relative to the given total size.
     /// </summary>
-    /// <param name="topLeft">The top-left coordinate of the position.</param>
-    /// <param name="bottomRight">The bottom-right coordinate of the position.</param>
+    /// <param name="topLeft">The top-left point of the position.</param>
+    /// <param name="bottomRight">The bottom-right point of the position.</param>
     /// <param name="totalSize">The total size used to calculate the relative position.</param>
     /// <returns>
-    /// A <see cref="Position2D"/> object representing the relative position defined by the given coordinates
+    /// A <see cref="Position2D"/> object representing the relative position defined by the given points
     /// and total size.
     /// </returns>
-    public static Position2D ToPosition(Coordinate2D topLeft, Coordinate2D bottomRight, Size2D totalSize)
+    public static Position2D ToPosition(Point2D topLeft, Point2D bottomRight, Size2D totalSize)
     {
-        var br = new Coordinate2D(totalSize.Width, totalSize.Height) - new Coordinate2D(bottomRight.X, bottomRight.Y);
+        var br = new Point2D(totalSize.Width, totalSize.Height) - new Point2D(bottomRight.X, bottomRight.Y);
         return new Position2D(topLeft.Y, topLeft.X, br.Y, br.X);
     }
 }

@@ -31,5 +31,5 @@ public interface IImageDrawService
     /// <param name="target">The target image file (optional).</param>
     /// <param name="dpi">The DPI to use for drawing (optional, needed for conversion of dimension units).</param>
     /// <returns>The resulting image file with all images drawn.</returns>
-    IImageFile Draw(IEnumerable<ImageToAdd> items, IImageFile? target = null, int? dpi = null);
+    IImageFile Draw(IEnumerable<ImageLayer> items, IImageFile? target = null, int? dpi = null);
 }

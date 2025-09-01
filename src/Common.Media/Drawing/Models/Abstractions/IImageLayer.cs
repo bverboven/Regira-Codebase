@@ -1,11 +1,11 @@
 ﻿namespace Regira.Media.Drawing.Models.Abstractions;
 
-public interface IImageToAdd
+public interface IImageLayer
 {
     public object Source { get; set; }
-    public ImageToAddOptions? Options { get; set; }
+    public ImageLayerOptions? Options { get; set; }
 }
-public interface IImageToAdd<T> : IImageToAdd
+public interface IImageLayer<T> : IImageLayer
 {
     public new T Source { get; set; }
 }

@@ -136,10 +136,10 @@ public class DimensionTests
     }
 
     [Test]
-    public void CalculateSize_FromCoordinates_ReturnsCorrectSize()
+    public void CalculateSize_FromPoints_ReturnsCorrectSize()
     {
-        var topLeft = new Coordinate2D(10, 20);
-        var bottomRight = new Coordinate2D(30, 50);
+        var topLeft = new Point2D(10, 20);
+        var bottomRight = new Point2D(30, 50);
         var expected = new Size2D(20, 30);
         var result = DimensionsUtility.CalculateSize(topLeft, bottomRight);
         Assert.That(result.Width, Is.EqualTo(expected.Width));
@@ -197,11 +197,11 @@ public class DimensionTests
     }
 
     [Test]
-    public void ToCoordinates_ReturnsCorrectCoordinates()
+    public void ToPoints_ReturnsCorrectPoints()
     {
         var position = new Position2D(10, 20, 5, 15);
         var totalSize = new Size2D(100, 200);
-        var (topLeft, bottomRight) = DimensionsUtility.ToCoordinates(position, totalSize);
+        var (topLeft, bottomRight) = DimensionsUtility.ToPoints(position, totalSize);
         Assert.That(topLeft.X, Is.EqualTo(20));
         Assert.That(topLeft.Y, Is.EqualTo(10));
         Assert.That(bottomRight.X, Is.EqualTo(85));
@@ -209,11 +209,11 @@ public class DimensionTests
     }
 
     [Test]
-    public void ToCoordinateSize_ReturnsCorrectCoordinateAndSize()
+    public void ToPointSize_ReturnsCorrectPointAndSize()
     {
         var position = new Position2D(10, 20, 5, 15);
         var totalSize = new Size2D(100, 200);
-        var (coordinate, size) = DimensionsUtility.ToCoordinateSize(position, totalSize);
+        var (coordinate, size) = DimensionsUtility.ToPointSize(position, totalSize);
         Assert.That(coordinate.X, Is.EqualTo(20));
         Assert.That(coordinate.Y, Is.EqualTo(10));
         Assert.That(size.Width, Is.EqualTo(65));
@@ -223,8 +223,8 @@ public class DimensionTests
     [Test]
     public void ToPosition_ReturnsCorrectPosition()
     {
-        var topLeft = new Coordinate2D(20, 10);
-        var bottomRight = new Coordinate2D(85, 195);
+        var topLeft = new Point2D(20, 10);
+        var bottomRight = new Point2D(85, 195);
         var totalSize = new Size2D(100, 200);
         var pos = DimensionsUtility.ToPosition(topLeft, bottomRight, totalSize);
         Assert.That(pos.Top, Is.EqualTo(10));

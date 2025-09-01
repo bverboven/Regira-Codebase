@@ -118,7 +118,7 @@ public class ImageService : IImageService
     {
         var format = GetFormat(input);
         using var img = input.ToBitmap();
-        var (topLeft, bottomRight) = DimensionsUtility.ToCoordinates(rect, new Size2D(img.Width, img.Height));
+        var (topLeft, bottomRight) = DimensionsUtility.ToPoints(rect, new Size2D(img.Width, img.Height));
         var skRect = new SKRect((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X, (int)bottomRight.Y);
         using var croppedBitmap = SkiaUtility.CropRectangle(img, skRect);
         return croppedBitmap.ToImageFile(format.ToSkiaFormat());
@@ -146,7 +146,7 @@ public class ImageService : IImageService
         using var scaledBitmap = SkiaUtility.ResizeFixed(sourceBitmap, new SKSize(size.Width, size.Height), quality);
         return scaledBitmap.ToImageFile(format.ToSkiaFormat());
     }
-    
+
     /// <inheritdoc/>
     public IImageFile Rotate(IImageFile input, float angle, Color? background = null)
     {
@@ -227,10 +227,10 @@ public class ImageService : IImageService
         return img.ToImageFile();
     }
     /// <inheritdoc/>
-    public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int? dpi = null)
+    public IImageFile Draw(IEnumerable<ImageLayer> imageLayers, IImageFile? target = null, int? dpi = null)
     {
         dpi ??= DrawImageDefaults.Dpi;
-        var imagesCollection = imagesToAdd.ToArray();
+        var imagesCollection = imageLayers.ToArray();
         using var targetImage = target?.ToBitmap() ?? DrawUtility.CreateSizedCanvas(imagesCollection);
         DrawUtility.Draw(imagesCollection, targetImage, dpi.Value);
         return targetImage.ToImageFile();

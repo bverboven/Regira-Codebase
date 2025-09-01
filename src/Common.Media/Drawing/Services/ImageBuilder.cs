@@ -9,11 +9,11 @@ public class ImageBuilder(IImageService service, IEnumerable<IImageCreator> imag
     // ReSharper disable PossibleMultipleEnumeration
     private readonly IImageCreator[] _imageCreators = imageCreators.Concat([AggregateImageCreator.Create(service, imageCreators)]).ToArray();
     // ReSharper restore PossibleMultipleEnumeration
-    private readonly List<IImageToAdd> _items = new();
+    private readonly List<IImageLayer> _items = new();
     private int? _dpi;
     private object? _target;
 
-    public ImageBuilder Add(params IImageToAdd[] items)
+    public ImageBuilder Add(params IImageLayer[] items)
     {
         _items.AddRange(items);
         return this;
@@ -47,32 +47,32 @@ public class ImageBuilder(IImageService service, IEnumerable<IImageCreator> imag
     public IImageFile Build()
     {
         var target = _target != null
-            ? GetImageFile(new ImageToAdd<object> { Source = _target })
+            ? GetImageFile(new ImageLayer<object> { Source = _target })
             : null;
 
         target = _items.Select(ToImageToAdd)
             .Aggregate(
                 target,
-                (img, imageToAdd) => service.Draw([imageToAdd], img, _dpi)
+                (img, imageLayer) => service.Draw([imageLayer], img, _dpi)
             );
 
         return target!;
     }
 
-    protected ImageToAdd ToImageToAdd(IImageToAdd item)
+    protected ImageLayer ToImageToAdd(IImageLayer item)
     {
-        if (item is ImageToAdd imageToAdd)
+        if (item is ImageLayer imageLayer)
         {
-            return imageToAdd;
+            return imageLayer;
         }
 
-        return new ImageToAdd
+        return new ImageLayer
         {
             Source = GetImageFile(item),
             Options = item.Options
         };
     }
-    protected IImageFile GetImageFile(IImageToAdd item)
+    protected IImageFile GetImageFile(IImageLayer item)
     {
         var image = item.Source as IImageFile;
 

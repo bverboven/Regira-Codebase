@@ -11,7 +11,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_No_Params(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("yellow-200x150.jpg")
         };
@@ -29,7 +29,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Top_Left(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
@@ -49,7 +49,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Bottom_Left(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
@@ -69,7 +69,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Top_Right(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("green-50x100.jpg"),
             Options = new()
@@ -90,7 +90,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Bottom_Right(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("green-50x100.jpg"),
             Options = new()
@@ -114,7 +114,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Top_HCenter(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
@@ -135,7 +135,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Bottom_HCenter(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
@@ -157,7 +157,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Left_VCenter(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("green-50x100.jpg"),
             Options = new()
@@ -179,7 +179,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Right_VCenter(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("green-50x100.jpg"),
             Options = new()
@@ -201,7 +201,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Middle(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
@@ -228,7 +228,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Absolute_Top_Left(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
@@ -251,7 +251,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Absolute_Top_Right(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
@@ -274,7 +274,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Absolute_Bottom_Left(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
@@ -295,7 +295,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Absolute_Bottom_Right(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
@@ -318,7 +318,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Margin10(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
@@ -338,7 +338,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Top_Left_Margin10(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
@@ -360,7 +360,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Bottom_Left_Margin10(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
@@ -382,7 +382,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Top_Right_Margin10(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("green-50x100.jpg"),
             Options = new()
@@ -405,7 +405,7 @@ public static class DrawingPositionExtensions
     public static async Task AddImage_Bottom_Right_Margin10(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
-        var imgToAdd = new ImageToAdd
+        var imgToAdd = new ImageLayer
         {
             Source = await service.ReadImage("green-50x100.jpg"),
             Options = new()

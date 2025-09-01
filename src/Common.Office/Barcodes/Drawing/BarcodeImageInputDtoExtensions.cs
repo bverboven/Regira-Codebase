@@ -6,14 +6,14 @@ using Regira.Office.Barcodes.Models.DTO.Extensions;
 
 namespace Regira.Office.Barcodes.Drawing;
 
-public static class BarcodeImageInputDtoExtensions
+public static class BarcodeImageLayerDtoExtensions
 {
-    public static IImageToAdd ToImageToAdd(this BarcodeImageInputDto input)
+    public static IImageLayer ToImageLayer(this BarcodeImageLayerDto input)
     {
-        return new ImageToAdd<BarcodeInput>
+        return new ImageLayer<BarcodeInput>
         {
-            Source = input.Barcode.ToBarcodeInput(),
-            Options = input.DrawOptions?.ToImageToAddOptions()
+            Source = input.BarcodeOptions.ToBarcodeInput(),
+            Options = input.DrawOptions?.ToImageLayerOptions()
         };
     }
 }

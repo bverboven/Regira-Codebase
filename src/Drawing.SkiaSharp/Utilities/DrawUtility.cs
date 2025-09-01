@@ -9,9 +9,9 @@ namespace Regira.Drawing.SkiaSharp.Utilities;
 
 public static class DrawUtility
 {
-    public static SKBitmap Draw(IEnumerable<ImageToAdd> imagesToAdd, SKBitmap? target = null, int? dpi = null)
+    public static SKBitmap Draw(IEnumerable<ImageLayer> imageLayers, SKBitmap? target = null, int? dpi = null)
     {
-        var images = imagesToAdd.ToList();
+        var images = imageLayers.ToList();
         target ??= CreateSizedCanvas(images);
 
         if (!images.Any())
@@ -29,9 +29,9 @@ public static class DrawUtility
         return target;
     }
 
-    public static SKBitmap CreateSizedCanvas(IEnumerable<ImageToAdd> imagesToAdd)
+    public static SKBitmap CreateSizedCanvas(IEnumerable<ImageLayer> imageLayers)
     {
-        var images = imagesToAdd.ToList();
+        var images = imageLayers.ToList();
         var size = new SKSize(
             (int)images.Max(x => x.Options?.Size?.Width ?? (x.Source.Size?.Width ?? 0)),
             (int)images.Max(x => x.Options?.Size?.Height ?? (x.Source.Size?.Height ?? 0))
@@ -39,12 +39,12 @@ public static class DrawUtility
         return SkiaUtility.Create(size, ImageDefaults.BackgroundColor.ToSkiaColor());
     }
 
-    public static void AddImage(ImageToAdd imageToAdd, SKCanvas canvas, Size2D targetSize, int? dpi = null)
+    public static void AddImage(ImageLayer imageLayer, SKCanvas canvas, Size2D targetSize, int? dpi = null)
     {
         dpi ??= DrawImageDefaults.Dpi;
 
-        var img = imageToAdd.Source;
-        var options = imageToAdd.Options ?? new ImageToAddOptions();
+        var img = imageLayer.Source;
+        var options = imageLayer.Options ?? new ImageLayerOptions();
 
         var source = img.ToBitmap();
 

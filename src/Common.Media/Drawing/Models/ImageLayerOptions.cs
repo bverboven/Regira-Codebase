@@ -4,7 +4,7 @@ using Regira.Media.Drawing.Enums;
 
 namespace Regira.Media.Drawing.Models;
 
-public class ImageToAddOptions
+public class ImageLayerOptions
 {
     public LengthUnit DimensionUnit { get; set; } = DrawImageDefaults.DimensionUnit;
     public Size2D? Size { get; set; }

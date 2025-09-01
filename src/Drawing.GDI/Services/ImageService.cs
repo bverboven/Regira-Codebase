@@ -83,7 +83,7 @@ public class ImageService : IImageService
     public IImageFile CropRectangle(IImageFile input, Position2D rect)
     {
         using var img = input.ToBitmap();
-        var (coordinate, size) = DimensionsUtility.ToCoordinateSize(rect, new Size2D(img.Width, img.Height));
+        var (coordinate, size) = DimensionsUtility.ToPointSize(rect, new Size2D(img.Width, img.Height));
         var gdiRectangle = new Rectangle((int)coordinate.X, (int)coordinate.Y, (int)size.Width, (int)size.Height);
         using var cropped = GdiUtility.CropRectangle(img, gdiRectangle);
         return cropped.ToImageFile(img.RawFormat);
@@ -167,10 +167,10 @@ public class ImageService : IImageService
         return img.ToImageFile(img.RawFormat);
     }
     /// <inheritdoc/>
-    public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int? dpi = null)
+    public IImageFile Draw(IEnumerable<ImageLayer> imageLayers, IImageFile? target = null, int? dpi = null)
     {
         dpi ??= DrawImageDefaults.Dpi;
-        var imagesCollection = imagesToAdd.ToArray();
+        var imagesCollection = imageLayers.ToArray();
         using var targetImage = target?.ToBitmap() ?? DrawUtility.CreateSizedCanvas(imagesCollection);
         DrawUtility.Draw(imagesCollection, targetImage, dpi.Value);
         return targetImage.ToImageFile(targetImage.RawFormat);
