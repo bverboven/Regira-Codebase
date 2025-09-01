@@ -1,4 +1,4 @@
-﻿using Regira.Dimensions;
+﻿using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Models.Abstractions;
@@ -19,8 +19,8 @@ public static class ImageBuilderExtensions
                 Source = await service.ReadImage("yellow-200x150.jpg"),
                 Options = new()
                 {
-                    PositionType = ImagePosition.HCenter | ImagePosition.VCenter,
-                    Size = new Size2D(300, 200)
+                    Position = ImagePosition.HCenter | ImagePosition.VCenter,
+                    Size = new ImageSize(300, 200)
                 }
             },
             new ImageLayer
@@ -28,7 +28,7 @@ public static class ImageBuilderExtensions
                 Source = await service.ReadImage("blue-50x50.jpg"),
                 Options = new()
                 {
-                    PositionType = ImagePosition.Top | ImagePosition.Right
+                    Position = ImagePosition.Top | ImagePosition.Right
                 }
             },
             new ImageLayer
@@ -36,8 +36,8 @@ public static class ImageBuilderExtensions
                 Source = await service.ReadImage("red-150x100.jpg"),
                 Options = new()
                 {
-                    PositionType = ImagePosition.Bottom | ImagePosition.Left,
-                    Size = new Size2D(100,50)
+                    Position = ImagePosition.Bottom | ImagePosition.Left,
+                    Size = new ImageSize(100,50)
                 }
             }
         };
@@ -61,7 +61,7 @@ public static class ImageBuilderExtensions
     {
         var target = new CanvasImageOptions
         {
-            Size = new Size2D(400, 300)
+            Size = new ImageSize(400, 300)
         };
         var imageLayers = new IImageLayer[]
         {
@@ -70,8 +70,8 @@ public static class ImageBuilderExtensions
                 Source = await service.ReadImage("yellow-200x150.jpg"),
                 Options = new()
                 {
-                    PositionType = ImagePosition.HCenter | ImagePosition.VCenter,
-                    Size = new Size2D(350, 250)
+                    Position = ImagePosition.HCenter | ImagePosition.VCenter,
+                    Size = new ImageSize(350, 250)
                 }
             },
             new ImageLayer
@@ -79,7 +79,7 @@ public static class ImageBuilderExtensions
                 Source = await service.ReadImage("green-50x100.jpg"),
                 Options = new()
                 {
-                    PositionType = ImagePosition.Top | ImagePosition.Right,
+                    Position = ImagePosition.Top | ImagePosition.Right,
                 }
             },
             new ImageLayer
@@ -87,8 +87,8 @@ public static class ImageBuilderExtensions
                 Source = await service.ReadImage("blue-50x50.jpg"),
                 Options = new()
                 {
-                    PositionType = ImagePosition.Absolute,
-                    Position = new Position2D(20, null, null, 10)
+                    Position = ImagePosition.Absolute,
+                    Offset = new ImageEdgeOffset(20, null, null, 10)
                 }
             },
             new ImageLayer
@@ -96,8 +96,8 @@ public static class ImageBuilderExtensions
                 Source = await service.ReadImage("red-150x100.jpg"),
                 Options = new()
                 {
-                    PositionType = ImagePosition.Absolute,
-                    Position = new Position2D(null, 10, 20, null)
+                    Position = ImagePosition.Absolute,
+                    Offset = new ImageEdgeOffset(null, 10, 20, null)
                 }
             }
         };
@@ -126,7 +126,75 @@ public static class ImageBuilderExtensions
         AssertColor("#FF0000", service.GetPixelColor(resultImg, 20, 270));
         AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 399, 299));
     }
+    /*
+    public static async Task Build_WithTargetCanvas_In_Mm(this IImageService service)
+    {
+        var target = new CanvasImageOptions
+        {
+            Size = new ImageSize(40, 20),
+            DimensionUnit = LengthUnit.Millimeters,
+            Dpi = 300
+        };
+        var imageLayers = new IImageLayer[]
+        {
+            new ImageLayer
+            {
+                Source = await service.ReadImage("yellow-200x150.jpg"),
+                Options = new()
+                {
+                    Position = ImagePosition.HCenter | ImagePosition.VCenter,
+                    Size = new ImageSize(80, 50),
+                    DimensionUnit = LengthUnit.Percent
+                }
+            },
+            new ImageLayer
+            {
+                Source = await service.ReadImage("green-50x100.jpg"),
+                Options = new()
+                {
+                    Position = ImagePosition.Top | ImagePosition.Right,
+                    Size = new ImageSize(5, 10),
+                    DimensionUnit = LengthUnit.Millimeters
+                }
+            },
+            new ImageLayer
+            {
+                Source = await service.ReadImage("blue-50x50.jpg"),
+                Options = new()
+                {
+                    Position = ImagePosition.Absolute,
+                    Offset = new ImageEdgeOffset(20, null, null, 10),
+                    Size = new ImageSize(5, 5),
+                    DimensionUnit = LengthUnit.Millimeters
+                }
+            },
+            new ImageLayer
+            {
+                Source = await service.ReadImage("red-150x100.jpg"),
+                Options = new()
+                {
+                    Position = ImagePosition.Absolute,
+                    Offset = new ImageEdgeOffset(null, 10, 20, null),
+                    Size = new ImageSize(40, 33.33f),
+                    DimensionUnit = LengthUnit.Percent
+                }
+            }
+        };
 
+        var imageCreators = new List<IImageCreator>
+        {
+            new CanvasImageCreator(service),
+            new LabelImageCreator(service)
+        };
+
+
+        var drawBuilder = new ImageBuilder(service, imageCreators);
+        using var resultImg = drawBuilder.Add(imageLayers)
+            .SetTargetObject(target)
+            .Build();
+        await service.SaveImage(resultImg, "build-with-canvas-in-mm.jpg");
+    }
+    */
     public static async Task Build_WithTargetImage(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
@@ -137,8 +205,8 @@ public static class ImageBuilderExtensions
                 Source = await service.ReadImage("yellow-200x150.jpg"),
                 Options = new()
                 {
-                    PositionType = ImagePosition.HCenter | ImagePosition.VCenter,
-                    Size = new Size2D(350, 250)
+                    Position = ImagePosition.HCenter | ImagePosition.VCenter,
+                    Size = new ImageSize(350, 250)
                 }
             },
             new ImageLayer
@@ -146,7 +214,7 @@ public static class ImageBuilderExtensions
                 Source = await service.ReadImage("green-50x100.jpg"),
                 Options = new()
                 {
-                    PositionType = ImagePosition.Top | ImagePosition.Right,
+                    Position = ImagePosition.Top | ImagePosition.Right,
                 }
             },
             new ImageLayer
@@ -154,8 +222,8 @@ public static class ImageBuilderExtensions
                 Source = await service.ReadImage("blue-50x50.jpg"),
                 Options = new()
                 {
-                    PositionType = ImagePosition.Absolute,
-                    Position = new Position2D(20, null, null, 10)
+                    Position = ImagePosition.Absolute,
+                    Offset = new ImageEdgeOffset(20, null, null, 10)
                 }
             },
             new ImageLayer
@@ -163,8 +231,8 @@ public static class ImageBuilderExtensions
                 Source = await service.ReadImage("red-150x100.jpg"),
                 Options = new()
                 {
-                    PositionType = ImagePosition.Absolute,
-                    Position = new Position2D(null, 10, 20, null)
+                    Position = ImagePosition.Absolute,
+                    Offset = new ImageEdgeOffset(null, 10, 20, null)
                 }
             }
         };
@@ -205,8 +273,8 @@ public static class ImageBuilderExtensions
                 Source = await service.ReadImage("yellow-200x150.jpg"),
                 Options = new()
                 {
-                    PositionType = ImagePosition.HCenter | ImagePosition.VCenter,
-                    Size = new Size2D(350, 250)
+                    Position = ImagePosition.HCenter | ImagePosition.VCenter,
+                    Size = new ImageSize(350, 250)
                 }
             },
             new ImageLayer
@@ -214,7 +282,7 @@ public static class ImageBuilderExtensions
                 Source = await service.ReadImage("green-50x100.jpg"),
                 Options = new()
                 {
-                    PositionType = ImagePosition.Top | ImagePosition.Right,
+                    Position = ImagePosition.Top | ImagePosition.Right,
                 }
             },
             new ImageLayer
@@ -222,8 +290,8 @@ public static class ImageBuilderExtensions
                 Source = await service.ReadImage("blue-50x50.jpg"),
                 Options = new()
                 {
-                    PositionType = ImagePosition.Absolute,
-                    Position = new Position2D(20, null, null, 10)
+                    Position = ImagePosition.Absolute,
+                    Offset = new ImageEdgeOffset(20, null, null, 10)
                 }
             },
             new ImageLayer
@@ -231,8 +299,8 @@ public static class ImageBuilderExtensions
                 Source = await service.ReadImage("red-150x100.jpg"),
                 Options = new()
                 {
-                    PositionType = ImagePosition.Absolute,
-                    Position = new Position2D(null, 10, 20, null)
+                    Position = ImagePosition.Absolute,
+                    Offset = new ImageEdgeOffset(null, 10, 20, null)
                 }
             },
             new ImageLayer<LabelImageOptions>
@@ -248,7 +316,7 @@ public static class ImageBuilderExtensions
                 },
                 Options = new()
                 {
-                    PositionType = ImagePosition.HCenter | ImagePosition.VCenter
+                    Position = ImagePosition.HCenter | ImagePosition.VCenter
                 }
             }
         };

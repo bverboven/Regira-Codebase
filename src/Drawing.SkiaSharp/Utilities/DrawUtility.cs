@@ -1,15 +1,14 @@
-﻿using Regira.Dimensions;
-using Regira.Media.Drawing.Constants;
+﻿using Regira.Media.Drawing.Constants;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
-using Regira.Utilities;
 using SkiaSharp;
 
 namespace Regira.Drawing.SkiaSharp.Utilities;
 
 public static class DrawUtility
 {
-    public static SKBitmap Draw(IEnumerable<ImageLayer> imageLayers, SKBitmap? target = null, int? dpi = null)
+    public static SKBitmap Draw(IEnumerable<ImageLayer> imageLayers, SKBitmap? target = null)
     {
         var images = imageLayers.ToList();
         target ??= CreateSizedCanvas(images);
@@ -22,7 +21,7 @@ public static class DrawUtility
         var canvas = new SKCanvas(target);
         foreach (var img in images)
         {
-            AddImage(img, canvas, new Size2D(target.Width, target.Height), dpi);
+            AddImage(img, canvas, new ImageSize(target.Width, target.Height));
         }
 
         canvas.Flush();
@@ -33,16 +32,14 @@ public static class DrawUtility
     {
         var images = imageLayers.ToList();
         var size = new SKSize(
-            (int)images.Max(x => x.Options?.Size?.Width ?? (x.Source.Size?.Width ?? 0)),
-            (int)images.Max(x => x.Options?.Size?.Height ?? (x.Source.Size?.Height ?? 0))
+            images.Max(x => x.Options?.Size?.Width ?? (x.Source.Size?.Width ?? 0)),
+            images.Max(x => x.Options?.Size?.Height ?? (x.Source.Size?.Height ?? 0))
         );
         return SkiaUtility.Create(size, ImageDefaults.BackgroundColor.ToSkiaColor());
     }
 
-    public static void AddImage(ImageLayer imageLayer, SKCanvas canvas, Size2D targetSize, int? dpi = null)
+    public static void AddImage(ImageLayer imageLayer, SKCanvas canvas, ImageSize targetSize)
     {
-        dpi ??= ImageLayerDefaults.Dpi;
-
         var img = imageLayer.Source;
         var options = imageLayer.Options ?? new ImageLayerOptions();
 
@@ -55,10 +52,7 @@ public static class DrawUtility
         using var resizedImage = options.Size is { Width: > 0, Height: > 0 }
             ? SkiaUtility.ResizeFixed(opacityImage, options.Size.Value.ToSkiaSize(), 100)
             : options.Size?.Width > 0 || options.Size?.Height > 0
-                ? SkiaUtility.Resize(opacityImage, new SKSize(
-                    DimensionsUtility.GetPixels(options.Size.Value.Width, options.DimensionUnit, (int)targetSize.Width, dpi.Value),
-                    DimensionsUtility.GetPixels(options.Size.Value.Height, options.DimensionUnit, (int)targetSize.Height, dpi.Value)
-                    ))
+                ? SkiaUtility.Resize(opacityImage, options.Size.Value.ToSkiaSize(), 100)
                 : opacityImage;
 
         // Rotate if needed
@@ -67,7 +61,7 @@ public static class DrawUtility
             : resizedImage;
 
         // Position
-        var coordinate = DrawImageUtility.GetCoordinate(options, targetSize, new Size2D(resizedImage.Width, resizedImage.Height), dpi);
+        var coordinate = DrawImageUtility.GetCoordinate(options, targetSize, new ImageSize(resizedImage.Width, resizedImage.Height));
 
         canvas.DrawBitmap(resizedImage, coordinate.X, coordinate.Y);
     }

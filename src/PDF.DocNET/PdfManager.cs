@@ -2,9 +2,9 @@
 using Docnet.Core.Editors;
 using Docnet.Core.Models;
 using Regira.Collections;
-using Regira.Dimensions;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Media.Drawing.Services.Abstractions;
 using Regira.Office.MimeTypes;
@@ -168,8 +168,8 @@ public class PdfManager(IImageService imageService) : IPdfService
                     return new JpegImage
                     {
                         Bytes = jpeg.Bytes,
-                        Width = (int)(jpeg.Size?.Width ?? 0),
-                        Height = (int)(jpeg.Size?.Height ?? 0)
+                        Width = jpeg.Size?.Width ?? 0,
+                        Height = jpeg.Size?.Height ?? 0
                     };
                 }
             )
@@ -180,7 +180,7 @@ public class PdfManager(IImageService imageService) : IPdfService
     }
     public IEnumerable<IImageFile> ToImages(IBinaryFile pdf, PdfImageOptions? options = null)
     {
-        var pageDimensions = new PageDimensions(((int?)options?.Size?.Width) ?? 1080, (int?)options?.Size?.Height ?? 1920);
+        var pageDimensions = new PageDimensions(options?.Size?.Width ?? 1080, options?.Size?.Height ?? 1920);
         using var docReader = DocLib.Instance.GetDocReader(pdf.GetBytes(), pageDimensions);
         var pageCount = docReader.GetPageCount();
         for (var pageIndex = 0; pageIndex < pageCount; pageIndex++)
@@ -191,7 +191,7 @@ public class PdfManager(IImageService imageService) : IPdfService
             var width = pr.GetPageWidth();
             var height = pr.GetPageHeight();
 
-            yield return imageService.Parse(imgBytes, new Size2D(width, height), options?.Format)!;
+            yield return imageService.Parse(imgBytes, new ImageSize(width, height), options?.Format)!;
         }
     }
 }

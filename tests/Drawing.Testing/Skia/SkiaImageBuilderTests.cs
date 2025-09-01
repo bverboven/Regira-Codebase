@@ -16,6 +16,8 @@ public class SkiaImageBuilderTests
     public Task Build_NoTarget() => _imgService.Build_NoTarget();
     [Test]
     public Task Build_WithTargetCanvas() => _imgService.Build_WithTargetCanvas();
+    //[Test]
+    //public Task Build_WithTargetCanvas_In_Mm() => _imgService.Build_WithTargetCanvas_In_Mm();
     [Test]
     public Task Build_WithTargetImage() => _imgService.Build_WithTargetImage();
     [Test]

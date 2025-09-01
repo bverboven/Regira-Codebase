@@ -177,64 +177,7 @@ public static class DimensionsUtility
         var factor = (float)srcDpi / targetDpi;
         return points / factor;
     }
-
-    /// <summary>
-    /// Calculates the size of a rectangular area defined by two points.
-    /// </summary>
-    /// <param name="topLeft">
-    /// The top-left point of the rectangle.
-    /// </param>
-    /// <param name="bottomRight">
-    /// The bottom-right point of the rectangle.
-    /// </param>
-    /// <returns>
-    /// A <see cref="Size2D"/> representing the width and height of the rectangle.
-    /// </returns>
-    public static Size2D CalculateSize(Point2D topLeft, Point2D bottomRight)
-        => new(bottomRight.X - topLeft.X, bottomRight.Y - topLeft.Y);
-    /// <summary>
-    /// Calculates the scaled size of a source dimension to fit within a target dimension while maintaining the aspect ratio.
-    /// </summary>
-    /// <param name="source">The original size to be scaled, represented as a <see cref="Size2D"/>.</param>
-    /// <param name="target">
-    /// The target size within which the source size should fit, represented as a <see cref="Size2D"/>.
-    /// If either width or height of the target is zero, the scaling will be based on the non-zero dimension.
-    /// </param>
-    /// <returns>
-    /// A new <see cref="Size2D"/> representing the scaled size of the source dimension that fits within the target dimension.
-    /// </returns>
-    public static Size2D CalculateSize(Size2D source, Size2D target)
-    {
-        if (target is { Width: 0, Height: 0 } || source.Equals(target))
-        {
-            return new Size2D(target.Width, target.Height);
-        }
-
-        double widthFactor = 1, heightFactor = 1, factor = 1;
-        if (target.Width > 0)
-        {
-            widthFactor = (double)target.Width / source.Width;
-            if (target.Height == 0)
-            {
-                factor = widthFactor;
-            }
-        }
-        if (target.Height > 0)
-        {
-            heightFactor = (double)target.Height / source.Height;
-            if (target.Width == 0)
-            {
-                factor = heightFactor;
-            }
-        }
-
-        if (Math.Abs(factor - 1) < double.Epsilon)
-        {
-            factor = Math.Min(widthFactor, heightFactor);
-        }
-
-        return new Size2D((int)(source.Width * factor), (int)(source.Height * factor));
-    }
+    
     /// <summary>
     /// Converts a given dimension to pixels based on the specified unit and target parameters.
     /// </summary>
@@ -262,71 +205,5 @@ public static class DimensionsUtility
             default: //case LengthUnit.Point:
                 return (int)dimension;
         }
-    }
-
-    /// <summary>
-    /// Converts a <see cref="Position2D"/> to a pair of points representing the top-left and bottom-right corners
-    /// within a given total size.
-    /// </summary>
-    /// <param name="position">
-    /// The <see cref="Position2D"/> specifying the position with optional top, left, bottom, and right offsets.
-    /// </param>
-    /// <param name="totalSize">
-    /// The total size as a <see cref="Size2D"/> within which the points are calculated.
-    /// </param>
-    /// <returns>
-    /// A tuple containing the top-left and bottom-right points as <see cref="Point2D"/>.
-    /// </returns>
-    public static (Point2D TopLeft, Point2D BottomRight) ToPoints(Position2D position, Size2D totalSize)
-    {
-        var topLeft = new Point2D(position.Left ?? 0, position.Top ?? 0);
-        var bottomRight = new Point2D(totalSize.Width, totalSize.Height) - new Point2D(position.Right, position.Bottom);
-        return (topLeft, bottomRight);
-    }
-    /// <summary>
-    /// Converts a given position and total size into a point and size representation.
-    /// </summary>
-    /// <param name="position">
-    /// The position, defined by its top, left, bottom, and right boundaries.
-    /// </param>
-    /// <param name="totalSize">
-    /// The total size of the area, used to calculate the resulting point and size.
-    /// </param>
-    /// <returns>
-    /// A tuple containing:
-    /// <list type="bullet">
-    /// <item>
-    /// <description>
-    /// <see cref="Point2D"/> representing the top-left point of the position.
-    /// </description>
-    /// </item>
-    /// <item>
-    /// <description>
-    /// <see cref="Size2D"/> representing the dimensions of the position.
-    /// </description>
-    /// </item>
-    /// </list>
-    /// </returns>
-    public static (Point2D TopLeft, Size2D Size) ToPointSize(Position2D position, Size2D totalSize)
-    {
-        var points = ToPoints(position, totalSize);
-        var calculatedSize = CalculateSize(points.TopLeft, points.BottomRight);
-        return (points.TopLeft, calculatedSize);
-    }
-    /// <summary>
-    /// Converts the specified top-left and bottom-right points into a <see cref="Position2D"/> object
-    /// relative to the given total size.
-    /// </summary>
-    /// <param name="topLeft">The top-left point of the position.</param>
-    /// <param name="bottomRight">The bottom-right point of the position.</param>
-    /// <param name="totalSize">The total size used to calculate the relative position.</param>
-    /// <returns>
-    /// A <see cref="Position2D"/> object representing the relative position defined by the given points
-    /// and total size.
-    /// </returns>
-    public static Position2D ToPosition(Point2D topLeft, Point2D bottomRight, Size2D totalSize)
-    {
-        var br = new Point2D(totalSize.Width, totalSize.Height) - new Point2D(bottomRight.X, bottomRight.Y);
-        return new Position2D(topLeft.Y, topLeft.X, br.Y, br.X);
     }
 }

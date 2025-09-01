@@ -80,6 +80,7 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
         for (var i = 0; i < pageCount; i++)
         {
             using var image = doc.SaveAsImage(i);
+#pragma warning disable CA1416
             if (options?.Size.HasValue == true)
             {
                 using var resized = GdiUtility.Resize(image, options.Size.Value.ToGdiSize());
@@ -89,6 +90,7 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
             {
                 yield return image.ToImageFile(ImageFormat.Jpeg);
             }
+#pragma warning restore CA1416
         }
     }
     

@@ -75,8 +75,8 @@ public class BarcodeService : IBarcodeService
             Format = Convert(input.Format),
             Options = new EncodingOptions
             {
-                Width = (int)input.Size.Width,
-                Height = (int)input.Size.Height,
+                Width = input.Size.Width,
+                Height = input.Size.Height,
                 Margin = 0,
                 PureBarcode = true,
                 GS1Format = true,
@@ -92,7 +92,7 @@ public class BarcodeService : IBarcodeService
         {
             using var img = writer.Write(input.Content);
 
-            using var resizedImg = (input.Size.Width > 0 && img.Width != (int)input.Size.Width) || (input.Size.Height > 0 && img.Height != (int)input.Size.Height)
+            using var resizedImg = (input.Size.Width > 0 && img.Width != input.Size.Width) || (input.Size.Height > 0 && img.Height != input.Size.Height)
                 ? SkiaUtility.ResizeFixed(img, input.Size.ToSkiaSize())
                 : img;
 

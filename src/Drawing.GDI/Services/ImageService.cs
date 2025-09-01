@@ -1,12 +1,12 @@
-﻿using Regira.Dimensions;
-using Regira.Drawing.GDI.Utilities;
+﻿using Regira.Drawing.GDI.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Constants;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Media.Drawing.Services.Abstractions;
-using Regira.Utilities;
+using Regira.Media.Drawing.Utilities;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -50,9 +50,9 @@ public class ImageService : IImageService
         return Parse(stream);
     }
     /// <inheritdoc/>
-    public IImageFile Parse(byte[] rawBytes, Size2D size, ImageFormat? format = null)
+    public IImageFile Parse(byte[] rawBytes, ImageSize size, ImageFormat? format = null)
     {
-        using var bmp = new Bitmap((int)size.Width, (int)size.Height, PixelFormat.Format32bppArgb);
+        using var bmp = new Bitmap(size.Width, size.Height, PixelFormat.Format32bppArgb);
         var rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
 
         var bmpData = bmp.LockBits(rect, ImageLockMode.WriteOnly, bmp.PixelFormat);
@@ -80,33 +80,33 @@ public class ImageService : IImageService
     }
 
     /// <inheritdoc/>
-    public IImageFile CropRectangle(IImageFile input, Position2D rect)
+    public IImageFile CropRectangle(IImageFile input, ImageEdgeOffset rect)
     {
         using var img = input.ToBitmap();
-        var (coordinate, size) = DimensionsUtility.ToPointSize(rect, new Size2D(img.Width, img.Height));
-        var gdiRectangle = new Rectangle((int)coordinate.X, (int)coordinate.Y, (int)size.Width, (int)size.Height);
+        var (coordinate, size) = DrawImageUtility.ToPointSize(rect, new ImageSize(img.Width, img.Height));
+        var gdiRectangle = new Rectangle(coordinate.X, coordinate.Y, size.Width, size.Height);
         using var cropped = GdiUtility.CropRectangle(img, gdiRectangle);
         return cropped.ToImageFile(img.RawFormat);
     }
 
     /// <inheritdoc/>
-    public Size2D GetDimensions(IImageFile input)
+    public ImageSize GetDimensions(IImageFile input)
     {
         using var img = input.ToBitmap();
-        return new Size2D(img.Width, img.Height);
+        return new ImageSize(img.Width, img.Height);
     }
     /// <inheritdoc/>
-    public IImageFile Resize(IImageFile input, Size2D wantedSize, int quality = 100)
+    public IImageFile Resize(IImageFile input, ImageSize wantedSize, int quality = 100)
     {
         using var img = input.ToBitmap();
-        using var resized = GdiUtility.Resize(img, new Size((int)wantedSize.Width, (int)wantedSize.Height));
+        using var resized = GdiUtility.Resize(img, new Size(wantedSize.Width, wantedSize.Height));
         return resized.ToImageFile(img.RawFormat);
     }
     /// <inheritdoc/>
-    public IImageFile ResizeFixed(IImageFile input, Size2D size, int quality = 100)
+    public IImageFile ResizeFixed(IImageFile input, ImageSize size, int quality = 100)
     {
         using var img = input.ToBitmap();
-        using var resized = GdiUtility.ResizeFixed(img, new Size((int)size.Width, (int)size.Height));
+        using var resized = GdiUtility.ResizeFixed(img, new Size(size.Width, size.Height));
         return resized.ToImageFile(img.RawFormat);
     }
 
@@ -155,7 +155,7 @@ public class ImageService : IImageService
     }
 
     /// <inheritdoc/>
-    public IImageFile Create(Size2D size, Color? backgroundColor = null, ImageFormat? format = null)
+    public IImageFile Create(ImageSize size, Color? backgroundColor = null, ImageFormat? format = null)
     {
         using var img = GdiUtility.Create(size.ToGdiSize(), (backgroundColor ?? ImageDefaults.BackgroundColor).ToGdiColor(), (format ?? ImageDefaults.Format).ToGdiImageFormat());
         return img.ToImageFile(img.RawFormat);
@@ -167,12 +167,11 @@ public class ImageService : IImageService
         return img.ToImageFile(img.RawFormat);
     }
     /// <inheritdoc/>
-    public IImageFile Draw(IEnumerable<ImageLayer> imageLayers, IImageFile? target = null, int? dpi = null)
+    public IImageFile Draw(IEnumerable<ImageLayer> imageLayers, IImageFile? target = null)
     {
-        dpi ??= ImageLayerDefaults.Dpi;
         var imagesCollection = imageLayers.ToArray();
         using var targetImage = target?.ToBitmap() ?? DrawUtility.CreateSizedCanvas(imagesCollection);
-        DrawUtility.Draw(imagesCollection, targetImage, dpi.Value);
+        DrawUtility.Draw(imagesCollection, targetImage);
         return targetImage.ToImageFile(targetImage.RawFormat);
     }
 }

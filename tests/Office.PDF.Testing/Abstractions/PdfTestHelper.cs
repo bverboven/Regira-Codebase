@@ -1,8 +1,8 @@
 ﻿using NUnit.Framework.Legacy;
 using Regira.Collections;
-using Regira.Dimensions;
 using Regira.IO.Extensions;
 using Regira.IO.Storage.FileSystem;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Office.PDF.Abstractions;
 using Regira.Office.PDF.Models;
 using Regira.Utilities;
@@ -88,7 +88,7 @@ public static class PdfTestHelper
 
         var pdfPath = Path.Combine(inputDir, inputFileName);
         await using var pdfStream = File.OpenRead(pdfPath);
-        Size2D size = new[] { 480, 600 };
+        ImageSize size = new[] { 480, 600 };
         var images = service.ToImages(pdfStream.ToBinaryFile(), new PdfImageOptions { Size = size });
 
         var count = 0;

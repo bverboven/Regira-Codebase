@@ -1,4 +1,4 @@
-using Regira.Dimensions;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Models.Abstractions;
@@ -17,7 +17,7 @@ public interface IImageDrawService
     /// <param name="backgroundColor">The background color (optional).</param>
     /// <param name="format">The image format (optional).</param>
     /// <returns>The created image file.</returns>
-    IImageFile Create(Size2D size, Color? backgroundColor = null, ImageFormat? format = null);
+    IImageFile Create(ImageSize size, Color? backgroundColor = null, ImageFormat? format = null);
     /// <summary>
     /// Creates an image containing text, using the specified label options.
     /// </summary>
@@ -29,7 +29,6 @@ public interface IImageDrawService
     /// </summary>
     /// <param name="items">The collection of images to add.</param>
     /// <param name="target">The target image file (optional).</param>
-    /// <param name="dpi">The DPI to use for drawing (optional, needed for conversion of dimension units).</param>
     /// <returns>The resulting image file with all images drawn.</returns>
-    IImageFile Draw(IEnumerable<ImageLayer> items, IImageFile? target = null, int? dpi = null);
+    IImageFile Draw(IEnumerable<ImageLayer> items, IImageFile? target = null);
 }

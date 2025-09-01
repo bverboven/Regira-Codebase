@@ -1,16 +1,15 @@
-﻿using Regira.Dimensions;
-using Regira.Media.Drawing.Constants;
+﻿using Regira.Media.Drawing.Constants;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Enums;
 
 namespace Regira.Media.Drawing.Models;
 
 public class ImageLayerOptions
 {
-    public LengthUnit DimensionUnit { get; set; } = ImageLayerDefaults.DimensionUnit;
-    public Size2D? Size { get; set; }
-    public float Margin { get; set; } = ImageLayerDefaults.Margin;
-    public ImagePosition PositionType { get; set; } = ImageLayerDefaults.PositionType;
-    public Position2D? Position { get; set; } = ImageLayerDefaults.Position;
+    public ImageSize? Size { get; set; }
+    public int Margin { get; set; } = ImageLayerDefaults.Margin;
+    public ImagePosition Position { get; set; } = ImageLayerDefaults.Position;
+    public ImageEdgeOffset? Offset { get; set; } = ImageLayerDefaults.Offset;
     public float Rotation { get; set; } = ImageLayerDefaults.Rotation;
     public float Opacity { get; set; } = ImageLayerDefaults.Opacity;
 }

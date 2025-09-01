@@ -1,4 +1,4 @@
-﻿using Regira.Dimensions;
+﻿using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Services.Abstractions;
@@ -34,7 +34,7 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.Top | ImagePosition.Left
+                Position = ImagePosition.Top | ImagePosition.Left
             }
         };
 
@@ -54,7 +54,7 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.Bottom | ImagePosition.Left
+                Position = ImagePosition.Bottom | ImagePosition.Left
             }
         };
 
@@ -74,7 +74,7 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("green-50x100.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.Top | ImagePosition.Right
+                Position = ImagePosition.Top | ImagePosition.Right
             }
         };
 
@@ -95,7 +95,7 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("green-50x100.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.Bottom | ImagePosition.Right
+                Position = ImagePosition.Bottom | ImagePosition.Right
             }
         };
 
@@ -119,7 +119,7 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.Top | ImagePosition.HCenter
+                Position = ImagePosition.Top | ImagePosition.HCenter
             }
         };
 
@@ -140,7 +140,7 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.Bottom | ImagePosition.HCenter
+                Position = ImagePosition.Bottom | ImagePosition.HCenter
             }
         };
 
@@ -162,7 +162,7 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("green-50x100.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.VCenter | ImagePosition.Left
+                Position = ImagePosition.VCenter | ImagePosition.Left
             }
         };
 
@@ -184,7 +184,7 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("green-50x100.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.VCenter | ImagePosition.Right
+                Position = ImagePosition.VCenter | ImagePosition.Right
             }
         };
 
@@ -206,7 +206,7 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.VCenter | ImagePosition.HCenter
+                Position = ImagePosition.VCenter | ImagePosition.HCenter
             }
         };
 
@@ -233,8 +233,8 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.Absolute,
-                Position = new Position2D(50, 50)
+                Position = ImagePosition.Absolute,
+                Offset = new ImageEdgeOffset(50, 50)
             }
         };
 
@@ -256,8 +256,8 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.Absolute,
-                Position = new Position2D(50, null, null, 50)
+                Position = ImagePosition.Absolute,
+                Offset = new ImageEdgeOffset(50, null, null, 50)
             }
         };
 
@@ -279,8 +279,8 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.Absolute,
-                Position = new Position2D(null, 50, 50, null)
+                Position = ImagePosition.Absolute,
+                Offset = new ImageEdgeOffset(null, 50, 50, null)
             }
         };
 
@@ -300,8 +300,8 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.Absolute,
-                Position = new Position2D(null, null, 50, 50)
+                Position = ImagePosition.Absolute,
+                Offset = new ImageEdgeOffset(null, null, 50, 50)
             }
         };
 
@@ -343,7 +343,7 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.Top | ImagePosition.Left,
+                Position = ImagePosition.Top | ImagePosition.Left,
                 Margin = 10
             }
         };
@@ -365,7 +365,7 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("yellow-200x150.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.Bottom | ImagePosition.Left,
+                Position = ImagePosition.Bottom | ImagePosition.Left,
                 Margin = 10
             }
         };
@@ -387,7 +387,7 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("green-50x100.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.Top | ImagePosition.Right,
+                Position = ImagePosition.Top | ImagePosition.Right,
                 Margin = 10
             }
         };
@@ -410,7 +410,7 @@ public static class DrawingPositionExtensions
             Source = await service.ReadImage("green-50x100.jpg"),
             Options = new()
             {
-                PositionType = ImagePosition.Bottom | ImagePosition.Right,
+                Position = ImagePosition.Bottom | ImagePosition.Right,
                 Margin = 10
             }
         };

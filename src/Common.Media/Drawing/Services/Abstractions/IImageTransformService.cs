@@ -1,4 +1,4 @@
-using Regira.Dimensions;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Models.Abstractions;
 
@@ -13,8 +13,8 @@ public interface IImageTransformService
     /// Gets the dimensions (width and height) of the input image.
     /// </summary>
     /// <param name="input">The image file.</param>
-    /// <returns>The size of the image as a <see cref="Size2D"/>.</returns>
-    Size2D GetDimensions(IImageFile input);
+    /// <returns>The size of the image as a <see cref="ImageSize"/>.</returns>
+    ImageSize GetDimensions(IImageFile input);
     /// <summary>
     /// Resizes the input image to the specified size, with optional quality.
     /// </summary>
@@ -22,7 +22,7 @@ public interface IImageTransformService
     /// <param name="wantedSize">The desired size.</param>
     /// <param name="quality">The quality of the resize operation (default 100).</param>
     /// <returns>The resized image file.</returns>
-    IImageFile Resize(IImageFile input, Size2D wantedSize, int quality = 100);
+    IImageFile Resize(IImageFile input, ImageSize wantedSize, int quality = 100);
     /// <summary>
     /// Resizes the input image to the exact specified size, ignoring aspect ratio, with optional quality.
     /// </summary>
@@ -30,15 +30,17 @@ public interface IImageTransformService
     /// <param name="size">The target size.</param>
     /// <param name="quality">The quality of the resize operation (default 100).</param>
     /// <returns>The resized image file.</returns>
-    IImageFile ResizeFixed(IImageFile input, Size2D size, int quality = 100);
+    IImageFile ResizeFixed(IImageFile input, ImageSize size, int quality = 100);
 
     /// <summary>
-    /// Crops the input image to the specified rectangle.
+    /// Crops the specified rectangular region from the input image.
     /// </summary>
-    /// <param name="input">The source image file.</param>
-    /// <param name="rect">The rectangle to crop, specified as a <see cref="Position2D"/>.</param>
+    /// <param name="input">The source image file to crop.</param>
+    /// <param name="rect">
+    /// The rectangular region to crop, defined by its top, left, bottom, and right margins.
+    /// </param>
     /// <returns>The cropped image file.</returns>
-    IImageFile CropRectangle(IImageFile input, Position2D rect);
+    IImageFile CropRectangle(IImageFile input, ImageEdgeOffset rect);
     
     /// <summary>
     /// Rotates the input image by the specified angle, with an optional background color.

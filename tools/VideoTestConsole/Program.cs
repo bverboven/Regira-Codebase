@@ -1,6 +1,7 @@
 ﻿using Regira.Drawing.SkiaSharp.Services;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.FFMpeg;
 using Regira.System;
 
@@ -19,7 +20,7 @@ foreach (var file in files)
     Console.WriteLine($"Creating snapshot of file {Path.GetFileName(file)}");
     try
     {
-        using var img = await snapshooter.Snapshot(mp4File, new Regira.Dimensions.Size2D(640, 480), TimeSpan.FromSeconds(.5));
+        using var img = await snapshooter.Snapshot(mp4File, new ImageSize(640, 480), TimeSpan.FromSeconds(.5));
         var outputFilename = Path.Combine(outputDir, $"{Path.GetFileName(file)}.jpeg");
         await img!.SaveAs(outputFilename);
         Console.WriteLine($"Snapshot at {outputFilename}");

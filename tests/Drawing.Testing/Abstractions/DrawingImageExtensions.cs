@@ -1,5 +1,5 @@
 ﻿using Drawing.Testing.Extensions;
-using Regira.Dimensions;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Services.Abstractions;
@@ -26,7 +26,7 @@ public static class DrawingImageExtensions
     {
         using var image = await service.ReadImage(filename);
         var original = image.Size;
-        var wantedSize = new Size2D(1024, 1024);
+        var wantedSize = new ImageSize(1024, 1024);
         using var resized = service.Resize(image, wantedSize, 60);
 
         await service.SaveImage(resized, $"{Path.GetFileNameWithoutExtension(filename)}-resized.jpg");
@@ -40,7 +40,7 @@ public static class DrawingImageExtensions
     {
         using var image = await service.ReadImage(filename);
         var original = image.Size;
-        var targetSize = new Size2D(1024, 1024);
+        var targetSize = new ImageSize(1024, 1024);
         using var resized = service.ResizeFixed(image, targetSize);
 
         await service.SaveImage(resized, $"{Path.GetFileNameWithoutExtension(filename)}-resized-fixed.jpg");
@@ -76,10 +76,10 @@ public static class DrawingImageExtensions
     {
         using var image = await service.ReadImage(filename);
 
-        var halfWidth = (int)image.Size!.Value.Width / 2;
-        var halfHeight = (int)image.Size!.Value.Height / 2;
+        var halfWidth = image.Size!.Value.Width / 2;
+        var halfHeight = image.Size!.Value.Height / 2;
 
-        var rectangles = new Dictionary<string, Position2D>
+        var rectangles = new Dictionary<string, ImageEdgeOffset>
         {
             ["topleft"] = new(0, 0, halfHeight, halfWidth),
             ["topright"] = new(0, halfWidth, halfHeight, 0),

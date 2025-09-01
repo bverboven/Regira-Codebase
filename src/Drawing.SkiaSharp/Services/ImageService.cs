@@ -1,13 +1,13 @@
-﻿using Regira.Dimensions;
-using Regira.Drawing.SkiaSharp.Utilities;
+﻿using Regira.Drawing.SkiaSharp.Utilities;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Constants;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Media.Drawing.Services.Abstractions;
-using Regira.Utilities;
+using Regira.Media.Drawing.Utilities;
 using SkiaSharp;
 
 namespace Regira.Drawing.SkiaSharp.Services;
@@ -67,12 +67,12 @@ public class ImageService : IImageService
         return img;
     }
     /// <inheritdoc/>
-    public IImageFile? Parse(byte[] rawBytes, Size2D size, ImageFormat? format = null)
+    public IImageFile? Parse(byte[] rawBytes, ImageSize size, ImageFormat? format = null)
     {
         format ??= ImageFormat.Jpeg;
 
         using var skImg = SKImage.FromPixels(
-            new SKImageInfo((int)size.Width, (int)size.Height, SKColorType.Bgra8888, SKAlphaType.Premul),
+            new SKImageInfo(size.Width, size.Height, SKColorType.Bgra8888, SKAlphaType.Premul),
             SKData.CreateCopy(rawBytes)
         );
 
@@ -114,24 +114,24 @@ public class ImageService : IImageService
     }
 
     /// <inheritdoc/>
-    public IImageFile CropRectangle(IImageFile input, Position2D rect)
+    public IImageFile CropRectangle(IImageFile input, ImageEdgeOffset rect)
     {
         var format = GetFormat(input);
         using var img = input.ToBitmap();
-        var (topLeft, bottomRight) = DimensionsUtility.ToPoints(rect, new Size2D(img.Width, img.Height));
-        var skRect = new SKRect((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X, (int)bottomRight.Y);
+        var (topLeft, bottomRight) = DrawImageUtility.ToPoints(rect, new ImageSize(img.Width, img.Height));
+        var skRect = new SKRect(topLeft.X, topLeft.Y, bottomRight.X, bottomRight.Y);
         using var croppedBitmap = SkiaUtility.CropRectangle(img, skRect);
         return croppedBitmap.ToImageFile(format.ToSkiaFormat());
     }
 
     /// <inheritdoc/>
-    public Size2D GetDimensions(IImageFile input)
+    public ImageSize GetDimensions(IImageFile input)
     {
         using var img = input.ToBitmap();
-        return new Size2D(img.Width, img.Height);
+        return new ImageSize(img.Width, img.Height);
     }
     /// <inheritdoc/>
-    public IImageFile Resize(IImageFile input, Size2D wantedSize, int quality = 80)
+    public IImageFile Resize(IImageFile input, ImageSize wantedSize, int quality = 80)
     {
         var format = GetFormat(input);
         using var sourceBitmap = input.ToBitmap();
@@ -139,7 +139,7 @@ public class ImageService : IImageService
         return scaledBitmap.ToImageFile(format.ToSkiaFormat());
     }
     /// <inheritdoc/>
-    public IImageFile ResizeFixed(IImageFile input, Size2D size, int quality = 80)
+    public IImageFile ResizeFixed(IImageFile input, ImageSize size, int quality = 80)
     {
         var format = GetFormat(input);
         using var sourceBitmap = input.ToBitmap();
@@ -215,7 +215,7 @@ public class ImageService : IImageService
     }
 
     /// <inheritdoc/>
-    public IImageFile Create(Size2D size, Color? backgroundColor = null, ImageFormat? format = null)
+    public IImageFile Create(ImageSize size, Color? backgroundColor = null, ImageFormat? format = null)
     {
         using var img = SkiaUtility.Create(size.ToSkiaSize(), (backgroundColor ?? ImageDefaults.BackgroundColor).ToSkiaColor());
         return img.ToImageFile((format ?? ImageDefaults.Format).ToSkiaFormat());
@@ -227,12 +227,11 @@ public class ImageService : IImageService
         return img.ToImageFile();
     }
     /// <inheritdoc/>
-    public IImageFile Draw(IEnumerable<ImageLayer> imageLayers, IImageFile? target = null, int? dpi = null)
+    public IImageFile Draw(IEnumerable<ImageLayer> imageLayers, IImageFile? target = null)
     {
-        dpi ??= ImageLayerDefaults.Dpi;
         var imagesCollection = imageLayers.ToArray();
         using var targetImage = target?.ToBitmap() ?? DrawUtility.CreateSizedCanvas(imagesCollection);
-        DrawUtility.Draw(imagesCollection, targetImage, dpi.Value);
+        DrawUtility.Draw(imagesCollection, targetImage);
         return targetImage.ToImageFile();
     }
 }

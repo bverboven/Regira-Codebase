@@ -1,8 +1,8 @@
 ﻿using FFMpegCore;
-using Regira.Dimensions;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Media.Drawing.Services.Abstractions;
 using Regira.Media.Drawing.Utilities;
@@ -15,13 +15,13 @@ public class SnapshotService(IImageService imageService, IProcessHelper? process
 {
     readonly IProcessHelper _processHelper = processHelper ?? new ProcessHelper();
 
-    public async Task<IImageFile?> Snapshot(IBinaryFile input, Size2D? size = null, TimeSpan? time = null)
+    public async Task<IImageFile?> Snapshot(IBinaryFile input, ImageSize? size = null, TimeSpan? time = null)
     {
         var inputPath = input.GetPath();
         if (!size.HasValue || size.Value.Width == 0 || size.Value.Height == 0)
         {
             var mediaInfo = await FFProbe.AnalyseAsync(inputPath);
-            size = new Size2D(mediaInfo.PrimaryVideoStream!.Width, mediaInfo.PrimaryVideoStream!.Height);
+            size = new ImageSize(mediaInfo.PrimaryVideoStream!.Width, mediaInfo.PrimaryVideoStream!.Height);
         }
 
         var tempPath = $"{Path.GetTempFileName()}.bmp";

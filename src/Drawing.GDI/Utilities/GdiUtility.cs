@@ -1,7 +1,7 @@
-﻿using Regira.Dimensions;
-using Regira.Media.Drawing.Constants;
+﻿using Regira.Media.Drawing.Constants;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Media.Drawing.Models;
-using Regira.Utilities;
+using Regira.Media.Drawing.Utilities;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -55,7 +55,7 @@ public static class GdiUtility
         var width = maxSize.Width;
         var height = maxSize.Height;
 
-        var size = DimensionsUtility.CalculateSize(new Size2D(img.Width, img.Height), new Size2D(width, height));
+        var size = DrawImageUtility.CalculateSize(new ImageSize(img.Width, img.Height), new ImageSize(width, height));
         return ResizeFixed(img, size.ToGdiSize(), quality);
     }
     public static Image ResizeFixed(Image img, Size size, int quality = 80)
