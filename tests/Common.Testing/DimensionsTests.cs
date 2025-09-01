@@ -1,6 +1,6 @@
-﻿using System.Text.Json;
-using Regira.Dimensions;
+﻿using Regira.Dimensions;
 using Regira.Utilities;
+using System.Text.Json;
 
 namespace Common.Testing;
 
@@ -94,7 +94,7 @@ public class DimensionsTests
     {
         var size = _references[format];
         var expected = ((Size2D)size.Pt72).Round();
-        Assert.That(DimensionsUtility.ModifyDPI(size.Pt300, 300, 72).Round(), Is.EqualTo(expected));
+        Assert.That(DimensionsUtility.ModifyDpi(size.Pt300, 300, 72).Round(), Is.EqualTo(expected));
     }
 
     [TestCase("a0")]
@@ -105,6 +105,6 @@ public class DimensionsTests
     {
         var size = _references[format];
         var expected = ((Size2D)size.Pt300).Round();
-        Assert.That(DimensionsUtility.ModifyDPI(size.Pt72, 72, 300).Round(), Is.EqualTo(expected));
+        Assert.That(DimensionsUtility.ModifyDpi(size.Pt72, 72, 300).Round(), Is.EqualTo(expected));
     }
 }

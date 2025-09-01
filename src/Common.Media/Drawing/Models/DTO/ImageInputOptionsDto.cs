@@ -3,7 +3,7 @@ using Regira.Media.Drawing.Enums;
 
 namespace Regira.Media.Drawing.Models.DTO;
 
-public class ImageToAddOptionsDto
+public class ImageInputOptionsDto
 {
     public LengthUnit? DimensionUnit { get; set; }
     public float? Width { get; set; }

@@ -1,8 +1,8 @@
 ﻿using Regira.Dimensions;
 using Regira.Media.Drawing.Constants;
-using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
+using Regira.Utilities;
 using SkiaSharp;
 
 namespace Regira.Drawing.SkiaSharp.Utilities;
@@ -41,6 +41,8 @@ public static class DrawUtility
 
     public static void AddImage(ImageToAdd imageToAdd, SKCanvas canvas, Size2D targetSize, int? dpi = null)
     {
+        dpi ??= DrawImageDefaults.Dpi;
+
         var img = imageToAdd.Source;
         var options = imageToAdd.Options ?? new ImageToAddOptions();
 
@@ -54,8 +56,8 @@ public static class DrawUtility
             ? SkiaUtility.ResizeFixed(opacityImage, options.Size.Value.ToSkiaSize(), 100)
             : options.Size?.Width > 0 || options.Size?.Height > 0
                 ? SkiaUtility.Resize(opacityImage, new SKSize(
-                    SizeUtility.GetPixels(options.Size.Value.Width, options.DimensionUnit, (int)targetSize.Width, dpi),
-                    SizeUtility.GetPixels(options.Size.Value.Height, options.DimensionUnit, (int)targetSize.Height, dpi)
+                    DimensionsUtility.GetPixels(options.Size.Value.Width, options.DimensionUnit, (int)targetSize.Width, dpi.Value),
+                    DimensionsUtility.GetPixels(options.Size.Value.Height, options.DimensionUnit, (int)targetSize.Height, dpi.Value)
                     ))
                 : opacityImage;
 
@@ -65,43 +67,8 @@ public static class DrawUtility
             : resizedImage;
 
         // Position
-        var inputPosition = options.Position ?? new Position2D();
-        int? imgLeft = inputPosition.Left.HasValue ? SizeUtility.GetPixels(inputPosition.Left.Value, options.DimensionUnit, (int)targetSize.Width, dpi) : null;
-        int? imgRight = inputPosition.Right.HasValue ? SizeUtility.GetPixels(inputPosition.Right.Value, options.DimensionUnit, (int)targetSize.Width, dpi) : null;
-        int? imgTop = inputPosition.Top.HasValue ? SizeUtility.GetPixels(inputPosition.Top.Value, options.DimensionUnit, (int)targetSize.Height, dpi) : null;
-        int? imgBottom = inputPosition.Bottom.HasValue ? SizeUtility.GetPixels(inputPosition.Bottom.Value, options.DimensionUnit, (int)targetSize.Height, dpi) : null;
+        var coordinate = DrawImageUtility.GetCoordinate(options, targetSize, new Size2D(resizedImage.Width, resizedImage.Height), dpi);
 
-        float left = 0;
-        if (options.PositionType.HasFlag(ImagePosition.HCenter))
-        {
-            left = (targetSize.Width / 2) - (resizedImage.Width / 2f);
-        }
-        else if (options.PositionType.HasFlag(ImagePosition.Right) || Math.Abs(left) < float.Epsilon && inputPosition.Right.HasValue)
-        {
-            left = targetSize.Width - resizedImage.Width - options.Margin;
-        }
-        else
-        {
-            left += options.Margin;
-        }
-
-        float top = 0;
-        if (options.PositionType.HasFlag(ImagePosition.VCenter))
-        {
-            top = (targetSize.Height / 2) - (resizedImage.Height / 2f);
-        }
-        else if (options.PositionType.HasFlag(ImagePosition.Bottom) || Math.Abs(top) < float.Epsilon && inputPosition.Bottom.HasValue)
-        {
-            top = targetSize.Height - resizedImage.Height - options.Margin;
-        }
-        else
-        {
-            top += options.Margin;
-        }
-
-        left += (imgLeft ?? 0) - (imgRight ?? 0);
-        top += (imgTop ?? 0) - (imgBottom ?? 0);
-
-        canvas.DrawBitmap(resizedImage, left, top);
+        canvas.DrawBitmap(resizedImage, coordinate.X, coordinate.Y);
     }
 }

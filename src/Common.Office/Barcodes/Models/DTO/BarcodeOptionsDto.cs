@@ -1,6 +1,6 @@
 ﻿namespace Regira.Office.Barcodes.Models.DTO;
 
-public record BarcodeInputDto
+public record BarcodeOptionsDto
 {
     public BarcodeFormat? Format { get; set; }
     public string Content { get; set; } = null!;

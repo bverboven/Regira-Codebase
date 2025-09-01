@@ -13,5 +13,5 @@ public class CanvasImageInputDto
     public float Width { get; set; }
     public float Height { get; set; }
     public CanvasOptionsDto? CanvasOptions { get; set; }
-    public ImageToAddOptionsDto? DrawOptions { get; set; }
+    public ImageInputOptionsDto? DrawOptions { get; set; }
 }

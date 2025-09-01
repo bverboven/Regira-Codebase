@@ -1,7 +1,7 @@
 ﻿namespace Regira.Media.Drawing.Models.DTO;
 
-public class ImageToAddDto
+public class ImageInputDto
 {
     public byte[] Image { get; set; } = null!;
-    public ImageToAddOptionsDto? DrawOptions { get; set; }
+    public ImageInputOptionsDto? DrawOptions { get; set; }
 }

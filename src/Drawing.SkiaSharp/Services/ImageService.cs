@@ -7,17 +7,23 @@ using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Media.Drawing.Services.Abstractions;
+using Regira.Utilities;
 using SkiaSharp;
 
 namespace Regira.Drawing.SkiaSharp.Services;
 
+/// <summary>
+/// Provides a set of methods for handling image processing tasks, such as parsing, resizing, cropping, rotating, 
+/// flipping, and changing formats. This class also supports creating new images, drawing on images, and retrieving 
+/// image properties like dimensions and pixel colors.
+/// </summary>
+/// <remarks>
+/// This service is built on top of SkiaSharp and integrates with various abstractions and utilities for image manipulation.
+/// It supports multiple image formats and provides functionality for both memory-based and stream-based image operations.
+/// </remarks>
 public class ImageService : IImageService
 {
-    /// <summary>
-    /// Creates an IImageFile with its content and size
-    /// </summary>
-    /// <param name="stream"></param>
-    /// <returns>Image with Stream, Width &amp; Height</returns>
+    /// <inheritdoc/>
     public IImageFile? Parse(Stream? stream)
     {
         if (stream == null)
@@ -38,11 +44,7 @@ public class ImageService : IImageService
         };
         return img;
     }
-    /// <summary>
-    /// Creates an IImageFile with its content and size
-    /// </summary>
-    /// <param name="bytes"></param>
-    /// <returns>Image with Bytes, Width &amp; Height</returns>
+    /// <inheritdoc/>
     public IImageFile? Parse(byte[]? bytes)
     {
         if (bytes == null)
@@ -64,6 +66,7 @@ public class ImageService : IImageService
         };
         return img;
     }
+    /// <inheritdoc/>
     public IImageFile? Parse(byte[] rawBytes, Size2D size, ImageFormat? format = null)
     {
         format ??= ImageFormat.Jpeg;
@@ -82,9 +85,10 @@ public class ImageService : IImageService
         using var img = SkiaUtility.ChangeFormat(skBitmap, format.Value.ToSkiaFormat());
         return img.ToImageFile(format.Value.ToSkiaFormat());
     }
-
+    /// <inheritdoc/>
     public IImageFile? Parse(IMemoryFile file) => file.HasStream() ? Parse(file.Stream) : Parse(file.GetBytes());
 
+    /// <inheritdoc/>
     public ImageFormat GetFormat(IImageFile input)
     {
         if (input.Stream != null && input.Stream != Stream.Null)
@@ -101,6 +105,7 @@ public class ImageService : IImageService
         using var ms = new MemoryStream(bytes);
         return ConversionUtility.GetFormat(ms).ToImageFormat();
     }
+    /// <inheritdoc/>
     public IImageFile ChangeFormat(IImageFile input, ImageFormat targetFormat)
     {
         var skiaFormat = targetFormat.ToSkiaFormat();
@@ -108,26 +113,24 @@ public class ImageService : IImageService
         return convertedBitmap.ToImageFile(skiaFormat);
     }
 
+    /// <inheritdoc/>
     public IImageFile CropRectangle(IImageFile input, Position2D rect)
     {
         var format = GetFormat(input);
-        using var sourceBitmap = input.ToBitmap();
-        var skRect = new SKRect(
-           rect.Left!.Value,
-           rect.Top!.Value,
-           // Position2D expects Right and Bottom to be distances from the right/bottom edge
-           sourceBitmap.Width - rect.Right!.Value,
-           sourceBitmap.Height - rect.Bottom!.Value
-        );
-        using var croppedBitmap = SkiaUtility.CropRectangle(sourceBitmap, skRect);
+        using var img = input.ToBitmap();
+        var (topLeft, bottomRight) = DimensionsUtility.ToCoordinates(rect, new Size2D(img.Width, img.Height));
+        var skRect = new SKRect((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X, (int)bottomRight.Y);
+        using var croppedBitmap = SkiaUtility.CropRectangle(img, skRect);
         return croppedBitmap.ToImageFile(format.ToSkiaFormat());
     }
 
+    /// <inheritdoc/>
     public Size2D GetDimensions(IImageFile input)
     {
         using var img = input.ToBitmap();
         return new Size2D(img.Width, img.Height);
     }
+    /// <inheritdoc/>
     public IImageFile Resize(IImageFile input, Size2D wantedSize, int quality = 80)
     {
         var format = GetFormat(input);
@@ -135,6 +138,7 @@ public class ImageService : IImageService
         using var scaledBitmap = SkiaUtility.Resize(sourceBitmap, new SKSize(wantedSize.Width, wantedSize.Height), quality);
         return scaledBitmap.ToImageFile(format.ToSkiaFormat());
     }
+    /// <inheritdoc/>
     public IImageFile ResizeFixed(IImageFile input, Size2D size, int quality = 80)
     {
         var format = GetFormat(input);
@@ -142,7 +146,8 @@ public class ImageService : IImageService
         using var scaledBitmap = SkiaUtility.ResizeFixed(sourceBitmap, new SKSize(size.Width, size.Height), quality);
         return scaledBitmap.ToImageFile(format.ToSkiaFormat());
     }
-
+    
+    /// <inheritdoc/>
     public IImageFile Rotate(IImageFile input, float angle, Color? background = null)
     {
         var format = GetFormat(input);
@@ -150,7 +155,7 @@ public class ImageService : IImageService
         using var rotatedBitmap = SkiaUtility.Rotate(sourceBitmap, angle, (background ?? Color.Transparent).ToSkiaColor());
         return rotatedBitmap.ToImageFile(format.ToSkiaFormat());
     }
-
+    /// <inheritdoc/>
     public IImageFile FlipHorizontal(IImageFile input)
     {
         var format = GetFormat(input);
@@ -158,6 +163,7 @@ public class ImageService : IImageService
         using var flippedBitmap = SkiaUtility.FlipHorizontal(sourceBitmap);
         return flippedBitmap.ToImageFile(format.ToSkiaFormat());
     }
+    /// <inheritdoc/>
     public IImageFile FlipVertical(IImageFile input)
     {
         var format = GetFormat(input);
@@ -166,11 +172,13 @@ public class ImageService : IImageService
         return flippedBitmap.ToImageFile(format.ToSkiaFormat());
     }
 
+    /// <inheritdoc/>
     public Color GetPixelColor(IImageFile input, int x, int y)
     {
         using var image = input.ToBitmap();
         return SkiaUtility.GetPixelColor(image, x, y).ToColor();
     }
+    /// <inheritdoc/>
     public IImageFile MakeTransparent(IImageFile input, Color? color = null)
     {
         color ??= new Color(245, 245, 245);
@@ -179,7 +187,8 @@ public class ImageService : IImageService
         // return as PNG image
         return transparentBitmap.ToImageFile();
     }
-    public IImageFile RemoveAlpha(IImageFile input)
+    /// <inheritdoc/>
+    public IImageFile MakeOpaque(IImageFile input)
     {
         using var inputBitmap = input.ToBitmap();
 
@@ -205,19 +214,22 @@ public class ImageService : IImageService
         return outputBitmap.ToImageFile();
     }
 
+    /// <inheritdoc/>
     public IImageFile Create(Size2D size, Color? backgroundColor = null, ImageFormat? format = null)
     {
         using var img = SkiaUtility.Create(size.ToSkiaSize(), (backgroundColor ?? ImageDefaults.BackgroundColor).ToSkiaColor());
         return img.ToImageFile((format ?? ImageDefaults.Format).ToSkiaFormat());
     }
-    public IImageFile CreateTextImage(TextImageOptions? options = null)
+    /// <inheritdoc/>
+    public IImageFile CreateTextImage(LabelImageOptions? options = null)
     {
         using var img = SkiaUtility.CreateTextImage(options);
         return img.ToImageFile();
     }
+    /// <inheritdoc/>
     public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int? dpi = null)
     {
-        dpi ??= PrintDefaults.Dpi;
+        dpi ??= DrawImageDefaults.Dpi;
         var imagesCollection = imagesToAdd.ToArray();
         using var targetImage = target?.ToBitmap() ?? DrawUtility.CreateSizedCanvas(imagesCollection);
         DrawUtility.Draw(imagesCollection, targetImage, dpi.Value);

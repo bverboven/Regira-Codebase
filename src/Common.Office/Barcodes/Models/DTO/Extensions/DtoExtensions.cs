@@ -4,7 +4,7 @@ namespace Regira.Office.Barcodes.Models.DTO.Extensions;
 
 public static class DtoExtensions
 {
-    public static BarcodeInput ToBarcodeInput(this BarcodeInputDto dto)
+    public static BarcodeInput ToBarcodeInput(this BarcodeOptionsDto dto)
         => new()
         {
             Format = dto.Format ?? BarcodeFormat.Code128,
@@ -13,7 +13,7 @@ public static class DtoExtensions
             Color = dto.Color ?? "#000000",
             BackgroundColor = dto.BackgroundColor ?? "#FFFFFF"
         };
-    public static QRCodeInput ToQRCodeInput(this BarcodeInputDto dto)
+    public static QRCodeInput ToQRCodeInput(this BarcodeOptionsDto dto)
         => new()
         {
             Format = BarcodeFormat.QRCode,

@@ -23,7 +23,7 @@ public static class DrawingTextExtensions
     public static async Task Add_Text_With_Options(this IImageService service)
     {
         var input = "Hello World!";
-        using var testImage = service.CreateTextImage(new TextImageOptions
+        using var testImage = service.CreateTextImage(new LabelImageOptions
         {
             Text = input,
             FontSize = 25,
@@ -44,7 +44,7 @@ public static class DrawingTextExtensions
     public static async Task Add_Text_With_Margin(this IImageService service)
     {
         var input = "Hello World!";
-        using var testImage = service.CreateTextImage(new TextImageOptions
+        using var testImage = service.CreateTextImage(new LabelImageOptions
         {
             Text = input,
             FontSize = 25,

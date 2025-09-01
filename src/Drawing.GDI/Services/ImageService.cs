@@ -6,6 +6,7 @@ using Regira.Media.Drawing.Constants;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Media.Drawing.Services.Abstractions;
+using Regira.Utilities;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -15,8 +16,18 @@ using ImageFormat = Regira.Media.Drawing.Enums.ImageFormat;
 
 namespace Regira.Drawing.GDI.Services;
 
+/// <summary>
+/// Provides a set of services for manipulating and processing images, including parsing, resizing, cropping, 
+/// format conversion, and other image-related operations. This class implements the <see cref="IImageService"/> interface.
+/// </summary>
+/// <remarks>
+/// This service supports various image formats defined in the <see cref="ImageFormat"/> enumeration and 
+/// works with image files represented by the <see cref="IImageFile"/> interface. It also provides utility 
+/// methods for creating, drawing, and modifying images.
+/// </remarks>
 public class ImageService : IImageService
 {
+    /// <inheritdoc/>
     public IImageFile? Parse(Stream? stream)
     {
         if (stream == null)
@@ -27,6 +38,7 @@ public class ImageService : IImageService
         using var img = Image.FromStream(stream);
         return img.ToImageFile(img.RawFormat);
     }
+    /// <inheritdoc/>
     public IImageFile? Parse(byte[]? bytes)
     {
         if (bytes == null)
@@ -37,6 +49,7 @@ public class ImageService : IImageService
         using var stream = new MemoryStream(bytes);
         return Parse(stream);
     }
+    /// <inheritdoc/>
     public IImageFile Parse(byte[] rawBytes, Size2D size, ImageFormat? format = null)
     {
         using var bmp = new Bitmap((int)size.Width, (int)size.Height, PixelFormat.Format32bppArgb);
@@ -49,13 +62,16 @@ public class ImageService : IImageService
         bmp.UnlockBits(bmpData);
         return bmp.ToImageFile((format ?? ImageFormat.Jpeg).ToGdiImageFormat());
     }
+    /// <inheritdoc/>
     public IImageFile? Parse(IMemoryFile file) => file.HasStream() ? Parse(file.Stream) : Parse(file.GetBytes());
 
+    /// <inheritdoc/>
     public ImageFormat GetFormat(IImageFile input)
     {
         using var img = input.ToBitmap();
         return img.RawFormat.ToImageFormat();
     }
+    /// <inheritdoc/>
     public IImageFile ChangeFormat(IImageFile input, ImageFormat targetFormat)
     {
         using var img = input.ToBitmap();
@@ -63,31 +79,30 @@ public class ImageService : IImageService
         return convertedImg.ToImageFile(targetFormat.ToGdiImageFormat());
     }
 
+    /// <inheritdoc/>
     public IImageFile CropRectangle(IImageFile input, Position2D rect)
     {
         using var img = input.ToBitmap();
-        var gdiRectangle = new Rectangle(
-            (int)rect.Left!,
-            (int)rect.Top!,
-            // Position2D expects Right and Bottom to be distances from the right/bottom edge
-            (int)(img.Width - rect.Right! - rect.Left),
-            (int)(img.Height - rect.Bottom! - rect.Top)
-        );// int x, int y, int width, int height
+        var (coordinate, size) = DimensionsUtility.ToCoordinateSize(rect, new Size2D(img.Width, img.Height));
+        var gdiRectangle = new Rectangle((int)coordinate.X, (int)coordinate.Y, (int)size.Width, (int)size.Height);
         using var cropped = GdiUtility.CropRectangle(img, gdiRectangle);
         return cropped.ToImageFile(img.RawFormat);
     }
 
+    /// <inheritdoc/>
     public Size2D GetDimensions(IImageFile input)
     {
         using var img = input.ToBitmap();
         return new Size2D(img.Width, img.Height);
     }
+    /// <inheritdoc/>
     public IImageFile Resize(IImageFile input, Size2D wantedSize, int quality = 100)
     {
         using var img = input.ToBitmap();
         using var resized = GdiUtility.Resize(img, new Size((int)wantedSize.Width, (int)wantedSize.Height));
         return resized.ToImageFile(img.RawFormat);
     }
+    /// <inheritdoc/>
     public IImageFile ResizeFixed(IImageFile input, Size2D size, int quality = 100)
     {
         using var img = input.ToBitmap();
@@ -95,18 +110,21 @@ public class ImageService : IImageService
         return resized.ToImageFile(img.RawFormat);
     }
 
+    /// <inheritdoc/>
     public IImageFile Rotate(IImageFile input, float angle, Color? background = null)
     {
         using var img = input.ToBitmap();
         using var rotated = GdiUtility.Rotate(img, angle, background?.ToGdiColor());
         return rotated.ToImageFile(img.RawFormat);
     }
+    /// <inheritdoc/>
     public IImageFile FlipHorizontal(IImageFile input)
     {
         using var img = input.ToBitmap();
         using var flipped = GdiUtility.FlipHorizontal(img);
         return flipped.ToImageFile(img.RawFormat);
     }
+    /// <inheritdoc/>
     public IImageFile FlipVertical(IImageFile input)
     {
         using var img = input.ToBitmap();
@@ -114,11 +132,13 @@ public class ImageService : IImageService
         return flipped.ToImageFile(img.RawFormat);
     }
 
+    /// <inheritdoc/>
     public Color GetPixelColor(IImageFile input, int x, int y)
     {
         using var img = input.ToBitmap();
         return GdiUtility.GetPixelColor(img, x, y).ToColor();
     }
+    /// <inheritdoc/>
     public IImageFile MakeTransparent(IImageFile input, Color? color = null)
     {
         color ??= new Color(245, 245, 245);
@@ -126,32 +146,30 @@ public class ImageService : IImageService
         using var target = GdiUtility.MakeTransparent(img, color.Value.ToGdiColor());
         return target.ToImageFile(System.Drawing.Imaging.ImageFormat.Png);
     }
-
-    /// <summary>
-    /// Removes alpha value from pixels
-    /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    public IImageFile RemoveAlpha(IImageFile input)
+    /// <inheritdoc/>
+    public IImageFile MakeOpaque(IImageFile input)
     {
         using var img = input.ToBitmap();
         using var target = GdiUtility.ChangeOpacity(img, 1);
         return target.ToImageFile(img.RawFormat);
     }
 
+    /// <inheritdoc/>
     public IImageFile Create(Size2D size, Color? backgroundColor = null, ImageFormat? format = null)
     {
         using var img = GdiUtility.Create(size.ToGdiSize(), (backgroundColor ?? ImageDefaults.BackgroundColor).ToGdiColor(), (format ?? ImageDefaults.Format).ToGdiImageFormat());
         return img.ToImageFile(img.RawFormat);
     }
-    public IImageFile CreateTextImage(TextImageOptions? options = null)
+    /// <inheritdoc/>
+    public IImageFile CreateTextImage(LabelImageOptions? options = null)
     {
         using var img = GdiUtility.CreateTextImage(options);
         return img.ToImageFile(img.RawFormat);
     }
+    /// <inheritdoc/>
     public IImageFile Draw(IEnumerable<ImageToAdd> imagesToAdd, IImageFile? target = null, int? dpi = null)
     {
-        dpi ??= PrintDefaults.Dpi;
+        dpi ??= DrawImageDefaults.Dpi;
         var imagesCollection = imagesToAdd.ToArray();
         using var targetImage = target?.ToBitmap() ?? DrawUtility.CreateSizedCanvas(imagesCollection);
         DrawUtility.Draw(imagesCollection, targetImage, dpi.Value);

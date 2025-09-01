@@ -9,7 +9,7 @@ namespace Regira.Media.Drawing.Models.DTO.Extensions;
 
 public static class DtoExtensions
 {
-    public static ImageToAddOptions ToImageToAddOptions(this ImageToAddOptionsDto dto)
+    public static ImageToAddOptions ToImageToAddOptions(this ImageInputOptionsDto dto)
     {
         return new ImageToAddOptions
         {
@@ -23,7 +23,7 @@ public static class DtoExtensions
         };
     }
     
-    public static ImageToAdd ToImageToAdd(this ImageToAddDto dto)
+    public static ImageToAdd ToImageToAdd(this ImageInputDto dto)
     {
         return new ImageToAdd
         {
@@ -32,19 +32,19 @@ public static class DtoExtensions
         };
     }
 
-    public static TextImageOptions ToTextImageOptions(this TextImageInputDto dto)
+    public static LabelImageOptions ToTextImageOptions(this LabelImageInputDto dto)
         => new()
         {
             Text = dto.Text,
-            FontName = dto.TextOptions?.FontName ?? TextImageDefaults.FontName,
-            FontSize = dto.TextOptions?.FontSize ?? TextImageDefaults.FontSize,
-            TextColor = dto.TextOptions?.TextColor ?? TextImageDefaults.TextColor,
-            BackgroundColor = dto.TextOptions?.BackgroundColor ?? TextImageDefaults.BackgroundColor,
-            Padding = dto.TextOptions?.Padding ?? TextImageDefaults.Padding
+            FontName = dto.LabelOptions?.FontName ?? LabelImageDefaults.FontName,
+            FontSize = dto.LabelOptions?.FontSize ?? LabelImageDefaults.FontSize,
+            TextColor = dto.LabelOptions?.TextColor ?? LabelImageDefaults.TextColor,
+            BackgroundColor = dto.LabelOptions?.BackgroundColor ?? LabelImageDefaults.BackgroundColor,
+            Padding = dto.LabelOptions?.Padding ?? LabelImageDefaults.Padding
         };
-    public static IImageToAdd ToImageToAdd(this TextImageInputDto dto)
+    public static IImageToAdd ToImageToAdd(this LabelImageInputDto dto)
     {
-        return new ImageToAdd<TextImageOptions>
+        return new ImageToAdd<LabelImageOptions>
         {
             Source = dto.ToTextImageOptions(),
             Options = dto.DrawOptions?.ToImageToAddOptions()

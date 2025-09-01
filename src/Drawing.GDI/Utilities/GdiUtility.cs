@@ -1,7 +1,7 @@
 ﻿using Regira.Dimensions;
 using Regira.Media.Drawing.Constants;
 using Regira.Media.Drawing.Models;
-using Regira.Media.Drawing.Utilities;
+using Regira.Utilities;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -55,7 +55,7 @@ public static class GdiUtility
         var width = maxSize.Width;
         var height = maxSize.Height;
 
-        var size = SizeUtility.CalculateSize(new Size2D(img.Width, img.Height), new Size2D(width, height));
+        var size = DimensionsUtility.CalculateSize(new Size2D(img.Width, img.Height), new Size2D(width, height));
         return ResizeFixed(img, size.ToGdiSize(), quality);
     }
     public static Image ResizeFixed(Image img, Size size, int quality = 80)
@@ -302,7 +302,7 @@ public static class GdiUtility
             var orientation = image.GetPropertyItem(EXIF_ORIENTATION_ID)!.Value![0];
             // ReSharper restore PossibleNullReferenceException
 
-            if (orientation >= 1 && orientation <= 8)
+            if (orientation is >= 1 and <= 8)
             {
                 switch (orientation)
                 {
@@ -386,13 +386,13 @@ public static class GdiUtility
 
         return ChangeFormat(untypedImage, format);
     }
-    public static Image CreateTextImage(TextImageOptions? options = null)
+    public static Image CreateTextImage(LabelImageOptions? options = null)
     {
-        options ??= new TextImageOptions();
+        options ??= new LabelImageOptions();
 
-        var font = new Font(FontFamily.Families.First(f => f.Name.Equals(options.FontName ?? TextImageDefaults.FontName)), options.FontSize ?? TextImageDefaults.FontSize);
-        var textColor = (options.TextColor ?? TextImageDefaults.TextColor).ToGdiColor();
-        var backgroundColor = (options.BackgroundColor ?? TextImageDefaults.BackgroundColor).ToGdiColor();
+        var font = new Font(FontFamily.Families.First(f => f.Name.Equals(options.FontName ?? LabelImageDefaults.FontName)), options.FontSize ?? LabelImageDefaults.FontSize);
+        var textColor = (options.TextColor ?? LabelImageDefaults.TextColor).ToGdiColor();
+        var backgroundColor = (options.BackgroundColor ?? LabelImageDefaults.BackgroundColor).ToGdiColor();
 
         SizeF textSize;
         using (var dummy = new Bitmap(1, 1))
@@ -401,7 +401,7 @@ public static class GdiUtility
             textSize = drawing.MeasureString(options.Text, font);
         }
 
-        var padding = options.Padding ?? TextImageDefaults.Padding;
+        var padding = options.Padding ?? LabelImageDefaults.Padding;
         var img = Create(new Size((int)textSize.Width + padding * 2, (int)textSize.Height + padding * 2), backgroundColor);
         using (var drawing = GetGraphics(img))
         {

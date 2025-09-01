@@ -235,9 +235,9 @@ public static class ImageBuilderExtensions
                     Position = new Position2D(null, 10, 20, null)
                 }
             },
-            new ImageToAdd<TextImageOptions>
+            new ImageToAdd<LabelImageOptions>
             {
-                Source = new TextImageOptions
+                Source = new LabelImageOptions
                 {
                     Text = "Hello World!",
                     FontName = "Arial",

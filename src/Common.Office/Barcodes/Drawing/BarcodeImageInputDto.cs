@@ -5,6 +5,6 @@ namespace Regira.Office.Barcodes.Drawing;
 
 public class BarcodeImageInputDto
 {
-    public BarcodeInputDto Barcode { get; set; } = null!;
-    public ImageToAddOptionsDto? DrawOptions { get; set; }
+    public BarcodeOptionsDto Barcode { get; set; } = null!;
+    public ImageInputOptionsDto? DrawOptions { get; set; }
 }

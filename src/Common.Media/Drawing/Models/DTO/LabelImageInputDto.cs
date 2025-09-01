@@ -1,8 +1,8 @@
 ﻿namespace Regira.Media.Drawing.Models.DTO;
 
-public class TextImageInputDto
+public class LabelImageInputDto
 {
-    public class TextOptionsDto
+    public class LabelOptionsDto
     {
         public string? FontName { get; set; }
         public int? FontSize { get; set; }
@@ -12,6 +12,6 @@ public class TextImageInputDto
     }
 
     public string Text { get; set; } = null!;
-    public TextOptionsDto? TextOptions { get; set; }
-    public ImageToAddOptionsDto? DrawOptions { get; set; }
+    public LabelOptionsDto? LabelOptions { get; set; }
+    public ImageInputOptionsDto? DrawOptions { get; set; }
 }

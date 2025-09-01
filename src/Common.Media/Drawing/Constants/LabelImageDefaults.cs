@@ -1,6 +1,6 @@
 ﻿namespace Regira.Media.Drawing.Constants;
 
-public static class TextImageDefaults
+public static class LabelImageDefaults
 {
     public static int FontSize { get; set; } = 15;
     public static string FontName { get; set; } = "Arial";

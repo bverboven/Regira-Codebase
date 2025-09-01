@@ -1,6 +1,8 @@
-﻿using Regira.Media.Drawing.Constants;
+﻿using Regira.Dimensions;
+using Regira.Media.Drawing.Constants;
 using Regira.Media.Drawing.Models;
 using Regira.Media.Drawing.Utilities;
+using Regira.Utilities;
 using SkiaSharp;
 
 namespace Regira.Drawing.SkiaSharp.Utilities;
@@ -19,7 +21,7 @@ public static class SkiaUtility
 
     public static SKBitmap Resize(SKBitmap src, SKSize wantedSize, int quality = 80)
     {
-        var targetSize = SizeUtility.CalculateSize(new[] { src.Width, src.Height }, new[] { wantedSize.Width, wantedSize.Height });
+        var targetSize = DimensionsUtility.CalculateSize(new Size2D(src.Width, src.Height), new Size2D(wantedSize.Width, wantedSize.Height));
         return ResizeFixed(src, new SKSize(targetSize.Width, targetSize.Height), quality);
     }
     public static SKBitmap ResizeFixed(SKBitmap src, SKSize wantedSize, int quality = 80)
@@ -127,7 +129,8 @@ public static class SkiaUtility
 
         return newImg;
     }
-    public static SKColor GetPixelColor(SKBitmap img, int x, int y) => img.GetPixel(x, y);
+    public static SKColor GetPixelColor(SKBitmap img, int x, int y)
+        => img.GetPixel(x, y);
 
 
     public static SKBitmap Create(SKSize size, SKColor backgroundColor)
@@ -137,23 +140,23 @@ public static class SkiaUtility
         canvas.Clear(backgroundColor);
         return bitmap;
     }
-    public static SKBitmap CreateTextImage(TextImageOptions? options = null)
+    public static SKBitmap CreateTextImage(LabelImageOptions? options = null)
     {
-        options ??= new TextImageOptions();
+        options ??= new LabelImageOptions();
 
-        var textColor = (options.TextColor ?? TextImageDefaults.TextColor).ToSkiaColor();
-        var backgroundColor = (options.BackgroundColor ?? TextImageDefaults.BackgroundColor).ToSkiaColor();
+        var textColor = (options.TextColor ?? LabelImageDefaults.TextColor).ToSkiaColor();
+        var backgroundColor = (options.BackgroundColor ?? LabelImageDefaults.BackgroundColor).ToSkiaColor();
 
         // Create SKFont for measuring
-        using var typeface = SKTypeface.FromFamilyName(options.FontName ?? TextImageDefaults.FontName, SKFontStyle.Normal);
-        using var font = new SKFont(typeface, options.FontSize ?? TextImageDefaults.FontSize);
+        using var typeface = SKTypeface.FromFamilyName(options.FontName ?? LabelImageDefaults.FontName, SKFontStyle.Normal);
+        using var font = new SKFont(typeface, options.FontSize ?? LabelImageDefaults.FontSize);
 
         // Measure text width using SKFont
         float textWidth = font.MeasureText(options.Text);
         float textHeight = font.Metrics.Descent - font.Metrics.Ascent;
 
         // Add padding
-        var padding = options.Padding ?? TextImageDefaults.Padding;
+        var padding = options.Padding ?? LabelImageDefaults.Padding;
         int width = (int)Math.Ceiling(textWidth + padding * 2);
         int height = (int)Math.Ceiling(textHeight + padding * 2);
 
