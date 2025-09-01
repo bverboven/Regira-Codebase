@@ -74,7 +74,7 @@ public static class DrawImageUtility
         {
             left = (int)(targetSize.Width / 2f - imageSize.Width / 2f);
         }
-        else if (options.Position.HasFlag(ImagePosition.Right) && inputPosition.Right.HasValue)
+        else if (options.Position.HasFlag(ImagePosition.Right) || (options.Position == ImagePosition.Absolute && inputPosition.Right.HasValue))
         {
             left = targetSize.Width - imageSize.Width - imgMargin;
         }
@@ -88,7 +88,7 @@ public static class DrawImageUtility
         {
             top = (int)(targetSize.Height / 2f - imageSize.Height / 2f);
         }
-        else if (options.Position.HasFlag(ImagePosition.Bottom) && inputPosition.Bottom.HasValue)
+        else if (options.Position.HasFlag(ImagePosition.Bottom) || (options.Position == ImagePosition.Absolute && inputPosition.Bottom.HasValue))
         {
             top = targetSize.Height - imageSize.Height - imgMargin;
         }
