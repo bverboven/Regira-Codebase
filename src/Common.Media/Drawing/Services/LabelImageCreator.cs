@@ -4,7 +4,7 @@ using Regira.Media.Drawing.Services.Abstractions;
 
 namespace Regira.Media.Drawing.Services;
 
-public class TextImageCreator(IImageService service) : ImageCreatorBase<LabelImageOptions>
+public class LabelImageCreator(IImageService service) : ImageCreatorBase<LabelImageOptions>
 {
     public override IImageFile Create(LabelImageOptions input)
         => service.CreateTextImage(input);

@@ -3,7 +3,7 @@ using Regira.Media.Drawing.Enums;
 
 namespace Regira.Media.Drawing.Constants;
 
-public static class DrawImageDefaults
+public static class ImageLayerDefaults
 {
     public static LengthUnit DimensionUnit { get; set; } = LengthUnit.Points;
     public static float Margin { get; set; } = 0;

@@ -6,11 +6,11 @@ namespace Regira.Media.Drawing.Models;
 
 public class ImageLayerOptions
 {
-    public LengthUnit DimensionUnit { get; set; } = DrawImageDefaults.DimensionUnit;
+    public LengthUnit DimensionUnit { get; set; } = ImageLayerDefaults.DimensionUnit;
     public Size2D? Size { get; set; }
-    public float Margin { get; set; } = DrawImageDefaults.Margin;
-    public ImagePosition PositionType { get; set; } = DrawImageDefaults.PositionType;
-    public Position2D? Position { get; set; } = DrawImageDefaults.Position;
-    public float Rotation { get; set; } = DrawImageDefaults.Rotation;
-    public float Opacity { get; set; } = DrawImageDefaults.Opacity;
+    public float Margin { get; set; } = ImageLayerDefaults.Margin;
+    public ImagePosition PositionType { get; set; } = ImageLayerDefaults.PositionType;
+    public Position2D? Position { get; set; } = ImageLayerDefaults.Position;
+    public float Rotation { get; set; } = ImageLayerDefaults.Rotation;
+    public float Opacity { get; set; } = ImageLayerDefaults.Opacity;
 }

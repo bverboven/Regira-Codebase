@@ -6,6 +6,8 @@ namespace Regira.Media.Drawing.Models;
 public class CanvasImageOptions
 {
     public Size2D Size { get; set; }
+    public LengthUnit? DimensionUnit { get; set; }
+    public int? Dpi { get; set; }
     public Color? BackgroundColor { get; set; }
     public ImageFormat? ImageFormat { get; set; }
 

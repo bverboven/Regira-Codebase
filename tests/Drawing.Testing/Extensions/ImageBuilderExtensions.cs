@@ -105,7 +105,7 @@ public static class ImageBuilderExtensions
         var imageCreators = new List<IImageCreator>
         {
             new CanvasImageCreator(service),
-            new TextImageCreator(service)
+            new LabelImageCreator(service)
         };
 
 
@@ -172,7 +172,7 @@ public static class ImageBuilderExtensions
         var imageCreators = new List<IImageCreator>
         {
             new CanvasImageCreator(service),
-            new TextImageCreator(service)
+            new LabelImageCreator(service)
         };
 
 
@@ -256,7 +256,7 @@ public static class ImageBuilderExtensions
         var imageCreators = new List<IImageCreator>
         {
             new CanvasImageCreator(service),
-            new TextImageCreator(service)
+            new LabelImageCreator(service)
         };
 
 

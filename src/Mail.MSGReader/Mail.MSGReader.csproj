@@ -11,7 +11,7 @@
     <AssemblyName>Regira.Office.Mail.MSGReader</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.9.0</Version>
+    <Version>4.9.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MsgReader" Version="6.0.3" />

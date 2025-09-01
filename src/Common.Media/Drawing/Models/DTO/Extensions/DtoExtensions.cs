@@ -13,16 +13,16 @@ public static class DtoExtensions
     {
         return new ImageLayerOptions
         {
-            DimensionUnit = dto.DimensionUnit ?? DrawImageDefaults.DimensionUnit,
+            DimensionUnit = dto.DimensionUnit ?? ImageLayerDefaults.DimensionUnit,
             Size = new Size2D(dto.Width ?? 0, dto.Height ?? 0),
-            Margin = dto.Margin ?? DrawImageDefaults.Margin,
+            Margin = dto.Margin ?? ImageLayerDefaults.Margin,
             PositionType = dto.Position ?? ImagePosition.Absolute,
             Position = new Position2D(dto.Top, dto.Left, dto.Bottom, dto.Right),
-            Rotation = dto.Rotation ?? DrawImageDefaults.Rotation,
-            Opacity = dto.Opacity ?? DrawImageDefaults.Opacity
+            Rotation = dto.Rotation ?? ImageLayerDefaults.Rotation,
+            Opacity = dto.Opacity ?? ImageLayerDefaults.Opacity
         };
     }
-    
+
     public static ImageLayer ToImageLayer(this ImageLayerDto dto)
     {
         return new ImageLayer
@@ -55,6 +55,8 @@ public static class DtoExtensions
         => new()
         {
             Size = new Size2D(dto.Width, dto.Height),
+            DimensionUnit = dto.DimensionUnit ?? ImageLayerDefaults.DimensionUnit,
+            Dpi = dto.Dpi ?? ImageLayerDefaults.Dpi,
             BackgroundColor = dto.CanvasOptions?.BackgroundColor ?? ImageDefaults.BackgroundColor,
             ImageFormat = dto.CanvasOptions?.ImageFormat ?? ImageDefaults.Format
         };

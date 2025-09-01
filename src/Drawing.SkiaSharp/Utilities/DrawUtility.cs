@@ -41,7 +41,7 @@ public static class DrawUtility
 
     public static void AddImage(ImageLayer imageLayer, SKCanvas canvas, Size2D targetSize, int? dpi = null)
     {
-        dpi ??= DrawImageDefaults.Dpi;
+        dpi ??= ImageLayerDefaults.Dpi;
 
         var img = imageLayer.Source;
         var options = imageLayer.Options ?? new ImageLayerOptions();

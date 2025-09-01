@@ -169,7 +169,7 @@ public class ImageService : IImageService
     /// <inheritdoc/>
     public IImageFile Draw(IEnumerable<ImageLayer> imageLayers, IImageFile? target = null, int? dpi = null)
     {
-        dpi ??= DrawImageDefaults.Dpi;
+        dpi ??= ImageLayerDefaults.Dpi;
         var imagesCollection = imageLayers.ToArray();
         using var targetImage = target?.ToBitmap() ?? DrawUtility.CreateSizedCanvas(imagesCollection);
         DrawUtility.Draw(imagesCollection, targetImage, dpi.Value);

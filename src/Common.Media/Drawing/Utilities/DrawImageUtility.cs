@@ -64,7 +64,7 @@ public static class DrawImageUtility
     /// </returns>
     public static Point2D GetCoordinate(ImageLayerOptions options, Size2D targetSize, Size2D imageSize, int? dpi)
     {
-        dpi ??= DrawImageDefaults.Dpi;
+        dpi ??= ImageLayerDefaults.Dpi;
 
         var inputPosition = options.Position ?? new Position2D();
         int? imgLeft = inputPosition.Left.HasValue ? DimensionsUtility.GetPixels(inputPosition.Left.Value, options.DimensionUnit, (int)targetSize.Width, dpi.Value) : null;

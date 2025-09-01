@@ -42,7 +42,7 @@ public static class DrawUtility
 
     public static void AddImageLayer(ImageLayer imageLayer, Graphics g1, Size2D targetSize, int? dpi = null)
     {
-        dpi ??= DrawImageDefaults.Dpi;
+        dpi ??= ImageLayerDefaults.Dpi;
 
         var img = imageLayer.Source;
         var options = imageLayer.Options ?? new ImageLayerOptions();
