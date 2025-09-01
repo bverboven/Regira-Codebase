@@ -52,8 +52,10 @@ public class BarcodeService : IBarcodeReader, IBarcodeWriter
         using var image = generator.GenerateImage();
         var width = input.Size.Width;
         var height = input.Size.Height;
-        using var resizedImg = GdiUtility.ResizeFixed(image, new Size((int)width, (int)height));
+        using var resizedImg = GdiUtility.ResizeFixed(image, new Size(width, height));
+#pragma warning disable CA1416
         return resizedImg.ToImageFile(ImageFormat.Jpeg);
+#pragma warning restore CA1416
     }
 
     SpireBarcodeType Convert(BarcodeFormat format)

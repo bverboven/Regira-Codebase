@@ -33,8 +33,8 @@ public static class DrawUtility
     {
         var images = imageLayers.AsList();
         var size = new Size(
-            (int)images.Max(x => x.Options?.Size?.Width ?? (x.Source.Size?.Width ?? 0)),
-            (int)images.Max(x => x.Options?.Size?.Height ?? (x.Source.Size?.Height ?? 0))
+            images.Max(x => x.Options?.Size?.Width ?? (x.Source.Size?.Width ?? 0)),
+            images.Max(x => x.Options?.Size?.Height ?? (x.Source.Size?.Height ?? 0))
         );
         return GdiUtility.Create(size);
     }

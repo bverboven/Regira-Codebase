@@ -180,7 +180,7 @@ public class PdfManager(IImageService imageService) : IPdfService
     }
     public IEnumerable<IImageFile> ToImages(IBinaryFile pdf, PdfImageOptions? options = null)
     {
-        var pageDimensions = new PageDimensions(((int?)options?.Size?.Width) ?? 1080, (int?)options?.Size?.Height ?? 1920);
+        var pageDimensions = new PageDimensions(options?.Size?.Width ?? 1080, options?.Size?.Height ?? 1920);
         using var docReader = DocLib.Instance.GetDocReader(pdf.GetBytes(), pageDimensions);
         var pageCount = docReader.GetPageCount();
         for (var pageIndex = 0; pageIndex < pageCount; pageIndex++)

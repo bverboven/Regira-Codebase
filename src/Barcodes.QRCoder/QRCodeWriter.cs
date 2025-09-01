@@ -31,7 +31,7 @@ public class QRCodeWriter : IQRCodeWriter
         var img = qrCode.GetGraphic(10, true).ToBinaryFile().ToImageFile();
         var width = input.Size.Width;
         var height = input.Size.Height;
-        using var resizedImg = GdiUtility.Resize(img.ToBitmap(), new Size((int)width, (int)height));
+        using var resizedImg = GdiUtility.Resize(img.ToBitmap(), new Size(width, height));
         return resizedImg.ToImageFile(ImageFormat.Jpeg);
     }
 }

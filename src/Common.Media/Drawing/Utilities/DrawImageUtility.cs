@@ -63,13 +63,13 @@ public static class DrawImageUtility
     public static ImagePoint GetCoordinate(ImageLayerOptions options, ImageSize targetSize, ImageSize imageSize)
     {
         var inputPosition = options.Offset ?? new ImageEdgeOffset();
-        int? imgLeft = inputPosition.Left;
-        int? imgRight = inputPosition.Right;
-        int? imgTop = inputPosition.Top;
-        int? imgBottom = inputPosition.Bottom;
-        int imgMargin = options.Margin;
+        var imgLeft = inputPosition.Left;
+        var imgRight = inputPosition.Right;
+        var imgTop = inputPosition.Top;
+        var imgBottom = inputPosition.Bottom;
+        var imgMargin = options.Margin;
 
-        int left = 0;
+        var left = 0;
         if (options.Position.HasFlag(ImagePosition.HCenter))
         {
             left = (int)(targetSize.Width / 2f - imageSize.Width / 2f);
@@ -83,7 +83,7 @@ public static class DrawImageUtility
             left += imgMargin;
         }
 
-        int top = 0;
+        var top = 0;
         if (options.Position.HasFlag(ImagePosition.VCenter))
         {
             top = (int)(targetSize.Height / 2f - imageSize.Height / 2f);
