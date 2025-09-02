@@ -13,7 +13,7 @@ public static class BarcodeImageLayerDtoExtensions
     {
         return new ImageLayer<BarcodeInput>
         {
-            Source = input.BarcodeOptions.ToBarcodeInput(),
+            Source = input.BarcodeOptions.ToBarcodeInput(targetSize, dpi),
             Options = input.DrawOptions?.ToImageLayerOptions(targetSize, dpi)
         };
     }

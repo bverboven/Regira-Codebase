@@ -11,6 +11,8 @@ public struct ImageSize(int width = 0, int height = 0) : IEquatable<ImageSize>
     public int Width { get; set; } = width;
     public int Height { get; set; } = height;
 
+    public static ImageSize Empty => new(0, 0);
+
 
     // enable multiply/division of dimensions
     public static ImageSize operator *(ImageSize dim, int n)

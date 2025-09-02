@@ -60,7 +60,7 @@ public class DimensionTests
         var topLeft = new ImagePoint(20, 10);
         var bottomRight = new ImagePoint(85, 195);
         var totalSize = new ImageSize(100, 200);
-        var pos = DrawImageUtility.ToPosition(topLeft, bottomRight, totalSize);
+        var pos = DrawImageUtility.ToOffset(topLeft, bottomRight, totalSize);
         Assert.That(pos.Top, Is.EqualTo(10));
         Assert.That(pos.Left, Is.EqualTo(20));
         Assert.That(pos.Bottom, Is.EqualTo(5));

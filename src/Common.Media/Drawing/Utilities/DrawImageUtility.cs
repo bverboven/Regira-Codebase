@@ -60,7 +60,7 @@ public static class DrawImageUtility
     /// <returns>
     /// A <see cref="ImagePoint"/> representing the calculated X and Y coordinates for the image's imgOffset.
     /// </returns>
-    public static ImagePoint GetCoordinate(ImageLayerOptions options, ImageSize targetSize, ImageSize imageSize)
+    public static ImagePoint GetPoint(ImageLayerOptions options, ImageSize targetSize, ImageSize imageSize)
     {
         var inputPosition = options.Offset ?? new ImageEdgeOffset();
         var imgLeft = inputPosition.Left;
@@ -162,6 +162,7 @@ public static class DrawImageUtility
         return new ImageSize((int)(source.Width * factor), (int)(source.Height * factor));
     }
 
+    
     /// <summary>
     /// Converts a <see cref="ImageEdgeOffset"/> to a pair of points representing the top-left and bottom-right corners
     /// within a given total size.
@@ -222,13 +223,24 @@ public static class DrawImageUtility
     /// A <see cref="ImageEdgeOffset"/> object representing the relative imgOffset defined by the given points
     /// and total size.
     /// </returns>
-    public static ImageEdgeOffset ToPosition(ImagePoint topLeft, ImagePoint bottomRight, ImageSize totalSize)
+    public static ImageEdgeOffset ToOffset(ImagePoint topLeft, ImagePoint bottomRight, ImageSize totalSize)
     {
         var br = new ImagePoint(totalSize.Width, totalSize.Height) - new ImagePoint(bottomRight.X, bottomRight.Y);
         return new ImageEdgeOffset(topLeft.Y, topLeft.X, br.Y, br.X);
     }
 
-    public static ImagePoint CalculatePoint(Point2D point, LengthUnit unit, ImageSize targetSize, int? dpi = null)
+    
+    /// <summary>
+    /// Calculates the position of a point in pixels based on the given coordinate, unit, target size, and DPI.
+    /// </summary>
+    /// <param name="point">The coordinate of the point to calculate.</param>
+    /// <param name="unit">The unit of measurement for the coordinate (e.g., points, inches, millimeters, percent).</param>
+    /// <param name="targetSize">The size of the target image in pixels.</param>
+    /// <param name="dpi">
+    /// The dots per inch (DPI) value to use for the calculation. If not specified, a default DPI value is used.
+    /// </param>
+    /// <returns>An <see cref="ImagePoint"/> representing the calculated position in pixels.</returns>
+    public static ImagePoint CalculatePoint(Coordinate2D point, LengthUnit unit, ImageSize targetSize, int? dpi = null)
     {
         dpi ??= ImageLayerDefaults.Dpi;
 
@@ -237,6 +249,24 @@ public static class DrawImageUtility
 
         return new ImagePoint(x, y);
     }
+    /// <summary>
+    /// Calculates the edge offset for an image based on the specified position, unit, target size, and DPI.
+    /// </summary>
+    /// <param name="offset">
+    /// The <see cref="Position2D"/> representing the top, left, bottom, and right offsets.
+    /// </param>
+    /// <param name="unit">
+    /// The <see cref="LengthUnit"/> used to interpret the offset values.
+    /// </param>
+    /// <param name="targetSize">
+    /// The <see cref="ImageSize"/> representing the dimensions of the target image.
+    /// </param>
+    /// <param name="dpi">
+    /// The dots per inch (DPI) value used for conversion. If not specified, a default DPI value is used.
+    /// </param>
+    /// <returns>
+    /// An <see cref="ImageEdgeOffset"/> representing the calculated pixel-based edge offsets.
+    /// </returns>
     public static ImageEdgeOffset CalculateEdgeOffset(Position2D offset, LengthUnit unit, ImageSize targetSize, int? dpi = null)
     {
         dpi ??= ImageLayerDefaults.Dpi;
@@ -256,6 +286,18 @@ public static class DrawImageUtility
 
         return new ImageEdgeOffset(top, left, bottom, right);
     }
+    /// <summary>
+    /// Calculates the size of an image based on the specified dimensions, unit, target size, and DPI.
+    /// </summary>
+    /// <param name="size">The original size of the image, represented as a <see cref="Size2D"/> structure. Can be <c>null</c>.</param>
+    /// <param name="unit">The unit of measurement for the size, such as points, inches, millimeters, or percent.</param>
+    /// <param name="targetSize">The target size of the image, represented as an <see cref="ImageSize"/> structure.</param>
+    /// <param name="dpi">
+    /// The dots per inch (DPI) value used for the calculation. If <c>null</c>, the default DPI value from <see cref="ImageLayerDefaults.Dpi"/> is used.
+    /// </param>
+    /// <returns>
+    /// A new <see cref="ImageSize"/> structure representing the calculated size of the image, or <c>null</c> if the input size is <c>null</c> or has zero width and height.
+    /// </returns>
     public static ImageSize? CalculateSize(Size2D? size, LengthUnit unit, ImageSize targetSize, int? dpi = null)
     {
         if (size is null or { Width: 0, Height: 0 })

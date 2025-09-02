@@ -3,8 +3,14 @@
 namespace Regira.Dimensions;
 
 /// <summary>
-/// Represents a two-dimensional position with optional top, left, bottom, and right coordinates.
+/// Represents a two-dimensional position with optional top, left, bottom, and right offsets.
 /// </summary>
+/// <remarks>
+/// This struct is commonly used to define positional offsets in two-dimensional space, 
+/// such as margins or padding, and supports implicit conversions from arrays of integers or floats.
+/// It works similarly to the CSS <c>position: absolute</c> property, allowing precise control over 
+/// the placement of elements relative to their container.
+/// </remarks>
 [DebuggerDisplay("Position2D = [{Top},{Left},{Bottom},{Right}]")]
 public struct Position2D(float? top, float? left, float? bottom, float? right) : IEquatable<Position2D>
 {

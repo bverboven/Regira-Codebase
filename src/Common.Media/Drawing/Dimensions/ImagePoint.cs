@@ -18,7 +18,7 @@ public readonly struct ImagePoint(int x, int y) : IEquatable<ImagePoint>
     public static ImagePoint operator -(ImagePoint c1, ImagePoint c2)
         => new(c1.X - c2.X, c1.Y - c2.Y);
 
-    public static implicit operator ImagePoint(Point2D point)
+    public static implicit operator ImagePoint(Coordinate2D point)
         => new((int)point.X, (int)point.Y);
     public static implicit operator ImagePoint(int[] point)
         => point.Length switch
