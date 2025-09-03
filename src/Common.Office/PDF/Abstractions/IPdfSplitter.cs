@@ -5,6 +5,6 @@ namespace Regira.Office.PDF.Abstractions;
 
 public interface IPdfSplitter
 {
-    IEnumerable<IMemoryFile> Split(IBinaryFile pdf, IEnumerable<PdfSplitRange> ranges);
-    int GetPageCount(IBinaryFile pdf);
+    IEnumerable<IMemoryFile> Split(IMemoryFile pdf, IEnumerable<PdfSplitRange> ranges);
+    int GetPageCount(IMemoryFile pdf);
 }

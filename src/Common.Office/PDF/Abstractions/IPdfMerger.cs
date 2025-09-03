@@ -4,5 +4,5 @@ namespace Regira.Office.PDF.Abstractions;
 
 public interface IPdfMerger
 {
-    IMemoryFile? Merge(IEnumerable<IBinaryFile> items);
+    IMemoryFile? Merge(IEnumerable<IMemoryFile> items);
 }

@@ -13,7 +13,7 @@ namespace Office.PDF.Testing.Abstractions;
 
 public static class PdfTestHelper
 {
-    static readonly string AssemblyDir = AssemblyUtility.GetAssemblyDirectory();
+    static readonly string AssemblyDir = AssemblyUtility.GetAssemblyDirectory()!;
     static readonly string AssetsDir = Path.Combine(AssemblyDir, "../../../", "Assets");
     private static string InputDir => Path.Combine(AssetsDir, "Input");
     static string OutputDir(object service) => Path.Combine(AssetsDir, "Output", service.GetType().Assembly.GetName().Name!.Split('.').Last());
@@ -38,7 +38,7 @@ public static class PdfTestHelper
             var splitPdf = splidPdfs[i];
             var splitPageCount = pdfSplitter.GetPageCount(splitPdf.ToBinaryFile());
             Assert.That(splitPageCount, Is.EqualTo(ranges[i].End - ranges[i].Start + 1));
-            await FileSystemUtility.SaveStream(Path.Combine(outputDir, $"split-{i + 1}.pdf"), splitPdf.GetStream());
+            await FileSystemUtility.SaveStream(Path.Combine(outputDir, $"split-{i + 1}.pdf"), splitPdf.GetStream()!);
         }
         // clean up
         foreach (var splitStream in splidPdfs)
@@ -70,11 +70,11 @@ public static class PdfTestHelper
             .Select(x => x.ToBinaryFile())
             .ToArray();
 
-        using var merged = pdfMerger.Merge(splidPdfs);
+        using var merged = pdfMerger.Merge(splidPdfs)!;
         var expectedPageCount = ranges.Sum(r => (r.End ?? pageCount) - r.Start + 1);
         var mergedPageCount = pdfSplitter.GetPageCount(merged.ToBinaryFile());
 
-        await FileSystemUtility.SaveStream(Path.Combine(outputDir, "split-merged.pdf"), merged.GetStream());
+        await FileSystemUtility.SaveStream(Path.Combine(outputDir, "split-merged.pdf"), merged.GetStream()!);
         Assert.That(mergedPageCount, Is.EqualTo(expectedPageCount));
         // clean up
         splidPdfs.Dispose();
@@ -89,14 +89,14 @@ public static class PdfTestHelper
         var pdfPath = Path.Combine(inputDir, inputFileName);
         await using var pdfStream = File.OpenRead(pdfPath);
         ImageSize size = new[] { 480, 600 };
-        var images = service.ToImages(pdfStream.ToBinaryFile(), new PdfImageOptions { Size = size });
+        var images = service.ToImages(pdfStream.ToBinaryFile(), new PdfToImagesOptions { Size = size });
 
         var count = 0;
         foreach (var image in images)
         {
             ClassicAssert.IsNotNull(image);
             var imgPath = Path.Combine(outputDir, $"pdf-img-{count + 1}.jpg");
-            await File.WriteAllBytesAsync(imgPath, image.Bytes);
+            await File.WriteAllBytesAsync(imgPath, image.Bytes!);
             //Assert.IsTrue(size.Width >= image.Size.Width);
             //Assert.AreEqual(size.Height, image.Size.Height);
             count++;

@@ -4,7 +4,7 @@ using Regira.IO.Extensions;
 using Regira.Office.Word.Abstractions;
 using Regira.Office.Word.Models;
 
-namespace Word.Mini;
+namespace Regira.Office.Word.Mini;
 
 public class WordCreator : IWordCreator
 {
@@ -28,9 +28,9 @@ public class WordCreator : IWordCreator
                     x.Name,
                     new MiniWordPicture
                     {
-                        Bytes = x.Bytes,
-                        Width = (int)(x.Size?.Width ?? 0),
-                        Height = (int)(x.Size?.Height ?? 0)
+                        Bytes = x.File?.GetBytes(),
+                        Width = x.Size?.Width ?? 0,
+                        Height = x.Size?.Height ?? 0
                     }
                 )) ?? []
             )

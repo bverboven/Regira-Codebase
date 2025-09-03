@@ -9,6 +9,7 @@ using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Media.Drawing.Services.Abstractions;
 using Regira.Office.MimeTypes;
 using Regira.Office.PDF.Abstractions;
+using Regira.Office.PDF.Defaults;
 using Regira.Office.PDF.Models;
 using ImageFormat = Regira.Media.Drawing.Enums.ImageFormat;
 
@@ -16,14 +17,14 @@ namespace Regira.Office.PDF.DocNET;
 
 public class PdfManager(IImageService imageService) : IPdfService
 {
-    public int GetPageCount(IBinaryFile pdf)
+    public int GetPageCount(IMemoryFile pdf)
     {
         using var docReader = DocLib.Instance.GetDocReader(pdf.GetBytes(), new PageDimensions());
         return docReader.GetPageCount();
     }
 
 
-    public IEnumerable<IMemoryFile> Split(IBinaryFile pdf, IEnumerable<PdfSplitRange> ranges)
+    public IEnumerable<IMemoryFile> Split(IMemoryFile pdf, IEnumerable<PdfSplitRange> ranges)
     {
         foreach (var range in ranges)
         {
@@ -52,7 +53,7 @@ public class PdfManager(IImageService imageService) : IPdfService
         var mergedBytes = DocLib.Instance.Merge(partlyMergedPdfs.ToArray());
         return mergedBytes.ToMemoryFile(ContentTypes.PDF);
     }
-    public IMemoryFile? Merge(IEnumerable<IBinaryFile> items)
+    public IMemoryFile? Merge(IEnumerable<IMemoryFile> items)
     {
         byte[]? resultBytes = null;
         foreach (var pdf in items)
@@ -66,7 +67,7 @@ public class PdfManager(IImageService imageService) : IPdfService
             : null;
         return ms?.ToMemoryFile(ContentTypes.PDF);
     }
-    public IMemoryFile? RemovePages(IBinaryFile pdf, IEnumerable<int> pages)
+    public IMemoryFile? RemovePages(IMemoryFile pdf, IEnumerable<int> pages)
     {
         var pagesToRemove = pages.ToArray();
 
@@ -110,13 +111,13 @@ public class PdfManager(IImageService imageService) : IPdfService
     }
 
 
-    public string GetText(IBinaryFile pdf)
+    public string GetText(IMemoryFile pdf)
     {
         var texts = GetTextPerPage(pdf)
             .Select(line => line.Trim());
         return string.Join(Environment.NewLine, texts);
     }
-    public IList<string> GetTextPerPage(IBinaryFile pdf)
+    public IList<string> GetTextPerPage(IMemoryFile pdf)
     {
         var pageDim = new PageDimensions();
         using var docReader = DocLib.Instance.GetDocReader(pdf.GetBytes(), pageDim);
@@ -132,7 +133,7 @@ public class PdfManager(IImageService imageService) : IPdfService
 
         return pageTexts;
     }
-    public IMemoryFile? RemoveEmptyPages(IBinaryFile pdf)
+    public IMemoryFile? RemoveEmptyPages(IMemoryFile pdf)
     {
         var texts = GetTextPerPage(pdf);
         var emptyPages = texts
@@ -178,9 +179,13 @@ public class PdfManager(IImageService imageService) : IPdfService
         var pdfBytes = DocLib.Instance.JpegToPdf(jpegImages);
         return pdfBytes.ToMemoryFile(ContentTypes.PDF);
     }
-    public IEnumerable<IImageFile> ToImages(IBinaryFile pdf, PdfImageOptions? options = null)
+    public IEnumerable<IImageFile> ToImages(IMemoryFile pdf, PdfToImagesOptions? options = null)
     {
-        var pageDimensions = new PageDimensions(options?.Size?.Width ?? 1080, options?.Size?.Height ?? 1920);
+        var pageDimensions = new PageDimensions(
+            options?.Size?.Width ?? PdfDefaults.ImageSize.Width,
+            options?.Size?.Height ?? PdfDefaults.ImageSize.Height
+        );
+
         using var docReader = DocLib.Instance.GetDocReader(pdf.GetBytes(), pageDimensions);
         var pageCount = docReader.GetPageCount();
         for (var pageIndex = 0; pageIndex < pageCount; pageIndex++)

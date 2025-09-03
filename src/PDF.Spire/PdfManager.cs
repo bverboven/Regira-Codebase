@@ -16,13 +16,13 @@ namespace Regira.Office.PDF.Spire;
 
 public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfTextExtractor
 {
-    public int GetPageCount(IBinaryFile pdfStream)
+    public int GetPageCount(IMemoryFile pdfStream)
     {
         using var doc = new PdfDocument(pdfStream.GetStream());
         return doc.Pages.Count;
     }
 
-    public IEnumerable<IMemoryFile> Split(IBinaryFile pdf, IEnumerable<PdfSplitRange> ranges)
+    public IEnumerable<IMemoryFile> Split(IMemoryFile pdf, IEnumerable<PdfSplitRange> ranges)
     {
         using var doc = new PdfDocument(pdf.GetStream());
         foreach (var range in ranges)
@@ -45,7 +45,7 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
         merged.Save(ms);
         return ms.ToMemoryFile(ContentTypes.PDF);
     }
-    public IMemoryFile Merge(IEnumerable<IBinaryFile> items)
+    public IMemoryFile Merge(IEnumerable<IMemoryFile> items)
     {
         var merged = new PdfDocument();
         foreach (var pdfStream in items)
@@ -60,7 +60,7 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
         return ToMemoryFile(merged);
     }
 
-    public string GetText(IBinaryFile pdf)
+    public string GetText(IMemoryFile pdf)
     {
         var doc = new PdfDocument(pdf.GetStream());
         var text = new StringBuilder(doc.Pages.Count);
@@ -73,7 +73,7 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
 
         return text.ToString();
     }
-    public IEnumerable<IImageFile> ToImages(IBinaryFile pdf, PdfImageOptions? options = null)
+    public IEnumerable<IImageFile> ToImages(IMemoryFile pdf, PdfToImagesOptions? options = null)
     {
         using var doc = new PdfDocument(pdf.GetStream());
         var pageCount = doc.Pages.Count;

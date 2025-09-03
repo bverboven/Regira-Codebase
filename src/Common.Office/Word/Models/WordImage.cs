@@ -1,11 +1,12 @@
-﻿using Regira.Dimensions;
+﻿using Regira.IO.Abstractions;
+using Regira.Media.Drawing.Dimensions;
 
 namespace Regira.Office.Word.Models;
 
 public class WordImage
 {
     public string Name { get; set; } = null!;
-    public Size2D? Size { get; set; }
-    public byte[]? Bytes { get; set; }
+    public ImageSize? Size { get; set; }
+    public IMemoryFile? File { get; set; }
     public HorizontalAlignment? HorizontalAlignment { get; set; }
 }

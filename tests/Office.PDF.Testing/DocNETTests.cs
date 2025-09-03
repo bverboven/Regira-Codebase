@@ -3,7 +3,6 @@ using Office.PDF.Testing.Abstractions;
 using Regira.Collections;
 using Regira.Drawing.SkiaSharp.Services;
 using Regira.IO.Extensions;
-using Regira.IO.Models;
 using Regira.IO.Storage.FileSystem;
 using Regira.Office.PDF.DocNET;
 using Regira.Office.PDF.Models;
@@ -101,9 +100,9 @@ Simple PDF File 2
 
 
     [Test]
-    public void Remove_Empty_Pages()
+    public async Task Remove_Empty_Pages()
     {
-        var bf = new BinaryFileItem { Path = Path.Combine(_inputDir, "has-empty-pages.pdf") };
+        var bf = (await FileSystemUtility.Parse(Path.Combine(_inputDir, "has-empty-pages.pdf")))!;
         var textsWithEmptyPages = _pdfService.GetTextPerPage(bf);
         using var resultPdf = _pdfService.RemoveEmptyPages(bf);
         var texts = _pdfService.GetTextPerPage(resultPdf!.ToBinaryFile());

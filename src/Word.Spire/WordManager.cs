@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
+using Regira.Media.Drawing.Dimensions;
 using Regira.Office.MimeTypes;
 using Regira.Office.Word.Abstractions;
 using Regira.Office.Word.Models;
@@ -24,7 +25,6 @@ using SpirePageOrientation = Spire.Doc.Documents.PageOrientation;
 using SpirePageSize = Spire.Doc.Documents.PageSize;
 using SpireParagraph = Spire.Doc.Documents.Paragraph;
 using Regira.Media.Drawing.Models.Abstractions;
-
 
 
 #if NETSTANDARD2_0
@@ -82,8 +82,8 @@ public class WordManager : IWordManager
             yield return new WordImage
             {
                 Name = pic.Title,
-                Size = new(pic.Width, pic.Height),
-                Bytes = pic.ImageBytes
+                Size = new ImageSize((int)pic.Width, (int)pic.Height),
+                File = pic.ImageBytes.ToBinaryFile()
             };
         }
     }
@@ -454,7 +454,7 @@ public class WordManager : IWordManager
                 var currentWidth = templateImage.Width;
                 var currentHeight = templateImage.Height;
 
-                templateImage.LoadImage(inputImage.Bytes);
+                templateImage.LoadImage(inputImage.File?.GetBytes());
                 // restore original width and height (overwritten by new image dimensions)
                 templateImage.Width = currentWidth;
                 templateImage.Height = currentHeight;

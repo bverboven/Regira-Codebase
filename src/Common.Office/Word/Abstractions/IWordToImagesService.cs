@@ -6,7 +6,7 @@ namespace Regira.Office.Word.Abstractions;
 /// <summary>
 /// Converts a document to a collection of images (1 image per page)
 /// </summary>
-public interface IImageRenderer
+public interface IWordToImagesService
 {
     IEnumerable<IImageFile> ToImages(WordTemplateInput input);
 }

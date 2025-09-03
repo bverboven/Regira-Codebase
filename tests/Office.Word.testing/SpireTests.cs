@@ -2,6 +2,7 @@
 using Regira.Collections;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
+using Regira.IO.Storage.FileSystem;
 using Regira.Office.Models;
 using Regira.Office.Word.Models;
 using Regira.Office.Word.Spire;
@@ -254,7 +255,7 @@ public class SpireTests
         input.Images.Add(new()
         {
             Name = "placeholder",// Alt Text
-            Bytes = await File.ReadAllBytesAsync(imgFile)
+            File = await FileSystemUtility.Parse(imgFile)
         });
         var mgr = new WordManager();
         using var outputFile = (await mgr.Create(input))
@@ -515,7 +516,7 @@ public class SpireTests
         doc2Input.Images.Add(new()
         {
             Name = "placeholder", // Alt Text
-            Bytes = await File.ReadAllBytesAsync(imgFile)
+            File = await FileSystemUtility.Parse(imgFile)
         });
 
         // create

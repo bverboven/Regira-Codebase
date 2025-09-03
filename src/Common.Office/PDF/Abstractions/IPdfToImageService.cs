@@ -6,9 +6,9 @@ namespace Regira.Office.PDF.Abstractions;
 
 public interface IPdfToImageService
 {
-    IEnumerable<IImageFile> ToImages(IBinaryFile pdf, PdfImageOptions? options = null);
+    IEnumerable<IImageFile> ToImages(IMemoryFile pdf, PdfToImagesOptions? options = null);
 }
 public interface IPdfToImageAsyncService
 {
-    IAsyncEnumerable<IImageFile> ToImagesAsync(IBinaryFile pdf, PdfImageOptions? options = null);
+    IAsyncEnumerable<IImageFile> ToImagesAsync(IMemoryFile pdf, PdfToImagesOptions? options = null);
 }

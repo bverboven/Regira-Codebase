@@ -1,4 +1,5 @@
-﻿using Regira.TreeList;
+﻿using Regira.IO.Extensions;
+using Regira.TreeList;
 using Spire.Doc;
 using Spire.Doc.Documents;
 using Spire.Doc.Fields;
@@ -46,7 +47,7 @@ internal static class ParagraphExtensions
 
         if (src.Image != null)
         {
-            var docPicture = target.AppendPicture(src.Image.Bytes);
+            var docPicture = target.AppendPicture(src.Image.File?.GetBytes());
             if (src.Image.Size.HasValue)
             {
                 docPicture.Width = src.Image.Size.Value.Width;

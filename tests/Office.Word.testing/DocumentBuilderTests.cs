@@ -36,7 +36,7 @@ public class DocumentBuilderTests
                 PageBreakAfter = true,
                 Image = i % 5 == 0 ? new WordImage
                 {
-                    Bytes = img,
+                    File = img.ToBinaryFile(),
                     HorizontalAlignment = (i % 10 == 0) ? HorizontalAlignment.Left : HorizontalAlignment.Right,
                     Size = new(300, 169)
                 } : null
@@ -68,7 +68,7 @@ public class DocumentBuilderTests
         Assert.That(file.Exists, Is.True);
         Assert.That(file.Length > 0, Is.True);
 
-        var content =await manager.GetText(new WordTemplateInput { Template = docFile });
+        var content = await manager.GetText(new WordTemplateInput { Template = docFile });
         Assert.That(content.Contains(headingParagraph.Text), Is.True);
     }
 }
