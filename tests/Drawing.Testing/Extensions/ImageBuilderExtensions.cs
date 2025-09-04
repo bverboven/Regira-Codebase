@@ -111,7 +111,7 @@ public static class ImageBuilderExtensions
 
         var drawBuilder = new ImageBuilder(service, imageCreators);
         using var resultImg = drawBuilder.Add(imageLayers)
-            .SetTargetObject(target)
+            .SetBaseLayer(target)
             .Build();
         await service.SaveImage(resultImg, "build-with-canvas.jpg");
 
@@ -126,75 +126,6 @@ public static class ImageBuilderExtensions
         AssertColor("#FF0000", service.GetPixelColor(resultImg, 20, 270));
         AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 399, 299));
     }
-    /*
-    public static async Task Build_WithTargetCanvas_In_Mm(this IImageService service)
-    {
-        var target = new CanvasImageOptions
-        {
-            Size = new ImageSize(40, 20),
-            DimensionUnit = LengthUnit.Millimeters,
-            Dpi = 300
-        };
-        var imageLayers = new IImageLayer[]
-        {
-            new ImageLayer
-            {
-                Source = await service.ReadImage("yellow-200x150.jpg"),
-                Options = new()
-                {
-                    Position = ImagePosition.HCenter | ImagePosition.VCenter,
-                    Size = new ImageSize(80, 50),
-                    DimensionUnit = LengthUnit.Percent
-                }
-            },
-            new ImageLayer
-            {
-                Source = await service.ReadImage("green-50x100.jpg"),
-                Options = new()
-                {
-                    Position = ImagePosition.Top | ImagePosition.Right,
-                    Size = new ImageSize(5, 10),
-                    DimensionUnit = LengthUnit.Millimeters
-                }
-            },
-            new ImageLayer
-            {
-                Source = await service.ReadImage("blue-50x50.jpg"),
-                Options = new()
-                {
-                    Position = ImagePosition.Absolute,
-                    Offset = new ImageEdgeOffset(20, null, null, 10),
-                    Size = new ImageSize(5, 5),
-                    DimensionUnit = LengthUnit.Millimeters
-                }
-            },
-            new ImageLayer
-            {
-                Source = await service.ReadImage("red-150x100.jpg"),
-                Options = new()
-                {
-                    Position = ImagePosition.Absolute,
-                    Offset = new ImageEdgeOffset(null, 10, 20, null),
-                    Size = new ImageSize(40, 33.33f),
-                    DimensionUnit = LengthUnit.Percent
-                }
-            }
-        };
-
-        var imageCreators = new List<IImageCreator>
-        {
-            new CanvasImageCreator(service),
-            new LabelImageCreator(service)
-        };
-
-
-        var drawBuilder = new ImageBuilder(service, imageCreators);
-        using var resultImg = drawBuilder.Add(imageLayers)
-            .SetTargetObject(target)
-            .Build();
-        await service.SaveImage(resultImg, "build-with-canvas-in-mm.jpg");
-    }
-    */
     public static async Task Build_WithTargetImage(this IImageService service)
     {
         using var target = await service.ReadImage("white-400x300.jpg");
@@ -246,7 +177,7 @@ public static class ImageBuilderExtensions
 
         var drawBuilder = new ImageBuilder(service, imageCreators);
         using var resultImg = drawBuilder
-            .SetTargetImage(target)
+            .SetBaseLayer(target)
             .Add(imageLayers)
             .Build();
         await service.SaveImage(resultImg, "build-with-target.jpg");
@@ -330,7 +261,7 @@ public static class ImageBuilderExtensions
 
         var drawBuilder = new ImageBuilder(service, imageCreators);
         using var resultImg = drawBuilder
-            .SetTargetImage(target)
+            .SetBaseLayer(target)
             .Add(imageLayers)
             .Build();
         await service.SaveImage(resultImg, "build-images.jpg");

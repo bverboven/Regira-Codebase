@@ -34,7 +34,7 @@ public static class SkiaUtility
         }
         return target;
     }
-    public static SKBitmap Rotate(SKBitmap src, float degrees, SKColor backgroundColor)
+    public static SKBitmap Rotate(SKBitmap src, int degrees, SKColor backgroundColor)
     {
         //degrees = (360 + degrees) % 360;
         var newSize = RotateUtility.CalculateSize(new[] { src.Width, src.Height }, degrees);

@@ -4,7 +4,7 @@ namespace Regira.Office.Word.Drawing;
 
 public class WordToImageLayerDto
 {
-    public byte[] File { get; set; } = null!;
+    public byte[] Bytes { get; set; } = null!;
     public int? Page { get; set; }
     public ImageLayerOptionsDto? DrawOptions { get; set; }
 }

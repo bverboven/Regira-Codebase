@@ -2,6 +2,6 @@
 
 public class ImageLayerDto
 {
-    public byte[] Image { get; set; } = null!;
+    public byte[] Bytes { get; set; } = null!;
     public ImageLayerOptionsDto? DrawOptions { get; set; }
 }

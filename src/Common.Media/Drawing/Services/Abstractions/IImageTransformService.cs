@@ -41,15 +41,15 @@ public interface IImageTransformService
     /// </param>
     /// <returns>The cropped image file.</returns>
     IImageFile CropRectangle(IImageFile input, ImageEdgeOffset rect);
-    
+
     /// <summary>
     /// Rotates the input image by the specified angle, with an optional background color.
     /// </summary>
     /// <param name="input">The source image file.</param>
-    /// <param name="angle">The rotation angle in degrees.</param>
+    /// <param name="degrees"></param>
     /// <param name="background">The background color to use for empty areas (optional).</param>
     /// <returns>The rotated image file.</returns>
-    IImageFile Rotate(IImageFile input, float angle, Color? background = null);
+    IImageFile Rotate(IImageFile input, int degrees, Color? background = null);
     /// <summary>
     /// Flips the input image horizontally.
     /// </summary>

@@ -7,7 +7,7 @@ namespace Regira.Office.PDF.Drawing;
 
 public class PdfToImageLayerOptions
 {
-    public IMemoryFile Pdf { get; set; } = null!;
+    public IMemoryFile File { get; set; } = null!;
     public int? Page { get; set; }
     public ImageSize? Size { get; set; } = PdfDefaults.ImageSize;
     public ImageFormat Format { get; set; } = PdfDefaults.ImageFormat;

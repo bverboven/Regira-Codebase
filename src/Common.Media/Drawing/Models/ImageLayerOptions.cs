@@ -10,6 +10,6 @@ public class ImageLayerOptions
     public int Margin { get; set; } = ImageLayerDefaults.Margin;
     public ImagePosition Position { get; set; } = ImageLayerDefaults.Position;
     public ImageEdgeOffset? Offset { get; set; } = ImageLayerDefaults.Offset;
-    public float Rotation { get; set; } = ImageLayerDefaults.Rotation;
+    public int Rotation { get; set; } = ImageLayerDefaults.Rotation;
     public float Opacity { get; set; } = ImageLayerDefaults.Opacity;
 }

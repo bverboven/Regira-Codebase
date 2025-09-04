@@ -13,26 +13,26 @@ namespace Regira.Office.PDF.Drawing;
 
 public static class PdfImageModelExtensions
 {
-    public static PdfToImageLayerOptions ToPdfToImageLayerOptions(this PdfImageLayerDto dto, ImageSize targetSize, int? dpi = null)
-    {
-        dpi ??= ImageLayerDefaults.Dpi;
-
-        return new PdfToImageLayerOptions
-        {
-            Pdf = dto.Pdf.ToMemoryFile(),
-            Page = dto.Page ?? 1,
-            Size = new Size2D(dto.DrawOptions?.Width ?? PdfDefaults.ImageSize.Width, dto.DrawOptions?.Height ?? PdfDefaults.ImageSize.Height)
-                .ToImageSize(dto.DrawOptions?.DimensionUnit ?? ImageLayerDefaults.DimensionUnit, targetSize, dpi.Value),
-            Format = dto.Format ?? PdfDefaults.ImageFormat
-        };
-    }
-
     public static IImageLayer ToImageLayer(this PdfImageLayerDto input, ImageSize targetSize, int? dpi)
     {
         return new ImageLayer<PdfToImageLayerOptions>
         {
             Source = input.ToPdfToImageLayerOptions(targetSize, dpi),
             Options = input.DrawOptions?.ToImageLayerOptions(targetSize, dpi)
+        };
+    }
+
+    public static PdfToImageLayerOptions ToPdfToImageLayerOptions(this PdfImageLayerDto dto, ImageSize targetSize, int? dpi = null)
+    {
+        dpi ??= ImageLayerDefaults.Dpi;
+
+        return new PdfToImageLayerOptions
+        {
+            File = dto.Bytes.ToMemoryFile(),
+            Page = dto.Page ?? 1,
+            Size = new Size2D(dto.DrawOptions?.Width ?? PdfDefaults.ImageSize.Width, dto.DrawOptions?.Height ?? PdfDefaults.ImageSize.Height)
+                .ToImageSize(dto.DrawOptions?.DimensionUnit ?? ImageLayerDefaults.DimensionUnit, targetSize, dpi.Value),
+            Format = dto.Format ?? PdfDefaults.ImageFormat
         };
     }
 

@@ -9,20 +9,21 @@ namespace Regira.Office.Word.Drawing;
 
 public static class WordImageModelExtensions
 {
-    public static WordToImageLayerOptions ToWordToImageLayerOptions(this WordToImageLayerDto dto)
-    {
-        return new WordToImageLayerOptions
-        {
-            File = dto.File.ToMemoryFile(),
-            Page = dto.Page ?? 1
-        };
-    }
     public static IImageLayer ToImageLayer(this WordToImageLayerDto input, ImageSize targetSize, int? dpi)
     {
         return new ImageLayer<WordToImageLayerOptions>
         {
             Source = input.ToWordToImageLayerOptions(),
             Options = input.DrawOptions?.ToImageLayerOptions(targetSize, dpi)
+        };
+    }
+
+    public static WordToImageLayerOptions ToWordToImageLayerOptions(this WordToImageLayerDto dto)
+    {
+        return new WordToImageLayerOptions
+        {
+            File = dto.Bytes.ToMemoryFile(),
+            Page = dto.Page ?? 1
         };
     }
 

@@ -6,6 +6,7 @@ using Regira.Media.Drawing.Enums;
 using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Media.Drawing.Services;
 using Regira.Media.Drawing.Utilities;
+using Regira.Utilities;
 
 namespace Regira.Media.Drawing.Models.DTO.Extensions;
 
@@ -30,7 +31,7 @@ public static class DtoExtensions
     {
         return new ImageLayer
         {
-            Source = dto.Image.ToBinaryFile().ToImageFile(),
+            Source = dto.Bytes.ToBinaryFile().ToImageFile(),
             Options = dto.DrawOptions?.ToImageLayerOptions(targetSize, dpi),
         };
     }
@@ -59,24 +60,34 @@ public static class DtoExtensions
         };
     }
 
-    public static CanvasImageOptions ToCanvasImageOptions(this CanvasImageLayerDto dto, ImageSize targetSize, int? dpi)
+    public static CanvasImageOptions ToCanvasImageOptions(this CanvasImageDto dto, ImageSize targetSize)
     {
-        dpi ??= ImageLayerDefaults.Dpi;
+        var dpi = dto.Dpi ?? ImageLayerDefaults.Dpi;
         var dimUnit = dto.DimensionUnit ?? ImageLayerDefaults.DimensionUnit;
 
         return new CanvasImageOptions
         {
-            Size = new Size2D(dto.Width, dto.Height).ToImageSize(dimUnit, targetSize, dpi.Value)!.Value,
-            BackgroundColor = dto.CanvasOptions?.BackgroundColor ?? ImageDefaults.BackgroundColor,
-            ImageFormat = dto.CanvasOptions?.ImageFormat ?? ImageDefaults.Format
+            Size = new Size2D(dto.Width, dto.Height).ToImageSize(dimUnit, targetSize, dpi)!.Value,
+            BackgroundColor = dto.BackgroundColor ?? ImageDefaults.BackgroundColor,
+            ImageFormat = dto.ImageFormat ?? ImageDefaults.Format
         };
     }
-    public static IImageLayer ToImageLayer(this CanvasImageLayerDto dto, ImageSize targetSize, int? dpi)
+    public static IImageLayer ToImageLayer(this CanvasImageLayerDto dto, ImageSize targetSize)
     {
+        var dpi = dto.Dpi ?? ImageLayerDefaults.Dpi;
+        var dimUnit = dto.DimensionUnit ?? ImageLayerDefaults.DimensionUnit;
+
         return new ImageLayer<CanvasImageOptions>
         {
-            Source = dto.ToCanvasImageOptions(targetSize, dpi),
-            Options = dto.DrawOptions?.ToImageLayerOptions(targetSize, dpi)
+            Source = dto.ToCanvasImageOptions(targetSize),
+            Options = new ImageLayerOptions
+            {
+                Margin = DimensionsUtility.GetPixels(dto.DrawOptions?.Margin ?? 0, dimUnit, Math.Max(targetSize.Width, targetSize.Height), dpi),
+                Position = dto.DrawOptions?.Position ?? ImagePosition.Absolute,
+                Offset = new Position2D(dto.DrawOptions?.Top, dto.DrawOptions?.Left, dto.DrawOptions?.Bottom, dto.DrawOptions?.Right).ToImageEdgeOffset(dimUnit, targetSize, dpi),
+                Rotation = dto.DrawOptions?.Rotation ?? ImageLayerDefaults.Rotation,
+                Opacity = dto.DrawOptions?.Opacity ?? ImageLayerDefaults.Opacity
+            }
         };
     }
 }

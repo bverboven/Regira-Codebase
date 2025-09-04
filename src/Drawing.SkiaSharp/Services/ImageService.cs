@@ -148,11 +148,11 @@ public class ImageService : IImageService
     }
 
     /// <inheritdoc/>
-    public IImageFile Rotate(IImageFile input, float angle, Color? background = null)
+    public IImageFile Rotate(IImageFile input, int degrees, Color? background = null)
     {
         var format = GetFormat(input);
         using var sourceBitmap = input.ToBitmap();
-        using var rotatedBitmap = SkiaUtility.Rotate(sourceBitmap, angle, (background ?? Color.Transparent).ToSkiaColor());
+        using var rotatedBitmap = SkiaUtility.Rotate(sourceBitmap, degrees, (background ?? Color.Transparent).ToSkiaColor());
         return rotatedBitmap.ToImageFile(format.ToSkiaFormat());
     }
     /// <inheritdoc/>

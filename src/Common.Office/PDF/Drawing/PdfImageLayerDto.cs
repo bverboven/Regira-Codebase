@@ -5,7 +5,7 @@ namespace Regira.Office.PDF.Drawing;
 
 public class PdfImageLayerDto
 {
-    public byte[] Pdf { get; set; } = null!;
+    public byte[] Bytes { get; set; } = null!;
     public int? Page { get; set; }
     public ImageFormat? Format { get; set; }
     public ImageLayerOptionsDto? DrawOptions { get; set; }

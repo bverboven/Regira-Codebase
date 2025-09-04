@@ -102,7 +102,7 @@ public static class GdiUtility
         return result;
     }
 
-    public static Image Rotate(Image img, float degrees, GdiColor? background)
+    public static Image Rotate(Image img, int degrees, GdiColor? background)
     {
         // https://www.codeproject.com/Articles/3319/Image-Rotation-in-NET
         if (img == null)

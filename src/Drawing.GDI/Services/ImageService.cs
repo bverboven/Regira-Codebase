@@ -111,10 +111,10 @@ public class ImageService : IImageService
     }
 
     /// <inheritdoc/>
-    public IImageFile Rotate(IImageFile input, float angle, Color? background = null)
+    public IImageFile Rotate(IImageFile input, int degrees, Color? background = null)
     {
         using var img = input.ToBitmap();
-        using var rotated = GdiUtility.Rotate(img, angle, background?.ToGdiColor());
+        using var rotated = GdiUtility.Rotate(img, degrees, background?.ToGdiColor());
         return rotated.ToImageFile(img.RawFormat);
     }
     /// <inheritdoc/>

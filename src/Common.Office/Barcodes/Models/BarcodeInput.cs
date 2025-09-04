@@ -1,4 +1,5 @@
 ﻿using Regira.Office.Barcodes.Abstractions;
+using Regira.Office.Barcodes.Defaults;
 
 namespace Regira.Office.Barcodes.Models;
 
@@ -6,7 +7,7 @@ public class BarcodeInput : BarcodeInputBase
 {
     public BarcodeInput()
     {
-        Format = BarcodeFormat.Code128;
+        Format = BarcodeDefaults.Format;
     }
 
     public static implicit operator BarcodeInput(string content) => new() { Content = content };

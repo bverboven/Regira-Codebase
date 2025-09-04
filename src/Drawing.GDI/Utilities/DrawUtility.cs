@@ -62,8 +62,8 @@ public static class DrawUtility
             : resizedImage;
 
         // Position
-        var coordinate = DrawImageUtility.GetPoint(options, targetSize, new ImageSize(resizedImage.Width, resizedImage.Height));
+        var coordinate = DrawImageUtility.GetPoint(options, targetSize, new ImageSize(rotatedImage.Width, rotatedImage.Height));
 
-        g1.DrawImage(resizedImage, coordinate.X, coordinate.Y);
+        g1.DrawImage(rotatedImage, coordinate.X, coordinate.Y);
     }
 }

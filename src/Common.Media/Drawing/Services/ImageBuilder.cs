@@ -11,38 +11,91 @@ public class ImageBuilder(IImageService service, IEnumerable<IImageCreator> imag
     private readonly IImageCreator[] _imageCreators = imageCreators.Concat([AggregateImageCreator.Create(service, imageCreators)]).ToArray();
     // ReSharper restore PossibleMultipleEnumeration
     private readonly List<IImageLayer> _items = [];
-    private object? _target;
+    private IImageLayer? _target;
+    
+    /// <summary>
+    /// Use an existing image as target to draw on
+    /// </summary>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    /// 
+    public ImageBuilder SetBaseLayer(IImageFile target)
+    {
+        _target = new ImageLayer { Source = target };
+        return this;
+    }
+    /// <summary>
+    /// Sets the base layer for the image builder using the specified <see cref="IImageLayer"/>.
+    /// </summary>
+    /// <param name="target">
+    /// The <see cref="IImageLayer"/> to be used as the base layer for drawing operations.
+    /// </param>
+    /// <returns>
+    /// The current instance of <see cref="ImageBuilder"/> to allow method chaining.
+    /// </returns>
+    public ImageBuilder SetBaseLayer(IImageLayer target)
+    {
+        _target = target;
+        return this;
+    }
+    /// <summary>
+    /// Sets the base layer for the image builder using the specified <see cref="CanvasImageOptions"/>.
+    /// </summary>
+    /// <param name="target">
+    /// The <see cref="CanvasImageOptions"/> instance that defines the size, background color, and image format
+    /// to be used as the base layer for drawing operations.
+    /// </param>
+    /// <returns>
+    /// The current instance of <see cref="ImageBuilder"/> to allow method chaining.
+    /// </returns>
+    public ImageBuilder SetBaseLayer(CanvasImageOptions target)
+    {
+        _target = new ImageLayer<CanvasImageOptions> { Source = target };
+        return this;
+    }
 
+    /// <summary>
+    /// Adds the specified image layers to the image builder.
+    /// </summary>
+    /// <param name="items">
+    /// An array of <see cref="IImageLayer"/> objects to be added to the image.
+    /// </param>
+    /// <returns>
+    /// The current instance of <see cref="ImageBuilder"/> to allow method chaining.
+    /// </returns>
     public ImageBuilder Add(params IImageLayer[] items)
     {
         _items.AddRange(items);
         return this;
     }
     /// <summary>
-    /// Use an existing image as target to draw on
+    /// Adds the specified collection of image layers to the image builder.
     /// </summary>
-    /// <param name="target"></param>
-    /// <returns></returns>
-    public ImageBuilder SetTargetImage(IImageFile target)
+    /// <param name="items">
+    /// A collection of <see cref="IImageLayer"/> objects to be added to the image.
+    /// </param>
+    /// <returns>
+    /// The current instance of <see cref="ImageBuilder"/> to allow method chaining.
+    /// </returns>
+    public ImageBuilder Add(IEnumerable<IImageLayer> items)
     {
-        _target = target;
+        _items.AddRange(items);
         return this;
     }
+
     /// <summary>
-    /// Target requires a matching <see cref="IImageCreator"/>> to be found
+    /// Builds and returns the resulting <see cref="IImageFile"/> by combining the base layer and additional image layers.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="target"></param>
-    /// <returns></returns>
-    public ImageBuilder SetTargetObject<T>(T target)
-    {
-        _target = target;
-        return this;
-    }
+    /// <returns>
+    /// The constructed <see cref="IImageFile"/> containing the combined image layers.
+    /// </returns>
+    /// <exception cref="Exception">
+    /// Thrown when the base layer cannot be converted into an <see cref="IImageFile"/>.
+    /// </exception>
     public IImageFile Build()
     {
         var target = _target != null
-            ? _imageCreators.GetImageFile(new ImageLayer<object> { Source = _target }) ?? throw new Exception($"Could not create IImageFile from {_target.GetType()}")
+            ? _imageCreators.GetImageFile(_target) ?? throw new Exception($"Could not create IImageFile from {_target.GetType()}")
             : null;
 
         var result = _items.Select(ToImageLayer)

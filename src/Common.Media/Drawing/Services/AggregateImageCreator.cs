@@ -24,7 +24,7 @@ public class AggregateImageCreator : ImageCreatorBase<AggregateImageOptions>
 
         if (input.Target != null)
         {
-            builder.SetTargetObject(input.Target);
+            builder.SetBaseLayer(input.Target);
         }
 
         builder.Add(input.ImageLayers.ToArray());

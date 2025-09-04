@@ -1,4 +1,4 @@
-﻿using Regira.Media.Drawing.Dimensions;
+﻿using Regira.Office.Barcodes.Defaults;
 
 namespace Regira.Office.Barcodes.Models;
 
@@ -7,7 +7,7 @@ public class QRCodeInput : BarcodeInput
     public QRCodeInput()
     {
         Format = BarcodeFormat.QRCode;
-        Size = new ImageSize(400, 400);
+        Size = BarcodeDefaults.Size.Width;
     }
 
     public static implicit operator QRCodeInput(string content) => new() { Content = content };
