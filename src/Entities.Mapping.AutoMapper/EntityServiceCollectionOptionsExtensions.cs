@@ -1,9 +1,10 @@
-﻿using System.Reflection;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
+using System.Reflection;
 
-namespace Regira.Entities.DependencyInjection.Mapping;
+namespace Regira.Entities.Mapping.AutoMapper;
 
 public static class EntityServiceCollectionOptionsExtensions
 {
@@ -19,6 +20,8 @@ public static class EntityServiceCollectionOptionsExtensions
         {
             options.Services.AddAutoMapper(assemblies);
         }
+
+        options.Services.AddTransient<IEntityMapper, EntityMapper>();
 
         return options;
     }

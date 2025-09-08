@@ -10,7 +10,6 @@ using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
-using Regira.Entities.Web.Attachments.Models;
 using Regira.IO.Storage.Abstractions;
 using Regira.Web.DependencyInjection;
 
@@ -259,13 +258,14 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             configure?.Invoke(e);
         });
 
-        Services
-            .AddAutoMapper(cfg =>
-            {
-                cfg.CreateMap<TAttachment, AttachmentDto<TAttachmentKey>>()
-                    .ReverseMap();
-                cfg.CreateMap<AttachmentInputDto<TAttachmentKey>, TAttachment>();
-            });
+        // ToDo: use AddAttachmentMapper
+        //Services
+        //    .AddAutoMapper(cfg =>
+        //    {
+        //        cfg.CreateMap<TAttachment, AttachmentDto<TAttachmentKey>>()
+        //            .ReverseMap();
+        //        cfg.CreateMap<AttachmentInputDto<TAttachmentKey>, TAttachment>();
+        //    });
         return this;
     }
     /// <summary>

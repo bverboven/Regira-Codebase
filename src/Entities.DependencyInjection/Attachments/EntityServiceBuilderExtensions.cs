@@ -33,10 +33,11 @@ public static class EntityServiceBuilderExtensions
             attachmentBuilder.AddDefaultAttachmentServices();
         }
 
-        if (!attachmentBuilder.HasEntityAttachmentMapping)
-        {
-            attachmentBuilder.WithDefaultMapping();
-        }
+        //if (!attachmentBuilder.HasEntityAttachmentMapping)
+        //{
+        //    throw new Exception("No mapping configuration");
+        //    //attachmentBuilder.WithDefaultMapping();
+        //}
 
         return attachmentBuilder;
     }
@@ -60,10 +61,11 @@ public static class EntityServiceBuilderExtensions
             attachmentBuilder.AddDefaultAttachmentServices();
         }
 
-        if (!attachmentBuilder.HasEntityAttachmentMapping)
-        {
-            attachmentBuilder.WithDefaultMapping();
-        }
+        //if (!attachmentBuilder.HasEntityAttachmentMapping)
+        //{
+        //    throw new Exception("No mapping configuration");
+        //    //attachmentBuilder.WithDefaultMapping();
+        //}
 
         return attachmentBuilder;
     }
@@ -91,10 +93,11 @@ public static class EntityServiceBuilderExtensions
             attachmentBuilder.AddDefaultAttachmentServices();
         }
 
-        if (!attachmentBuilder.HasEntityAttachmentMapping)
-        {
-            attachmentBuilder.WithDefaultMapping();
-        }
+        //if (!attachmentBuilder.HasEntityAttachmentMapping)
+        //{
+        //    throw new Exception("No mapping configuration");
+        //    //attachmentBuilder.WithDefaultMapping();
+        //}
 
         return attachmentBuilder;
     }

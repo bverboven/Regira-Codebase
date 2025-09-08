@@ -2,11 +2,6 @@
 using Regira.Entities.DependencyInjection.Primers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
-using Regira.Entities.EFcore.Normalizing;
-using Regira.Entities.EFcore.Primers;
-using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
-using Regira.Entities.Keywords;
-using Regira.Normalizing;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 

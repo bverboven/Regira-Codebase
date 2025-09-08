@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.Normalizers;
 using Regira.Entities.DependencyInjection.Preppers;
@@ -25,34 +24,7 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
     public bool HasService<TService>() => Services.Any(s => s.ServiceType == typeof(TService));
 
     // Entity mapping
-    /// <summary>
-    /// Adds AutoMapper maps for
-    /// <list type="bullet">
-    ///     <item><typeparamref name="TEntity"/> -&gt; <see cref="TDto"/></item>
-    ///     <item><see cref="TDto"/> -&gt; <typeparamref name="TEntity"/></item>
-    ///     <item><see cref="TInputDto"/> -&gt; <typeparamref name="TEntity"/></item>
-    /// </list>
-    /// </summary>
-    /// <typeparam name="TDto"></typeparam>
-    /// <typeparam name="TInputDto"></typeparam>
-    /// <returns></returns>
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddMapping<TDto, TInputDto>()
-        where TDto : class
-        where TInputDto : class
-    {
-        Services.AddAutoMapper(cfg =>
-        {
-            cfg.CreateMap<TEntity, TDto>();
-            cfg.CreateMap<TInputDto, TEntity>();
-        });
-        return this;
-    }
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddMappingProfile<TProfile>()
-        where TProfile : Profile, new()
-    {
-        Services.AddAutoMapper(cfg => cfg.AddProfile<TProfile>());
-        return this;
-    }
+    // ToDo: use AddMapping & AddMappingProfile
 
     // Entity service
     /// <summary>

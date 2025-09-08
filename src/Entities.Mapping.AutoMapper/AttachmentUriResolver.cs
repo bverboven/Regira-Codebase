@@ -5,7 +5,7 @@ using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.Models.Abstractions;
 
-namespace Regira.Entities.Web.Attachments.Mappings;
+namespace Regira.Entities.Mapping.AutoMapper;
 
 public class AttachmentUriResolver<TEntity, TDto>(LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor)
     : AttachmentUriResolver<TEntity, int, int, int, Attachment, TDto>(linkGenerator, httpContextAccessor)

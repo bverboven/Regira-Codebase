@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -49,7 +48,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
 
         try
         {
-            var mapper = HttpContext.RequestServices.GetRequiredService<IMapper>();
+            var mapper = HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
             var item = mapper.Map<TEntity>(model);
 
             var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, int>>();
@@ -127,7 +126,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
         sw.Start();
 
         var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, int>>();
-        var mapper = HttpContext.RequestServices.GetRequiredService<IMapper>();
+        var mapper = HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
 
         var item = mapper.Map<TEntity>(model);
         item.ObjectId = objectId;
@@ -148,7 +147,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
         sw.Start();
 
         var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, int>>();
-        var mapper = HttpContext.RequestServices.GetRequiredService<IMapper>();
+        var mapper = HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
 
         var item = (await service.List(new { id }, new PagingInfo { PageSize = 1 })).SingleOrDefault();
         if (item == null)

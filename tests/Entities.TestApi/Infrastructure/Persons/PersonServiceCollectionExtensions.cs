@@ -31,7 +31,7 @@ public static class PersonServiceCollectionExtensions
                 });
                 e.AddNormalizer<PersonNormalizer>();
                 e.HasManager<PersonManager>();
-                e.AddMapping<PersonDto, PersonInputDto>();
+                //e.AddMapping<TContext, Person, int, PersonDto, PersonInputDto>();
             })
             //.For<Person>(builder =>
             //{

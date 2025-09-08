@@ -18,10 +18,9 @@ public static class CourseServiceCollectionExtensions
             {
                 e.Includes((query, _) => query.IncludeEntityAttachments());
                 e.AddQueryFilter<CourseQueryFilter>();
-                e.AddMapping<CourseDto, CourseInputDto>();
+                //e.AddMapping<TContext, Course, int, CourseDto, CourseInputDto>();
                 e.HasAttachments(
-                    course => course.Attachments,
-                    a => a.AddMapping<CourseAttachmentDto, CourseAttachmentInputDto>()
+                    course => course.Attachments//, a => a.AddMapping<TContext, CourseAttachment, int, CourseAttachmentDto, CourseAttachmentInputDto>()
                 );
                 // extra person filter
                 e.AddTransient<IFilteredQueryBuilder<Person, int, PersonSearchObject>, CoursePersonQueryFilter>();

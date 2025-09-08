@@ -17,18 +17,18 @@
     <ProjectReference Include="..\Common.Entities\Common.Entities.csproj" />
     <ProjectReference Include="..\Common.Web\Common.Web.csproj" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+  <!--<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="AutoMapper">
       <Version>10.1.1</Version>
     </PackageReference>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection">
       <Version>8.1.1</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+  </ItemGroup>-->
+  <!--<ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
     <PackageReference Include="AutoMapper" Version="13.0.1" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0' or '$(TargetFramework)' == 'net9.0'">
+  </ItemGroup>-->
+  <!--<ItemGroup Condition="'$(TargetFramework)' == 'net8.0' or '$(TargetFramework)' == 'net9.0'">
     <PackageReference Include="AutoMapper" Version="14.0.0" />
-  </ItemGroup>
+  </ItemGroup>-->
 </Project>

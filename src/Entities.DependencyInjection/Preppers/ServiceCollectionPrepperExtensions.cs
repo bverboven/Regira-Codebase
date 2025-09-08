@@ -34,7 +34,7 @@ public static class ServiceCollectionPrepperExtensions
 
     public static IServiceCollection AddPrepper<TEntity>(this IServiceCollection services, Action<TEntity> prepareFunc)
         where TEntity : class
-        => services.AddTransient<IEntityPrepper>(p => new EntityPrepper<TEntity>(item =>
+        => services.AddTransient<IEntityPrepper>(_ => new EntityPrepper<TEntity>(item =>
         {
             prepareFunc(item);
             return Task.CompletedTask;

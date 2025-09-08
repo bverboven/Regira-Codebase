@@ -3,7 +3,6 @@ using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.Keywords;
 using Regira.Normalizing;
-using static Regira.Entities.DependencyInjection.ServiceBuilders.Extensions.EntityServiceCollectionNormalizingExtensions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 
