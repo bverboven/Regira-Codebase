@@ -1,4 +1,6 @@
-﻿using Regira.Entities.DependencyInjection.Normalizers;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Regira.Entities.Abstractions;
+using Regira.Entities.DependencyInjection.Normalizers;
 using Regira.Entities.DependencyInjection.Primers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
@@ -31,6 +33,19 @@ public static class EntityServiceCollectionExtensions
         }
         options.AddDefaultGlobalQueryFilters();
 
+        return options;
+    }
+
+    public static EntityServiceCollectionOptions UseMapper<TMapperImplementation>(this EntityServiceCollectionOptions options)
+        where TMapperImplementation : class, IEntityMapper
+    {
+        options.Services.AddTransient<IEntityMapper, TMapperImplementation>();
+        return options;
+    }
+    public static EntityServiceCollectionOptions UseMapper<TMapperImplementation>(this EntityServiceCollectionOptions options, Func<IServiceProvider, IEntityMapper> factory)
+        where TMapperImplementation : class, IEntityMapper
+    {
+        options.Services.AddTransient(factory);
         return options;
     }
 }

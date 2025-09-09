@@ -196,6 +196,8 @@ public class PersonControllerTests : IDisposable
         var coursesResponse = await client.GetAsync("/courses");
         var coursesResult = await coursesResponse.Content.ReadFromJsonAsync<ListResult<CourseDto>>();
 
+        var response = await coursesResponse.Content.ReadAsStringAsync();
+
         var course1 = coursesResult!.Items[0];
         var course2 = coursesResult.Items[1];
         var course3 = coursesResult.Items[2];

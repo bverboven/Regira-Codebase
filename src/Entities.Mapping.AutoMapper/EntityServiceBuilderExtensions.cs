@@ -35,6 +35,12 @@ public static class EntityServiceBuilderExtensions
         });
         return builder;
     }
+
+    public static IServiceCollection AddMapping<TEntity, TDto, TInputDto>(this IServiceCollection services)
+        where TEntity : class, IEntity<int>
+        where TDto : class
+        where TInputDto : class
+        => AddMapping<TEntity, int, TDto, TInputDto>(services);
     public static IServiceCollection AddMapping<TEntity, TKey, TDto, TInputDto>(this IServiceCollection services)
         where TEntity : class, IEntity<TKey>
         where TDto : class

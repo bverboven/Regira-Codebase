@@ -31,25 +31,7 @@ public static class PersonServiceCollectionExtensions
                 });
                 e.AddNormalizer<PersonNormalizer>();
                 e.HasManager<PersonManager>();
-                //e.AddMapping<TContext, Person, int, PersonDto, PersonInputDto>();
-            })
-            //.For<Person>(builder =>
-            //{
-            //    builder
-            //        .AddMapping<PersonDto, PersonInputDto>()
-            //        .WithSearchObject<PersonSearchObject>()
-            //        .Complex<PersonSortBy, PersonIncludes>()
-            //
-            //        .AddNormalizer<PersonNormalizer>()
-            //        .HasManager<PersonManager>()
-            //        .Related(x => x.Departments)
-            //        .AddQueryFilter<PersonQueryFilter>()
-            //        .SortBy<PersonSortQueryBuilder>()
-            //        .Includes<PersonIncludableQueryBuilder>()
-            //        .HasAttachments<TContext, Person, PersonAttachment>()
-            //        .Build();
-            //})
-            ;
+            });
 
         return services;
     }

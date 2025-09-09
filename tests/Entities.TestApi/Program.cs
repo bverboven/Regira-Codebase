@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Regira.DAL.EFcore.Services;
+using Regira.Entities.Abstractions;
+using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
@@ -14,10 +16,13 @@ using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
+using Regira.Entities.Mapping.AutoMapper;
 using Regira.Entities.Models.Abstractions;
+using Regira.Entities.Web.Attachments.Models;
 using Regira.IO.Storage.FileSystem;
 using Serilog;
 using Serilog.Events;
+using System.Reflection;
 using System.Text.Json.Serialization;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
@@ -50,7 +55,8 @@ builder.Host.UseSerilog((_, config) => config
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
 );
 
-builder.Services.AddProblemDetails();
+builder.Services
+    .AddProblemDetails();
 
 builder.Services
     .AddHttpContextAccessor()
@@ -66,8 +72,8 @@ builder.Services
     {
         o.UseDefaults();
         o.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
-        //o.UseAutoMapper([typeof(Person).Assembly]);
         o.AddPrepper<IHasAggregateKey>(x => x.AggregateKey ??= Guid.NewGuid());
+        //o.UseAutoMapper();
     })
     // Entity types
     .AddEnrollments()
@@ -91,6 +97,34 @@ builder.Services
         db.CourseAttachments.ToDescriptor<Course>(),
         db.PersonAttachments.ToDescriptor<Person>()
     ]);
+builder.Services
+    .AddTransient<IEntityMapper, EntityMapper>()
+    .AddTransient<AttachmentUriResolver<CourseAttachment, CourseAttachmentDto>>()
+    .AddAutoMapper((_, e) =>
+    {
+        e.CreateMap<Attachment, AttachmentDto>();
+        e.CreateMap<Attachment, AttachmentDto<int>>();
+        e.CreateMap(typeof(Attachment<>), typeof(AttachmentDto<>));
+        e.CreateMap<AttachmentInputDto, Attachment>();
+        e.CreateMap<AttachmentInputDto<int>, Attachment>();
+        e.CreateMap(typeof(AttachmentInputDto<>), typeof(Attachment<>));
+        e.CreateMap<EntityAttachment, EntityAttachmentDto>();
+        e.CreateMap(typeof(EntityAttachment<,,,>), typeof(EntityAttachmentDto<,,>));
+        e.CreateMap<EntityAttachmentInputDto, EntityAttachment>();
+        e.CreateMap(typeof(EntityAttachmentInputDto<,,>), typeof(EntityAttachment<,,,>));
+
+        e.CreateMap<Course, CourseDto>();
+        e.CreateMap<CourseInputDto, Course>();
+        e.CreateMap<CourseAttachment, CourseAttachmentDto>();
+        e.CreateMap<CourseAttachmentInputDto, CourseAttachment>();
+
+        e.CreateMap<Department, DepartmentDto>();
+        e.CreateMap<DepartmentInputDto, Department>();
+
+        e.CreateMap<Person, PersonDto>();
+        e.CreateMap<PersonInputDto, Person>();
+    }, Array.Empty<Assembly>());
+
 
 var app = builder.Build();
 

@@ -8,7 +8,6 @@
         <UserSecretsId>a148955e-1052-48e7-a8da-4534748de1c4</UserSecretsId>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="AutoMapper" Version="14.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.8" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
@@ -17,6 +16,7 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
     </ItemGroup>
     <ItemGroup>
+        <ProjectReference Include="..\..\src\Entities.Mapping.AutoMapper\Entities.Mapping.AutoMapper.csproj" />
         <ProjectReference Include="..\Testing.Library\_Testing.Library.csproj" />
         <ProjectReference Include="..\..\src\Entities.DependencyInjection\Entities.DependencyInjection.csproj" />
         <ProjectReference Include="..\..\src\IO.Storage.Azure\IO.Storage.Azure.csproj" />
