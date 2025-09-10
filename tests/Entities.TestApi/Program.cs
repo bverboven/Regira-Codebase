@@ -26,6 +26,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
+using AutoEntityMapper = Regira.Entities.Mapping.AutoMapper.EntityMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,8 +98,11 @@ builder.Services
         db.CourseAttachments.ToDescriptor<Course>(),
         db.PersonAttachments.ToDescriptor<Person>()
     ]);
+
+// mapping
 builder.Services
-    .AddTransient<IEntityMapper, EntityMapper>()
+    .AddTransient<IEntityMapper, AutoEntityMapper>()
+    .AddTransient<AttachmentUriResolver<EntityAttachment, EntityAttachmentDto>>()
     .AddTransient<AttachmentUriResolver<CourseAttachment, CourseAttachmentDto>>()
     .AddAutoMapper((_, e) =>
     {
