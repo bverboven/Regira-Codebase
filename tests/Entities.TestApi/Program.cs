@@ -108,14 +108,22 @@ builder.Services
         e.CreateMap<AttachmentInputDto, Attachment>();
         e.CreateMap<AttachmentInputDto<int>, Attachment>();
         e.CreateMap(typeof(AttachmentInputDto<>), typeof(Attachment<>));
-        e.CreateMap<EntityAttachment, EntityAttachmentDto>();
+        e.CreateMap<EntityAttachment, EntityAttachmentDto>()
+            .ForMember(
+                x => x.Uri,
+                opt => opt.MapFrom<AttachmentUriResolver<EntityAttachment, EntityAttachmentDto>>()
+            );
         e.CreateMap(typeof(EntityAttachment<,,,>), typeof(EntityAttachmentDto<,,>));
         e.CreateMap<EntityAttachmentInputDto, EntityAttachment>();
         e.CreateMap(typeof(EntityAttachmentInputDto<,,>), typeof(EntityAttachment<,,,>));
 
         e.CreateMap<Course, CourseDto>();
         e.CreateMap<CourseInputDto, Course>();
-        e.CreateMap<CourseAttachment, CourseAttachmentDto>();
+        e.CreateMap<CourseAttachment, CourseAttachmentDto>()
+            .ForMember(
+                x => x.Uri,
+                opt => opt.MapFrom<AttachmentUriResolver<CourseAttachment, CourseAttachmentDto>>()
+            );
         e.CreateMap<CourseAttachmentInputDto, CourseAttachment>();
 
         e.CreateMap<Department, DepartmentDto>();
