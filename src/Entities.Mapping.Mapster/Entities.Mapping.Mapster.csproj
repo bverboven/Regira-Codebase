@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
+	<LangVersion>latest</LangVersion>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<Authors>B.Verboven</Authors>
+	<RootNamespace>Regira.Entities.Mapping.Mapster</RootNamespace>
+	<PackageId>Regira.Entities.Mapping.Mapster</PackageId>
+	<AssemblyName>Regira.Entities.Mapping.Mapster</AssemblyName>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<NoWarn>1701;1702;1591</NoWarn>
+	<Version>4.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mapster" Version="7.4.0" />
+    <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="..\Entities.DependencyInjection\Entities.DependencyInjection.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -3,6 +3,7 @@ using Entities.TestApi.Infrastructure.Courses;
 using Entities.TestApi.Infrastructure.Departments;
 using Entities.TestApi.Infrastructure.Enrollments;
 using Entities.TestApi.Infrastructure.Persons;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -16,17 +17,18 @@ using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
+using Regira.Entities.Mapping.Mapster;
 using Regira.Entities.Mapping.AutoMapper;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Attachments.Models;
 using Regira.IO.Storage.FileSystem;
 using Serilog;
 using Serilog.Events;
-using System.Reflection;
 using System.Text.Json.Serialization;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 using AutoEntityMapper = Regira.Entities.Mapping.AutoMapper.EntityMapper;
+using MapsterEntityMapper = Regira.Entities.Mapping.Mapster.EntityMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,42 +102,93 @@ builder.Services
     ]);
 
 // mapping
+
+// Mapster
 builder.Services
-    .AddTransient<IEntityMapper, AutoEntityMapper>()
-    .AddTransient<AttachmentUriResolver<EntityAttachment, EntityAttachmentDto>>()
-    .AddTransient<AttachmentUriResolver<CourseAttachment, CourseAttachmentDto>>()
-    .AddAutoMapper((_, e) =>
-    {
-        e.CreateMap<Attachment, AttachmentDto>();
-        e.CreateMap<Attachment, AttachmentDto<int>>();
-        e.CreateMap(typeof(Attachment<>), typeof(AttachmentDto<>));
-        e.CreateMap<AttachmentInputDto, Attachment>();
-        e.CreateMap<AttachmentInputDto<int>, Attachment>();
-        e.CreateMap(typeof(AttachmentInputDto<>), typeof(Attachment<>));
-        e.CreateMap<EntityAttachment, EntityAttachmentDto>()
-            .ForMember(
-                x => x.Uri,
-                opt => opt.MapFrom<AttachmentUriResolver<EntityAttachment, EntityAttachmentDto>>()
-            );
-        e.CreateMap(typeof(EntityAttachment<,,,>), typeof(EntityAttachmentDto<,,>));
-        e.CreateMap<EntityAttachmentInputDto, EntityAttachment>();
-        e.CreateMap(typeof(EntityAttachmentInputDto<,,>), typeof(EntityAttachment<,,,>));
+    .AddTransient<IEntityMapper, MapsterEntityMapper>()
+    .AddMapster();
+builder.Services.AddTransient<AttachmentUriResolver<EntityAttachment>>();
+builder.Services.AddTransient<AttachmentUriResolver<CourseAttachment>>();
+{
+    var config = new TypeAdapterConfig();
+    // Generic mappings
+    config.NewConfig<Attachment, AttachmentDto>();
+    config.NewConfig<Attachment, AttachmentDto<int>>();
+    config.NewConfig(typeof(Attachment<>), typeof(AttachmentDto<>));
 
-        e.CreateMap<Course, CourseDto>();
-        e.CreateMap<CourseInputDto, Course>();
-        e.CreateMap<CourseAttachment, CourseAttachmentDto>()
-            .ForMember(
-                x => x.Uri,
-                opt => opt.MapFrom<AttachmentUriResolver<CourseAttachment, CourseAttachmentDto>>()
-            );
-        e.CreateMap<CourseAttachmentInputDto, CourseAttachment>();
+    config.NewConfig<AttachmentInputDto, Attachment>();
+    config.NewConfig<AttachmentInputDto<int>, Attachment>();
+    config.NewConfig(typeof(AttachmentInputDto<>), typeof(Attachment<>));
 
-        e.CreateMap<Department, DepartmentDto>();
-        e.CreateMap<DepartmentInputDto, Department>();
+    //config.NewConfig<EntityAttachment, EntityAttachmentDto>()
+    //    .Map(dest => dest.Uri,
+    //        src => src,
+    //        (src, ctx) => ctx.ServiceProvider.GetRequiredService<AttachmentUriResolver<EntityAttachment>>().Resolve(src));
 
-        e.CreateMap<Person, PersonDto>();
-        e.CreateMap<PersonInputDto, Person>();
-    }, Array.Empty<Assembly>());
+    config.NewConfig(typeof(EntityAttachment<,,,>), typeof(EntityAttachmentDto<,,>));
+    config.NewConfig<EntityAttachmentInputDto, EntityAttachment>();
+    config.NewConfig(typeof(EntityAttachmentInputDto<,,>), typeof(EntityAttachment<,,,>));
+
+    // Course
+    config.NewConfig<Course, CourseDto>();
+    config.NewConfig<CourseInputDto, Course>();
+
+    //config.NewConfig<CourseAttachment, CourseAttachmentDto>()
+    //    .AfterMapping((src, dest, ctx) =>
+    //    {
+    //        var resolver = ctx.ServiceProvider
+    //            .GetRequiredService<AttachmentUriResolver<CourseAttachment, CourseAttachmentDto>>();
+    //        dest.Uri = resolver.Resolve(src);
+    //    });
+
+    config.NewConfig<CourseAttachmentInputDto, CourseAttachment>();
+
+    // Department
+    config.NewConfig<Department, DepartmentDto>();
+    config.NewConfig<DepartmentInputDto, Department>();
+
+    // Person
+    config.NewConfig<Person, PersonDto>();
+    config.NewConfig<PersonInputDto, Person>();
+}
+
+// AutoMapper
+//builder.Services
+//    .AddTransient<IEntityMapper, AutoEntityMapper>()
+//    .AddTransient<AttachmentUriResolver<EntityAttachment, EntityAttachmentDto>>()
+//    .AddTransient<AttachmentUriResolver<CourseAttachment, CourseAttachmentDto>>()
+//    .AddAutoMapper((_, e) =>
+//    {
+//        e.CreateMap<Attachment, AttachmentDto>();
+//        e.CreateMap<Attachment, AttachmentDto<int>>();
+//        e.CreateMap(typeof(Attachment<>), typeof(AttachmentDto<>));
+//        e.CreateMap<AttachmentInputDto, Attachment>();
+//        e.CreateMap<AttachmentInputDto<int>, Attachment>();
+//        e.CreateMap(typeof(AttachmentInputDto<>), typeof(Attachment<>));
+//        e.CreateMap<EntityAttachment, EntityAttachmentDto>()
+//            .ForMember(
+//                x => x.Uri,
+//                opt => opt.MapFrom<AttachmentUriResolver<EntityAttachment, EntityAttachmentDto>>()
+//            );
+//        e.CreateMap(typeof(EntityAttachment<,,,>), typeof(EntityAttachmentDto<,,>));
+//        e.CreateMap<EntityAttachmentInputDto, EntityAttachment>();
+//        e.CreateMap(typeof(EntityAttachmentInputDto<,,>), typeof(EntityAttachment<,,,>));
+
+//        e.CreateMap<Course, CourseDto>();
+//        e.CreateMap<CourseInputDto, Course>();
+//        e.CreateMap<CourseAttachment, CourseAttachmentDto>()
+//            .ForMember(
+//                x => x.Uri,
+//                opt => opt.MapFrom<AttachmentUriResolver<CourseAttachment, CourseAttachmentDto>>()
+//            );
+//        e.CreateMap<CourseAttachmentInputDto, CourseAttachment>();
+
+//        e.CreateMap<Department, DepartmentDto>();
+//        e.CreateMap<DepartmentInputDto, Department>();
+
+//        e.CreateMap<Person, PersonDto>();
+//        e.CreateMap<PersonInputDto, Person>();
+//    }, Array.Empty<Assembly>());
 
 
 var app = builder.Build();

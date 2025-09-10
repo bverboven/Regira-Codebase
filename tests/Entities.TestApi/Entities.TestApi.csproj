@@ -17,6 +17,7 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\Entities.Mapping.AutoMapper\Entities.Mapping.AutoMapper.csproj" />
+        <ProjectReference Include="..\..\src\Entities.Mapping.Mapster\Entities.Mapping.Mapster.csproj" />
         <ProjectReference Include="..\Testing.Library\_Testing.Library.csproj" />
         <ProjectReference Include="..\..\src\Entities.DependencyInjection\Entities.DependencyInjection.csproj" />
         <ProjectReference Include="..\..\src\IO.Storage.Azure\IO.Storage.Azure.csproj" />

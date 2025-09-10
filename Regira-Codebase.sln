@@ -254,6 +254,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PDF.PockyBum522", "src\PDF.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities.Mapping.AutoMapper", "src\Entities.Mapping.AutoMapper\Entities.Mapping.AutoMapper.csproj", "{7D22D6AC-0B8C-EA80-1763-E2D49950A740}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities.Mapping.Mapster", "src\Entities.Mapping.Mapster\Entities.Mapping.Mapster.csproj", "{3D2783DC-2649-4324-96BE-14DAD47D732C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -644,6 +646,10 @@ Global
 		{7D22D6AC-0B8C-EA80-1763-E2D49950A740}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D22D6AC-0B8C-EA80-1763-E2D49950A740}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D22D6AC-0B8C-EA80-1763-E2D49950A740}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D2783DC-2649-4324-96BE-14DAD47D732C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D2783DC-2649-4324-96BE-14DAD47D732C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D2783DC-2649-4324-96BE-14DAD47D732C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D2783DC-2649-4324-96BE-14DAD47D732C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -767,6 +773,7 @@ Global
 		{2C98B4F8-928D-47D6-ADDC-3DA0226C1D45} = {E2F76CCF-019B-4DCA-A592-C0D1A802626C}
 		{73C5C211-D718-4AE3-80B7-1FF9B1202058} = {E2F76CCF-019B-4DCA-A592-C0D1A802626C}
 		{7D22D6AC-0B8C-EA80-1763-E2D49950A740} = {2C28B4F6-F9F0-4CF6-BECB-2C308B0C2186}
+		{3D2783DC-2649-4324-96BE-14DAD47D732C} = {2C28B4F6-F9F0-4CF6-BECB-2C308B0C2186}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C20C1CB-93D4-46D3-A172-85F0202D818C}
