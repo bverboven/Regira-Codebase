@@ -15,7 +15,7 @@ using Testing.Library.Data;
 
 namespace Entities.Web.Testing;
 
-[Collection("Non-Parallel Collection")]
+[Collection(nameof(NonParallelCollectionDefinition))]
 public class PersonControllerTests : IDisposable
 {
     private readonly ContosoContext _dbContext;

@@ -5,12 +5,12 @@ namespace Regira.Entities.Mapping.Mapster;
 
 public class EntityMapper(IMapper mapper) : IEntityMapper
 {
-    public TTarget Map<TTarget>(object? source)
+    public TTarget Map<TTarget>(object source)
         => mapper.Map<TTarget>(source!);
 
-    public TTarget Map<TSource, TTarget>(TSource? source)
+    public TTarget Map<TSource, TTarget>(TSource source)
         => mapper.Map<TSource, TTarget>(source!);
 
-    public TTarget Map<TSource, TTarget>(TSource? source, TTarget target)
+    public TTarget Map<TSource, TTarget>(TSource source, TTarget target)
         => mapper.Map(source, target);
 }

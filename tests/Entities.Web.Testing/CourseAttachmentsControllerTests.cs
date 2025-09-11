@@ -13,7 +13,7 @@ using Testing.Library.Data;
 
 namespace Entities.Web.Testing;
 
-[Collection("Non-Parallel Collection")]
+[Collection(nameof(NonParallelCollectionDefinition))]
 public class CourseAttachmentsControllerTests : IDisposable
 {
     Department[] Departments { get; }

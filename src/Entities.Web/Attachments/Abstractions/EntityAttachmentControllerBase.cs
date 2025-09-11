@@ -62,7 +62,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
             var affected = await service.SaveChanges();
 
             var savedItem = await FetchItem(item.Id);
-            var savedModel = mapper.Map<TDto>(savedItem)!;
+            var savedModel = mapper.Map<TDto>(savedItem!);
 
             sw.Stop();
 
