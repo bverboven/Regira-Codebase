@@ -54,11 +54,7 @@ public static class ControllerExtensions
         var items = await service.List(so, pagingInfo);
 
         var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
-        //var models = mapper.Map<List<TDto>>(items);
-        var models = items.Select(x =>
-        {
-            return mapper.Map<TDto>(x);
-        }).ToList();
+        var models = mapper.Map<List<TDto>>(items);
 
         sw.Stop();
         return ctrl.ListResult(models, sw.ElapsedMilliseconds);

@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Regira.DAL.EFcore.Services;
-using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
@@ -21,15 +20,13 @@ using Regira.Entities.Mapping.AutoMapper;
 using Regira.Entities.Mapping.Mapster;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Web.Attachments.Models;
+using Regira.Entities.Web.Attachments.Services;
 using Regira.IO.Storage.FileSystem;
 using Serilog;
 using Serilog.Events;
-using System.Reflection;
 using System.Text.Json.Serialization;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
-using AutoEntityMapper = Regira.Entities.Mapping.AutoMapper.EntityMapper;
-using MapsterEntityMapper = Regira.Entities.Mapping.Mapster.EntityMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -109,82 +106,37 @@ var useAutoMapper = false;
 
 if (useMapster)
 {
-    // Mapster
-    var mapsterConfig = new TypeAdapterConfig();
-    // important to prevent stackoverflow!!
-    mapsterConfig.Default.PreserveReference(true);
-    // Generic mappings
-    mapsterConfig.NewConfig<Attachment, AttachmentDto>();
-    mapsterConfig.NewConfig<Attachment, AttachmentDto<int>>();
-    mapsterConfig.NewConfig(typeof(Attachment<>), typeof(AttachmentDto<>));
-
-    mapsterConfig.NewConfig<AttachmentInputDto, Attachment>();
-    mapsterConfig.NewConfig<AttachmentInputDto<int>, Attachment>();
-    mapsterConfig.NewConfig(typeof(AttachmentInputDto<>), typeof(Attachment<>));
-
-    //config.NewConfig<EntityAttachment, EntityAttachmentDto>()
-    //    .Map(dest => dest.Uri,
-    //        src => src,
-    //        (src, ctx) => ctx.ServiceProvider.GetRequiredService<AttachmentUriResolver<EntityAttachment>>().Resolve(src));
-
-    mapsterConfig.NewConfig(typeof(EntityAttachment<,,,>), typeof(EntityAttachmentDto<,,>));
-    mapsterConfig.NewConfig<EntityAttachmentInputDto, EntityAttachment>();
-    mapsterConfig.NewConfig(typeof(EntityAttachmentInputDto<,,>), typeof(EntityAttachment<,,,>));
-
-    // Course
-    mapsterConfig.NewConfig<Course, CourseDto>();
-    mapsterConfig.NewConfig<CourseInputDto, Course>();
-
-    //config.NewConfig<CourseAttachment, CourseAttachmentDto>()
-    //    .AfterMapping((src, dest, ctx) =>
-    //    {
-    //        var resolver = ctx.ServiceProvider
-    //            .GetRequiredService<AttachmentUriResolver<CourseAttachment, CourseAttachmentDto>>();
-    //        dest.Uri = resolver.Resolve(src);
-    //    });
-
-    mapsterConfig.NewConfig<CourseAttachmentInputDto, CourseAttachment>();
-
-    // Department
-    mapsterConfig.NewConfig<Department, DepartmentDto>();
-    mapsterConfig.NewConfig<DepartmentInputDto, Department>();
-
-    // Person
-    mapsterConfig.NewConfig<Person, PersonDto>();
-    mapsterConfig.NewConfig<PersonInputDto, Person>();
-
     builder.Services
-        .AddSingleton(mapsterConfig)
-        .AddTransient<IEntityMapper, MapsterEntityMapper>()
-        .AddTransient<AttachmentUriResolver<EntityAttachment>>()
-        .AddTransient<AttachmentUriResolver<CourseAttachment>>()
-        .AddMapster();
+        .UseMapsterMapping((config, p) =>
+        {
+            // Course
+            config.NewConfig<Course, CourseDto>();
+            config.NewConfig<CourseInputDto, Course>();
+            config.NewConfig<CourseAttachment, CourseAttachmentDto>()
+                .Map(
+                    dest => dest.Uri,
+                    src => p.GetRequiredService<AttachmentUriResolver<CourseAttachment>>().Resolve(src)
+                );
+            config.NewConfig<CourseAttachmentInputDto, CourseAttachment>();
+
+            // Department
+            config.NewConfig<Department, DepartmentDto>();
+            config.NewConfig<DepartmentInputDto, Department>();
+
+            // Person
+            config.NewConfig<Person, PersonDto>();
+            config.NewConfig<PersonInputDto, Person>();
+        })
+        .AddTransient<AttachmentUriResolver<CourseAttachment>>();
 }
 
 if (useAutoMapper)
 {
     // AutoMapper
     builder.Services
-        .AddTransient<IEntityMapper, AutoEntityMapper>()
-        .AddTransient<AttachmentUriResolver<EntityAttachment, EntityAttachmentDto>>()
-        .AddTransient<AttachmentUriResolver<CourseAttachment, CourseAttachmentDto>>()
-        .AddAutoMapper((_, e) =>
+        .UseAutoMapperMapping((_, e) =>
         {
-            e.CreateMap<Attachment, AttachmentDto>();
-            e.CreateMap<Attachment, AttachmentDto<int>>();
-            e.CreateMap(typeof(Attachment<>), typeof(AttachmentDto<>));
-            e.CreateMap<AttachmentInputDto, Attachment>();
-            e.CreateMap<AttachmentInputDto<int>, Attachment>();
-            e.CreateMap(typeof(AttachmentInputDto<>), typeof(Attachment<>));
-            e.CreateMap<EntityAttachment, EntityAttachmentDto>()
-                .ForMember(
-                    x => x.Uri,
-                    opt => opt.MapFrom<AttachmentUriResolver<EntityAttachment, EntityAttachmentDto>>()
-                );
-            e.CreateMap(typeof(EntityAttachment<,,,>), typeof(EntityAttachmentDto<,,>));
-            e.CreateMap<EntityAttachmentInputDto, EntityAttachment>();
-            e.CreateMap(typeof(EntityAttachmentInputDto<,,>), typeof(EntityAttachment<,,,>));
-
+            // Course
             e.CreateMap<Course, CourseDto>();
             e.CreateMap<CourseInputDto, Course>();
             e.CreateMap<CourseAttachment, CourseAttachmentDto>()
@@ -194,27 +146,30 @@ if (useAutoMapper)
                 );
             e.CreateMap<CourseAttachmentInputDto, CourseAttachment>();
 
+            // Department
             e.CreateMap<Department, DepartmentDto>();
             e.CreateMap<DepartmentInputDto, Department>();
 
+            // Person
             e.CreateMap<Person, PersonDto>();
             e.CreateMap<PersonInputDto, Person>();
-        }, Array.Empty<Assembly>());
+        })
+        .AddTransient<AttachmentUriResolver<CourseAttachment, CourseAttachmentDto>>();
 }
 
 var app = builder.Build();
 
-if (useMapster)
-{
-    using (var scope = app.Services.CreateScope())
-    {
-        var resolver = scope.ServiceProvider.GetRequiredService<AttachmentUriResolver<CourseAttachment>>();
-        var config = app.Services.GetRequiredService<TypeAdapterConfig>();
+//if (useMapster)
+//{
+//    using (var scope = app.Services.CreateScope())
+//    {
+//        var resolver = scope.ServiceProvider.GetRequiredService<AttachmentUriResolver<CourseAttachment>>();
+//        var config = app.Services.GetRequiredService<TypeAdapterConfig>();
 
-        config.NewConfig<CourseAttachment, CourseAttachmentDto>()
-            .Map(dest => dest.Uri, src => resolver.Resolve(src));
-    }
-}
+//        config.NewConfig<CourseAttachment, CourseAttachmentDto>()
+//            .Map(dest => dest.Uri, src => resolver.Resolve(src));
+//    }
+//}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
