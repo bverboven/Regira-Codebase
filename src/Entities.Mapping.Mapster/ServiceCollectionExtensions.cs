@@ -9,13 +9,16 @@ namespace Regira.Entities.Mapping.Mapster;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection UseMapsterMapping(this IServiceCollection services, Action<TypeAdapterConfig, IServiceProvider>? configure = null)
+    public static IServiceCollection UseMapsterMapping(this IServiceCollection services, Action<EntityAdapterConfigBuilder> configure)
     {
+        var config = new TypeAdapterConfig();
+        var builder = new EntityAdapterConfigBuilder(config, services);
+
+        configure.Invoke(builder);
+
         services
             .AddSingleton(p =>
             {
-                var config = new TypeAdapterConfig();
-
                 // important to prevent stackoverflow!!
                 config.Default.PreserveReference(true);
 
@@ -31,8 +34,8 @@ public static class ServiceCollectionExtensions
                 config.NewConfig(typeof(EntityAttachment<,,,>), typeof(EntityAttachmentDto<,,>));
                 config.NewConfig<EntityAttachmentInputDto, EntityAttachment>();
                 config.NewConfig(typeof(EntityAttachmentInputDto<,,>), typeof(EntityAttachment<,,,>));
-                
-                configure?.Invoke(config, p);
+
+                builder.Build(p);
 
                 return config;
             })

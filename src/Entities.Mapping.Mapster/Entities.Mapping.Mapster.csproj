@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	<ProjectReference Include="..\Entities.DependencyInjection\Entities.DependencyInjection.csproj" />
+    <ProjectReference Include="..\Entities.Web\Entities.Web.csproj" />
   </ItemGroup>
 
 </Project>

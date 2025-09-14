@@ -49,7 +49,6 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
     /// <list type="bullet">
     ///     <item><see cref="IEntityService{TEntityAttachment}"/></item>
     ///     <item><see cref="IEntityService{TEntityAttachment,TKey}"/></item>
-    ///     <item><see cref="AttachmentUriResolver{TEntity,TEntityAttachmentKey,TObjectKey,TAttachmentKey,TAttachment,TDto}"/></item>
     /// </list>
     /// </summary>
     /// <returns></returns>

@@ -15,6 +15,5 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Entities.EFcore\Entities.EFcore.csproj" />
-    <ProjectReference Include="..\Entities.Web\Entities.Web.csproj" />
   </ItemGroup>
 </Project>

@@ -3,12 +3,10 @@ using Entities.TestApi.Infrastructure.Courses;
 using Entities.TestApi.Infrastructure.Departments;
 using Entities.TestApi.Infrastructure.Enrollments;
 using Entities.TestApi.Infrastructure.Persons;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Regira.DAL.EFcore.Services;
-using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
@@ -19,8 +17,6 @@ using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 using Regira.Entities.Mapping.AutoMapper;
 using Regira.Entities.Mapping.Mapster;
 using Regira.Entities.Models.Abstractions;
-using Regira.Entities.Web.Attachments.Models;
-using Regira.Entities.Web.Attachments.Services;
 using Regira.IO.Storage.FileSystem;
 using Serilog;
 using Serilog.Events;
@@ -107,69 +103,38 @@ var useAutoMapper = false;
 if (useMapster)
 {
     builder.Services
-        .UseMapsterMapping((config, p) =>
+        .UseMapsterMapping(config =>
         {
-            // Course
-            config.NewConfig<Course, CourseDto>();
-            config.NewConfig<CourseInputDto, Course>();
-            config.NewConfig<CourseAttachment, CourseAttachmentDto>()
-                .Map(
-                    dest => dest.Uri,
-                    src => p.GetRequiredService<AttachmentUriResolver<CourseAttachment>>().Resolve(src)
-                );
-            config.NewConfig<CourseAttachmentInputDto, CourseAttachment>();
-
-            // Department
-            config.NewConfig<Department, DepartmentDto>();
-            config.NewConfig<DepartmentInputDto, Department>();
-
-            // Person
-            config.NewConfig<Person, PersonDto>();
-            config.NewConfig<PersonInputDto, Person>();
-        })
-        .AddTransient<AttachmentUriResolver<CourseAttachment>>();
+            config
+                // Course
+                .Map<Course, CourseDto, CourseInputDto>(e =>
+                {
+                    e.HasAttachments<CourseAttachment, CourseAttachmentDto, CourseAttachmentInputDto>();
+                })
+                // Department
+                .Map<Department, DepartmentDto, DepartmentInputDto>()
+                // Person
+                .Map<Person, PersonDto, PersonInputDto>();
+        });
 }
 
 if (useAutoMapper)
 {
     // AutoMapper
     builder.Services
-        .UseAutoMapperMapping((_, e) =>
+        .UseAutoMapperMapping()
+        // Course
+        .Map<Course, CourseDto, CourseInputDto>(e =>
         {
-            // Course
-            e.CreateMap<Course, CourseDto>();
-            e.CreateMap<CourseInputDto, Course>();
-            e.CreateMap<CourseAttachment, CourseAttachmentDto>()
-                .ForMember(
-                    x => x.Uri,
-                    opt => opt.MapFrom<AttachmentUriResolver<CourseAttachment, CourseAttachmentDto>>()
-                );
-            e.CreateMap<CourseAttachmentInputDto, CourseAttachment>();
-
-            // Department
-            e.CreateMap<Department, DepartmentDto>();
-            e.CreateMap<DepartmentInputDto, Department>();
-
-            // Person
-            e.CreateMap<Person, PersonDto>();
-            e.CreateMap<PersonInputDto, Person>();
+            e.HasAttachments<CourseAttachment, CourseAttachmentDto, CourseAttachmentInputDto>();
         })
-        .AddTransient<AttachmentUriResolver<CourseAttachment, CourseAttachmentDto>>();
+        // Department
+        .Map<Department, DepartmentDto, DepartmentInputDto>()
+        // Person
+        .Map<Person, PersonDto, PersonInputDto>();
 }
 
 var app = builder.Build();
-
-//if (useMapster)
-//{
-//    using (var scope = app.Services.CreateScope())
-//    {
-//        var resolver = scope.ServiceProvider.GetRequiredService<AttachmentUriResolver<CourseAttachment>>();
-//        var config = app.Services.GetRequiredService<TypeAdapterConfig>();
-
-//        config.NewConfig<CourseAttachment, CourseAttachmentDto>()
-//            .Map(dest => dest.Uri, src => resolver.Resolve(src));
-//    }
-//}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

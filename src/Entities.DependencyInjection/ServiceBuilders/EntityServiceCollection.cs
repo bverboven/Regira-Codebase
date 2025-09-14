@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
+using Regira.Entities.DependencyInjection.Abstractions;
 using Regira.Entities.DependencyInjection.Primers;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
 using Regira.Entities.EFcore.Attachments;
@@ -11,7 +12,6 @@ using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.IO.Storage.Abstractions;
-using Regira.Web.DependencyInjection;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 
@@ -232,10 +232,8 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
 
 
     // Service with attachments
-    public EntityServiceCollection<TContext> WithAttachments(Func<IServiceProvider, IFileService> factory, Action<EntitySearchObjectServiceBuilder<TContext, Attachment, int, AttachmentSearchObject<int>>>? configure = null)
-    {
-        return WithAttachments<Attachment, int, AttachmentSearchObject<int>>(factory, configure);
-    }
+    public EntityServiceCollection<TContext> WithAttachments(Func<IServiceProvider, IFileService> factory, Action<EntitySearchObjectServiceBuilder<TContext, Attachment, int, AttachmentSearchObject<int>>>? configure = null) 
+        => WithAttachments<Attachment, int, AttachmentSearchObject<int>>(factory, configure);
 
     public EntityServiceCollection<TContext> WithAttachments<TAttachment, TAttachmentKey, TAttachmentSearchObject>(
         Func<IServiceProvider, IFileService> factory,
@@ -257,15 +255,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             e.AddTransient<IAttachmentFileService<TAttachment, TAttachmentKey>>(p => new AttachmentFileService<TAttachment, TAttachmentKey>(factory(p)));
             configure?.Invoke(e);
         });
-
-        // ToDo: use AddAttachmentMapper
-        //Services
-        //    .AddAutoMapper(cfg =>
-        //    {
-        //        cfg.CreateMap<TAttachment, AttachmentDto<TAttachmentKey>>()
-        //            .ReverseMap();
-        //        cfg.CreateMap<AttachmentInputDto<TAttachmentKey>, TAttachment>();
-        //    });
+        
         return this;
     }
     /// <summary>

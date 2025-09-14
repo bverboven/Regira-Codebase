@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 
-namespace Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
+namespace Regira.Entities.Web.DependencyInjection;
 
 public static class EntityServiceCollectionJsonExtensions
 {
