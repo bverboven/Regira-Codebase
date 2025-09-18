@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Entities.TestApi.Infrastructure.Departments;
-using Regira.Entities.Web.Attachments.Models;
+﻿using Entities.TestApi.Infrastructure.Departments;
+using Regira.Entities.Mapping.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace Entities.TestApi.Infrastructure.Courses;
 

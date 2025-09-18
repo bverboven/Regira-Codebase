@@ -15,12 +15,12 @@ using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 using Regira.Entities.Mapping.AutoMapper;
-using Regira.Entities.Mapping.Mapster;
 using Regira.Entities.Models.Abstractions;
 using Regira.IO.Storage.FileSystem;
 using Serilog;
 using Serilog.Events;
 using System.Text.Json.Serialization;
+using Regira.Entities.Mapping.Mapster;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 
@@ -71,6 +71,7 @@ builder.Services
         o.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
         o.AddPrepper<IHasAggregateKey>(x => x.AggregateKey ??= Guid.NewGuid());
         //o.UseAutoMapper();
+        o.UseMapsterMapping();
     })
     // Entity types
     .AddEnrollments()
@@ -95,11 +96,11 @@ builder.Services
         db.PersonAttachments.ToDescriptor<Person>()
     ]);
 
-var useMapster = true;
-var useAutoMapper = false;
+/*
+var useMapster = false;
+var useAutoMapper = true;
 
 // mapping
-
 if (useMapster)
 {
     builder.Services
@@ -131,9 +132,10 @@ if (useAutoMapper)
         // Department
         .Map<Department, DepartmentDto, DepartmentInputDto>()
         // Person
-        .Map<Person, PersonDto, PersonInputDto>();
+        .Map<Person, PersonDto, PersonInputDto>()
+        ;
 }
-
+*/
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

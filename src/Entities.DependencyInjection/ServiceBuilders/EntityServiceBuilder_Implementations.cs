@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.Normalizers;
 using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.Primers;
@@ -14,6 +13,7 @@ using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
+using Regira.Entities.Services.Abstractions;
 using System.Linq.Expressions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
@@ -24,7 +24,14 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
     public bool HasService<TService>() => Services.Any(s => s.ServiceType == typeof(TService));
 
     // Entity mapping
-    // ToDo: use AddMapping & AddMappingProfile
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddMapping<TDto, TInputDto>()
+        where TDto : class
+        where TInputDto : class
+    {
+        Options.EntityMapConfigurator.Configure<TEntity,TDto>();
+        Options.EntityMapConfigurator.Configure<TInputDto,TEntity>();
+        return this;
+    }
 
     // Entity service
     /// <summary>

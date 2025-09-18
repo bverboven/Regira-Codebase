@@ -1,6 +1,6 @@
 ﻿using Regira.DAL.Paging;
-using Regira.Entities.Abstractions;
 using Regira.Entities.Models.Abstractions;
+using Regira.Entities.Services.Abstractions;
 
 namespace Regira.Entities.EFcore.Services;
 

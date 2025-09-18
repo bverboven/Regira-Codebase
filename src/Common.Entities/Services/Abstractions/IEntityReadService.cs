@@ -1,7 +1,7 @@
 ﻿using Regira.DAL.Paging;
 using Regira.Entities.Models.Abstractions;
 
-namespace Regira.Entities.Abstractions;
+namespace Regira.Entities.Services.Abstractions;
 
 // With ID type
 public interface IEntityReadService<TEntity, in TKey>

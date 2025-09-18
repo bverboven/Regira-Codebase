@@ -1,4 +1,4 @@
-﻿namespace Regira.Entities.Web.Attachments.Abstractions;
+﻿namespace Regira.Entities.Attachments.Mapping.Abstractions;
 
 public interface IEntityAttachmentInput : IEntityAttachmentInput<int, int>;
 public interface IEntityAttachmentInput<TKey, TObjectId> : IEntityAttachmentInput<TKey, TObjectId, int>;

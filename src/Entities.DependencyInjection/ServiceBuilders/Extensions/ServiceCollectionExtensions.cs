@@ -6,22 +6,11 @@ namespace Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    /// <summary>
-    /// <inheritdoc cref="UseEntities"/>
-    /// </summary>
-    /// <typeparam name="TContext"></typeparam>
-    /// <param name="services"></param>
-    /// <param name="configure"></param>
-    /// <returns></returns>
     public static EntityServiceCollection<TContext> UseEntities<TContext>(this IServiceCollection services, Action<EntityServiceCollectionOptions>? configure = null)
         where TContext : DbContext
-        => new(services.UseEntities(configure));
-
-    static IServiceCollection UseEntities(this IServiceCollection services, Action<EntityServiceCollectionOptions>? configure = null)
     {
         var options = new EntityServiceCollectionOptions(services);
         configure?.Invoke(options);
-
-        return services;
+        return new EntityServiceCollection<TContext>(options);
     }
 }

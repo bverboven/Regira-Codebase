@@ -1,6 +1,6 @@
-﻿using Regira.Entities.Web.Attachments.Abstractions;
+﻿using Regira.Entities.Attachments.Mapping.Abstractions;
 
-namespace Regira.Entities.Web.Attachments.Models;
+namespace Regira.Entities.Mapping.Models;
 
 public class EntityAttachmentInputDto : EntityAttachmentInputDto<int, int, int>, IEntityAttachmentInput;
 public class EntityAttachmentInputDto<TKey, TObjectId, TAttachmentId> : IEntityAttachmentInput<TKey, TObjectId, TAttachmentId>

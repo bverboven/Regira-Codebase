@@ -2,10 +2,10 @@
 using Entities.Testing.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.Models;
+using Regira.Entities.Services.Abstractions;
 
 namespace Entities.Testing;
 

@@ -1,18 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.ServiceBuilders;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 using Regira.Entities.EFcore.Attachments;
+using Regira.Entities.Mapping.Models;
 using Regira.Entities.Models.Abstractions;
+using Regira.Entities.Services.Abstractions;
 using System.Linq.Expressions;
 
 namespace Regira.Entities.DependencyInjection.Attachments;
 
-public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment>(IServiceCollection services)
-    : EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, EntityAttachmentSearchObject, int, Attachment>(services),
+public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment>(EntityServiceCollectionOptions options)
+    : EntityAttachmentServiceBuilder<TContext, TEntity, int, TEntityAttachment, int, EntityAttachmentSearchObject, int, Attachment>(options),
         IEntityAttachmentServiceBuilder<TEntity, TEntityAttachment>
     where TContext : DbContext
     where TEntityAttachment : class, IEntityAttachment<int, int, int, Attachment>, new()
@@ -28,8 +30,8 @@ public class EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment
     }
 }
 
-public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>(IServiceCollection services)
-    : EntitySearchObjectServiceBuilder<TContext, TEntityAttachment, TEntityAttachmentKey, TSearchObject>(services),
+public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>(EntityServiceCollectionOptions options)
+    : EntitySearchObjectServiceBuilder<TContext, TEntityAttachment, TEntityAttachmentKey, TSearchObject>(options),
         IEntityAttachmentServiceBuilder<TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TAttachmentKey, TAttachment>
     where TContext : DbContext
     where TObject : class, IEntity<TObjectKey>, IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>
@@ -43,7 +45,37 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
     /// </summary>
     public bool HasStrictRelation { get; set; } = true;
     public bool HasEntityAttachmentMapping { get; set; }
-    
+
+    /// <summary>
+    /// Adds AutoMapper maps
+    /// <list type="bullet">
+    ///     <item><typeparamref name="TEntityAttachment"/> -&gt; <see cref="EntityAttachmentDto"/></item>
+    ///     <item><see cref="EntityAttachmentInputDto"/> -&gt; <typeparamref name="TEntityAttachment"/></item>
+    /// </list>
+    /// </summary>
+    /// <returns></returns>
+    public EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment> WithDefaultMapping()
+        => AddMapping<EntityAttachmentDto, EntityAttachmentInputDto>();
+    /// <summary>
+    /// Adds mapping configurations for the specified entity attachment DTO and input DTO types.
+    /// </summary>
+    /// <remarks>This method configures mappings between the entity attachment type and the specified DTO
+    /// types. It also sets the <c>HasEntityAttachmentMapping</c> flag to <see langword="true"/>.</remarks>
+    /// <typeparam name="TEntityAttachmentDto">The type of the entity attachment DTO to be mapped.</typeparam>
+    /// <typeparam name="TEntityAttachmentInputDto">The type of the entity attachment input DTO to be mapped.</typeparam>
+    /// <returns>The current <see cref="EntityAttachmentServiceBuilder{TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment}"/> instance, allowing for method chaining.</returns>
+    public new EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment> AddMapping<TEntityAttachmentDto, TEntityAttachmentInputDto>()
+        where TEntityAttachmentDto : EntityAttachmentDto
+    {
+        Options.EntityMapConfigurator.ConfigureAttachment<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment, TEntityAttachmentDto>();
+        Options.EntityMapConfigurator.Configure<TEntityAttachmentInputDto, TEntityAttachment>();
+
+        HasEntityAttachmentMapping = true;
+
+        return this;
+    }
+
+
     /// <summary>
     /// Adds implementations for
     /// <list type="bullet">

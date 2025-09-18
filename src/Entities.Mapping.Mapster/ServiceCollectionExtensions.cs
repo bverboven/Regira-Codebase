@@ -1,22 +1,22 @@
 ﻿using Mapster;
 using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Models;
-using Regira.Entities.Web.Attachments.Models;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
+using Regira.Entities.Mapping.Abstractions;
+using Regira.Entities.Mapping.Models;
 using Regira.Entities.Web.Attachments.Services;
 
 namespace Regira.Entities.Mapping.Mapster;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection UseMapsterMapping(this IServiceCollection services, Action<EntityAdapterConfigBuilder> configure)
+    public static EntityServiceCollectionOptions UseMapsterMapping(this EntityServiceCollectionOptions options, Action<TypeAdapterConfig>? configure = null)
     {
         var config = new TypeAdapterConfig();
-        var builder = new EntityAdapterConfigBuilder(config, services);
 
-        configure.Invoke(builder);
+        options.EntityMapConfigurator = new EntityMapConfigurator(config);
 
-        services
+        options.Services
             .AddSingleton(p =>
             {
                 // important to prevent stackoverflow!!
@@ -35,7 +35,7 @@ public static class ServiceCollectionExtensions
                 config.NewConfig<EntityAttachmentInputDto, EntityAttachment>();
                 config.NewConfig(typeof(EntityAttachmentInputDto<,,>), typeof(EntityAttachment<,,,>));
 
-                builder.Build(p);
+                configure?.Invoke(config);
 
                 return config;
             })
@@ -43,6 +43,6 @@ public static class ServiceCollectionExtensions
             .AddTransient<IEntityMapper, EntityMapper>()
             .AddMapster();
 
-        return services;
+        return options;
     }
 }

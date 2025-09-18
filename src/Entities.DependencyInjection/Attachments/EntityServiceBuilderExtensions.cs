@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.Extensions;
 using Regira.Entities.Models.Abstractions;
+using Regira.Entities.Services.Abstractions;
 using System.Linq.Expressions;
 
 namespace Regira.Entities.DependencyInjection.Attachments;
@@ -22,7 +22,7 @@ public static class EntityServiceBuilderExtensions
         where TEntity : class, IEntity<int>, IHasAttachments<TEntityAttachment>
         where TEntityAttachment : class, IEntityAttachment<int, int, int, Attachment>, new()
     {
-        var attachmentBuilder = new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment>(builder.Services);
+        var attachmentBuilder = new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment>(builder.Options);
 
         configure?.Invoke(attachmentBuilder);
 
@@ -33,11 +33,10 @@ public static class EntityServiceBuilderExtensions
             attachmentBuilder.AddDefaultAttachmentServices();
         }
 
-        //if (!attachmentBuilder.HasEntityAttachmentMapping)
-        //{
-        //    throw new Exception("No mapping configuration");
-        //    //attachmentBuilder.WithDefaultMapping();
-        //}
+        if (!attachmentBuilder.HasEntityAttachmentMapping)
+        {
+            attachmentBuilder.WithDefaultMapping();
+        }
 
         return attachmentBuilder;
     }
@@ -50,7 +49,7 @@ public static class EntityServiceBuilderExtensions
         where TEntity : class, IEntity<int>, IHasAttachments<TEntityAttachment>
         where TEntityAttachment : class, IEntityAttachment<int, int, int, Attachment>, new()
     {
-        var attachmentBuilder = new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment>(builder.Services);
+        var attachmentBuilder = new EntityAttachmentServiceBuilder<TContext, TEntity, TEntityAttachment>(builder.Options);
 
         configure?.Invoke(attachmentBuilder);
 
@@ -61,11 +60,10 @@ public static class EntityServiceBuilderExtensions
             attachmentBuilder.AddDefaultAttachmentServices();
         }
 
-        //if (!attachmentBuilder.HasEntityAttachmentMapping)
-        //{
-        //    throw new Exception("No mapping configuration");
-        //    //attachmentBuilder.WithDefaultMapping();
-        //}
+        if (!attachmentBuilder.HasEntityAttachmentMapping)
+        {
+            attachmentBuilder.WithDefaultMapping();
+        }
 
         return attachmentBuilder;
     }
@@ -82,7 +80,7 @@ public static class EntityServiceBuilderExtensions
         where TSearchObject : class, IEntityAttachmentSearchObject<TEntityAttachmentKey, TKey>, new()
         where TAttachment : class, IAttachment<TAttachmentKey>, new()
     {
-        var attachmentBuilder = new EntityAttachmentServiceBuilder<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>(builder.Services);
+        var attachmentBuilder = new EntityAttachmentServiceBuilder<TContext, TEntity, TKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment>(builder.Options);
 
         configure?.Invoke(attachmentBuilder);
 
@@ -93,11 +91,10 @@ public static class EntityServiceBuilderExtensions
             attachmentBuilder.AddDefaultAttachmentServices();
         }
 
-        //if (!attachmentBuilder.HasEntityAttachmentMapping)
-        //{
-        //    throw new Exception("No mapping configuration");
-        //    //attachmentBuilder.WithDefaultMapping();
-        //}
+        if (!attachmentBuilder.HasEntityAttachmentMapping)
+        {
+            attachmentBuilder.WithDefaultMapping();
+        }
 
         return attachmentBuilder;
     }

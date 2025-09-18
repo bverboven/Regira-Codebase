@@ -1,6 +1,6 @@
 ﻿using Regira.Entities.Models.Abstractions;
 
-namespace Regira.Entities.Abstractions;
+namespace Regira.Entities.Services.Abstractions;
 
 // with ID type
 public interface IEntityService<TEntity, TKey> : IEntityReadService<TEntity, TKey>, IEntityWriteService<TEntity, TKey>

@@ -1,27 +1,31 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.DependencyInjection.Abstractions;
 using Regira.Entities.DependencyInjection.Primers;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
+using Regira.Entities.Services.Abstractions;
 using Regira.IO.Storage.Abstractions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 
-public class EntityServiceCollection<TContext>(IServiceCollection services) : ServiceCollectionWrapper(services), IEntityServiceCollection<TContext> where TContext : DbContext
+public class EntityServiceCollection<TContext>(EntityServiceCollectionOptions options) : ServiceCollectionWrapper(options.Services), IEntityServiceCollection<TContext> where TContext : DbContext
 {
+    protected internal EntityServiceCollectionOptions Options => options;
+
+
     // Default service
     public EntityServiceCollection<TContext> For<TEntity>(Action<EntityIntServiceBuilder<TContext, TEntity>>? configure = null)
         where TEntity : class, IEntity<int>
     {
-        var builder = new EntityIntServiceBuilder<TContext, TEntity>(this);
+        var builder = new EntityIntServiceBuilder<TContext, TEntity>(Options);
         configure?.Invoke(builder);
 
         // Query Builder
@@ -62,7 +66,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
     public EntityServiceCollection<TContext> For<TEntity, TKey>(Action<EntityServiceBuilder<TContext, TEntity, TKey>>? configure = null)
         where TEntity : class, IEntity<TKey>
     {
-        var builder = new EntityServiceBuilder<TContext, TEntity, TKey>(this);
+        var builder = new EntityServiceBuilder<TContext, TEntity, TKey>(options);
         configure?.Invoke(builder);
 
         // Query Builder
@@ -97,7 +101,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         where TEntity : class, IEntity<TKey>
         where TSearchObject : class, ISearchObject<TKey>, new()
     {
-        var builder = new EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject>(this);
+        var builder = new EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject>(Options);
         configure?.Invoke(builder);
 
         // Query Builder
@@ -135,7 +139,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
     {
-        var simpleBuilder = new EntitySearchObjectServiceBuilder<TContext, TEntity, int, TSearchObject>(this);
+        var simpleBuilder = new EntitySearchObjectServiceBuilder<TContext, TEntity, int, TSearchObject>(Options);
         var builder = new ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(simpleBuilder);
         configure?.Invoke(builder);
 
@@ -192,7 +196,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
     {
-        var simpleBuilder = new EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject>(this);
+        var simpleBuilder = new EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject>(Options);
         var builder = new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(simpleBuilder);
         configure?.Invoke(builder);
 
@@ -232,7 +236,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
 
 
     // Service with attachments
-    public EntityServiceCollection<TContext> WithAttachments(Func<IServiceProvider, IFileService> factory, Action<EntitySearchObjectServiceBuilder<TContext, Attachment, int, AttachmentSearchObject<int>>>? configure = null) 
+    public EntityServiceCollection<TContext> WithAttachments(Func<IServiceProvider, IFileService> factory, Action<EntitySearchObjectServiceBuilder<TContext, Attachment, int, AttachmentSearchObject<int>>>? configure = null)
         => WithAttachments<Attachment, int, AttachmentSearchObject<int>>(factory, configure);
 
     public EntityServiceCollection<TContext> WithAttachments<TAttachment, TAttachmentKey, TAttachmentSearchObject>(
@@ -242,7 +246,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
         where TAttachment : class, IAttachment<TAttachmentKey>, new()
         where TAttachmentSearchObject : AttachmentSearchObject<TAttachmentKey>, new()
     {
-        var builder = new EntitySearchObjectServiceBuilder<TContext, TAttachment, TAttachmentKey, TAttachmentSearchObject>(this);
+        var builder = new EntitySearchObjectServiceBuilder<TContext, TAttachment, TAttachmentKey, TAttachmentSearchObject>(Options);
 
         builder.AddPrimer<EntityAttachmentPrimer>();
 
@@ -255,7 +259,7 @@ public class EntityServiceCollection<TContext>(IServiceCollection services) : Se
             e.AddTransient<IAttachmentFileService<TAttachment, TAttachmentKey>>(p => new AttachmentFileService<TAttachment, TAttachmentKey>(factory(p)));
             configure?.Invoke(e);
         });
-        
+
         return this;
     }
     /// <summary>

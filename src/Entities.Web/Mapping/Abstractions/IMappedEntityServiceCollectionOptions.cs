@@ -1,6 +1,6 @@
 ﻿using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
-using Regira.Entities.Web.Attachments.Models;
+using Regira.Entities.Mapping.Models;
 
 namespace Regira.Entities.Web.Mapping.Abstractions;
 

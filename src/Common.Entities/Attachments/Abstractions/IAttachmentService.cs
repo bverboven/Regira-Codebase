@@ -1,5 +1,5 @@
-﻿using Regira.Entities.Abstractions;
-using Regira.Entities.Attachments.Models;
+﻿using Regira.Entities.Attachments.Models;
+using Regira.Entities.Services.Abstractions;
 
 namespace Regira.Entities.Attachments.Abstractions;
 

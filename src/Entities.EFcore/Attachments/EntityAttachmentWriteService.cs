@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.EFcore.Preppers.Abstractions;
 using Regira.Entities.EFcore.Services;
+using Regira.Entities.Services.Abstractions;
 
 namespace Regira.Entities.EFcore.Attachments;
 

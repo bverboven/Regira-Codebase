@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Models;
+using Regira.Entities.Services.Abstractions;
 using Regira.Utilities;
 using System.Text;
 using Testing.Library.Contoso;

@@ -1,5 +1,5 @@
-﻿using Regira.Entities.Abstractions;
-using Regira.Entities.Services;
+﻿using Regira.Entities.Services;
+using Regira.Entities.Services.Abstractions;
 using Testing.Library.Contoso;
 
 namespace Entities.TestApi.Infrastructure.Persons;

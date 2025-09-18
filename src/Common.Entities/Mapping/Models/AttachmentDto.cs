@@ -1,4 +1,4 @@
-﻿namespace Regira.Entities.Web.Attachments.Models;
+﻿namespace Regira.Entities.Mapping.Models;
 
 public class AttachmentDto : AttachmentDto<int>;
 public class AttachmentDto<TKey>

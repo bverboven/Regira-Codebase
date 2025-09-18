@@ -29,6 +29,7 @@ public static class PersonServiceCollectionExtensions
                         _ => query.OrderBy(x => x.GivenName).ThenBy(x => x.LastName)
                     };
                 });
+                e.AddMapping<PersonDto, PersonInputDto>();
                 e.AddNormalizer<PersonNormalizer>();
                 e.HasManager<PersonManager>();
             });

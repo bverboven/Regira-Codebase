@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Extensions;
 using Regira.Entities.Attachments.Models;
-using Regira.Entities.Web.Attachments.Models;
+using Regira.Entities.Mapping.Abstractions;
+using Regira.Entities.Mapping.Models;
+using Regira.Entities.Services.Abstractions;
 using Regira.Entities.Web.Models;
 using Regira.Web.Extensions;
 using Regira.Web.IO;
