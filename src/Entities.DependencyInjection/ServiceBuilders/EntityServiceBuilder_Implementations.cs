@@ -11,6 +11,7 @@ using Regira.Entities.EFcore.Processing.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
+using Regira.Entities.Mapping.Abstractions;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Services.Abstractions;
@@ -38,10 +39,27 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
         mapConfig.Configure(inputDto, typeof(TEntity));
         return this;
     }
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddAfterMapper<TImplementation>()
+        where TImplementation : class, IEntityAfterMapper
+    {
+        Services.AddTransient<IEntityAfterMapper, TImplementation>();
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddAfterMapper<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityAfterMapper
+    {
+        Services.AddTransient<IEntityAfterMapper>(factory);
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddAfterMapper<TTarget>(Action<TEntity, TTarget> afterMapAction)
+    {
+        Services.AddTransient<IEntityAfterMapper>(_ => new EntityAfterMapper<TEntity, TTarget>(afterMapAction));
+        return this;
+    }
 
     // Entity service
     /// <summary>
-    /// Adds <see cref="EntityRepository{TContext, TEntity}"/> as implementation for:
+    /// Adds <see cref="EntityRepository{TEntity}"/> as implementation for:
     /// <list type="bullet">
     ///     <item><see cref="IEntityService{TEntity}"/></item>
     ///     <item><see cref="IEntityService{TEntity, TKey}"/></item>

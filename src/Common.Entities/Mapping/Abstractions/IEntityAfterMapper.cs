@@ -15,7 +15,12 @@ public abstract class EntityAfterMapperBase<TSource, TTarget> : IEntityAfterMapp
 {
     public abstract void AfterMap(TSource source, TTarget target);
     public bool CanMap(object source)
-        => TypeUtility.ImplementsBaseType<TSource>(source.GetType());
+        => source.GetType() == typeof(TSource) || TypeUtility.ImplementsBaseType<TSource>(source.GetType());
     void IEntityAfterMapper.AfterMap(object source, object target)
         => AfterMap((TSource)source, (TTarget)target);
+}
+public class EntityAfterMapper<TSource, TTarget>(Action<TSource, TTarget> afterMapAction) : EntityAfterMapperBase<TSource, TTarget>
+{
+    public override void AfterMap(TSource source, TTarget target)
+        => afterMapAction(source, target);
 }

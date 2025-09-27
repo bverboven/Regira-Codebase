@@ -30,7 +30,7 @@
 	<PackageReference Include="AutoMapper" Version="14.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Entities.Web\Entities.Web.csproj" />
+    <ProjectReference Include="..\Entities.DependencyInjection\Entities.DependencyInjection.csproj" />
   </ItemGroup>
 
 </Project>

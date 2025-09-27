@@ -16,7 +16,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Common.Entities\Common.Entities.csproj" />
     <ProjectReference Include="..\Common.Web\Common.Web.csproj" />
-    <ProjectReference Include="..\Entities.DependencyInjection\Entities.DependencyInjection.csproj" />
   </ItemGroup>
   <!--<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="AutoMapper">

@@ -10,6 +10,10 @@ using Regira.Entities.Mapping.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Services.Abstractions;
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Regira.Entities.Mapping.Abstractions;
+using Regira.Entities.Web.Attachments.Services;
 
 namespace Regira.Entities.DependencyInjection.Attachments;
 
@@ -67,6 +71,14 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
     public new EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment> AddMapping<TEntityAttachmentDto, TEntityAttachmentInputDto>()
         where TEntityAttachmentDto : EntityAttachmentDto
     {
+        AddTransient<IEntityAfterMapper>(p =>
+        {
+            return new EntityAfterMapper<TEntityAttachment, TEntityAttachmentDto>((item, dto) =>
+            {
+                var uriResolver = new AttachmentUriResolver<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>(p.GetRequiredService<LinkGenerator>(), p.GetRequiredService<IHttpContextAccessor>());
+                dto.Uri = uriResolver.Resolve(item);
+            });
+        });
         base.AddMapping<TEntityAttachmentDto, TEntityAttachmentInputDto>();
         HasEntityAttachmentMapping = true;
 

@@ -70,8 +70,8 @@ builder.Services
         o.UseDefaults();
         o.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
         o.AddPrepper<IHasAggregateKey>(x => x.AggregateKey ??= Guid.NewGuid());
-        //o.UseAutoMapper();
-        o.UseMapsterMapping();
+        o.UseAutoMapper();
+        //o.UseMapsterMapping();
     })
     // Entity types
     .AddEnrollments()

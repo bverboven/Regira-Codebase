@@ -3,11 +3,11 @@ using Regira.Entities.Mapping.Abstractions;
 
 namespace Regira.Entities.Mapping.Mapster;
 
-public class EntityMapper(IMapper mapper) : IEntityMapper
+public class EntityMapper(IMapper mapper, IEnumerable<IEntityAfterMapper>? afterMappers = null) : EntityMapperBase(afterMappers)
 {
-    public TTarget Map<TTarget>(object source)
+    public override TTarget MapEntity<TTarget>(object source)
         => mapper.Map<TTarget>(source);
 
-    public TTarget Map<TSource, TTarget>(TSource source, TTarget target)
+    public override void MapEntity<TSource, TTarget>(TSource source, TTarget target)
         => mapper.Map(source, target);
 }

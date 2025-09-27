@@ -3,7 +3,7 @@ using Regira.Entities.Mapping.Abstractions;
 
 namespace Regira.Entities.Mapping.AutoMapper;
 
-public class EntityMapper(IMapper mapper) : EntityMapperBase
+public class EntityMapper(IMapper mapper, IEnumerable<IEntityAfterMapper>? afterMappers = null) : EntityMapperBase(afterMappers)
 {
     public override TTarget MapEntity<TTarget>(object source)
         => mapper.Map<TTarget>(source);
