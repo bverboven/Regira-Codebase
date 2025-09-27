@@ -9,6 +9,7 @@ using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
+using Regira.Entities.Mapping.Models;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Services.Abstractions;
@@ -237,10 +238,12 @@ public class EntityServiceCollection<TContext>(EntityServiceCollectionOptions op
 
     // Service with attachments
     public EntityServiceCollection<TContext> WithAttachments(Func<IServiceProvider, IFileService> factory, Action<EntitySearchObjectServiceBuilder<TContext, Attachment, int, AttachmentSearchObject<int>>>? configure = null)
-        => WithAttachments<Attachment, int, AttachmentSearchObject<int>>(factory, configure);
+    {
+        return WithAttachments<Attachment, int, AttachmentSearchObject<int>>(factory, configure);
+    }
 
     public EntityServiceCollection<TContext> WithAttachments<TAttachment, TAttachmentKey, TAttachmentSearchObject>(
-        Func<IServiceProvider, IFileService> factory,
+        Func<IServiceProvider, IFileService> fileServiceFactory,
         Action<EntitySearchObjectServiceBuilder<TContext, TAttachment, TAttachmentKey, TAttachmentSearchObject>>? configure = null
     )
         where TAttachment : class, IAttachment<TAttachmentKey>, new()
@@ -256,9 +259,22 @@ public class EntityServiceCollection<TContext>(EntityServiceCollectionOptions op
             e.Process<AttachmentProcessor<TAttachment, TAttachmentKey>>();
             e.AddPrimer<AttachmentPrimer>();
             e.AddTransient<IFileIdentifierGenerator, DefaultFileIdentifierGenerator<TAttachmentKey, TAttachment>>();
-            e.AddTransient<IAttachmentFileService<TAttachment, TAttachmentKey>>(p => new AttachmentFileService<TAttachment, TAttachmentKey>(factory(p)));
+            e.AddTransient<IAttachmentFileService<TAttachment, TAttachmentKey>>(p => new AttachmentFileService<TAttachment, TAttachmentKey>(fileServiceFactory(p)));
             configure?.Invoke(e);
         });
+
+        // mappings
+        var mapConfig = Options.EntityMapConfiguratorFactory(Services);
+        mapConfig.Configure<Attachment, AttachmentDto>();
+        mapConfig.Configure<Attachment, AttachmentDto<int>>();
+        mapConfig.Configure(typeof(Attachment<>), typeof(AttachmentDto<>));
+        mapConfig.Configure<AttachmentInputDto, Attachment>();
+        mapConfig.Configure<AttachmentInputDto<int>, Attachment>();
+        mapConfig.Configure(typeof(AttachmentInputDto<>), typeof(Attachment<>));
+        mapConfig.Configure<EntityAttachment, EntityAttachmentDto>();
+        mapConfig.Configure(typeof(EntityAttachment<,,,>), typeof(EntityAttachmentDto<,,>));
+        mapConfig.Configure<EntityAttachmentInputDto, EntityAttachment>();
+        mapConfig.Configure(typeof(EntityAttachmentInputDto<,,>), typeof(EntityAttachment<,,,>));
 
         return this;
     }

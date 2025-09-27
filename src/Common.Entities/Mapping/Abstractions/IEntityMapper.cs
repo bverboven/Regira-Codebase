@@ -1,24 +1,42 @@
-﻿using Regira.Entities.Attachments.Abstractions;
-using Regira.Entities.Attachments.Models;
-using Regira.Entities.Mapping.Models;
-using Regira.Entities.Models.Abstractions;
-
-namespace Regira.Entities.Mapping.Abstractions;
+﻿namespace Regira.Entities.Mapping.Abstractions;
 
 public interface IEntityMapper
 {
     TTarget Map<TTarget>(object source);
-
-    TTarget Map<TSource, TTarget>(TSource source);
-
     TTarget Map<TSource, TTarget>(TSource source, TTarget target);
 }
 
-public interface IEntityMapConfigurator
+public abstract class EntityMapperBase(IEnumerable<IEntityAfterMapper>? afterMappers = null) : IEntityMapper
 {
-    void Configure<TSource, TTarget>();
-    void ConfigureAttachment<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment, TEntityAttachmentDto>()
-        where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>
-        where TAttachment : class, IAttachment<TAttachmentKey>, new()
-        where TEntityAttachmentDto : EntityAttachmentDto;
+    public virtual TTarget Map<TTarget>(object source)
+    {
+        var target = MapEntity<TTarget>(source);
+        ApplyAfterMappings(source, target);
+
+        return target;
+    }
+    public virtual TTarget Map<TSource, TTarget>(TSource source, TTarget target)
+    {
+        MapEntity(source, target);
+        ApplyAfterMappings(source, target);
+
+        return target;
+    }
+
+    public virtual void ApplyAfterMappings<TSource, TTarget>(TSource source, TTarget target)
+    {
+        if (source != null)
+        {
+            var targetAfterMappers = afterMappers?
+                .Where(m => m.CanMap(source))
+                .ToArray() ?? [];
+            foreach (var afterMapper in targetAfterMappers)
+            {
+                afterMapper.AfterMap(source, target!);
+            }
+        }
+    }
+    
+    public abstract TTarget MapEntity<TTarget>(object source);
+    public abstract void MapEntity<TSource, TTarget>(TSource source, TTarget target);
 }

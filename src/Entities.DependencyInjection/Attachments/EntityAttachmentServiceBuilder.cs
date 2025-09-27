@@ -67,9 +67,7 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
     public new EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment> AddMapping<TEntityAttachmentDto, TEntityAttachmentInputDto>()
         where TEntityAttachmentDto : EntityAttachmentDto
     {
-        Options.EntityMapConfigurator.ConfigureAttachment<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment, TEntityAttachmentDto>();
-        Options.EntityMapConfigurator.Configure<TEntityAttachmentInputDto, TEntityAttachment>();
-
+        base.AddMapping<TEntityAttachmentDto, TEntityAttachmentInputDto>();
         HasEntityAttachmentMapping = true;
 
         return this;

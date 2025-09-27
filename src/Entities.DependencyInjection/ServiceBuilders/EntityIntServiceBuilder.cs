@@ -17,7 +17,7 @@ namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 public partial class EntityIntServiceBuilder<TContext, TEntity>
 {
     public new bool HasEntityService() => HasService<IEntityService<TEntity>>();
-
+    
     // Entity service
     public new EntityIntServiceBuilder<TContext, TEntity> AddDefaultService()
         => UseEntityService<EntityRepository<TEntity>>();

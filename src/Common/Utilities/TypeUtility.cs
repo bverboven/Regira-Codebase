@@ -24,6 +24,15 @@ public static class TypeUtility
             .Distinct();
     }
     /// <summary>
+    /// Checks if a type implements a given base type (class or interface)
+    /// </summary>
+    /// <typeparam name="TBaseType"></typeparam>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public static bool ImplementsBaseType<TBaseType>(Type type)
+        => GetBaseTypes(type).Any(baseType => baseType == typeof(TBaseType));
+
+    /// <summary>
     /// Converts a nullable type to it's corresponding simple type (int? -> int)
     /// </summary>
     /// <param name="nullableType"></param>
@@ -32,7 +41,6 @@ public static class TypeUtility
     {
         return Nullable.GetUnderlyingType(nullableType) ?? nullableType;
     }
-
     /// <summary>
     /// Checks if a type is a simple type:
     /// <list type="bullet">
@@ -239,7 +247,7 @@ public static class TypeUtility
             ? interfaces.Contains(implementedInterface)
             : interfaces.Any(x => x == implementedInterface || x.IsGenericType && x.GetGenericTypeDefinition() == implementedInterface);
     }
-    
+
     /// <summary>
     /// Determines whether the specified type or any of its base types or interfaces
     /// contains the specified generic argument type.

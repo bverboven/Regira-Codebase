@@ -6,7 +6,7 @@ namespace Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 public class EntityServiceCollectionOptions(IServiceCollection services)
 {
     public IServiceCollection Services => services;
-    public IEntityMapConfigurator EntityMapConfigurator { get; set; } = null!;
+    public Func<IServiceCollection, IEntityMapConfigurator> EntityMapConfiguratorFactory { get; set; } = null!;
 
     // See extension methods for implementations
 }
