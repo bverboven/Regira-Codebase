@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
@@ -6,14 +8,12 @@ using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 using Regira.Entities.EFcore.Attachments;
+using Regira.Entities.Mapping.Abstractions;
 using Regira.Entities.Mapping.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Services.Abstractions;
-using System.Linq.Expressions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Regira.Entities.Mapping.Abstractions;
 using Regira.Entities.Web.Attachments.Services;
+using System.Linq.Expressions;
 
 namespace Regira.Entities.DependencyInjection.Attachments;
 
@@ -71,15 +71,18 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
     public new EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment> AddMapping<TEntityAttachmentDto, TEntityAttachmentInputDto>()
         where TEntityAttachmentDto : EntityAttachmentDto
     {
-        AddTransient<IEntityAfterMapper>(p =>
-        {
-            return new EntityAfterMapper<TEntityAttachment, TEntityAttachmentDto>((item, dto) =>
-            {
-                var uriResolver = new AttachmentUriResolver<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>(p.GetRequiredService<LinkGenerator>(), p.GetRequiredService<IHttpContextAccessor>());
-                dto.Uri = uriResolver.Resolve(item);
-            });
-        });
         base.AddMapping<TEntityAttachmentDto, TEntityAttachmentInputDto>();
+
+        // AfterMapper to resolve Uri
+        AddTransient<IEntityAfterMapper>(p => new EntityAfterMapper<TEntityAttachment, TEntityAttachmentDto>((item, dto) =>
+        {
+            var uriResolver = new AttachmentUriResolver<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>(
+                p.GetRequiredService<LinkGenerator>(),
+                p.GetRequiredService<IHttpContextAccessor>()
+            );
+            dto.Uri = uriResolver.Resolve(item);
+        }));
+
         HasEntityAttachmentMapping = true;
 
         return this;

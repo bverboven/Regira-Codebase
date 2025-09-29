@@ -20,7 +20,6 @@ using Regira.IO.Storage.FileSystem;
 using Serilog;
 using Serilog.Events;
 using System.Text.Json.Serialization;
-using Regira.Entities.Mapping.Mapster;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
 

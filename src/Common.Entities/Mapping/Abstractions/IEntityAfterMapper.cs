@@ -15,7 +15,7 @@ public abstract class EntityAfterMapperBase<TSource, TTarget> : IEntityAfterMapp
 {
     public abstract void AfterMap(TSource source, TTarget target);
     public bool CanMap(object source)
-        => source.GetType() == typeof(TSource) || TypeUtility.ImplementsBaseType<TSource>(source.GetType());
+        => TypeUtility.ImplementsType<TSource>(source.GetType());
     void IEntityAfterMapper.AfterMap(object source, object target)
         => AfterMap((TSource)source, (TTarget)target);
 }

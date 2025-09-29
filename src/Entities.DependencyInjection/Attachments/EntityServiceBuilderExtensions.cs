@@ -33,7 +33,7 @@ public static class EntityServiceBuilderExtensions
             attachmentBuilder.AddDefaultAttachmentServices();
         }
 
-        if (!attachmentBuilder.HasEntityAttachmentMapping)
+        if (attachmentBuilder is { HasEntityAttachmentMapping: false, Options.EntityMapConfiguratorFactory: not null })
         {
             attachmentBuilder.WithDefaultMapping();
         }
@@ -60,7 +60,7 @@ public static class EntityServiceBuilderExtensions
             attachmentBuilder.AddDefaultAttachmentServices();
         }
 
-        if (!attachmentBuilder.HasEntityAttachmentMapping)
+        if (attachmentBuilder is { HasEntityAttachmentMapping: false, Options.EntityMapConfiguratorFactory: not null })
         {
             attachmentBuilder.WithDefaultMapping();
         }
@@ -91,7 +91,7 @@ public static class EntityServiceBuilderExtensions
             attachmentBuilder.AddDefaultAttachmentServices();
         }
 
-        if (!attachmentBuilder.HasEntityAttachmentMapping)
+        if (attachmentBuilder is { HasEntityAttachmentMapping: false, Options.EntityMapConfiguratorFactory: not null })
         {
             attachmentBuilder.WithDefaultMapping();
         }

@@ -264,17 +264,20 @@ public class EntityServiceCollection<TContext>(EntityServiceCollectionOptions op
         });
 
         // mappings
-        var mapConfig = Options.EntityMapConfiguratorFactory(Services);
-        mapConfig.Configure<Attachment, AttachmentDto>();
-        mapConfig.Configure<Attachment, AttachmentDto<int>>();
-        mapConfig.Configure(typeof(Attachment<>), typeof(AttachmentDto<>));
-        mapConfig.Configure<AttachmentInputDto, Attachment>();
-        mapConfig.Configure<AttachmentInputDto<int>, Attachment>();
-        mapConfig.Configure(typeof(AttachmentInputDto<>), typeof(Attachment<>));
-        mapConfig.Configure<EntityAttachment, EntityAttachmentDto>();
-        mapConfig.Configure(typeof(EntityAttachment<,,,>), typeof(EntityAttachmentDto<,,>));
-        mapConfig.Configure<EntityAttachmentInputDto, EntityAttachment>();
-        mapConfig.Configure(typeof(EntityAttachmentInputDto<,,>), typeof(EntityAttachment<,,,>));
+        if (Options.EntityMapConfiguratorFactory != null)
+        {
+            var mapConfig = Options.EntityMapConfiguratorFactory.Invoke(Services);
+            mapConfig.Configure<Attachment, AttachmentDto>();
+            mapConfig.Configure<Attachment, AttachmentDto<int>>();
+            mapConfig.Configure(typeof(Attachment<>), typeof(AttachmentDto<>));
+            mapConfig.Configure<AttachmentInputDto, Attachment>();
+            mapConfig.Configure<AttachmentInputDto<int>, Attachment>();
+            mapConfig.Configure(typeof(AttachmentInputDto<>), typeof(Attachment<>));
+            mapConfig.Configure<EntityAttachment, EntityAttachmentDto>();
+            mapConfig.Configure(typeof(EntityAttachment<,,,>), typeof(EntityAttachmentDto<,,>));
+            mapConfig.Configure<EntityAttachmentInputDto, EntityAttachment>();
+            mapConfig.Configure(typeof(EntityAttachmentInputDto<,,>), typeof(EntityAttachment<,,,>));
+        }
 
         return this;
     }

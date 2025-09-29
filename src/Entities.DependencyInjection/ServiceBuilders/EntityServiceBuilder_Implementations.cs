@@ -27,16 +27,28 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
     // Entity mapping
     public EntityServiceBuilder<TContext, TEntity, TKey> AddMapping<TDto, TInputDto>()
     {
+        if (Options.EntityMapConfiguratorFactory == null)
+        {
+            throw new NullReferenceException($"Missing mapping configuration.");
+        }
+        
         var mapConfig = Options.EntityMapConfiguratorFactory.Invoke(Options.Services);
         mapConfig.Configure<TEntity, TDto>();
         mapConfig.Configure<TInputDto, TEntity>();
+        
         return this;
     }
     public EntityServiceBuilder<TContext, TEntity, TKey> AddMapping(Type dto, Type inputDto)
     {
+        if (Options.EntityMapConfiguratorFactory == null)
+        {
+            throw new NullReferenceException($"Missing mapping configuration.");
+        }
+
         var mapConfig = Options.EntityMapConfiguratorFactory.Invoke(Options.Services);
         mapConfig.Configure(typeof(TEntity), dto);
         mapConfig.Configure(inputDto, typeof(TEntity));
+        
         return this;
     }
     public EntityServiceBuilder<TContext, TEntity, TKey> AddAfterMapper<TImplementation>()

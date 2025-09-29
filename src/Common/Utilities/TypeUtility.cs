@@ -13,13 +13,15 @@ public static class TypeUtility
     /// <returns></returns>
     public static IEnumerable<Type> GetBaseTypes(Type type)
     {
+        var typeInterfaces = type.GetInterfaces();
         if (type.BaseType == null)
         {
-            return type.GetInterfaces();
+            return typeInterfaces;
         }
+
         return new[] { type.BaseType }
-            .Concat(type.GetInterfaces())
-            .Concat(type.GetInterfaces().SelectMany(GetBaseTypes))
+            .Concat(typeInterfaces)
+            .Concat(typeInterfaces.SelectMany(GetBaseTypes))
             .Concat(GetBaseTypes(type.BaseType))
             .Distinct();
     }
@@ -31,6 +33,10 @@ public static class TypeUtility
     /// <returns></returns>
     public static bool ImplementsBaseType<TBaseType>(Type type)
         => GetBaseTypes(type).Any(baseType => baseType == typeof(TBaseType));
+    public static bool ImplementsType<TType>(Type type)
+        => type == typeof(TType) || GetBaseTypes(type).Any(baseType => baseType == typeof(TType));
+    public static bool ImplementsType(Type type, Type typeToImplement)
+        => type == typeToImplement || GetBaseTypes(type).Any(baseType => baseType == typeToImplement);
 
     /// <summary>
     /// Converts a nullable type to it's corresponding simple type (int? -> int)
