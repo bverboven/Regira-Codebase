@@ -58,8 +58,8 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
     /// </list>
     /// </summary>
     /// <returns></returns>
-    public EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment> WithDefaultMapping()
-        => AddMapping<EntityAttachmentDto, EntityAttachmentInputDto>();
+    public MappedEntityServiceBuilder<TContext, TEntityAttachment, TEntityAttachmentKey> WithDefaultMapping()
+        => UseMapping<EntityAttachmentDto, EntityAttachmentInputDto>();
     /// <summary>
     /// Adds mapping configurations for the specified entity attachment DTO and input DTO types.
     /// </summary>
@@ -68,10 +68,10 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
     /// <typeparam name="TEntityAttachmentDto">The type of the entity attachment DTO to be mapped.</typeparam>
     /// <typeparam name="TEntityAttachmentInputDto">The type of the entity attachment input DTO to be mapped.</typeparam>
     /// <returns>The current <see cref="EntityAttachmentServiceBuilder{TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment}"/> instance, allowing for method chaining.</returns>
-    public new EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEntityAttachment, TEntityAttachmentKey, TSearchObject, TAttachmentKey, TAttachment> AddMapping<TEntityAttachmentDto, TEntityAttachmentInputDto>()
+    public MappedEntityServiceBuilder<TContext, TEntityAttachment, TEntityAttachmentKey> UseMapping<TEntityAttachmentDto, TEntityAttachmentInputDto>()
         where TEntityAttachmentDto : EntityAttachmentDto
     {
-        base.AddMapping<TEntityAttachmentDto, TEntityAttachmentInputDto>();
+        base.UseMapping<TEntityAttachmentDto, TEntityAttachmentInputDto>();
 
         // AfterMapper to resolve Uri
         AddTransient<IEntityAfterMapper>(p => new EntityAfterMapper<TEntityAttachment, TEntityAttachmentDto>((item, dto) =>
@@ -85,7 +85,7 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
 
         HasEntityAttachmentMapping = true;
 
-        return this;
+        return new MappedEntityServiceBuilder<TContext, TEntityAttachment, TEntityAttachmentKey>(Options);
     }
 
 

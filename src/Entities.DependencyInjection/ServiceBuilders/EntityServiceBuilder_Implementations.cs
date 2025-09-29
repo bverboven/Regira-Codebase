@@ -25,47 +25,56 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
     public bool HasService<TService>() => Services.Any(s => s.ServiceType == typeof(TService));
 
     // Entity mapping
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddMapping<TDto, TInputDto>()
+    public EntityServiceBuilder<TContext, TEntity, TKey> UseMapping<TDto, TInputDto>(Action<IEntityMapConfigurator>? mapAction = null)
     {
         if (Options.EntityMapConfiguratorFactory == null)
         {
-            throw new NullReferenceException($"Missing mapping configuration.");
+            throw new NullReferenceException("Missing mapping configuration.");
         }
-        
+
         var mapConfig = Options.EntityMapConfiguratorFactory.Invoke(Options.Services);
         mapConfig.Configure<TEntity, TDto>();
         mapConfig.Configure<TInputDto, TEntity>();
-        
-        return this;
+        mapAction?.Invoke(mapConfig);
+
+        return new MappedEntityServiceBuilder<TContext, TEntity, TKey>(Options);
     }
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddMapping(Type dto, Type inputDto)
+    public EntityServiceBuilder<TContext, TEntity, TKey> UseMapping(Type dto, Type inputDto, Action<IEntityMapConfigurator>? mapAction = null)
     {
         if (Options.EntityMapConfiguratorFactory == null)
         {
-            throw new NullReferenceException($"Missing mapping configuration.");
+            throw new NullReferenceException("Missing mapping configuration.");
         }
 
         var mapConfig = Options.EntityMapConfiguratorFactory.Invoke(Options.Services);
         mapConfig.Configure(typeof(TEntity), dto);
         mapConfig.Configure(inputDto, typeof(TEntity));
-        
+        mapAction?.Invoke(mapConfig);
+
+        return new MappedEntityServiceBuilder<TContext, TEntity, TKey>(Options);
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddMapping<TSource, TTarget>()
+    {
+        if (Options.EntityMapConfiguratorFactory == null)
+        {
+            throw new NullReferenceException("Missing mapping configuration.");
+        }
+
+        var mapConfig = Options.EntityMapConfiguratorFactory.Invoke(Options.Services);
+        mapConfig.Configure<TSource, TTarget>();
+
         return this;
     }
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddAfterMapper<TImplementation>()
-        where TImplementation : class, IEntityAfterMapper
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddMapping(Type sourceType, Type targetType)
     {
-        Services.AddTransient<IEntityAfterMapper, TImplementation>();
-        return this;
-    }
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddAfterMapper<TImplementation>(Func<IServiceProvider, TImplementation> factory)
-        where TImplementation : class, IEntityAfterMapper
-    {
-        Services.AddTransient<IEntityAfterMapper>(factory);
-        return this;
-    }
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddAfterMapper<TTarget>(Action<TEntity, TTarget> afterMapAction)
-    {
-        Services.AddTransient<IEntityAfterMapper>(_ => new EntityAfterMapper<TEntity, TTarget>(afterMapAction));
+        if (Options.EntityMapConfiguratorFactory == null)
+        {
+            throw new NullReferenceException("Missing mapping configuration.");
+        }
+
+        var mapConfig = Options.EntityMapConfiguratorFactory.Invoke(Options.Services);
+        mapConfig.Configure(sourceType, targetType);
+
         return this;
     }
 
