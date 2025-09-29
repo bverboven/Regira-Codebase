@@ -15,7 +15,7 @@ using Testing.Library.Data;
 
 namespace Entities.Web.Testing;
 
-[Collection("Non-Parallel Collection")]
+[Collection(nameof(NonParallelCollectionDefinition))]
 public class PersonControllerTests : IDisposable
 {
     private readonly ContosoContext _dbContext;
@@ -195,6 +195,8 @@ public class PersonControllerTests : IDisposable
 
         var coursesResponse = await client.GetAsync("/courses");
         var coursesResult = await coursesResponse.Content.ReadFromJsonAsync<ListResult<CourseDto>>();
+
+        var response = await coursesResponse.Content.ReadAsStringAsync();
 
         var course1 = coursesResult!.Items[0];
         var course2 = coursesResult.Items[1];

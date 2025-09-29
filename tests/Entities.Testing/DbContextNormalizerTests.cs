@@ -1,13 +1,13 @@
 ﻿using Entities.Testing.Infrastructure.Normalizers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.Normalizers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 using Regira.Entities.Models;
+using Regira.Entities.Services.Abstractions;
 using Regira.Normalizing.Models;
 using Testing.Library.Contoso;
 using Testing.Library.Data;

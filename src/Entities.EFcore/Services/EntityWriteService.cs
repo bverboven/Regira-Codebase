@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Regira.Entities.Abstractions;
 using Regira.Entities.EFcore.Extensions;
 using Regira.Entities.EFcore.Preppers.Abstractions;
 using Regira.Entities.Extensions;
 using Regira.Entities.Models.Abstractions;
+using Regira.Entities.Services.Abstractions;
 
 namespace Regira.Entities.EFcore.Services;
 

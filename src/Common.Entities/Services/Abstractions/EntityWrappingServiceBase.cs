@@ -3,7 +3,7 @@ using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Utilities;
 
-namespace Regira.Entities.Abstractions;
+namespace Regira.Entities.Services.Abstractions;
 
 public abstract class EntityWrappingServiceBase<TEntity>(IEntityService<TEntity, int, SearchObject<int>> service)
     : EntityWrappingServiceBase<TEntity, int, SearchObject<int>>(service), IEntityService<TEntity>

@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Regira.DAL.EFcore.Services;
-using Regira.Entities.DependencyInjection.Mapping;
 using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
@@ -15,6 +14,7 @@ using Regira.Entities.EFcore.Attachments;
 using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
+using Regira.Entities.Mapping.AutoMapper;
 using Regira.Entities.Models.Abstractions;
 using Regira.IO.Storage.FileSystem;
 using Serilog;
@@ -51,7 +51,8 @@ builder.Host.UseSerilog((_, config) => config
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
 );
 
-builder.Services.AddProblemDetails();
+builder.Services
+    .AddProblemDetails();
 
 builder.Services
     .AddHttpContextAccessor()
@@ -67,8 +68,9 @@ builder.Services
     {
         o.UseDefaults();
         o.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
-        o.UseAutoMapper([typeof(Person).Assembly]);
         o.AddPrepper<IHasAggregateKey>(x => x.AggregateKey ??= Guid.NewGuid());
+        o.UseAutoMapper();
+        //o.UseMapsterMapping();
     })
     // Entity types
     .AddEnrollments()
@@ -93,6 +95,46 @@ builder.Services
         db.PersonAttachments.ToDescriptor<Person>()
     ]);
 
+/*
+var useMapster = false;
+var useAutoMapper = true;
+
+// mapping
+if (useMapster)
+{
+    builder.Services
+        .UseMapsterMapping(config =>
+        {
+            config
+                // Course
+                .Map<Course, CourseDto, CourseInputDto>(e =>
+                {
+                    e.HasAttachments<CourseAttachment, CourseAttachmentDto, CourseAttachmentInputDto>();
+                })
+                // Department
+                .Map<Department, DepartmentDto, DepartmentInputDto>()
+                // Person
+                .Map<Person, PersonDto, PersonInputDto>();
+        });
+}
+
+if (useAutoMapper)
+{
+    // AutoMapper
+    builder.Services
+        .UseAutoMapperMapping()
+        // Course
+        .Map<Course, CourseDto, CourseInputDto>(e =>
+        {
+            e.HasAttachments<CourseAttachment, CourseAttachmentDto, CourseAttachmentInputDto>();
+        })
+        // Department
+        .Map<Department, DepartmentDto, DepartmentInputDto>()
+        // Person
+        .Map<Person, PersonDto, PersonInputDto>()
+        ;
+}
+*/
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

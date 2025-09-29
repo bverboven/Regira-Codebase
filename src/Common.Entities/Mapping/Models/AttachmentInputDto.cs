@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Regira.Entities.Web.Attachments.Models;
+namespace Regira.Entities.Mapping.Models;
 
 public class AttachmentInputDto : AttachmentInputDto<int>;
 public class AttachmentInputDto<TKey>

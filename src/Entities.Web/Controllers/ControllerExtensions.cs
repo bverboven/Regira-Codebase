@@ -1,11 +1,11 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.DAL.Paging;
-using Regira.Entities.Abstractions;
 using Regira.Entities.Extensions;
+using Regira.Entities.Mapping.Abstractions;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
+using Regira.Entities.Services.Abstractions;
 using Regira.Entities.Web.Models;
 using Regira.Utilities;
 using System.Diagnostics;
@@ -34,7 +34,7 @@ public static class ControllerExtensions
             return null;
         }
 
-        var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IMapper>();
+        var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
         var model = mapper.Map<TDto>(item);
         sw.Stop();
         return ctrl.DetailsResult(model, sw.ElapsedMilliseconds);
@@ -54,7 +54,7 @@ public static class ControllerExtensions
         var service = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, TKey>>();
         var items = await service.List(so, pagingInfo);
 
-        var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IMapper>();
+        var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
         var models = mapper.Map<List<TDto>>(items);
 
         sw.Stop();
@@ -75,7 +75,7 @@ public static class ControllerExtensions
         var items = await service
             .List(so, sortBy, includes.ToBitmask(), pagingInfo);
 
-        var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IMapper>();
+        var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
         var models = mapper.Map<List<TDto>>(items);
 
         sw.Stop();
@@ -100,7 +100,7 @@ public static class ControllerExtensions
             ? Array.Empty<TEntity>()
             : await service.List(so, pagingInfo);
 
-        var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IMapper>();
+        var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
         var models = mapper.Map<List<TDto>>(items);
 
         sw.Stop();
@@ -126,7 +126,7 @@ public static class ControllerExtensions
             ? Array.Empty<TEntity>()
             : await service.List(so, sortBy, includes.ToBitmask(), pagingInfo);
 
-        var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IMapper>();
+        var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
         var models = mapper.Map<List<TDto>>(items);
 
         sw.Stop();
@@ -144,8 +144,8 @@ public static class ControllerExtensions
 
         try
         {
-            var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IMapper>();
-            var item = mapper.Map<TEntity>(model);
+            var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
+            var item = mapper.Map<TEntity>(model!);
             if (id != null)
             {
                 item.Id = id;
@@ -205,7 +205,7 @@ public static class ControllerExtensions
         await service.Remove(item);
         await service.SaveChanges();
 
-        var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IMapper>();
+        var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
         var model = mapper.Map<TDto>(item);
 
         sw.Stop();

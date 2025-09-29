@@ -1,20 +1,21 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Regira.DAL.Paging;
-using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Extensions;
 using Regira.Entities.Attachments.Models;
+using Regira.Entities.Mapping.Abstractions;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
-using Regira.Entities.Web.Attachments.Models;
+using Regira.Entities.Services.Abstractions;
 using Regira.Entities.Web.Controllers;
 using Regira.Entities.Web.Models;
 using Regira.Web.IO;
 using System.Diagnostics;
+using Regira.Entities.Attachments.Mapping.Abstractions;
+using Regira.Entities.Mapping.Models;
 using static Regira.Web.Extensions.ControllerExtensions;
 
 namespace Regira.Entities.Web.Attachments.Abstractions;
@@ -49,7 +50,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
 
         try
         {
-            var mapper = HttpContext.RequestServices.GetRequiredService<IMapper>();
+            var mapper = HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
             var item = mapper.Map<TEntity>(model);
 
             var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, int>>();
@@ -63,7 +64,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
             var affected = await service.SaveChanges();
 
             var savedItem = await FetchItem(item.Id);
-            var savedModel = mapper.Map<TDto>(savedItem)!;
+            var savedModel = mapper.Map<TDto>(savedItem!);
 
             sw.Stop();
 
@@ -127,7 +128,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
         sw.Start();
 
         var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, int>>();
-        var mapper = HttpContext.RequestServices.GetRequiredService<IMapper>();
+        var mapper = HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
 
         var item = mapper.Map<TEntity>(model);
         item.ObjectId = objectId;
@@ -148,7 +149,7 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
         sw.Start();
 
         var service = HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, int>>();
-        var mapper = HttpContext.RequestServices.GetRequiredService<IMapper>();
+        var mapper = HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
 
         var item = (await service.List(new { id }, new PagingInfo { PageSize = 1 })).SingleOrDefault();
         if (item == null)

@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Regira.DAL.Paging;
-using Regira.Entities.Abstractions;
 using Regira.Entities.EFcore.Processing.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
+using Regira.Entities.Services.Abstractions;
 using Regira.Utilities;
 
 namespace Regira.Entities.EFcore.Services;

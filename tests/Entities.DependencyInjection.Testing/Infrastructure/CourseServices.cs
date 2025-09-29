@@ -1,7 +1,7 @@
-﻿using Regira.Entities.Abstractions;
-using Regira.Entities.EFcore.Services;
+﻿using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models;
 using Regira.Entities.Services;
+using Regira.Entities.Services.Abstractions;
 using Testing.Library.Contoso;
 
 namespace Entities.DependencyInjection.Testing.Infrastructure;

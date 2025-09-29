@@ -13,16 +13,31 @@ public static class TypeUtility
     /// <returns></returns>
     public static IEnumerable<Type> GetBaseTypes(Type type)
     {
+        var typeInterfaces = type.GetInterfaces();
         if (type.BaseType == null)
         {
-            return type.GetInterfaces();
+            return typeInterfaces;
         }
+
         return new[] { type.BaseType }
-            .Concat(type.GetInterfaces())
-            .Concat(type.GetInterfaces().SelectMany(GetBaseTypes))
+            .Concat(typeInterfaces)
+            .Concat(typeInterfaces.SelectMany(GetBaseTypes))
             .Concat(GetBaseTypes(type.BaseType))
             .Distinct();
     }
+    /// <summary>
+    /// Checks if a type implements a given base type (class or interface)
+    /// </summary>
+    /// <typeparam name="TBaseType"></typeparam>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public static bool ImplementsBaseType<TBaseType>(Type type)
+        => GetBaseTypes(type).Any(baseType => baseType == typeof(TBaseType));
+    public static bool ImplementsType<TType>(Type type)
+        => type == typeof(TType) || GetBaseTypes(type).Any(baseType => baseType == typeof(TType));
+    public static bool ImplementsType(Type type, Type typeToImplement)
+        => type == typeToImplement || GetBaseTypes(type).Any(baseType => baseType == typeToImplement);
+
     /// <summary>
     /// Converts a nullable type to it's corresponding simple type (int? -> int)
     /// </summary>
@@ -32,7 +47,6 @@ public static class TypeUtility
     {
         return Nullable.GetUnderlyingType(nullableType) ?? nullableType;
     }
-
     /// <summary>
     /// Checks if a type is a simple type:
     /// <list type="bullet">
@@ -239,7 +253,7 @@ public static class TypeUtility
             ? interfaces.Contains(implementedInterface)
             : interfaces.Any(x => x == implementedInterface || x.IsGenericType && x.GetGenericTypeDefinition() == implementedInterface);
     }
-    
+
     /// <summary>
     /// Determines whether the specified type or any of its base types or interfaces
     /// contains the specified generic argument type.

@@ -29,27 +29,10 @@ public static class PersonServiceCollectionExtensions
                         _ => query.OrderBy(x => x.GivenName).ThenBy(x => x.LastName)
                     };
                 });
+                e.AddMapping<PersonDto, PersonInputDto>();
                 e.AddNormalizer<PersonNormalizer>();
                 e.HasManager<PersonManager>();
-                e.AddMapping<PersonDto, PersonInputDto>();
-            })
-            //.For<Person>(builder =>
-            //{
-            //    builder
-            //        .AddMapping<PersonDto, PersonInputDto>()
-            //        .WithSearchObject<PersonSearchObject>()
-            //        .Complex<PersonSortBy, PersonIncludes>()
-            //
-            //        .AddNormalizer<PersonNormalizer>()
-            //        .HasManager<PersonManager>()
-            //        .Related(x => x.Departments)
-            //        .AddQueryFilter<PersonQueryFilter>()
-            //        .SortBy<PersonSortQueryBuilder>()
-            //        .Includes<PersonIncludableQueryBuilder>()
-            //        .HasAttachments<TContext, Person, PersonAttachment>()
-            //        .Build();
-            //})
-            ;
+            });
 
         return services;
     }

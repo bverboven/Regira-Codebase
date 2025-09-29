@@ -1,10 +1,10 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Extensions;
 using Regira.Entities.Attachments.Models;
-using Regira.Entities.Web.Attachments.Models;
+using Regira.Entities.Mapping.Abstractions;
+using Regira.Entities.Mapping.Models;
+using Regira.Entities.Services.Abstractions;
 using Regira.Entities.Web.Models;
 using Regira.Web.Extensions;
 using Regira.Web.IO;
@@ -13,7 +13,7 @@ namespace Regira.Entities.Web.Attachments.Abstractions;
 
 [ApiController]
 [Route("attachments")]
-public abstract class AttachmentControllerBase(IEntityService<Attachment, int> service, IMapper mapper) : ControllerBase
+public abstract class AttachmentControllerBase(IEntityService<Attachment, int> service, IEntityMapper mapper) : ControllerBase
 {
     [HttpGet("{id}")]
     public virtual async Task<IActionResult> GetFile([FromRoute] int id, bool inline = true)

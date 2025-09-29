@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.Abstractions;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection.Normalizers;
 using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.Primers;
@@ -13,8 +11,10 @@ using Regira.Entities.EFcore.Processing.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
+using Regira.Entities.Mapping.Abstractions;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
+using Regira.Entities.Services.Abstractions;
 using System.Linq.Expressions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
@@ -25,38 +25,53 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
     public bool HasService<TService>() => Services.Any(s => s.ServiceType == typeof(TService));
 
     // Entity mapping
-    /// <summary>
-    /// Adds AutoMapper maps for
-    /// <list type="bullet">
-    ///     <item><typeparamref name="TEntity"/> -&gt; <see cref="TDto"/></item>
-    ///     <item><see cref="TDto"/> -&gt; <typeparamref name="TEntity"/></item>
-    ///     <item><see cref="TInputDto"/> -&gt; <typeparamref name="TEntity"/></item>
-    /// </list>
-    /// </summary>
-    /// <typeparam name="TDto"></typeparam>
-    /// <typeparam name="TInputDto"></typeparam>
-    /// <returns></returns>
     public EntityServiceBuilder<TContext, TEntity, TKey> AddMapping<TDto, TInputDto>()
-        where TDto : class
-        where TInputDto : class
     {
-        Services.AddAutoMapper(cfg =>
+        if (Options.EntityMapConfiguratorFactory == null)
         {
-            cfg.CreateMap<TEntity, TDto>();
-            cfg.CreateMap<TInputDto, TEntity>();
-        });
+            throw new NullReferenceException($"Missing mapping configuration.");
+        }
+        
+        var mapConfig = Options.EntityMapConfiguratorFactory.Invoke(Options.Services);
+        mapConfig.Configure<TEntity, TDto>();
+        mapConfig.Configure<TInputDto, TEntity>();
+        
         return this;
     }
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddMappingProfile<TProfile>()
-        where TProfile : Profile, new()
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddMapping(Type dto, Type inputDto)
     {
-        Services.AddAutoMapper(cfg => cfg.AddProfile<TProfile>());
+        if (Options.EntityMapConfiguratorFactory == null)
+        {
+            throw new NullReferenceException($"Missing mapping configuration.");
+        }
+
+        var mapConfig = Options.EntityMapConfiguratorFactory.Invoke(Options.Services);
+        mapConfig.Configure(typeof(TEntity), dto);
+        mapConfig.Configure(inputDto, typeof(TEntity));
+        
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddAfterMapper<TImplementation>()
+        where TImplementation : class, IEntityAfterMapper
+    {
+        Services.AddTransient<IEntityAfterMapper, TImplementation>();
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddAfterMapper<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityAfterMapper
+    {
+        Services.AddTransient<IEntityAfterMapper>(factory);
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddAfterMapper<TTarget>(Action<TEntity, TTarget> afterMapAction)
+    {
+        Services.AddTransient<IEntityAfterMapper>(_ => new EntityAfterMapper<TEntity, TTarget>(afterMapAction));
         return this;
     }
 
     // Entity service
     /// <summary>
-    /// Adds <see cref="EntityRepository{TContext, TEntity}"/> as implementation for:
+    /// Adds <see cref="EntityRepository{TEntity}"/> as implementation for:
     /// <list type="bullet">
     ///     <item><see cref="IEntityService{TEntity}"/></item>
     ///     <item><see cref="IEntityService{TEntity, TKey}"/></item>

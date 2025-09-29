@@ -1,10 +1,9 @@
 ﻿#if NETCOREAPP3_1_OR_GREATER
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
+using System.Text.Json.Serialization;
 
-namespace Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
+namespace Regira.Entities.Web.DependencyInjection;
 
 public static class EntityServiceCollectionJsonExtensions
 {
@@ -15,12 +14,12 @@ public static class EntityServiceCollectionJsonExtensions
     /// <item>Enums as string</item>
     /// </list>
     /// </summary>
-    /// <param name="options"></param>
+    /// <param name="services"></param>
     /// <param name="configure"></param>
     /// <returns></returns>
-    public static EntityServiceCollectionOptions ConfigureDefaultJsonOptions(this EntityServiceCollectionOptions options, Action<JsonOptions>? configure = null)
+    public static IServiceCollection ConfigureDefaultJsonOptions(this IServiceCollection services, Action<JsonOptions>? configure = null)
     {
-        options.Services
+        services
             .Configure<JsonOptions>(o =>
             {
                 o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
@@ -29,7 +28,7 @@ public static class EntityServiceCollectionJsonExtensions
                 configure?.Invoke(o);
             });
 
-        return options;
+        return services;
     }
 }
 #endif

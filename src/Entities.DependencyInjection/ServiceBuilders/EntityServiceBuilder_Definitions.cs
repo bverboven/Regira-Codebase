@@ -1,16 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
+using Regira.Entities.Services.Abstractions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 
-public partial class EntityIntServiceBuilder<TContext, TEntity>(IServiceCollection services)
-    : EntityServiceBuilder<TContext, TEntity, int>(services),
+public partial class EntityIntServiceBuilder<TContext, TEntity>(EntityServiceCollectionOptions options)
+    : EntityServiceBuilder<TContext, TEntity, int>(options),
         IEntityServiceBuilder<TContext, TEntity>
     where TContext : DbContext
     where TEntity : class, IEntity<int>
@@ -18,7 +18,7 @@ public partial class EntityIntServiceBuilder<TContext, TEntity>(IServiceCollecti
     public new EntityIntServiceBuilder<TContext, TEntity, TSearchObject> WithSearchObject<TSearchObject>()
         where TSearchObject : class, ISearchObject<int>, new()
     {
-        return new EntityIntServiceBuilder<TContext, TEntity, TSearchObject>(Services);
+        return new EntityIntServiceBuilder<TContext, TEntity, TSearchObject>(Options);
     }
 
     public override void Build()
@@ -52,8 +52,8 @@ public partial class EntityIntServiceBuilder<TContext, TEntity>(IServiceCollecti
         }
     }
 }
-public class EntityIntServiceBuilder<TContext, TEntity, TSearchObject>(IServiceCollection services)
-    : EntitySearchObjectServiceBuilder<TContext, TEntity, int, TSearchObject>(services), IEntityServiceBuilder<TContext, TEntity>
+public class EntityIntServiceBuilder<TContext, TEntity, TSearchObject>(EntityServiceCollectionOptions options)
+    : EntitySearchObjectServiceBuilder<TContext, TEntity, int, TSearchObject>(options), IEntityServiceBuilder<TContext, TEntity>
     where TContext : DbContext
     where TEntity : class, IEntity<int>
     where TSearchObject : class, ISearchObject<int>, new()
@@ -62,7 +62,7 @@ public class EntityIntServiceBuilder<TContext, TEntity, TSearchObject>(IServiceC
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
     {
-        var simpleBuilder = new EntitySearchObjectServiceBuilder<TContext, TEntity, int, TSearchObject>(this);
+        var simpleBuilder = new EntitySearchObjectServiceBuilder<TContext, TEntity, int, TSearchObject>(Options);
         var builder = new ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>(simpleBuilder);
 
         return builder;
@@ -146,15 +146,15 @@ public partial class ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchOb
 }
 
 
-public partial class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceCollection services)
-    : EntityServiceCollection<TContext>(services),
+public partial class EntityServiceBuilder<TContext, TEntity, TKey>(EntityServiceCollectionOptions options)
+    : EntityServiceCollection<TContext>(options),
         IEntityServiceBuilder<TContext, TEntity, TKey>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
 {
     public EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject> WithSearchObject<TSearchObject>()
         where TSearchObject : class, ISearchObject<TKey>, new()
-        => new(Services);
+        => new(Options);
 
     public virtual void Build()
     {
@@ -185,8 +185,8 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>(IServiceColle
         }
     }
 }
-public partial class EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject>(IServiceCollection services)
-    : EntityServiceBuilder<TContext, TEntity, TKey>(services),
+public partial class EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject>(EntityServiceCollectionOptions options)
+    : EntityServiceBuilder<TContext, TEntity, TKey>(options),
         IEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
@@ -230,8 +230,8 @@ public partial class EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, T
 }
 
 public partial class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
-    EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject> services)
-    : EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject>(services)
+    EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject> builder)
+    : EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject>(builder.Options)
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()

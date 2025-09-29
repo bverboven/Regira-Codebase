@@ -3,7 +3,7 @@ using Entities.TestApi.Infrastructure;
 using Entities.TestApi.Infrastructure.Courses;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Regira.Entities.Web.Attachments.Models;
+using Regira.Entities.Mapping.Models;
 using Regira.Entities.Web.Models;
 using Regira.IO.Utilities;
 using System.Net;
@@ -13,7 +13,7 @@ using Testing.Library.Data;
 
 namespace Entities.Web.Testing;
 
-[Collection("Non-Parallel Collection")]
+[Collection(nameof(NonParallelCollectionDefinition))]
 public class CourseAttachmentsControllerTests : IDisposable
 {
     Department[] Departments { get; }

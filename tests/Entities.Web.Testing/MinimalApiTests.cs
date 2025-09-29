@@ -8,10 +8,7 @@ using Testing.Library.Data;
 
 namespace Entities.Web.Testing;
 
-[CollectionDefinition("Non-Parallel Collection", DisableParallelization = true)]
-public class NonParallelCollectionDefinitionClass;
-
-[Collection("Non-Parallel Collection")]
+[Collection(nameof(NonParallelCollectionDefinition))]
 public class MinimalApiTests : IDisposable
 {
     private readonly ContosoContext _dbContext;

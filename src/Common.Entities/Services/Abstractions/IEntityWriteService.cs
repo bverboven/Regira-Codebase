@@ -1,6 +1,6 @@
 ﻿using Regira.Entities.Models.Abstractions;
 
-namespace Regira.Entities.Abstractions;
+namespace Regira.Entities.Services.Abstractions;
 
 //public interface IEntityWriteService<TEntity> : IEntityWriteService<TEntity, int>
 //    where TEntity : class, IEntity<int>;

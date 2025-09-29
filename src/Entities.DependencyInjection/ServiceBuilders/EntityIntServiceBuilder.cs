@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.Abstractions;
 using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
@@ -10,6 +9,7 @@ using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
+using Regira.Entities.Services.Abstractions;
 using System.Linq.Expressions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
@@ -17,7 +17,7 @@ namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 public partial class EntityIntServiceBuilder<TContext, TEntity>
 {
     public new bool HasEntityService() => HasService<IEntityService<TEntity>>();
-
+    
     // Entity service
     public new EntityIntServiceBuilder<TContext, TEntity> AddDefaultService()
         => UseEntityService<EntityRepository<TEntity>>();

@@ -10,7 +10,7 @@ using Testing.Library.Data;
 
 namespace Entities.Web.Testing;
 
-[Collection("Non-Parallel Collection")]
+[Collection(nameof(NonParallelCollectionDefinition))]
 public class DepartmentControllerTests : IDisposable
 {
     private readonly ContosoContext _dbContext;

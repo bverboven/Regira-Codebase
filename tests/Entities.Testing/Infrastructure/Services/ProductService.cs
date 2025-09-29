@@ -1,9 +1,9 @@
 ﻿using Entities.Testing.Infrastructure.Data;
-using Regira.Entities.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models;
+using Regira.Entities.Services.Abstractions;
 
 namespace Entities.Testing.Infrastructure.Services;
 

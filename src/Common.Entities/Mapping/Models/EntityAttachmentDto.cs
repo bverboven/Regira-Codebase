@@ -1,4 +1,4 @@
-﻿namespace Regira.Entities.Web.Attachments.Models;
+﻿namespace Regira.Entities.Mapping.Models;
 
 public class EntityAttachmentDto : EntityAttachmentDto<int, int, int>;
 public class EntityAttachmentDto<TKey, TObjectId, TAttachmentId>
