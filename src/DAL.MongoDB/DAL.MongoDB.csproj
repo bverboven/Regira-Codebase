@@ -11,10 +11,10 @@
     <AssemblyName>Regira.DAL.MongoDB</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.7.0</Version>
+    <Version>4.8.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="3.4.3" />
+    <PackageReference Include="MongoDB.Driver" Version="3.5.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.System\Common.System.csproj" />

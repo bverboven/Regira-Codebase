@@ -11,10 +11,10 @@
     <AssemblyName>Regira.Office.Excel.MiniExcel</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.5.6</Version>
+    <Version>4.6.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MiniExcel" Version="1.41.3" />
+    <PackageReference Include="MiniExcel" Version="1.41.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
