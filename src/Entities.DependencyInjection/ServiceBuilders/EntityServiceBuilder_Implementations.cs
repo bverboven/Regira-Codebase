@@ -25,7 +25,7 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
     public bool HasService<TService>() => Services.Any(s => s.ServiceType == typeof(TService));
 
     // Entity mapping
-    public EntityServiceBuilder<TContext, TEntity, TKey> UseMapping<TDto, TInputDto>(Action<IEntityMapConfigurator>? mapAction = null)
+    public MappedEntityServiceBuilder<TContext, TEntity, TKey, TDto, TInputDto> UseMapping<TDto, TInputDto>(Action<IEntityMapConfigurator>? mapAction = null)
     {
         if (Options.EntityMapConfiguratorFactory == null)
         {
@@ -37,9 +37,9 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
         mapConfig.Configure<TInputDto, TEntity>();
         mapAction?.Invoke(mapConfig);
 
-        return new MappedEntityServiceBuilder<TContext, TEntity, TKey>(Options);
+        return new MappedEntityServiceBuilder<TContext, TEntity, TKey, TDto, TInputDto>(Options);
     }
-    public EntityServiceBuilder<TContext, TEntity, TKey> UseMapping(Type dto, Type inputDto, Action<IEntityMapConfigurator>? mapAction = null)
+    public MappedEntityServiceBuilder<TContext, TEntity, TKey> UseMapping(Type dto, Type inputDto, Action<IEntityMapConfigurator>? mapAction = null)
     {
         if (Options.EntityMapConfiguratorFactory == null)
         {
