@@ -22,7 +22,9 @@ public class EntityAttachment<TKey, TObjectKey, TAttachmentKey, TAttachment> : I
     public string? NewFileName { get; set; }
     [NotMapped]
     public string? NewContentType { get; set; }
-    
+    [NotMapped]
+    public byte[]? NewBytes { get; set; }
+
     IAttachment? IEntityAttachment.Attachment
     {
         get => Attachment;

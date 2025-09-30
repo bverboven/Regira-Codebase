@@ -27,6 +27,11 @@ public class EntityAttachmentPrimer(IFileIdentifierGenerator fileIdentifierGener
                 {
                     entity.Attachment.ContentType = entity.NewContentType;
                 }
+
+                if (entity.NewBytes?.Any() == true)
+                {
+                    entity.Attachment.Bytes = entity.NewBytes;
+                }
             }
         }
     }

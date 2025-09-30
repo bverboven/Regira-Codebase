@@ -11,7 +11,7 @@
     <AssemblyName>Regira.Entities.Web</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.12.0</Version>
+    <Version>4.12.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Web\Common.Web.csproj" />

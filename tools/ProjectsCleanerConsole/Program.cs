@@ -8,28 +8,26 @@ foreach (var slnFile in slnFiles)
 {
     var slnDir = Directory.GetParent(slnFile)!.FullName;
 
-    var files = Directory.GetFiles(slnDir, "*.csproj", SearchOption.AllDirectories)
-        .Where(f => f.Contains("\\src\\") || f.Contains("\\tests\\"))
-        .ToArray();
+    var files = Directory.GetFiles(slnDir, "*.csproj", SearchOption.AllDirectories);
 
     CleanUp(files);
 
-    static void CleanUp(IEnumerable<string> projectPaths)
+}
+static void CleanUp(IEnumerable<string> projectPaths)
+{
+    var projectDirs = projectPaths.Select(Path.GetDirectoryName).Distinct();
+    foreach (var dir in projectDirs)
     {
-        var projectDirs = projectPaths.Select(Path.GetDirectoryName!).Distinct();
-        foreach (var dir in projectDirs)
+        Console.WriteLine($"Processing '{dir}'");
+        var binDir = Path.Combine(dir!, "bin");
+        if (Directory.Exists(binDir))
         {
-            Console.WriteLine($"Processing '{dir}'");
-            var binDir = Path.Combine(dir!, "bin");
-            if (Directory.Exists(binDir))
-            {
-                Directory.Delete(binDir, true);
-            }
-            var objDir = Path.Combine(dir!, "obj");
-            if (Directory.Exists(objDir))
-            {
-                Directory.Delete(objDir, true);
-            }
+            Directory.Delete(binDir, true);
+        }
+        var objDir = Path.Combine(dir!, "obj");
+        if (Directory.Exists(objDir))
+        {
+            Directory.Delete(objDir, true);
         }
     }
 }

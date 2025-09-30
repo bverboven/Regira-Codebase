@@ -9,6 +9,7 @@ public interface IEntityAttachment
 
     string? NewFileName { get; set; }
     string? NewContentType { get; set; }
+    byte[]? NewBytes { get; set; }
     IAttachment? Attachment { get; set; }
 }
 public interface IEntityAttachment<TKey, TObjectKey> : IEntityAttachment<TKey, TObjectKey, int, Attachment>;

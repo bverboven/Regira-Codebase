@@ -204,11 +204,8 @@ public class CourseAttachmentsControllerTests : IDisposable
             .ToList();
         attachments.Insert(0, new CourseAttachmentInputDto
         {
-            Attachment = new AttachmentInputDto
-            {
-                FileName = attachmentFileName2,
-                Bytes = FileUtility.GetBytesFromString(attachmentFileName2)
-            },
+            NewFileName = attachmentFileName2,
+            NewBytes = FileUtility.GetBytesFromString(attachmentFileName2),
             ObjectId = courseId,
         });
         var courseInput = new CourseInputDto
@@ -221,8 +218,9 @@ public class CourseAttachmentsControllerTests : IDisposable
         };
 
         var updateResponse = await client.PutAsJsonAsync($"/courses/{courseInput.Id}", courseInput);
+        var updateResult = await updateResponse.Content.ReadAsStringAsync();
         updateResponse.EnsureSuccessStatusCode();
-
+        
         var detailsResponse3 = await client.GetAsync($"/courses/{courseId}");
         var detailsResult3 = await detailsResponse3.Content.ReadFromJsonAsync<DetailsResult<CourseDto>>();
         Assert.Equal(2, detailsResult3!.Item.Attachments!.Count);
@@ -264,11 +262,8 @@ public class CourseAttachmentsControllerTests : IDisposable
                 Description = entityAttachment.Description,
                 AttachmentId = entityAttachment.AttachmentId,
                 ObjectId = entityAttachment.ObjectId,
-                Attachment = new AttachmentInputDto
-                {
-                    FileName = attachmentFileName2,
-                    Bytes = FileUtility.GetBytesFromString(attachmentFileName2)
-                }
+                NewFileName =  attachmentFileName2,
+                NewBytes = FileUtility.GetBytesFromString(attachmentFileName2)
             }]
         };
 
@@ -277,7 +272,7 @@ public class CourseAttachmentsControllerTests : IDisposable
 
         var bytesResponse = await client.GetAsync($"/courses/{courseId}/files/{attachmentFileName2}");
         var bytesResult = await bytesResponse.Content.ReadAsByteArrayAsync();
-        Assert.Equal(courseInput.Attachments.First().Attachment!.Bytes, bytesResult);
+        Assert.Equal(courseInput.Attachments.First().NewBytes, bytesResult);
     }
     [Fact]
     public async Task Delete()

@@ -12,6 +12,5 @@ public class EntityAttachmentInputDto<TKey, TObjectId, TAttachmentId> : IEntityA
 
     public string? NewFileName { get; set; }
     public string? NewContentType { get; set; }
-
-    public AttachmentInputDto<TAttachmentId>? Attachment { get; set; }
+    public byte[]? NewBytes { get; set; }
 }

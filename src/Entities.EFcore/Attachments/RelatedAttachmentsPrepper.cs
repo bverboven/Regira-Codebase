@@ -41,6 +41,13 @@ public class RelatedAttachmentsPrepper<TContext, TEntity, TEntityAttachment, TEn
             var relatedItemsToDelete = originalItems.Where(o => modifiedItems.All(m => m.Id != null && m.Id.Equals(o.Id) != true)).ToArray();
             foreach (var entity in relatedItemsToAdd)
             {
+                if (entity.Attachment == null && entity.NewBytes?.Any() == true)
+                {
+                    entity.Attachment = new TAttachment();
+                    entity.Attachment.Bytes = entity.NewBytes;
+                    entity.Attachment.FileName = entity.NewFileName;
+                    entity.Attachment.ContentType = entity.NewContentType;
+                }
                 // Only add when attachment has content
                 if (entity.Attachment?.HasContent() == true)
                 {
@@ -52,6 +59,11 @@ public class RelatedAttachmentsPrepper<TContext, TEntity, TEntityAttachment, TEn
             foreach (var entity in relatedItemsToModify)
             {
                 var originalEntity = originalItems.Single(p => p.Id!.Equals(entity.Id));
+
+                if (!string.IsNullOrWhiteSpace(entity.NewFileName) || !string.IsNullOrWhiteSpace(entity.NewContentType) || entity.NewBytes?.Any() == true)
+                {
+                    entity.Attachment ??= originalEntity.Attachment;
+                }
 
                 if (entity.Attachment != null)
                 {
