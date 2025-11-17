@@ -74,13 +74,42 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
         base.UseMapping<TEntityAttachmentDto, TEntityAttachmentInputDto>();
 
         // AfterMapper to resolve Uri
+        AddTransient<IAttachmentUriResolver<TEntityAttachment>>(p => new AttachmentUriResolver<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>(
+            p.GetRequiredService<LinkGenerator>(),
+            p.GetRequiredService<IHttpContextAccessor>()
+        ));
         AddTransient<IEntityAfterMapper>(p => new EntityAfterMapper<TEntityAttachment, TEntityAttachmentDto>((item, dto) =>
         {
-            var uriResolver = new AttachmentUriResolver<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>(
-                p.GetRequiredService<LinkGenerator>(),
-                p.GetRequiredService<IHttpContextAccessor>()
-            );
+            var uriResolver = p.GetRequiredService<IAttachmentUriResolver<TEntityAttachment>>();
             dto.Uri = uriResolver.Resolve(item);
+        }));
+        AddTransient<IEntityAfterMapper>(p => new EntityAfterMapper<IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>, object>((item, dto) =>
+        {
+            var uriResolver = p.GetRequiredService<IAttachmentUriResolver<TEntityAttachment>>();
+            var attachmentsProp = item.GetType().GetProperty(nameof(IHasAttachments.Attachments));
+            var attachmentsValues = attachmentsProp?.GetValue(item);
+            if (attachmentsValues == null)
+            {
+                return;
+            }
+
+            var dtoAttachmentsProp = dto.GetType().GetProperty(nameof(IHasAttachments.Attachments));
+            var dtoAttachments = (ICollection<TEntityAttachmentDto>?)dtoAttachmentsProp?.GetValue(dto);
+            if (dtoAttachments == null)
+            {
+                return;
+            }
+
+            var attachments = (ICollection<TEntityAttachment>)attachmentsValues;
+            for (var i = 0; i < attachments.Count; i++)
+            {
+                var attachment = attachments.ElementAt(i);
+                var dtoAttachment = dtoAttachments.ElementAt(i);
+                if (dto != null)
+                {
+                    dtoAttachment.Uri = uriResolver.Resolve(attachment);
+                }
+            }
         }));
 
         HasEntityAttachmentMapping = true;

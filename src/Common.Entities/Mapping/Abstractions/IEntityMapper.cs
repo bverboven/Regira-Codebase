@@ -1,4 +1,6 @@
-﻿namespace Regira.Entities.Mapping.Abstractions;
+﻿using System.Collections;
+
+namespace Regira.Entities.Mapping.Abstractions;
 
 public interface IEntityMapper
 {
@@ -25,18 +27,35 @@ public abstract class EntityMapperBase(IEnumerable<IEntityAfterMapper>? afterMap
 
     public virtual void ApplyAfterMappings<TSource, TTarget>(TSource source, TTarget target)
     {
-        if (source != null)
+        if (source == null || target == null)
         {
-            var targetAfterMappers = afterMappers?
-                .Where(m => m.CanMap(source))
-                .ToArray() ?? [];
+            return;
+        }
+
+        var sourceCollection = (source as IEnumerable)?.Cast<object>().ToArray() ?? [source];
+        var targetCollection = (target as IEnumerable)?.Cast<object>().ToArray() ?? [target];
+
+        var firstSourceItem = sourceCollection.FirstOrDefault();
+        if (firstSourceItem == null)
+        {
+            return;
+        }
+
+        var targetAfterMappers = afterMappers?
+            .Where(m => m.CanMap(firstSourceItem))
+            .ToArray() ?? [];
+
+        for (var i = 0; i < sourceCollection.Length; i++)
+        {
+            var sourceItem = sourceCollection[i];
+            var targetItem = targetCollection[i];
             foreach (var afterMapper in targetAfterMappers)
             {
-                afterMapper.AfterMap(source, target!);
+                afterMapper.AfterMap(sourceItem, targetItem);
             }
         }
     }
-    
+
     public abstract TTarget MapEntity<TTarget>(object source);
     public abstract void MapEntity<TSource, TTarget>(TSource source, TTarget target);
 }

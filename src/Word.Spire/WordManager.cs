@@ -410,6 +410,7 @@ public class WordManager : IWordManager
             }
 
             var templateRow = table.Rows[1];
+            table.Rows.RemoveAt(1);
 
             for (var r = 0; r < data.Count; r++)
             {
@@ -438,9 +439,8 @@ public class WordManager : IWordManager
                     }
                 }
 
-                table.Rows.Add(newRow);
+                table.Rows.Insert(1 + r, newRow);
             }
-            table.Rows.RemoveAt(1);
         }
     }
     protected internal void ReplaceImages(Document doc, ICollection<WordImage> images)
