@@ -11,13 +11,13 @@
     <AssemblyName>Regira.Office.Mail.SendGrid</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.10.0</Version>
+    <Version>4.11.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.11" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Sendgrid" Version="9.29.3" />
