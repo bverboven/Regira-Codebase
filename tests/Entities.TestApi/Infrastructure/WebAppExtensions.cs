@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Attachments.Models;
 using Regira.Entities.Services.Abstractions;
-using Regira.Utilities;
 using System.Text;
 using Testing.Library.Contoso;
 using Testing.Library.Data;
@@ -28,7 +27,7 @@ public static class WebAppExtensions
 
             await db.SaveChangesAsync();
 
-            var courseAttachments = courses.Shuffle().Take(10).Select(x => new CourseAttachment
+            var courseAttachments = Enumerable.Shuffle(courses).Take(10).Select(x => new CourseAttachment
             {
                 ObjectId = x.Id,
                 Attachment = new Attachment

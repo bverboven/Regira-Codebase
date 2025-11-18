@@ -1,5 +1,4 @@
-﻿using Entities.TestApi;
-using Entities.TestApi.Infrastructure;
+﻿using Entities.TestApi.Infrastructure;
 using Entities.TestApi.Infrastructure.Courses;
 using Entities.TestApi.Infrastructure.Departments;
 using Entities.TestApi.Infrastructure.Persons;
@@ -7,7 +6,6 @@ using Entities.Web.Testing.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Web.Models;
-using Regira.Utilities;
 using System.Net;
 using System.Net.Http.Json;
 using Testing.Library.Contoso;
@@ -366,8 +364,7 @@ public class PersonControllerTests : IDisposable
         using var client = app.CreateClient();
 
         // create dummy data
-        var inputPersons = PersonNames.EN
-            .Shuffle()
+        var inputPersons = Enumerable.Shuffle(PersonNames.EN)
             .Select((name, i) => new PersonInputDto
             {
                 GivenName = name.GivenName,
