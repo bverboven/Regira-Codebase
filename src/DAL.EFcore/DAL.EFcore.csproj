@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -11,7 +11,7 @@
     <AssemblyName>Regira.DAL.EFcore</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>4.9.0</Version>
+    <Version>5.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Normalizing\**" />
@@ -34,7 +34,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.11" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) == 'net10.0'">
-	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
-	<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.0" />
   </ItemGroup>
 </Project>
