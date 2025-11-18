@@ -1,6 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
@@ -17,13 +17,13 @@
     <PackageReference Include="FreeSpire.Doc" Version="9.9.7" />
     <ProjectReference Include="..\Drawing.SkiaSharp\Drawing.SkiaSharp.csproj" />
   </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework) == 'net6.0' or $(TargetFramework) == 'net8.0' or $(TargetFramework) == 'net9.0'">
+  <ItemGroup Condition="$(TargetFramework) == 'net6.0' or $(TargetFramework) == 'net8.0' or $(TargetFramework) == 'net9.0' or $(TargetFramework) == 'net10.0'">
     <PackageReference Include="FreeSpire.Doc" Version="12.2.0" />
     <ProjectReference Include="..\Drawing.GDI\Drawing.GDI.csproj" />
   </ItemGroup>
   <ItemGroup>
     <!-- Fix vulnerabilities -->
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="9.0.11" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Office\Common.Office.csproj" />

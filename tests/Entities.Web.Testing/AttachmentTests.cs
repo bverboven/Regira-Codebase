@@ -1,12 +1,10 @@
-﻿using Entities.TestApi;
-using Entities.TestApi.Infrastructure;
+﻿using Entities.TestApi.Infrastructure;
 using Entities.Web.Testing.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Mapping.Models;
 using Regira.Entities.Web.Models;
 using Regira.IO.Utilities;
-using Regira.Utilities;
 using System.Net;
 using System.Net.Http.Json;
 using Testing.Library.Contoso;
@@ -44,7 +42,7 @@ public class AttachmentTests : IDisposable
         using var client = app.CreateClient();
 
 
-        var courseId = Courses.Shuffle().First().Id;
+        var courseId = Enumerable.Shuffle(Courses).First().Id;
         var courseAttachments = new List<EntityAttachmentDto>();
         for (var i = 1; i <= 10; i++)
         {
@@ -62,7 +60,7 @@ public class AttachmentTests : IDisposable
         var personAttachments = new List<EntityAttachmentDto>();
         for (var i = 1; i <= 5; i++)
         {
-            var personId = Persons.Shuffle().First().Id;
+            var personId = Enumerable.Shuffle(Persons).First().Id;
             var attachmentFileName = $"person-attachment-{i}.txt";
             var fileTextContent = $"This is the {i}th testmessage for attachments";
             var inputContent = new MultipartFormDataContent

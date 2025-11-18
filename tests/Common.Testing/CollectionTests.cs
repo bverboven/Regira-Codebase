@@ -167,7 +167,7 @@ public class CollectionTests
     {
         var testItems = Enumerable.Range(0, 1000).Select(_ => Guid.NewGuid().ToString()).ToList();
         var tempFile = Path.GetTempFileName();
-        await File.WriteAllLinesAsync(tempFile, testItems.Shuffle());
+        await File.WriteAllLinesAsync(tempFile, Enumerable.Shuffle(testItems));
         var indexDic = await testItems.ChunkActionsAsync(async x =>
         {
             var lines = await File.ReadAllLinesAsync(tempFile);

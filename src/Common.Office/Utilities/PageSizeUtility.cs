@@ -26,8 +26,8 @@ public static class PageSizeUtility
 
         if (orientation == PageOrientation.Landscape)
         {
-            portraitDimension = portraitDimension
-                .Reverse()
+            portraitDimension = Enumerable
+                .Reverse(portraitDimension)
                 .ToArray();
         }
 
