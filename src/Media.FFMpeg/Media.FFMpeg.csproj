@@ -14,7 +14,7 @@
     <Version>5.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="FFMpegCore" Version="5.2.0" />
+    <PackageReference Include="FFMpegCore" Version="5.4.0" />
   </ItemGroup>
   <ItemGroup>
     <!-- Upgraded for vulnerabilities -->

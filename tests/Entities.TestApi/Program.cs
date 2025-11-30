@@ -17,6 +17,7 @@ using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 using Regira.Entities.Mapping.AutoMapper;
 using Regira.Entities.Models.Abstractions;
 using Regira.IO.Storage.FileSystem;
+using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
 using System.Text.Json.Serialization;
@@ -43,7 +44,11 @@ builder.Services
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// OpenApi
+builder.Services.AddOpenApi();
+
+// Logging
 builder.Host.UseSerilog((_, config) => config
     .WriteTo.Console()
     .MinimumLevel.Debug()
@@ -94,54 +99,17 @@ builder.Services
         db.CourseAttachments.ToDescriptor<Course>(),
         db.PersonAttachments.ToDescriptor<Person>()
     ]);
-
-/*
-var useMapster = false;
-var useAutoMapper = true;
-
-// mapping
-if (useMapster)
-{
-    builder.Services
-        .UseMapsterMapping(config =>
-        {
-            config
-                // Course
-                .Map<Course, CourseDto, CourseInputDto>(e =>
-                {
-                    e.HasAttachments<CourseAttachment, CourseAttachmentDto, CourseAttachmentInputDto>();
-                })
-                // Department
-                .Map<Department, DepartmentDto, DepartmentInputDto>()
-                // Person
-                .Map<Person, PersonDto, PersonInputDto>();
-        });
-}
-
-if (useAutoMapper)
-{
-    // AutoMapper
-    builder.Services
-        .UseAutoMapperMapping()
-        // Course
-        .Map<Course, CourseDto, CourseInputDto>(e =>
-        {
-            e.HasAttachments<CourseAttachment, CourseAttachmentDto, CourseAttachmentInputDto>();
-        })
-        // Department
-        .Map<Department, DepartmentDto, DepartmentInputDto>()
-        // Person
-        .Map<Person, PersonDto, PersonInputDto>()
-        ;
-}
-*/
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "v1");
+    });
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
