@@ -13,10 +13,10 @@ public static class ApiKeyExtensions
         return services
             .AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = ApiKeyConstants.AuthenticationScheme;
-                options.DefaultChallengeScheme = ApiKeyConstants.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = ApiKeyDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = ApiKeyDefaults.AuthenticationScheme;
             })
-            .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyConstants.AuthenticationScheme, configure ?? (c => { }));
+            .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyDefaults.AuthenticationScheme, configure ?? (c => { }));
     }
 
     public static AuthenticationBuilder AddInMemoryApiKeyAuthentication(this AuthenticationBuilder builder, IEnumerable<ApiKeyOwner> apiKeyOwners)

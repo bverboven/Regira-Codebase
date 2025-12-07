@@ -4,16 +4,21 @@ namespace Regira.Security.Authentication.Jwt.Extensions;
 
 public static class PrincipalExtensions
 {
-    public static string? FindUserId(this ClaimsPrincipal principal)
+    extension(ClaimsPrincipal principal)
     {
-        return principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-    }
-    public static string? FindUserName(this ClaimsPrincipal principal)
-    {
-        return principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
-    }
-    public static string? FindEmail(this ClaimsPrincipal principal)
-    {
-        return principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        public string? FindUserId()
+        {
+            return principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        }
+
+        public string? FindUserName()
+        {
+            return principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+        }
+
+        public string? FindEmail()
+        {
+            return principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        }
     }
 }

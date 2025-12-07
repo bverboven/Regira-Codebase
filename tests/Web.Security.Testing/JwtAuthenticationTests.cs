@@ -66,6 +66,6 @@ public class JwtAuthenticationTests : IClassFixture<TestingWebApplicationFactory
         var user = JwtUsers.Value.First();
         var response = await httpClient.PostAsJsonAsync("auth", new { username = user.Name });
         var tokenResult = await response.Content.ReadFromJsonAsync<TokenResult>();
-        return tokenResult?.Token;
+        return tokenResult!.Token!;
     }
 }

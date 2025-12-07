@@ -1,8 +1,8 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Regira.Security.Authentication.ApiKey.Models;
 using Shouldly;
+using System.Net;
 using Web.Security.Testing.Infrastructure;
 using Web.Security.Testing.Infrastructure.ApiKey;
 using Xunit;
@@ -39,7 +39,7 @@ public class ApiAuthenticationTests : IClassFixture<TestingWebApplicationFactory
     public async Task Test_Protected_With_Valid_ApiKey_Returns_Ok()
     {
         var httpClient = _factory.CreateClient();
-        httpClient.DefaultRequestHeaders.Add(ApiKeyConstants.HeaderName, ApiKeyOwners.Value.First().Key);
+        httpClient.DefaultRequestHeaders.Add(ApiKeyDefaults.HeaderName, ApiKeyOwners.Value.First().Key);
 
         var response = await httpClient.GetAsync("protected");
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -48,7 +48,7 @@ public class ApiAuthenticationTests : IClassFixture<TestingWebApplicationFactory
     public async Task Test_Protected_With_Empty_ApiKey_Returns_Unauthorized()
     {
         var httpClient = _factory.CreateClient();
-        httpClient.DefaultRequestHeaders.Add(ApiKeyConstants.HeaderName, string.Empty);
+        httpClient.DefaultRequestHeaders.Add(ApiKeyDefaults.HeaderName, string.Empty);
 
         var response = await httpClient.GetAsync("protected");
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
@@ -57,7 +57,7 @@ public class ApiAuthenticationTests : IClassFixture<TestingWebApplicationFactory
     public async Task Test_Protected_With_Invalid_ApiKey_Returns_Unauthorized()
     {
         var httpClient = _factory.CreateClient();
-        httpClient.DefaultRequestHeaders.Add(ApiKeyConstants.HeaderName, "Bad Key");
+        httpClient.DefaultRequestHeaders.Add(ApiKeyDefaults.HeaderName, "Bad Key");
 
         var response = await httpClient.GetAsync("protected");
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);

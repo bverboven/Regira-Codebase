@@ -8,22 +8,10 @@ using System.Text.Encodings.Web;
 
 namespace Regira.Security.Authentication.ApiKey.Services;
 
-public class ApiKeyAuthenticationHandler(
-    IOptionsMonitor<ApiKeyAuthenticationOptions> options,
-    ILoggerFactory logger,
-    UrlEncoder encoder,
-    IApiKeyOwnerService apiKeyOwnerService)
+public class ApiKeyAuthenticationHandler(IOptionsMonitor<ApiKeyAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, IApiKeyOwnerService apiKeyOwnerService)
     : AuthenticationHandler<ApiKeyAuthenticationOptions>(options, logger, encoder)
 {
     // https://josef.codes/asp-net-core-protect-your-api-with-api-keys/
-#if !NET8_0_OR_GREATER
-    public ApiKeyAuthenticationHandler(IOptionsMonitor<ApiKeyAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, IApiKeyOwnerService apiKeyOwnerService)
-        : base(options, logger, encoder, clock)
-    {
-        _apiKeyOwnerService = apiKeyOwnerService ?? throw new ArgumentNullException(nameof(apiKeyOwnerService));
-    }
-#endif
-
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         //var endpoint = Request.HttpContext.Features.Get<IEndpointFeature>()?.Endpoint;

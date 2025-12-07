@@ -1,9 +1,10 @@
 using Duende.IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Regira.Security.Authentication.Jwt.Models;
 using System.Globalization;
 
-namespace Regira.Security.Authentication.Jwt.Samples;
+namespace Regira.Security.Authentication.Jwt.Services;
 
 public class AccessTokenHelper(IHttpContextAccessor httpContextAccessor, HttpClient httpClient)
 {
@@ -62,7 +63,7 @@ public class AccessTokenHelper(IHttpContextAccessor httpContextAccessor, HttpCli
             Address = discoveryResponse.TokenEndpoint,
             ClientId = refreshOptions.ClientId,
             ClientSecret = refreshOptions.ClientSecret,
-            RefreshToken = refreshToken
+            RefreshToken = refreshToken!
         };
         var refreshResponse = await httpClient.RequestRefreshTokenAsync(refreshTokenRequest);
 
@@ -70,15 +71,15 @@ public class AccessTokenHelper(IHttpContextAccessor httpContextAccessor, HttpCli
         var updatedTokens = new[] {
             new AuthenticationToken {
                 Name = "id_token",
-                Value = refreshResponse.IdentityToken
+                Value = refreshResponse.IdentityToken!
             },
             new AuthenticationToken {
                 Name = "access_token",
-                Value = refreshResponse.AccessToken
+                Value = refreshResponse.AccessToken!
             },
             new AuthenticationToken {
                 Name = "refresh_token",
-                Value = refreshResponse.RefreshToken
+                Value = refreshResponse.RefreshToken!
             },
             new AuthenticationToken {
                 Name = "expires_at",
@@ -96,6 +97,6 @@ public class AccessTokenHelper(IHttpContextAccessor httpContextAccessor, HttpCli
         // sign in
         await context.SignInAsync(refreshOptions.AuthenticationScheme, currentAuthenticateResult.Principal!, currentAuthenticateResult.Properties);
 
-        return refreshResponse.RefreshToken;
+        return refreshResponse.RefreshToken!;
     }
 }
