@@ -1,4 +1,4 @@
-﻿namespace Regira.Invoicing.ViaAdValvas;
+﻿namespace Regira.Invoicing.ViaAdValvas.Config;
 
 public static class PeppolNamespaces
 {

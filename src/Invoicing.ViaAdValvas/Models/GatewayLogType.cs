@@ -1,24 +1,24 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Regira.Invoicing.ViaAdValvas;
+namespace Regira.Invoicing.ViaAdValvas.Models;
 
 internal enum GatewayLogType : int
 {
-    [EnumMember()]
+    [EnumMember]
     Message = 0,
 
-    [EnumMember()]
+    [EnumMember]
     Warning = 1,
 
-    [EnumMember()]
+    [EnumMember]
     Error = 2,
 
-    [EnumMember()]
+    [EnumMember]
     Data = 3,
 
-    [EnumMember()]
+    [EnumMember]
     Stacktrace = 4,
 
-    [EnumMember()]
+    [EnumMember]
     Trace = 5,
 }

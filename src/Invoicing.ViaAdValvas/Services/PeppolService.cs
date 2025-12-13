@@ -1,7 +1,10 @@
 ﻿using System.Xml.Linq;
+using Regira.Invoicing.ViaAdValvas.Config;
+using Regira.Invoicing.ViaAdValvas.Helpers;
+using Regira.Invoicing.ViaAdValvas.Models;
 using Regira.Serializing.Abstractions;
 
-namespace Regira.Invoicing.ViaAdValvas;
+namespace Regira.Invoicing.ViaAdValvas.Services;
 
 public class PeppolService(GatewaySettings settings, ISerializer serializer)
 {
@@ -47,8 +50,8 @@ public class PeppolService(GatewaySettings settings, ISerializer serializer)
 
     protected UblDocumentRequest CreateRequest(XDocument doc)
     {
-        var referenceId = UblDocumentUtility.GetReferenceId(doc);
-        var receiverId = $"{UblDocumentUtility.GetRecipientSchemeId(doc)}:{UblDocumentUtility.GetRecipientId(doc)}";
+        var referenceId = doc.GetReferenceId();
+        var receiverId = $"{doc.GetRecipientSchemeId()}:{doc.GetRecipientId()}";
         var date = DateTime.Now;
         var seal = SealUtility.Generate(settings.SecretKey, settings.Token, date, settings.SenderID, referenceId);
 

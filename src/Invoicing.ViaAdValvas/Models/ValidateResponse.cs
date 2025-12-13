@@ -1,4 +1,4 @@
-﻿namespace Regira.Invoicing.ViaAdValvas;
+﻿namespace Regira.Invoicing.ViaAdValvas.Models;
 
 internal class ValidateResponse
 {

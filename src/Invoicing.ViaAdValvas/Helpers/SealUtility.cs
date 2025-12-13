@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Regira.Invoicing.ViaAdValvas;
+namespace Regira.Invoicing.ViaAdValvas.Helpers;
 
 public static class SealUtility
 {
