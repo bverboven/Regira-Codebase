@@ -5,7 +5,7 @@ using Regira.Office.Barcodes.Spire;
 namespace Office.Barcodes.Testing;
 
 [TestFixture]
-[Parallelizable(ParallelScope.All)]
+[Parallelizable(ParallelScope.Self)]
 public class SpireBarcodeTests() : BarcodeTestsBase(new BarcodeService(), new BarcodeService(), "Spire")
 {
     [TestCase("123456", BarcodeFormat.Code39, "1to6")]

@@ -11,8 +11,14 @@
     <AssemblyName>Regira.Web</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.0.0</Version>
+    <Version>5.0.1</Version>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="$(TargetFramework) == 'net6.0' or $(TargetFramework) == 'net8.0' or $(TargetFramework) == 'net9.0' or $(TargetFramework) == 'net10.0'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
     <!-- Upgrading to v2.3.0 causes errors in other projects (LinkGenerator is missing) -->
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
@@ -20,12 +26,6 @@
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
     <!-- Upgraded for vulnerabilities -->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="10.0.0" />
-  </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework) == 'net6.0' or $(TargetFramework) == 'net8.0' or $(TargetFramework) == 'net9.0' or $(TargetFramework) == 'net10.0'">
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="10.0.1" />
   </ItemGroup>
 </Project>

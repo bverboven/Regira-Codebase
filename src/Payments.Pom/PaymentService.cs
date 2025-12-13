@@ -1,7 +1,7 @@
 ﻿using System.Net;
-using Regira.Payments.Abstraction;
-using Regira.Payments.Enums;
-using Regira.Payments.Models;
+using Regira.Invoicing.Payments.Abstraction;
+using Regira.Invoicing.Payments.Enums;
+using Regira.Invoicing.Payments.Models;
 using Regira.Serializing.Abstractions;
 #if !NETSTANDARD2_0
 using System.Net.Http.Json;

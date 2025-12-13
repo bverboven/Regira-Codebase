@@ -10,14 +10,15 @@ public class RazorTemplateParser(RazorTemplateParser.Options? options = null) : 
         public string? TemplateKey { get; set; }
     }
 
+    private readonly RazorLightEngine _engine = new RazorLightEngineBuilder()
+        .UseEmbeddedResourcesProject(typeof(RazorTemplateParser))
+        .UseMemoryCachingProvider()
+        .Build();
+
     public async Task<string> Parse<T>(string html, T model)
     {
-        var engine = new RazorLightEngineBuilder()
-            .UseEmbeddedResourcesProject(GetType())
-            .UseMemoryCachingProvider()
-            .Build();
         var templateKey = options?.TemplateKey ?? Guid.NewGuid().ToString();
 
-        return await engine.CompileRenderStringAsync(templateKey, html, model);
+        return await _engine.CompileRenderStringAsync(templateKey, html, model);
     }
 }

@@ -1,7 +1,7 @@
-﻿using Regira.Payments.Abstraction;
-using Regira.Payments.Enums;
+﻿using Regira.Invoicing.Payments.Abstraction;
+using Regira.Invoicing.Payments.Enums;
 
-namespace Regira.Payments.Models;
+namespace Regira.Invoicing.Payments.Models;
 
 public class Payment : IPayment
 {

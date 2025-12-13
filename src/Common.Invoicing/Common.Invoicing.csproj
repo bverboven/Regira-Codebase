@@ -6,17 +6,14 @@
     <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>B.Verboven</Authors>
-    <RootNamespace>Regira.IO.Storage.SimpleTCP</RootNamespace>
-    <PackageId>Regira.IO.Storage.SimpleTCP</PackageId>
-    <AssemblyName>Regira.IO.Storage.SimpleTCP</AssemblyName>
+    <RootNamespace>Regira.Invoicing</RootNamespace>
+    <PackageId>Regira.Invoicing</PackageId>
+    <AssemblyName>Regira.Invoicing</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.0.1</Version>
+    <Version>5.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Common.IO.Storage\Common.IO.Storage.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="SimpleTCP.Core" Version="1.0.4" />
+    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 </Project>

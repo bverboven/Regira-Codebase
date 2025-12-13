@@ -26,13 +26,13 @@ public abstract class AccountControllerBase<TUser>(ITokenHelper tokenHelper, Use
         bool? isLockedOut = null;
         DateTimeOffset? lockedOutEnd = null;
 
-        var user = await userManager.FindByNameAsync(model.Username!);
+        var user = await userManager.FindByNameAsync(model.Username);
         if (user != null)
         {
             isLockedOut = await userManager.IsLockedOutAsync(user);
             if (isLockedOut == false)
             {
-                bool isAuthenticated = await userManager.CheckPasswordAsync(user, model.Password ?? string.Empty);
+                bool isAuthenticated = await userManager.CheckPasswordAsync(user, model.Password);
                 if (isAuthenticated)
                 {
                     var principal = await claimsFactory.CreateAsync(user);

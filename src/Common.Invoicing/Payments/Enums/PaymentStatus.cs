@@ -1,4 +1,4 @@
-﻿namespace Regira.Payments.Enums;
+﻿namespace Regira.Invoicing.Payments.Enums;
 
 public enum PaymentStatus
 {

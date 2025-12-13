@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework.Legacy;
-using Regira.Payments.Models;
+using Regira.Invoicing.Payments.Models;
 using Regira.Payments.Mollie.Config;
 using Regira.Payments.Mollie.Services;
 using Regira.Utilities;
