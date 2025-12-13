@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-#if NET10_0
+#if NET10_0_OR_GREATER
 using Microsoft.OpenApi;
 #else
 using Microsoft.OpenApi.Models;
@@ -12,7 +12,7 @@ public static class JwtAuthenticationExtensions
 {
     public static void AddJwtAuthentication(this SwaggerGenOptions o, string authenticationScheme = "Bearer")
     {
-#if NET10_0
+#if NET10_0_OR_GREATER
         // ToDo: verify this implementation
         var jwtSecurityScheme = new OpenApiSecurityScheme
         {
@@ -25,9 +25,9 @@ public static class JwtAuthenticationExtensions
         };
 
         o.AddSecurityDefinition(authenticationScheme, jwtSecurityScheme);
-        o.AddSecurityRequirement(_ => new OpenApiSecurityRequirement
+        o.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
         {
-            {new OpenApiSecuritySchemeReference(authenticationScheme), []}
+            {new OpenApiSecuritySchemeReference(authenticationScheme, doc), []}
         });
 #else
         // https://stackoverflow.com/questions/43447688/setting-up-swagger-asp-net-core-using-the-authorization-headers-bearer/#answer-64899768

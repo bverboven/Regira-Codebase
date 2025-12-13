@@ -25,7 +25,11 @@ public class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvider authe
                 BearerFormat = "Json Web Token"
             };
             document.Components ??= new OpenApiComponents();
+#if NET10_0_OR_GREATER
             document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
+#else
+            document.Components.SecuritySchemes ??= new Dictionary<string, OpenApiSecurityScheme>();
+#endif
             document.Components.SecuritySchemes.TryAdd("Bearer", scheme);
         }
     }

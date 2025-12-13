@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-#if NET10_0
+#if NET10_0_OR_GREATER
 using Microsoft.OpenApi;
 #else
 using Microsoft.OpenApi.Models;
@@ -15,7 +15,7 @@ public static class ApiKeyAuthenticationExtensions
     /// </summary>
     public static void AddApiKeyAuthentication(this SwaggerGenOptions o, string authenticationScheme = "ApiKey", string parameterName = "X-Api-Key")
     {
-#if NET10_0
+#if NET10_0_OR_GREATER
         // ToDo: verify this implementation
         var apiKeySecurityScheme = new OpenApiSecurityScheme
         {
@@ -29,7 +29,7 @@ public static class ApiKeyAuthenticationExtensions
         o.AddSecurityDefinition(authenticationScheme, apiKeySecurityScheme);
         o.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
         {
-            { new OpenApiSecuritySchemeReference(authenticationScheme), [] }
+            { new OpenApiSecuritySchemeReference(authenticationScheme, doc), [] }
         });
 #else
         var apiKeySecurityScheme = new OpenApiSecurityScheme
