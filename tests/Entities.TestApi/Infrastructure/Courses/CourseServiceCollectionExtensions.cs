@@ -17,6 +17,7 @@ public static class CourseServiceCollectionExtensions
             .For<Course, int, CourseSearchObject>(e =>
             {
                 e.Includes((query, _) => query.IncludeEntityAttachments());
+                e.SortBy(query => query.OrderBy(x => x.Title));
                 e.AddQueryFilter<CourseQueryFilter>();
                 e.UseMapping<CourseDto, CourseInputDto>();
                 e.HasAttachments(

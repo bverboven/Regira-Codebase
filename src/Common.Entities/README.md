@@ -110,3 +110,4 @@ public class PersonController : EntityControllerBase<Person, int>;
 public class PersonController : EntityControllerBase<Person, int, PersonSearchObject, PersonDto, PersonInputDto>;
 public class PersonController : EntityControllerBase<Person, int, PersonSearchObject, PersonSortBy, PersonIncludes, PersonDto, PersonInputDto>;
 ```
+

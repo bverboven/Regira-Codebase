@@ -91,7 +91,7 @@ public class QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
                     var canFilter = filterTypes.Any(ft => entityBaseTypes.Any(bt => TypeUtility.HasGenericArgument(ft, bt)));
                     if (canFilter)
                     {
-                        _logger?.LogDebug($"Applying filter {filter.GetType().FullName} for type {typeof(TEntity).FullName}");
+                        _logger?.LogDebug($"Applying global filter {filter.GetType().FullName} for type {typeof(TEntity).FullName}");
                         return filter.Build(filteredQuery, so);
                     }
 
@@ -103,7 +103,7 @@ public class QueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
                 globallyFilteredQuery,
                 (filteredQuery, filter) =>
                 {
-                    _logger?.LogDebug($"Applying global filter {filter.GetType().FullName} for type {typeof(TEntity).FullName}");
+                    _logger?.LogDebug($"Applying filter {filter.GetType().FullName} for type {typeof(TEntity).FullName}");
                     return filter.Build(filteredQuery, so);
                 }) ?? globallyFilteredQuery;
     }
