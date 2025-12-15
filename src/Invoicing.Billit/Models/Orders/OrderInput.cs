@@ -22,6 +22,26 @@ public class OrderInput
     public DateOnly ExpiryDate { get; set; }
     public string? PaymentReference { get; set; }
 
+    public FileInput? OrderPDF { get; set; }
+    public List<FileInput>? Attachments { get; set; }
+
     public CustomerInput Customer { get; set; } = null!;
     public List<OrderLineInput> OrderLines { get; set; } = null!;
+    public List<AdditionalDocumentInput>? AdditionalDocumentReference { get; set; }
+}
+
+public class AdditionalDocumentInput
+{
+    public string? ID { get; set; }
+    public string? DocumentDescription { get; set; }
+    public string? DocumentType { get; set; }
+    public FileInput File { get; set; } = null!;
+}
+
+public class FileInput
+{
+    public string? FileID { get; set; }
+    public string FileName { get; set; } = null!;
+    public string MimeType { get; set; } = null!;
+    public byte[] FileContent { get; set; } = null!;
 }
