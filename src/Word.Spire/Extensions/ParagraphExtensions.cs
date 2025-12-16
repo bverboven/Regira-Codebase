@@ -99,4 +99,10 @@ internal static class ParagraphExtensions
 
         return paragraph;
     }
+
+    public static void InjectHtml(this SpireParagraph paragraph, string html)
+    {
+        paragraph.Text = string.Empty;
+        paragraph.AppendHTML(html);
+    }
 }

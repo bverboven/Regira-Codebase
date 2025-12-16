@@ -381,14 +381,32 @@ public class WordManager : IWordManager
             .ToList();
         foreach (var parameter in parameters)
         {
-            doc.Replace(new Regex($"{{{{ *{parameter.Key} *}}}}"), parameter.Value.ToString() ?? string.Empty);
-            var bookmark = bookmarks.FirstOrDefault(b => b.Name.Equals(parameter.Key));
+            var parameterKey = parameter.Key;
+            var parameterValue = parameter.Value.ToString() ?? string.Empty;
+
+            var keyPattern = $"{{{{ *{parameterKey} *}}}}";
+            if (parameterKey.StartsWith("html_", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var sel = doc.FindPattern(new Regex(keyPattern, RegexOptions.IgnoreCase));
+                sel.GetAsOneRange().OwnerParagraph.InjectHtml(parameterValue);
+            }
+            else
+            {
+#if NETSTANDARD
+                var replacementText = parameterValue;
+#else
+                var replacementText = parameterValue.ReplaceLineEndings("\v");
+#endif
+                doc.Replace(new Regex(keyPattern, RegexOptions.IgnoreCase), replacementText);
+            }
+
+            var bookmark = bookmarks.FirstOrDefault(b => b.Name.Equals(parameterKey));
             if (bookmark != null)
             {
                 var target = bookmark.BookmarkStart.NextSibling;
                 if (target is TextRange tr)
                 {
-                    tr.Text = parameter.Value.ToString() ?? string.Empty;
+                    tr.Text = parameterValue;
                 }
                 // remove replaced bookmark?
                 doc.Bookmarks.Remove(bookmark);
