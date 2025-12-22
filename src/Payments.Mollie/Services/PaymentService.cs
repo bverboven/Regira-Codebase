@@ -3,7 +3,7 @@ using Mollie.Api.Client;
 using Mollie.Api.Models;
 using Mollie.Api.Models.Payment.Request;
 using Mollie.Api.Models.Payment.Response;
-using Regira.Invoicing.Payments.Abstraction;
+using Regira.Invoicing.Payments.Abstractions;
 using Regira.Invoicing.Payments.Enums;
 using Regira.Invoicing.Payments.Models;
 using Regira.Payments.Mollie.Config;

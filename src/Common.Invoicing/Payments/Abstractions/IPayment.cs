@@ -1,6 +1,6 @@
 ﻿using Regira.Invoicing.Payments.Enums;
 
-namespace Regira.Invoicing.Payments.Abstraction;
+namespace Regira.Invoicing.Payments.Abstractions;
 
 public interface IPayment
 {

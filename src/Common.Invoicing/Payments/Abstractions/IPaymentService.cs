@@ -1,4 +1,4 @@
-﻿namespace Regira.Invoicing.Payments.Abstraction;
+﻿namespace Regira.Invoicing.Payments.Abstractions;
 
 public interface IPaymentService
 {

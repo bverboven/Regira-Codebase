@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using Regira.Invoicing.Payments.Abstraction;
+using Regira.Invoicing.Payments.Abstractions;
 using Regira.Invoicing.Payments.Enums;
 using Regira.Invoicing.Payments.Models;
 using Regira.Serializing.Abstractions;

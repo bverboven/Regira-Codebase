@@ -1,4 +1,4 @@
-﻿using Regira.Invoicing.Payments.Abstraction;
+﻿using Regira.Invoicing.Payments.Abstractions;
 
 namespace Regira.Payments.Mollie.Config;
 
