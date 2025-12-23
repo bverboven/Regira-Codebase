@@ -1,4 +1,3 @@
-using NUnit.Framework.Legacy;
 using Regira.Security.Core;
 using Regira.Security.Hashing.BCryptNet;
 
@@ -33,6 +32,6 @@ public class BCryptNet_Hash_Tests
 
         var verifier = new Hasher(new CryptoOptions { Secret = secret });
         var success = verifier.Verify("wrong_password", hashed);
-        ClassicAssert.IsFalse(success);
+        Assert.That(success, Is.False);
     }
 }

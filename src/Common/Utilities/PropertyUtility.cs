@@ -43,7 +43,7 @@ public class PropertyUtility
     /// </value>
     /// <remarks>
     /// This property is initialized during the construction of the <see cref="PropertyUtility"/> instance
-    /// and corresponds to the <see cref="PropertyInfo.Name"/> of the provided property.
+    /// and corresponds to the <see cref="MemberInfo.Name"/> of the provided property.
     /// </remarks>
     public string Name { get; protected set; }
     /// <summary>

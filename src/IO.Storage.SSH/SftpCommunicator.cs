@@ -10,7 +10,7 @@ public class SftpCommunicator : IDisposable
     public SftpCommunicator(SftpConfig config)
     {
         _config = config;
-        _client = new SftpClient(_config.Host, _config.Port, _config.UserName, _config.Password);
+        _client = new SftpClient(_config.Host, _config.Port, _config.UserName, _config.Password ?? string.Empty);
     }
 
     protected internal Task<SftpClient> Open()

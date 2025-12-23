@@ -113,7 +113,7 @@ public class DictionaryUtilityTests
         dynamic? obj = _objWithArray;
         var dic = DictionaryUtility.ToDictionary(obj);
         CollectionAssert.IsNotEmpty(dic["Values"]);
-        var src = (int[])obj.Values;
+        var src = (int[])obj!.Values;
         var result = (IList<object>)dic["Values"];
         Assert.That(result, Is.EqualTo(src).AsCollection);
     }

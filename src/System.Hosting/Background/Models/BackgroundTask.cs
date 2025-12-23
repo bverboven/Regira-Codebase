@@ -6,7 +6,7 @@ public class BackgroundTask : IBackgroundTask
 {
     internal CancellationToken Token { get; set; }
 
-    public string? Id { get; set; }
+    public string Id { get; set; } = null!;
     public BackgroundTaskStatus Status { get; private set; }
     public double Progress { get; private set; }
     public object? Result { get; private set; }

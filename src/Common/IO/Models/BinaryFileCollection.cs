@@ -10,5 +10,6 @@ public class BinaryFileCollection(IEnumerable<IBinaryFile> items) : List<IBinary
         {
             fileItem.Dispose();
         }
+        GC.SuppressFinalize(this);
     }
 }

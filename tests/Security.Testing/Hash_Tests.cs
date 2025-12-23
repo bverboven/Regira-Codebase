@@ -1,4 +1,3 @@
-using NUnit.Framework.Legacy;
 using Regira.Security.Core;
 using Regira.Security.Hashing;
 
@@ -33,7 +32,7 @@ public class Hash_Tests
 
         var verifier = new Hasher(new CryptoOptions { Secret = secret });
         var success = verifier.Verify("wrong_password", hashed);
-        ClassicAssert.IsFalse(success);
+        Assert.That(success, Is.False);
     }
 
     [TestCase(LoremIpsum.Value, LoremIpsum.Value)]
@@ -61,6 +60,6 @@ public class Hash_Tests
 
         var verifier = new SimpleHasher(new CryptoOptions { Secret = secret });
         var success = verifier.Verify("wrong_password", hashed);
-        ClassicAssert.IsFalse(success);
+        Assert.That(success, Is.False);
     }
 }

@@ -1,4 +1,3 @@
-using NUnit.Framework.Legacy;
 using Regira.Security.Core;
 using Regira.Security.Encryption;
 
@@ -45,7 +44,7 @@ public class Symmetric_Tests
         var encrypted = encrypter.Encrypt("wrong_password");
         var decrypter = new SymmetricEncrypter(new CryptoOptions { Secret = secret });
         var decrypted = decrypter.Decrypt(encrypted);
-        ClassicAssert.AreNotEqual(plaintext, decrypted);
+        Assert.That(plaintext, Is.Not.EqualTo(decrypted));
     }
 
     [Test]

@@ -135,7 +135,7 @@ public static class ObjectUtility
     /// <example>
     /// <code>
     /// var input = new { Name = "John", Age = 30 };
-    /// var person = ObjectUtility.Create<Person>(input);
+    /// var person = ObjectUtility.Create{Person}(input);
     /// Console.WriteLine(person.Name); // Outputs: John
     /// Console.WriteLine(person.Age);  // Outputs: 30
     /// </code>

@@ -1,6 +1,6 @@
-﻿using System.Globalization;
-using PhoneNumbers;
+﻿using PhoneNumbers;
 using Regira.Normalizing.Abstractions;
+using System.Globalization;
 
 namespace Regira.Globalization.LibPhoneNumber;
 
@@ -18,7 +18,9 @@ public class PhoneNumberFormatter(CultureInfo? culture = null) : INormalizer, IF
         }
 
         var phoneNumber = ParseInput(input);
-        return PhoneNumberUtil.Format(phoneNumber, PhoneNumberFormat.E164);
+        return phoneNumber != null
+            ? PhoneNumberUtil.Format(phoneNumber, PhoneNumberFormat.E164)
+            : null;
     }
     public string? Format(string? input)
     {
@@ -28,7 +30,9 @@ public class PhoneNumberFormatter(CultureInfo? culture = null) : INormalizer, IF
         }
 
         var phoneNumber = ParseInput(input);
-        return PhoneNumberUtil.Format(phoneNumber, PhoneNumberFormat.INTERNATIONAL);
+        return phoneNumber != null
+            ? PhoneNumberUtil.Format(phoneNumber, PhoneNumberFormat.INTERNATIONAL)
+            : null;
     }
 
     internal PhoneNumber? ParseInput(string input)

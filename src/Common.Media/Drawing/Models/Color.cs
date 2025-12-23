@@ -51,7 +51,7 @@ public readonly struct Color(byte red = byte.MaxValue, byte green = byte.MaxValu
 
         hex = hex.TrimStart('#');
 
-        if (hex.Length == 3 || hex.Length == 4)
+        if (hex.Length is 3 or 4)
         {
             var expanded = "";
             foreach (var c in hex)
@@ -83,6 +83,7 @@ public readonly struct Color(byte red = byte.MaxValue, byte green = byte.MaxValu
         => Red == other.Red && Green == other.Green && Blue == other.Blue && Alpha == other.Alpha;
     public override bool Equals(object? obj)
         => obj is Color other && Equals(other);
+#if NETSTANDARD
     public override int GetHashCode()
     {
         unchecked
@@ -94,4 +95,7 @@ public readonly struct Color(byte red = byte.MaxValue, byte green = byte.MaxValu
             return hashCode;
         }
     }
+#else
+    public override int GetHashCode() => HashCode.Combine(Red, Green, Blue, Alpha);
+#endif
 }

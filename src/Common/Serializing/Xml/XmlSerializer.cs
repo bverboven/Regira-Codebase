@@ -43,7 +43,7 @@ public class XmlSerializer : ISerializer
     /// </returns>
     /// <remarks>
     /// This method uses <see cref="Regira.Utilities.XmlUtility.Deserialize{T}"/> to parse the XML content 
-    /// and <see cref="Regira.Utilities.ObjectUtility.Fill{T}"/> to populate the properties of the created object.
+    /// and <see cref="ObjectUtility.Fill{T}(T,object?)"/> to populate the properties of the created object.
     /// </remarks>
     /// <exception cref="ArgumentNullException">
     /// Thrown if <paramref name="type"/> is <c>null</c>.
@@ -64,6 +64,6 @@ public class XmlSerializer : ISerializer
     /// <exception cref="System.InvalidOperationException">
     /// Thrown if the object cannot be serialized due to invalid data or configuration.
     /// </exception>
-    public string Serialize<T>(T item) 
+    public string Serialize<T>(T item)
         => XmlUtility.Serialize(item);
 }
