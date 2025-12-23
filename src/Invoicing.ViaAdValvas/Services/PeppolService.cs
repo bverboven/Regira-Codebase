@@ -1,8 +1,8 @@
-﻿using System.Xml.Linq;
-using Regira.Invoicing.ViaAdValvas.Config;
+﻿using Regira.Invoicing.ViaAdValvas.Config;
 using Regira.Invoicing.ViaAdValvas.Helpers;
 using Regira.Invoicing.ViaAdValvas.Models;
 using Regira.Serializing.Abstractions;
+using System.Xml.Linq;
 
 namespace Regira.Invoicing.ViaAdValvas.Services;
 

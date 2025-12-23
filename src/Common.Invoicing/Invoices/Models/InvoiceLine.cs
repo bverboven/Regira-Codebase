@@ -10,4 +10,7 @@ public class InvoiceLine : IInvoiceLine
     public decimal Quantity { get; set; }
     public decimal UnitPriceExcl { get; set; }
     public decimal VatPercentage { get; set; }
+
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
 }

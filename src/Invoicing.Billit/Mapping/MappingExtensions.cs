@@ -7,7 +7,7 @@ namespace Regira.Invoicing.Billit.Mapping
 {
     public static class MappingExtensions
     {
-        public static OrderInput Map(this IInvoice item)
+        public static OrderInput ToOrderInput(this IInvoice item)
         {
             FileInput? pdf = null;
             if (item.Attachments?.Any() == true)
@@ -23,13 +23,11 @@ namespace Regira.Invoicing.Billit.Mapping
 
             return new OrderInput
             {
-                // Map properties from IInvoice to OrderInput
-
                 OrderType = item.InvoiceType == InvoiceType.Invoice ? OrderTypes.Invoice : OrderTypes.CreditNote,
                 OrderDirection = OrderDirections.Income,
                 OrderNumber = item.Code,
-                OrderDate = item.IssueDate,
-                ExpiryDate = item.DueDate ?? item.IssueDate.AddDays(30),
+                OrderDate = DateOnly.FromDateTime(item.IssueDate),
+                ExpiryDate = DateOnly.FromDateTime(item.DueDate ?? item.IssueDate.AddDays(30)),
                 PaymentReference = item.RemittanceInfo,
                 OrderPDF = pdf,
                 Customer = new CustomerInput

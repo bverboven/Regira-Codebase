@@ -8,4 +8,7 @@ public interface IInvoiceLine
     decimal Quantity { get; set; }
     decimal UnitPriceExcl { get; set; }
     decimal VatPercentage { get; set; }
+
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
 }

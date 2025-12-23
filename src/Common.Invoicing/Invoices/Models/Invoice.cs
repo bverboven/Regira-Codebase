@@ -9,13 +9,8 @@ public class Invoice : IInvoice
     public string? Title { get; set; }
     public string? Description { get; set; }
     public InvoiceType InvoiceType { get; set; }
-#if NETSTANDARD
-    public  DateTime IssueDate { get; set; }
-    public  DateTime? DueDate { get; set; }
-#else
-    public DateOnly IssueDate { get; set; }
-    public DateOnly? DueDate { get; set; }
-#endif
+    public DateTime IssueDate { get; set; }
+    public DateTime? DueDate { get; set; }
     public string? RemittanceInfo { get; set; }
     public InvoiceParty? Supplier { get; set; }
     public InvoiceParty Customer { get; set; } = new();
