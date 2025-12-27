@@ -1,7 +1,7 @@
 ﻿using Regira.Invoicing.Billit.Models.Contacts;
 using Regira.Invoicing.Billit.Models.Orders.Documents;
 
-namespace Regira.Invoicing.Billit.Models.Orders;
+namespace Regira.Invoicing.Billit.Models.Orders.Dto;
 
 public class OrderItemDto
 {

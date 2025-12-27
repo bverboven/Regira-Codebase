@@ -8,13 +8,11 @@ public interface IPeppolManager
 {
     Task<IList<InboxItemDto>> List(string? company);
     IAsyncEnumerable<PeppolItem> EnrichList(IList<InboxItemDto> items);
-    Task<PeppolSender?> GetParticipant(string identifier);
 }
 public class PeppolManager(IHttpClientFactory clientFactory, IPartyManager partyManager, IFileManager fileManager, ISerializer serializer) : IPeppolManager
 {
     private const string Path = "/v1/peppol";
     private readonly HttpClient _client = clientFactory.CreateClient(BillitConstants.HttpClientName);
-    private string PartyId => _client.DefaultRequestHeaders.GetValues(BillitConstants.HeaderPartyIdName).First();
 
     public async Task<IList<InboxItemDto>> List(string? company)
     {
@@ -68,7 +66,7 @@ public class PeppolManager(IHttpClientFactory clientFactory, IPartyManager party
         }
     }
 
-    public async Task<PeppolSender?> GetParticipant(string senderPeppolId)
+    async Task<PeppolSender?> GetParticipant(string senderPeppolId)
     {
         var identifier = senderPeppolId.Split(':').LastOrDefault();
         var parties = await partyManager.List(new PartySearchObject { Q = identifier });

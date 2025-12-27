@@ -16,6 +16,7 @@ public static class BillitServiceCollectionExtensions
 
         services
             .AddTransient<IFileManager, FileManager>()
+            .AddTransient<IInvoiceManager, InvoiceManager>()
             .AddTransient<IPartyManager, PartyManager>()
             .AddTransient<IPeppolManager, PeppolManager>();
 

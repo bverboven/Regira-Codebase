@@ -1,4 +1,4 @@
-﻿using Regira.Invoicing.Billit.Models.Orders;
+﻿using Regira.Invoicing.Billit.Models.Orders.Input;
 
 namespace Regira.Invoicing.Billit.Models.Peppol;
 

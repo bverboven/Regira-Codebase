@@ -1,6 +1,6 @@
 ﻿using Regira.Invoicing.Billit.Models.Contacts;
 
-namespace Regira.Invoicing.Billit.Models.Orders;
+namespace Regira.Invoicing.Billit.Models.Orders.Input;
 
 public class OrderInput
 {

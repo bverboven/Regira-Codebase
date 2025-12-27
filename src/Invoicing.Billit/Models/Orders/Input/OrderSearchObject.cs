@@ -1,4 +1,4 @@
-﻿namespace Regira.Invoicing.Billit.Models.Orders;
+﻿namespace Regira.Invoicing.Billit.Models.Orders.Input;
 
 public class OrderSearchObject
 {

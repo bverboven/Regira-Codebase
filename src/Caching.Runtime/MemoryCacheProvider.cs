@@ -15,6 +15,7 @@ namespace Regira.Caching.Runtime;
 /// </remarks>
 public class MemoryCacheProvider : CacheProviderBase
 {
+    // ToDo: https://www.milanjovanovic.tech/blog/how-to-build-a-high-performance-cache-without-external-libraries
     public class Options
     {
         public string? Prefix { get; set; }

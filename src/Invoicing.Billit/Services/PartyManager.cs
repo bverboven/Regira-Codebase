@@ -1,6 +1,6 @@
-﻿using System.Net.Http.Json;
-using Regira.Invoicing.Billit.Config;
+﻿using Regira.Invoicing.Billit.Config;
 using Regira.Invoicing.Billit.Models.Contacts;
+using System.Net.Http.Json;
 
 namespace Regira.Invoicing.Billit.Services;
 

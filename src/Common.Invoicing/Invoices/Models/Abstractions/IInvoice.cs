@@ -11,7 +11,7 @@ public interface IInvoice
     DateTime IssueDate { get; set; }
     DateTime? DueDate { get; set; }
     string? RemittanceInfo { get; set; }
-    InvoiceParty? Supplier { get; set; }
+    InvoiceParty Supplier { get; set; }
     InvoiceParty Customer { get; set; }
     ICollection<InvoiceLine> InvoiceLines { get; set; }
     ICollection<BinaryFileItem>? Attachments { get; set; }

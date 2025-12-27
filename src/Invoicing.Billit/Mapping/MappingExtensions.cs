@@ -1,5 +1,6 @@
 ﻿using Regira.Invoicing.Billit.Models.Contacts;
 using Regira.Invoicing.Billit.Models.Orders;
+using Regira.Invoicing.Billit.Models.Orders.Input;
 using Regira.Invoicing.Invoices.Models.Abstractions;
 using Regira.IO.Extensions;
 

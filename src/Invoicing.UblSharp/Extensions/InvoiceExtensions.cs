@@ -12,12 +12,19 @@ internal static class InvoiceExtensions
 {
     public static PartyType ToPartyType(this IInvoiceParty item)
     {
-        var identifierSegments = item.Code.Split(':');
-        var identifierScheme = identifierSegments.Length > 1 ? identifierSegments.First() : null;
-        var identifierValue = identifierSegments.Last();
+        var identifier = item.Identifiers?.FirstOrDefault();
+        if (identifier == null)
+        {
+            var identifierSegments = item.Code.Split(':');
+            identifier = new PartyIdentifier
+            {
+                Scheme = identifierSegments.Length > 1 ? identifierSegments.First() : UblDefaults.EndpointSchemeId,
+                Value = identifierSegments.Last()
+            };
+        }
         return new PartyType
         {
-            EndpointID = new IdentifierType { schemeID = identifierScheme ?? UblDefaults.EndpointSchemeId, Value = identifierValue },
+            EndpointID = new IdentifierType { schemeID = identifier.Scheme, Value = identifier.Value },
             PartyLegalEntity = new[] { new PartyLegalEntityType {
                 RegistrationName = item.Title,
                 CompanyID = item.Code
@@ -35,8 +42,8 @@ internal static class InvoiceExtensions
             Contact = new ContactType
             {
                 Name = item.Title,
-                Telephone = item.Phone,
-                ElectronicMail = item.Email
+                Telephone = item.ContactData?.FirstOrDefault(cd => cd.DataType == ContactDataTypes.Phone)?.Value,
+                ElectronicMail = item.ContactData?.FirstOrDefault(cd => cd.DataType == ContactDataTypes.Email)?.Value
             }
         };
     }

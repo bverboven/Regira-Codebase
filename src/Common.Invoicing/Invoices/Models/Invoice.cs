@@ -12,7 +12,7 @@ public class Invoice : IInvoice
     public DateTime IssueDate { get; set; }
     public DateTime? DueDate { get; set; }
     public string? RemittanceInfo { get; set; }
-    public InvoiceParty? Supplier { get; set; }
+    public InvoiceParty Supplier { get; set; } = new();
     public InvoiceParty Customer { get; set; } = new();
     public ICollection<InvoiceLine> InvoiceLines { get; set; } = [];
     public ICollection<BinaryFileItem>? Attachments { get; set; }
