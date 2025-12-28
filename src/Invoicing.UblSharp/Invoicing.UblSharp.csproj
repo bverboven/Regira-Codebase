@@ -1,26 +1,22 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-	<TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
-	<ImplicitUsings>enable</ImplicitUsings>
-	<Nullable>enable</Nullable>
-	<LangVersion>latest</LangVersion>
-	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<Authors>B.Verboven</Authors>
-	<RootNamespace>Regira.Invoicing.UblSharp</RootNamespace>
-	<PackageId>Regira.Invoicing.UblSharp</PackageId>
-	<AssemblyName>Regira.Invoicing.UblSharp</AssemblyName>
-	<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	<NoWarn>1701;1702;1591</NoWarn>
-	<Version>5.0.1</Version>
+    <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.Invoicing.UblSharp</RootNamespace>
+    <PackageId>Regira.Invoicing.UblSharp</PackageId>
+    <AssemblyName>Regira.Invoicing.UblSharp</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>5.0.1</Version>
   </PropertyGroup>
-
   <ItemGroup>
-	<PackageReference Include="UblSharp" Version="1.1.1" />
+    <PackageReference Include="UblSharp" Version="1.1.1" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Common.Invoicing\Common.Invoicing.csproj" />
   </ItemGroup>
-
 </Project>
