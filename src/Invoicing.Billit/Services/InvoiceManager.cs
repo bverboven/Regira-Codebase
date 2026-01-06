@@ -51,12 +51,11 @@ public class InvoiceManager(IHttpClientFactory clientFactory, ISerializer serial
 
         return new SendInvoiceResult();
     }
+
     public async Task<ISendInvoiceResult> Send(IInvoice input)
     {
         var result = await Create(input);
-        return new SendInvoiceResult
-        {
-            InvoiceId = result.InvoiceId
-        };
+
+        return await Send(result.InvoiceId);
     }
 }
