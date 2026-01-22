@@ -1,6 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 using Regira.Entities.Mapping.Abstractions;
+using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.DependencyInjection.Mapping;
 
@@ -37,4 +40,23 @@ public static class ServiceCollectionMappingExtensions
             c.SetMapConfigurator(configFactory);
             c.SetMapper<TEntityMapper>();
         });
+
+
+    // AfterMappers
+    public static EntityServiceCollectionOptions AfterMap<TSource, TTarget, TAfterMapper>(this EntityServiceCollectionOptions options)
+        where TAfterMapper : class, IEntityAfterMapper<TSource, TTarget>
+    {
+        options.Services.AddTransient<IEntityAfterMapper, TAfterMapper>();
+        return options;
+    }
+    public static EntityServiceCollectionOptions AfterMap<TSource, TTarget>(this EntityServiceCollectionOptions options, Action<TSource, TTarget> afterMapAction)
+    {
+        options.Services.AddTransient<IEntityAfterMapper>(p => new EntityAfterMapper<TSource, TTarget>(afterMapAction));
+        return options;
+    }
+    public static EntityServiceCollectionOptions AfterMap<TSource, TTarget>(this EntityServiceCollectionOptions options, Func<IServiceProvider, Action<TSource, TTarget>> afterMapAction)
+    {
+        options.Services.AddTransient<IEntityAfterMapper>(p => new EntityAfterMapper<TSource, TTarget>(afterMapAction(p)));
+        return options;
+    }
 }

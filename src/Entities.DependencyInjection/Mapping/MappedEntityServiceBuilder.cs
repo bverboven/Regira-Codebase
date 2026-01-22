@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 using Regira.Entities.Mapping.Abstractions;
 using Regira.Entities.Models.Abstractions;
 
-namespace Regira.Entities.DependencyInjection.ServiceBuilders;
+namespace Regira.Entities.DependencyInjection.Mapping;
 
 public class MappedEntityServiceBuilder<TContext, TEntity, TKey>(EntityServiceCollectionOptions options)
     : EntityServiceBuilder<TContext, TEntity, TKey>(options)
@@ -26,6 +27,11 @@ public class MappedEntityServiceBuilder<TContext, TEntity, TKey>(EntityServiceCo
     public MappedEntityServiceBuilder<TContext, TEntity, TKey> After<TSource, TTarget>(Action<TSource, TTarget> afterMapAction)
     {
         Services.AddTransient<IEntityAfterMapper>(_ => new EntityAfterMapper<TSource, TTarget>(afterMapAction));
+        return this;
+    }
+    public MappedEntityServiceBuilder<TContext, TEntity, TKey> After<TSource, TTarget>(Func<IServiceProvider, Action<TSource, TTarget>> afterMapActionFactory)
+    {
+        Services.AddTransient<IEntityAfterMapper>(p => new EntityAfterMapper<TSource, TTarget>(afterMapActionFactory(p)));
         return this;
     }
 }

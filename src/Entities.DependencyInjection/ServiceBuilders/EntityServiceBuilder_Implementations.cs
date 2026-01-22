@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Regira.Entities.Attachments.Abstractions;
+using Regira.Entities.DependencyInjection.Mapping;
 using Regira.Entities.DependencyInjection.Normalizers;
 using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.Primers;
@@ -12,6 +14,7 @@ using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Mapping.Abstractions;
+using Regira.Entities.Mapping.Models;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Services.Abstractions;

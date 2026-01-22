@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Regira.Entities.Attachments;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
+using Regira.Entities.DependencyInjection.Mapping;
 using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.ServiceBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
@@ -83,35 +85,8 @@ public class EntityAttachmentServiceBuilder<TContext, TObject, TObjectKey, TEnti
             var uriResolver = p.GetRequiredService<IAttachmentUriResolver<TEntityAttachment>>();
             dto.Uri = uriResolver.Resolve(item);
         }));
-        AddTransient<IEntityAfterMapper>(p => new EntityAfterMapper<IHasAttachments<TEntityAttachment, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>, object>((item, dto) =>
-        {
-            var uriResolver = p.GetRequiredService<IAttachmentUriResolver<TEntityAttachment>>();
-            var attachmentsProp = item.GetType().GetProperty(nameof(IHasAttachments.Attachments));
-            var attachmentsValues = attachmentsProp?.GetValue(item);
-            if (attachmentsValues == null)
-            {
-                return;
-            }
-
-            var dtoAttachmentsProp = dto.GetType().GetProperty(nameof(IHasAttachments.Attachments));
-            var dtoAttachments = (ICollection<TEntityAttachmentDto>?)dtoAttachmentsProp?.GetValue(dto);
-            if (dtoAttachments == null)
-            {
-                return;
-            }
-
-            var attachments = (ICollection<TEntityAttachment>)attachmentsValues;
-            for (var i = 0; i < attachments.Count; i++)
-            {
-                var attachment = attachments.ElementAt(i);
-                var dtoAttachment = dtoAttachments.ElementAt(i);
-                if (dto != null)
-                {
-                    dtoAttachment.Uri = uriResolver.Resolve(attachment);
-                }
-            }
-        }));
-
+        AddTransient<IEntityAfterMapper, EntityAttachmentUriAfterMapper<TObject, TEntityAttachment, TEntityAttachmentDto, TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>>();
+        
         HasEntityAttachmentMapping = true;
 
         return new MappedEntityServiceBuilder<TContext, TEntityAttachment, TEntityAttachmentKey>(Options);
