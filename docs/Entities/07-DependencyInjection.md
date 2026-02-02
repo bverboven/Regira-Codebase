@@ -90,7 +90,7 @@ config.AddDefaultGlobalQueryFilters(); // Filter IDs, archivable, timestamps
 ```csharp
 builder.Services
     .UseEntities<MyDbContext>(config => config.UseDefaults())
-    .For<Product>(cfg =>
+    .For<Product>(p =>
     {
         // Minimal - uses defaults
     });
@@ -101,26 +101,25 @@ builder.Services
 ```csharp
 builder.Services
     .UseEntities<MyDbContext>(config => config.UseDefaults())
-    .For<Product>(cfg =>
+    .For<Product>(e =>
     {
         // === Query Filters ===
-        cfg.UseFilter<ProductQueryFilter>();
+        e.AddQueryFilter<ProductQueryFilter>();
         
         // === Sorting ===
-        cfg.UseSorting<ProductSortedQueryBuilder>();
+        e.SortBy<ProductSortedQueryBuilder>();
         
         // === Includes ===
-        cfg.UseIncludes<ProductIncludableQueryBuilder>();
+        e.Includes<ProductIncludableQueryBuilder>();
         
         // === Processors (post-fetch) ===
-        cfg.UseProcessor<ProductProcessor>();
+        e.AddProcessor<ProductProcessor>();
         
         // === Preppers (pre-save) ===
-        cfg.UsePrepper<ProductPrepper>();
+        e.AddPrepper<ProductPrepper>();
         
         // === Related Entities ===
-        cfg.Related(x => x.Category);
-        cfg.Related(x => x.Reviews);
+        e.Related(x => x.Reviews);
     });
 ```
 
@@ -129,39 +128,10 @@ builder.Services
 The `Related` method declares navigation/child properties and optionally handles their preparation during save operations:
 
 ```csharp
-.For<Invoice>(cfg =>
-{
-    // Simple related property declaration
-    cfg.Related(x => x.Customer);
-    
+.For<Invoice>(e =>
+{    
     // Related with prepare function for child collection
-    cfg.Related(x => x.InvoiceLines, prepare: (invoice, lines) =>
-    {
-        // Add new lines
-        foreach (var line in lines.Where(l => l.Id == 0))
-        {
-            invoice.InvoiceLines.Add(line);
-        }
-        
-        // Modify existing lines
-        foreach (var line in lines.Where(l => l.Id > 0))
-        {
-            var existing = invoice.InvoiceLines.FirstOrDefault(il => il.Id == line.Id);
-            if (existing != null)
-            {
-                existing.Quantity = line.Quantity;
-                existing.Price = line.Price;
-            }
-        }
-        
-        // Delete removed lines
-        var lineIds = lines.Select(l => l.Id).ToList();
-        var toRemove = invoice.InvoiceLines.Where(il => !lineIds.Contains(il.Id)).ToList();
-        foreach (var line in toRemove)
-        {
-            invoice.InvoiceLines.Remove(line);
-        }
-    });
+    e.Related(item => item.InvoiceLines, item => item.InvoiceLines?.Prepare());
 });
 ```
 
@@ -174,10 +144,10 @@ The `Related` method declares navigation/child properties and optionally handles
 ### Shorthand Configuration Methods
 
 ```csharp
-.For<Product>(cfg =>
+.For<Product>(e =>
 {
     // Direct sorting lambda (instead of builder class)
-    cfg.SortBy((query, sortBy) => sortBy switch
+    e.SortBy((query, sortBy) => sortBy switch
     {
         ProductSortBy.Title => query.OrderBy(x => x.Title),
         ProductSortBy.Price => query.OrderBy(x => x.Price),
@@ -185,7 +155,7 @@ The `Related` method declares navigation/child properties and optionally handles
     });
     
     // Direct includes lambda
-    cfg.Includes((query, include) =>
+    e.Includes((query, include) =>
     {
         if (include.HasFlag(ProductIncludes.Category))
             query = query.Include(x => x.Category);
@@ -205,26 +175,26 @@ builder.Services
         config.UseDefaults();
         config.UseMapsterMapping();
     })
-    .For<Category>(cfg =>
+    .For<Category>(e =>
     {
-        cfg.SortBy((q, _) => q.OrderBy(x => x.Title));
-        cfg.Includes((q, _) => q.Include(x => x.Products));
-        cfg.Related(c => c.Products);
+        e.SortBy((q, _) => q.OrderBy(x => x.Title));
+        e.Includes((q, _) => q.Include(x => x.Products));
+        e.Related(c => c.Products);
     })
-    .For<Product>(cfg =>
+    .For<Product>(e =>
     {
-        cfg.UseFilter<ProductQueryFilter>();
-        cfg.UseSorting<ProductSortedQueryBuilder>();
-        cfg.UseIncludes<ProductIncludableQueryBuilder>();
-        cfg.UseProcessor<ProductProcessor>();
-        cfg.UsePrepper<ProductPrepper>();
-        cfg.Related(p => p.Category);
-        cfg.Related(p => p.Reviews);
+        e.AddQueryFilter<ProductQueryFilter>();
+        e.SortBy<ProductSortedQueryBuilder>();
+        e.Includes<ProductIncludableQueryBuilder>();
+        e.AddProcessor<ProductProcessor>();
+        e.AddPrepper<ProductPrepper>();
+        e.Related(p => p.Category);
+        e.Related(p => p.Reviews);
     })
-    .For<Review>(cfg =>
+    .For<Review>(e =>
     {
-        cfg.SortBy((q, _) => q.OrderByDescending(x => x.Created));
-        cfg.Related(r => r.Product);
+        e.SortBy((q, _) => q.OrderByDescending(x => x.Created));
+        e.Related(r => r.Product);
     });
 ```
 
@@ -395,9 +365,9 @@ builder.Services.UseEntities<MyDbContext>(config =>
 ```csharp
 builder.Services
     .UseEntities<MyDbContext>(config => config.UseDefaults())
-    .For<Product>(cfg =>
+    .For<Product>(e =>
     {
-        cfg.UseFilter<ProductQueryFilter>();
+        e.AddQueryFilter<ProductQueryFilter>();
     });
 
 // Override with custom service
@@ -439,28 +409,28 @@ builder.Services
         // Configure mapping
         config.UseMapsterMapping();
     })
-    .For<Category>(cfg =>
+    .For<Category>(e =>
     {
-        cfg.SortBy((q, _) => q.OrderBy(x => x.Title));
-        cfg.Includes((q, _) => q.Include(x => x.Products));
-        cfg.Related(c => c.Products);
+        e.SortBy((q, _) => q.OrderBy(x => x.Title));
+        e.Includes((q, _) => q.Include(x => x.Products));
+        e.Related(c => c.Products);
     })
-    .For<Product>(cfg =>
+    .For<Product>(e =>
     {
-        cfg.UseFilter<ProductQueryFilter>();
-        cfg.UseSorting<ProductSortedQueryBuilder>();
-        cfg.UseIncludes<ProductIncludableQueryBuilder>();
-        cfg.UseProcessor<ProductProcessor>();
-        cfg.UsePrepper<ProductPrepper>();
-        cfg.Related(p => p.Category);
-        cfg.Related(p => p.Reviews);
+        e.AddQueryFilter<ProductQueryFilter>();
+        e.SortBy<ProductSortedQueryBuilder>();
+        e.Includes<ProductIncludableQueryBuilder>();
+        e.AddProcessor<ProductProcessor>();
+        e.AddPrepper<ProductPrepper>();
+        e.Related(p => p.Category);
+        e.Related(p => p.Reviews);
     })
-    .For<Review>(cfg =>
+    .For<Review>(e =>
     {
-        cfg.SortBy((q, _) => q.OrderByDescending(x => x.Created));
-        cfg.UsePrepper<ReviewPrepper>();
-        cfg.Related(r => r.Product);
-        cfg.Related(r => r.User);
+        e.SortBy((q, _) => q.OrderByDescending(x => x.Created));
+        e.AddPrepper<ReviewPrepper>();
+        e.Related(r => r.Product);
+        e.Related(r => r.User);
     });
 
 // Add custom services
@@ -492,41 +462,14 @@ When setting up a new application:
 
 - [ ] Add DbContext with connection string
 - [ ] Call `UseEntities<TContext>()`
-- [ ] Call `UseDefaults()`
+- [ ] Add global Queryfilters, Preppers, Processors, ... or optionally Call `UseDefaults()`
 - [ ] Choose mapping strategy (AutoMapper or Mapster)
-- [ ] Configure each entity with `.For<TEntity>()`
+- [ ] Configure each entity with `.For<TEntity, ...>()`
 - [ ] Add entity-specific filters, sorting, includes
 - [ ] Register custom primers if needed
 - [ ] Register custom global filters if needed
 - [ ] Register custom services if needed
-- [ ] Configure mapping profiles/configuration
-
-## Best Practices
-
-### DO:
-- ✓ Use `UseDefaults()` for standard features
-- ✓ Configure all entities explicitly
-- ✓ Use lambdas for simple sorting/includes
-- ✓ Use builder classes for complex logic
-- ✓ Register custom services after entity configuration
-- ✓ Keep configuration organized and readable
-
-### DON'T:
-- ✗ Mix AutoMapper and Mapster
-- ✗ Skip entity configuration (even if minimal)
-- ✗ Add complex logic in configuration lambdas
-- ✗ Forget to register custom components
-- ✗ Register services before UseEntities
-
-## Troubleshooting
-
-| Issue | Solution |
-|-------|----------|
-| Mapping not working | Ensure UseAutoMapper() or UseMapsterMapping() is called |
-| Timestamps not set | Add HasCreatedDbPrimer / HasLastModifiedDbPrimer |
-| Archived items showing | Add FilterArchivablesQueryBuilder global filter |
-| Custom service not used | Register custom service AFTER UseEntities().For<T>() |
-| Filter not applying | Ensure UseFilter<T>() is called in For<T>() config |
+- [ ] Configure mapping profiles/configuration with AfterMappers if required
 
 ## Next Steps
 

@@ -263,16 +263,16 @@ public class ProductInput
 
 ```csharp
 // Services/QueryFilters/ProductQueryFilter.cs
-public class ProductQueryFilter : IFilteredQueryBuilder<Product, ProductSearchObject>
+public class ProductQueryFilter(IQKeywordHelper qHelper) : IFilteredQueryBuilder<Product, ProductSearchObject>
 {
     public IQueryable<Product> Build(IQueryable<Product> query, ProductSearchObject? search)
     {
-        if (search == null) return query;
+        if (search == null) 
+            return query;
         
-        // General text search using Q property (supports wildcards)
         if (!string.IsNullOrWhiteSpace(search.Q))
         {
-            var keywords = QKeywordHelper.GetKeywords(search.Q);
+            var keywords = qHelper.ParseKeyword(search.Q);
             query = query.Where(x => 
                 keywords.Any(k => x.Title.Contains(k)) ||
                 (x.Description != null && keywords.Any(k => x.Description.Contains(k))));
@@ -466,11 +466,11 @@ builder.Services
     })
     .For<Product>(cfg =>
     {
-        cfg.UseFilter<ProductQueryFilter>();
-        cfg.UseSorting<ProductSortedQueryBuilder>();
-        cfg.UseIncludes<ProductIncludableQueryBuilder>();
-        cfg.UseProcessor<ProductProcessor>();
-        cfg.UsePrepper<ProductPrepper>();
+        cfg.AddQueryFilter<ProductQueryFilter>();
+        cfg.SortBy<ProductSortedQueryBuilder>();
+        cfg.Includes<ProductIncludableQueryBuilder>();
+        cfg.AddProcessor<ProductProcessor>();
+        cfg.AddPrepper<ProductPrepper>();
         cfg.Related(p => p.Category);
         cfg.Related(p => p.Reviews);
     });

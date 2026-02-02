@@ -256,6 +256,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Peppol", "Peppol", "{1A469C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Invoicing.UblSharp", "src\Invoicing.UblSharp\Invoicing.UblSharp.csproj", "{CFC0520D-5B85-4D7A-BCE6-0B8ECB53533C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{0E4AA556-765A-44CD-939E-3E25EB66BF93}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Entities\01-Index.md = docs\Entities\01-Index.md
+		docs\Entities\02-Models.md = docs\Entities\02-Models.md
+		docs\Entities\02b-Entity-Interfaces.md = docs\Entities\02b-Entity-Interfaces.md
+		docs\Entities\03-Services.md = docs\Entities\03-Services.md
+		docs\Entities\04-Controllers.md = docs\Entities\04-Controllers.md
+		docs\Entities\06-Normalizing.md = docs\Entities\06-Normalizing.md
+		docs\Entities\07-DependencyInjection.md = docs\Entities\07-DependencyInjection.md
+		docs\Entities\05-Mapping.md = docs\Entities\05-Mapping.md
+		docs\Entities\08-Checklist.md = docs\Entities\08-Checklist.md
+		docs\Entities\09-Tips.md = docs\Entities\09-Tips.md
+		docs\Entities\10-Examples.md = docs\Entities\10-Examples.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -775,6 +790,7 @@ Global
 		{286B0BA0-A227-4B3B-B7EB-4F319CAAE31C} = {3DAF19FA-9AEA-465E-88D4-402F737EE5BA}
 		{1A469C02-404D-4438-9E93-F3400CCDF347} = {3DAF19FA-9AEA-465E-88D4-402F737EE5BA}
 		{CFC0520D-5B85-4D7A-BCE6-0B8ECB53533C} = {1A469C02-404D-4438-9E93-F3400CCDF347}
+		{0E4AA556-765A-44CD-939E-3E25EB66BF93} = {2C28B4F6-F9F0-4CF6-BECB-2C308B0C2186}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C20C1CB-93D4-46D3-A172-85F0202D818C}
