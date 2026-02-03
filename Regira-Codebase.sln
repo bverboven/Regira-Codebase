@@ -262,12 +262,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{0E4AA556-7
 		docs\Entities\02-Models.md = docs\Entities\02-Models.md
 		docs\Entities\02b-Entity-Interfaces.md = docs\Entities\02b-Entity-Interfaces.md
 		docs\Entities\03-Services.md = docs\Entities\03-Services.md
-		docs\Entities\05-Controllers.md = docs\Entities\05-Controllers.md
 		docs\Entities\04-Mapping.md = docs\Entities\04-Mapping.md
-		docs\Entities\07-DependencyInjection.md = docs\Entities\07-DependencyInjection.md
+		docs\Entities\05-Controllers.md = docs\Entities\05-Controllers.md
 		docs\Entities\06-Normalizing.md = docs\Entities\06-Normalizing.md
-		docs\Entities\08-Checklist.md = docs\Entities\08-Checklist.md
-		docs\Entities\09-Tips.md = docs\Entities\09-Tips.md
+		docs\Entities\07-Attachments.md = docs\Entities\07-Attachments.md
+		docs\Entities\09-Checklist.md = docs\Entities\09-Checklist.md
+		docs\Entities\08-Built-in-Features.md = docs\Entities\08-Built-in-Features.md
 		docs\Entities\10-Examples.md = docs\Entities\10-Examples.md
 	EndProjectSection
 EndProject

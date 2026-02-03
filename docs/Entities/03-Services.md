@@ -13,7 +13,6 @@ IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
 
 ## Service Layer Architecture
 
-- Services can be injected into other services using `EntityWrappingServiceBase` to created a wrapped pipeline
 - The default implementation is `EntityRepository`, which uses EF Core `DbContext` for data access
 - The `EntityRepository` is enriched by multiple helper services (QueryBuilders, Processors, Preppers, Primers)
 
@@ -23,17 +22,17 @@ IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
 
 ```csharp
 // Get single entity details by ID
-Task<TEntity?> Details(TKey id);
+Task<TEntity?> Details(TKey id)
 
 // List with custom SearchObject (enhanced filtering)
-Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null);
+Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
 // List with sorting and includes (complex filtering)
-Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null);
+Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null)
 
 // Count with custom (nullable) SearchObject
-Task<long> Count(TSearchObject? so);
+Task<long> Count(TSearchObject? so)
 // Count with multiple SearchObjects
-Task<long> Count(IList<TSearchObject?> so);
+Task<long> Count(IList<TSearchObject?> so)
 ```
 
 ### Write Operations
@@ -42,12 +41,12 @@ Task<long> Count(IList<TSearchObject?> so);
 - You **must call** `SaveChanges()` to commit all changes to the database
 
 ```csharp
-Task Save(TEntity item); // calls Add() or Modify() internally
-Task Add(TEntity item);
-Task<TEntity?> Modify(TEntity item);
-Task Remove(TEntity item);
+Task Save(TEntity item) // calls Add() or Modify() internally
+Task Add(TEntity item)
+Task<TEntity?> Modify(TEntity item)
+Task Remove(TEntity item)
 // Persist all changes to database
-Task<int> SaveChanges(CancellationToken token = default);
+Task<int> SaveChanges(CancellationToken token = default)
 ```
 
 ## Repository helper services

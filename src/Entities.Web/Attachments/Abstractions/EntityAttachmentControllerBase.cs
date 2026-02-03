@@ -79,12 +79,6 @@ public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto> :
 
             return BadRequest(ModelState);
         }
-        catch (Exception ex)
-        {
-            var logger = HttpContext.RequestServices.GetRequiredService<ILogger<EntityAttachmentControllerBase<TEntity>>>();
-            logger.LogError(ex, "Updating entity failed");
-            throw;
-        }
     }
 
     // Delete

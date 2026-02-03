@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Regira.DAL.Paging;
 using Regira.Entities.Extensions;
 using Regira.Entities.Mapping.Abstractions;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Services.Abstractions;
+using Regira.Entities.Web.Attachments.Abstractions;
 using Regira.Entities.Web.Models;
 using Regira.Utilities;
 using System.Diagnostics;
@@ -180,10 +183,6 @@ public static class ControllerExtensions
             }
 
             return ctrl.BadRequest(ctrl.ModelState);
-        }
-        catch (Exception ex)
-        {
-            return ctrl.StatusCode(500, ex);
         }
     }
     // Delete
