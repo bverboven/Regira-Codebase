@@ -52,6 +52,7 @@ Assuming a `DbContext Repository` is being used.
 1. QueryBuilders 
    1. Filters
    1. Sorting
+   1. Paging
    1. Includes
 1. Processors
 1. Mapping (+AfterMapping)*
@@ -73,6 +74,24 @@ Assuming a `DbContext Repository` is being used.
 - **Preppers**: Executed by WriteRepository before saving to prepare entities
 - **Primers**: EF Core SaveChangesInterceptors executed by DbContext during SubmitChanges
 - **AfterMapper**: Decorates DTOs or Entities after Mapper completes (e.g. calculating URIs)
+
+## Dependency Injection
+
+```csharp
+// basic sample setup
+builder.Services
+    .UseEntities(/* ... */)
+    .For<Category>()
+    .For<Product, int, ProductSearchObject>(item=> {
+        item.SortBy(query, _) => query.OrderBy(x => x.Title));
+        item.Includes((query, _) => query.Include(x => x.Category));
+    })
+    .For<Order, int, OrderSearchObject, OrderSortBy, OrderIncludes>(item=> {
+        item.SortBy(query, _) => query.OrderByDesc(x => x.Created));
+        item.Includes((query, _) => query.Include(x => x.OrderItems).OrderBy(x => x.Product.Title));
+        item.Related(c => c.OrderItems);
+    });
+```
 
 ## Next Steps
 

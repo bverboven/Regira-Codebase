@@ -34,3 +34,32 @@ public abstract class EntityAfterMapperBase<TSource, TTarget> : IEntityAfterMapp
         => AfterMap((TSource)source, (TTarget)target);
 }
 ```
+
+## Dependency Injection
+
+```csharp   
+services
+    .UseEntities<MyDbContext>(options => {
+        // ...
+
+        options.UseMapsterMapping();
+        // or
+        options.UseAutoMapper();
+
+        // global AfterMapper
+        options.AfterMap<IMyInterface, MyModel, MyAfterMapper>();
+    })
+    .For<Order>(e =>
+    {
+        // ...
+
+        e.UseMapping<OrderDto, OrderInputDto>()
+            .After((item, dto) => { /*...*/ })
+            .AfterInput((dto, item) => { /*...*/ });
+        
+        // extra mapping config
+        e.AddMapping<OrderItem, OrderItemDto>();
+        e.AddMapping<OrderItemInputDto, OrderItem>();
+    });
+
+```

@@ -2,6 +2,15 @@
 
 The `IEntityService` is the core service interface for managing entities. It provides standard CRUD operations and can be customized or extended as needed.
 
+Possible combinations:
+```csharp
+IEntityService<TEntity> // int ID
+IEntityService<TEntity, TKey>
+IEntityService<TEntity, TKey, TSearchObject>
+IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>
+IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
+```
+
 ## Service Layer Architecture
 
 - Services can be injected into other services using `EntityWrappingServiceBase` to created a wrapped pipeline
@@ -152,7 +161,7 @@ public interface IEntityPrepper<in TEntity> : IEntityPrepper
 
 ### Entity Primers
 
-- Primers are executed as EF Core SaveChangesInterceptors by DbContext. 
+- Primers are executed as EF Core SaveChangesInterceptors by DbContext (via extension method `DbContextOptionsBuilder.AddPrimerInterceptors`)
 - Primers can be registered **globally** (apply to an interface/base type) or **per entity**.
 
 ```csharp
@@ -162,6 +171,187 @@ public interface IEntityPrimer<in T>
     Task PrepareAsync(T entity, EntityEntry entry);
     bool CanPrepare(T entity);
 }
+```
+
+## Dependency Injection
+
+### Configuration Example
+
+This example demonstrates how to configure entities with all helper services:
+
+```csharp
+// Configure DbContext with Interceptors
+services.AddDbContext<MyDbContext>((sp, db) =>
+{
+    db.UseSqlServer(connectionString)
+        .AddPrimerInterceptors(sp);
+});
+
+// Configure Entity Services with all helper services
+services
+    .UseEntities<MyDbContext>(options =>
+    {
+        // Global helper services (apply to all entities implementing an interface)
+        options.AddGlobalFilterQueryBuilder<FilterIdsQueryBuilder<int>>();
+        options.AddGlobalFilterQueryBuilder<FilterArchivablesQueryBuilder>();
+        options.AddPrepper<IHasAggregateKey>(x => x.AggregateKey ??= Guid.NewGuid());
+        options.AddPrimer<AutoTruncatePrimer>();
+    })
+    
+    // Category
+    .For<Category, Guid>(e =>
+    {
+        // Query Filter
+        e.AddQueryFilter<CategoryQueryFilter>();
+        
+        // Sorting
+        e.SortBy((query, sortBy) =>
+        {
+            return sortBy switch
+            {
+                EntitySortBy.Id => query.OrderBy(x => x.Id),
+                EntitySortBy.IdDesc => query.OrderByDescending(x => x.Id),
+                _ => query.OrderBy(x => x.Name)
+            };
+        });
+
+        // Processor
+        e.Process<CategoryProcessor>();
+    })
+    
+    // Product
+    .For<Product, ProductSearchObject, ProductSortBy, ProductIncludes>(e =>
+    {
+        // Query Filter (inline)
+        e.Filter((query, so) =>
+        {
+            // filtering on Id is implemented by global filter
+            if (so?.MinPrice != null)
+                query = query.Where(x => x.Price >= so.MinPrice);
+            if (so?.MaxPrice != null)
+                query = query.Where(x => x.Price <= so.MaxPrice);
+            return query;
+        });
+        
+        // Sorting
+        e.SortBy((query, sortBy) =>
+        {
+            return sortBy switch
+            {
+                ProductSortBy.Name => query.OrderBy(x => x.Name),
+                ProductSortBy.NameDesc => query.OrderByDescending(x => x.Name),
+                ProductSortBy.Price => query.OrderBy(x => x.Price),
+                ProductSortBy.PriceDesc => query.OrderByDescending(x => x.Price),
+                _ => query.OrderBy(x => x.Id)
+            };
+        });
+        
+        // Include
+        e.Includes((query, includes) =>
+        {
+            if (includes?.HasFlag(ProductIncludes.Category) == true)
+                query = query.Include(x => x.Category);
+            if (includes?.HasFlag(ProductIncludes.Reviews) == true)
+                query = query.Include(x => x.Reviews);
+            return query;
+        });
+        
+        // Processor
+        e.Process((items, includes) =>
+        {
+            foreach (var item in items)
+            {
+                // Calculate display properties
+                item.DisplayPrice = $"${item.Price:F2}";
+            }
+            return Task.CompletedTask;
+        });
+        
+        // Prepper
+        e.Prepare(item =>
+        {
+            // Ensure SKU is set
+            item.Sku ??= GenerateSku(item);
+        });
+        
+        // Primer
+        e.AddPrimer<ProductPrimer>();
+        
+        // Related entities
+        e.Related(x => x.Reviews);
+    })
+    
+    // Order
+    .For<Order, int, OrderSearchObject, OrderSortBy, OrderIncludes>(e =>
+    {
+        e.AddQueryFilter<OrderQueryFilter>();
+        
+        e.SortBy((query, sortBy) =>
+        {
+            // Support ThenBy sorting
+            if (query is IOrderedQueryable<Order> sortedQuery){
+                return sortBy switch
+                {
+                    OrderSortBy.OrderNumber => sortedQuery.ThenBy(x => x.OrderNumber),
+                    OrderSortBy.OrderDate => sortedQuery.ThenBy(x => x.OrderDate),
+                    OrderSortBy.TotalAmount => sortedQuery.ThenBy(x => x.TotalAmount),
+                    _ => sortedQuery.ThenByDescending(x => x.OrderDate)
+                };
+            }
+            return sortBy switch
+            {
+                OrderSortBy.OrderNumber => query.OrderBy(x => x.OrderNumber),
+                OrderSortBy.OrderDate => query.OrderBy(x => x.OrderDate),
+                OrderSortBy.TotalAmount => query.OrderBy(x => x.TotalAmount),
+                _ => query.OrderByDescending(x => x.OrderDate)
+            };
+        });
+        
+        e.Includes<OrderIncludableQueryBuilder>();
+        
+        e.Process<OrderProcessor>();
+        
+        // Complex prepper with DbContext
+        e.Prepare(async (item, dbContext) =>
+        {
+            // Recalculate order totals
+            item.TotalAmount = item.OrderItems?.Sum(x => x.Quantity * x.UnitPrice) ?? 0;
+            await Task.CompletedTask;
+        });
+        
+        e.Related(x => x.OrderItems, (item, _) => item.OrderItems?.Prepare());
+    });
+```
+
+**Registration Order Matters**
+
+1. **Global services** execute first (registered on `EntityServiceCollectionOptions`)
+2. **Entity-specific services** execute next (registered on entity builder)
+
+**Tip**:
+
+```csharp
+// Use extension methods to configure Entities
+public static class ProductServiceCollectionExtensions
+{
+    public static IEntityServiceCollection<TContext> AddProducts<TContext>(this IEntityServiceCollection<TContext> services)
+        where TContext : DbContext
+    {
+        services
+            .For<Product>(e =>
+            {
+                // put logic here ...
+            });
+        return services;
+    }
+}
+
+// Resulting:
+services
+    .UseEntities<MyDbContext>(/* ... */)
+    .AddProducts()
+    .AddCategories()
+    .AddOrders();
 ```
 
 ## Next Steps

@@ -1,4 +1,4 @@
-# Dependency Injection Configuration - AI Agent Instructions
+# Dependency Injection
 
 ## Overview
 
@@ -13,11 +13,15 @@ The Regira Entity Framework uses a fluent configuration API for dependency injec
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Add DbContext
-builder.Services.AddDbContext<MyDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services
+    .AddDbContext<MyDbContext>(db => db.UseSqlServer(connectionString));
 
 // 2. Configure Entity Framework
-builder.Services.UseEntities<MyDbContext>();
+builder.Services
+    .UseEntities<MyDbContext>()
+    .For<Category>()
+    .For<Product>()
+    .For<Order>();
 
 // 3. Build and run
 var app = builder.Build();

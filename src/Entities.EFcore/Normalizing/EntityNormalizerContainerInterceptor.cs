@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Regira.DAL.EFcore.Extensions;
 using Regira.Entities.EFcore.Extensions;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
-using Regira.Utilities;
 
 namespace Regira.Entities.EFcore.Normalizing;
 

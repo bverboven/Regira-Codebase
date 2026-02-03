@@ -23,3 +23,4 @@
     - `Normalized` - Normalized keyword without wildcards
   - Inject `IQKeywordHelper` into your filter class to use these methods
   - Use `EF.Functions.Like()` for SQL LIKE queries with wildcard keywords
+- FilterHasNormalizedContentQueryBuilder

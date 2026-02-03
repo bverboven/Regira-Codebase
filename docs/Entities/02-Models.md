@@ -2,8 +2,6 @@
 
 ## Creating Entity Models
 
-### Basic Entity Structure
-
 - Implement `IEntity<TKey>`
 - Have a primary key property named `Id`
 - Implement relevant marker interfaces based on properties
@@ -51,9 +49,7 @@ public class SearchObject<TKey> : ISearchObject<TKey>
 - Use `QKeywordHelper` for wildcard support (*) in search queries
 - See TODO: *Normalizing Entities* for more info
 
-## Enums
-
-### SortBy Enum
+## SortBy Enum
 
 - The default SortBy enum can be a replaced by a custom one. 
 - If none is configured, `EntitySortBy` is used.
@@ -73,7 +69,7 @@ public enum EntitySortBy
 }
 ```
 
-### Includes Enum
+## Includes Enum
 
 - Use a bitmask enum to enable multiple includes as one value.
 - If none is configured, an very basic `EntityIncludes` is used.
