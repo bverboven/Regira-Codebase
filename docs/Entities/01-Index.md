@@ -2,14 +2,9 @@
 
 ## Index
 
-This documentation is split into multiple focused instruction files:
-
-1. **[Entity Models & Interfaces](02-Models.md)** - Creating and structuring entity models
-1. **[Services](03-Services.md)** - Implementing entity services and repositories
-1. **[Controllers](04-Controllers.md)** - Creating Web API controllers
-1. **[Dependency Injection](05-DependencyInjection.md)** - Configuring services and dependencies
-1. **[Mapping](06-Mapping.md)** - Mapping Entity &lt;-&gt; DTO
-1. **[Practical Examples](10-Examples.md)** - Complete implementation examples
+Regira Entities is a generic, extensible framework for managing **data entities** in .NET applications. 
+It provides a **standardized** way to handle CRUD operations, filtering, sorting, and includes, 
+while allowing **customization** through generic type parameters, interfaces and specialized helper services.
 
 ## Core Concepts
 
@@ -39,7 +34,7 @@ Main **functionality** of the service:
 |---------|---------|
 | Details | Get a single item by ID, usually with all Navigation properties included |
 | List    | Get a (filtered, sorted & paged) collection of items, usually with limited or no Navigation properties |
-| Save    | Create or Update an item, usually Navigation properties are excluded. However, child collections can be included |
+| Save    | Create or Update an item, usually Navigation properties are excluded (when updating). However, child collections can be included |
 | Remove  | Delete an item |
 
 ### Processing Pipeline
@@ -93,6 +88,15 @@ builder.Services
     });
 ```
 
-## Next Steps
+## Overview
 
-- ToDo
+1. **[Index](01-Index.md)** - Overview of Regira Entities
+1. [Entity Models](02-Models.md) - Creating and structuring entity models
+1. [Services](03-Services.md) - Implementing entity services and repositories
+1. [Mapping](04-Mapping.md) - Mapping Entities to and from DTOs
+1. [Controllers](05-Controllers.md) - Creating Web API controllers
+1. [Normalizing](06-Normalizing.md) - Data normalization techniques
+1. [Attachments](07-Attachments.md) - Managing file attachments] 
+1. [Built-in Features](08-Built-in-Features.md) - Ready to use components
+1. [Checklist](09-Checklist.md) - Step-by-step guide for common tasks
+1. [Practical Examples](10-Examples.md) - Complete implementation examples

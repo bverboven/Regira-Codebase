@@ -260,7 +260,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{0E4AA556-7
 	ProjectSection(SolutionItems) = preProject
 		docs\Entities\01-Index.md = docs\Entities\01-Index.md
 		docs\Entities\02-Models.md = docs\Entities\02-Models.md
-		docs\Entities\02b-Entity-Interfaces.md = docs\Entities\02b-Entity-Interfaces.md
 		docs\Entities\03-Services.md = docs\Entities\03-Services.md
 		docs\Entities\04-Mapping.md = docs\Entities\04-Mapping.md
 		docs\Entities\05-Controllers.md = docs\Entities\05-Controllers.md
