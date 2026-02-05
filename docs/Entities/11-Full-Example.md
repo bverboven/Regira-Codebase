@@ -946,6 +946,24 @@ This complete example demonstrates:
 
 You can copy this entire structure into a new ASP.NET Core project and have a fully functional webshop API with all Regira Entities features enabled.
 
+## Download Working Project
+
+📦 **[Download WebShop-Sample.zip](../../samples/WebShop-Sample.zip)** - Complete working project ready to run
+
+The zip file contains:
+- Complete project structure with all source files
+- Configured dependencies and NuGet packages
+- Sample data seeding
+- README with setup instructions
+- All code examples from this documentation
+
+**Quick Start:**
+1. Extract the zip file
+2. Navigate to the WebShop directory
+3. Run `dotnet restore`
+4. Run `dotnet run`
+5. Open `https://localhost:5001/swagger` in your browser
+
 ## Overview
 
 1. [Index](01-Index.md) - Overview of Regira Entities
