@@ -2,7 +2,7 @@
 
 ## Creating Entity Models
 
-- Implement `IEntity<TKey>`
+- Implement `IEntity<TKey>` (if entity has a serial int ID, use `IEntityWithSerial`))
 - Have a primary key property named `Id`
 - Implement relevant marker interfaces based on properties
 - Be a POCO (Plain Old CLR Object) - data only, minimal behavior

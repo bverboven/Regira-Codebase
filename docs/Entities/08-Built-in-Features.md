@@ -31,6 +31,8 @@ public class EntityInputException<T>(string message, Exception? innerException =
 **SetDecimalPrecisionConvention**: *Automatically configures decimal properties.*
 
 ```csharp
+using Regira.DAL.EFcore.Extensions; // external namespace
+
 // In DbContext class
 protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
@@ -42,6 +44,8 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
 Adds a global `AutoTruncatePrimer` as interceptor*.
 
 ```csharp
+using Regira.DAL.EFcore.Services; // external namespace
+
 services.AddDbContext<MyDbContext>((serviceProvider, db) =>
 {
     db.UseSqlServer(connectionString)
@@ -73,11 +77,16 @@ services.AddDbContext<MyDbContext>((serviceProvider, db) =>
 
 ### Query Builders
 
-`FilterArchivablesQueryBuilder`
-`FilterHasCreatedQueryBuilder`
-`FilterHasLastModifiedQueryBuilder`
-`FilterHasNormalizedContentQueryBuilder`
-`FilterIdsQueryBuilder`
+**FilterArchivablesQueryBuilder**: *Filters entities based on IsArchived property.*
+
+**FilterHasCreatedQueryBuilder**: *Filters entities based on Created timestamp range.*
+
+**FilterHasLastModifiedQueryBuilder**: *Filters entities based on LastModified timestamp range.*
+
+**FilterHasNormalizedContentQueryBuilder**: *Filters entities based on normalized content keywords (input: `ISearchObject.Q`).*
+
+**FilterIdsQueryBuilder**: *Filters entities based on a collection of IDs.*
+
 
 
 ### Query Extensions
@@ -111,6 +120,8 @@ public static class QueryExtensions
 ### Pagination
 
 ```csharp
+using Regira.DAL.Paging; // external namespace
+
 public static class QueryExtensions
 {
     public static IQueryable<T> PageQuery<T>(this IQueryable<T> query, PagingInfo? info)
