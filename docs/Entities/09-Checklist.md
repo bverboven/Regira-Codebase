@@ -9,14 +9,22 @@ ToDo
 When implementing a new entity in an application:
 
 *Required*
-- [ ] Create entity model(s) with appropriate interfaces
-- [ ] Configure DbContext
-- [ ] Create controller *(when using API)*
+- [ ] Create entity **Model(s)** 
+    - Use appropriate interfaces
+    - Use Data annotations (try using powers of 2 when setting MaxLength, 8, 64, 1024, ...)
+    - Prefer using `SetDecimalPrecisionConvention` in DbContext over setting precision on each property
+- [ ] Configure **DbContext**
+    - Add DbSet collection
+    - Configure relationships
+    - Prefer Data Annotations over Fluent API when possible
+- [ ] Create **Controller** *(when using API)*
+    - Add custom actions only when necessary, otherwise rely on built-in CRUD actions
+    - Prefer extending SearchObject to extend filtering over adding extra actions
 
 *Recommended (when using API)*
 
-- [ ] Create DTOs (output DTO, input DTO)
-- [ ] Configure mapping
+- [ ] Create **DTOs** (output DTO, input DTO)
+- [ ] Configure **Mapping**
 
 *Optional*
 

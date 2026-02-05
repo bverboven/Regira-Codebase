@@ -77,16 +77,15 @@ services.AddDbContext<MyDbContext>((serviceProvider, db) =>
 
 ### Query Builders
 
-**FilterArchivablesQueryBuilder**: *Filters entities based on IsArchived property.*
+**FilterIdsQueryBuilder**: *Filters entities based on a collection of IDs.*
+
+**FilterArchivablesQueryBuilder**: *Filters entities based on `IsArchived` property. Can be used to globally exclude archived items by default.*
 
 **FilterHasCreatedQueryBuilder**: *Filters entities based on Created timestamp range.*
 
 **FilterHasLastModifiedQueryBuilder**: *Filters entities based on LastModified timestamp range.*
 
 **FilterHasNormalizedContentQueryBuilder**: *Filters entities based on normalized content keywords (input: `ISearchObject.Q`).*
-
-**FilterIdsQueryBuilder**: *Filters entities based on a collection of IDs.*
-
 
 
 ### Query Extensions
