@@ -268,6 +268,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{0E4AA556-7
 		docs\Entities\09-Checklist.md = docs\Entities\09-Checklist.md
 		docs\Entities\08-Built-in-Features.md = docs\Entities\08-Built-in-Features.md
 		docs\Entities\10-Examples.md = docs\Entities\10-Examples.md
+		docs\Entities\copilot-instructions.md = docs\Entities\copilot-instructions.md
 	EndProjectSection
 EndProject
 Global
