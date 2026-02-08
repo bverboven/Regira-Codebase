@@ -57,8 +57,9 @@ Query builders are used to filter, sort entities and include navigation properti
 
 #### Filter Query Builders
 
-- uses the configured `TSearchObject`
-- if no SearchObject is configured, a basic `SearchObject<TKey>` is provided
+- Uses the configured `TSearchObject`
+- Inline shortcut is available
+- If no SearchObject is configured, a basic `SearchObject<TKey>` is provided
 
 ```csharp
 // interface
@@ -104,8 +105,10 @@ public abstract class GlobalFilteredQueryBuilderBase<TEntity, TKey> : FilteredQu
 
 #### Sort Query Builder
 
-- uses the configured `TSortyBy`
-- if no SortBy enum is configured, a basic `EntitySortBy` is provided
+- Uses the configured `TSortyBy`
+- Inline shortcut is available
+- If no SortBy enum is configured, a basic `EntitySortBy` is provided
+- No base class provided
 
 ```csharp
 // interface
@@ -119,8 +122,10 @@ public interface ISortedQueryBuilder<TEntity, TKey, TSortBy>
 
 #### Include Query Builder
 
-- uses the configured `TIncludes`
-- if no Includes enum is configured, a basic `EntityIncludes` is provided
+- Uses the configured `TIncludes`
+- Inline shortcut is available
+- If no Includes enum is configured, a basic `EntityIncludes` is provided
+- No base class provided
 
 ```csharp
 // interface
@@ -134,7 +139,11 @@ public interface IIncludableQueryBuilder<TEntity, TKey, TIncludes>
 
 ### Entity Processors
 
-Processors modify/decorate entities after fetching from database:
+- Processors modify/decorate entities after fetching from database
+- Inline shortcut is available
+- No base class provided
+
+*Fill `[NotMapped]` properties here.*
 
 ```csharp
 // interface
@@ -147,8 +156,12 @@ public interface IEntityProcessor<TEntity, TIncludes>
 
 ### Entity Preppers
 
-Preppers prepare entities before saving. 
-The original item is passed to enable advanced operations.
+- Prepare entities before saving
+- Inline shortcut is available
+- Can be registered globally (apply to an interface/base type) or per entity 
+- The original item is passed to enable advanced operations 
+
+*Prepare child collections here, or calculated fields.*
 
 ```csharp
 // interface
@@ -156,12 +169,17 @@ public interface IEntityPrepper<in TEntity> : IEntityPrepper
 {
     Task Prepare(TEntity modified, TEntity? original);
 }
+// base class
+public abstract class EntityPrepperBase<TEntity> : IEntityPrepper<TEntity>
+{
+    public abstract Task Prepare(TEntity modified, TEntity? original);
+}
 ```
 
 ### Entity Primers
 
-- Primers are executed as EF Core SaveChangesInterceptors by DbContext (via extension method `DbContextOptionsBuilder.AddPrimerInterceptors`)
-- Primers can be registered **globally** (apply to an interface/base type) or **per entity**.
+- Executed as EF Core `SaveChangesInterceptors` by DbContext (via extension method `DbContextOptionsBuilder.AddPrimerInterceptors`)
+- Can be registered **globally** (apply to an interface/base type) or **per entity**
 
 ```csharp
 // interface
@@ -169,6 +187,14 @@ public interface IEntityPrimer<in T>
 {
     Task PrepareAsync(T entity, EntityEntry entry);
     bool CanPrepare(T entity);
+}
+// base class
+public abstract class EntityPrimerBase<T> : IEntityPrimer<T>
+{
+    public virtual async Task PrepareManyAsync(IList<EntityEntry> entries)
+
+    public abstract Task PrepareAsync(T entity, EntityEntry entry);
+    public virtual bool CanPrepare(T? entity) => entity != null;
 }
 ```
 
@@ -193,6 +219,7 @@ services
         // Global helper services (apply to all entities implementing an interface)
         options.AddGlobalFilterQueryBuilder<FilterIdsQueryBuilder<int>>();
         options.AddGlobalFilterQueryBuilder<FilterArchivablesQueryBuilder>();
+        // using Prepper shortcut (inline implementation)
         options.AddPrepper<IHasAggregateKey>(x => x.AggregateKey ??= Guid.NewGuid());
         options.AddPrimer<AutoTruncatePrimer>();
     })

@@ -3,10 +3,10 @@
 Controllers provide Web API endpoints for entity operations. 
 
 - The framework provides base controllers that handle standard **CRUD** operations automatically
-- A controller will read or write entities using a **`IEntityService<TEntity>`**
+- A controller will read or write entities using a **IEntityService**
+- The controller's **generic types** must match the service's generic types (DTOs excluded)
 - It's **not necessary to inject** this service in the constructor,
 the base Controller will get it using `HttpContext.RequestServices`
-- The controller's **generic types** must match the service's generic types (DTOs excluded)
 - Responsible for mapping to and from DTO models using a `IEntityMapper`
 
 ## Controller Selection
@@ -30,7 +30,7 @@ EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TIn
 
 All base controllers provide these endpoints:
 
-### Fetch Endpoints
+### 1. Fetch Endpoints
 
 **Details:**
 ```csharp
@@ -65,9 +65,9 @@ List([FromBody] searchObject[], pagingInfo, includes[], sortBy[]) -> ListResult
 Search([FromBody] searchObject[], pagingInfo, includes[], sortBy[]) -> SearchResult
 ```
 
-*The SearchObject items each return a query that are inclusive.*
+*The SearchObject items return queries that are inclusive.*
 
-### Save (Add/Modify)
+### 2. Save (Add/Modify)
 
 ```csharp
 // POST /{entities} - Create
@@ -80,7 +80,7 @@ Modify(id, inputDto) -> SaveResult
 Save(inputDto) -> SaveResult
 ```
 
-### DELETE Endpoint
+### 3. DELETE Endpoint
 
 ```csharp
 // DELETE /{entities}/{id} - Delete

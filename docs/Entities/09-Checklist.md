@@ -2,7 +2,18 @@
 
 ## Setup
 
-ToDo
+- [ ] Install required packages
+- [ ] Create/configure **DbContext** (inherit from `DbContext`)
+    - DbSets
+    - Model configuration
+- [ ] Configure interceptors on DbContext (if needed)
+    - Primers
+    - Normalizers
+- [ ] Setup Entities using `.UseEntities()`
+    - [ ] Configure **Mapping** library (AutoMapper/Mapster) when using DTOs
+    - [ ] Register global filters, primers, preppers (optional)
+- [ ] Configure the FileService in `.WithAttachments()` when using attachments
+
 
 ## Add & configure a new Entity
 
@@ -11,20 +22,22 @@ When implementing a new entity in an application:
 *Required*
 - [ ] Create entity **Model(s)** 
     - Use appropriate interfaces
-    - Use Data annotations (try using powers of 2 when setting MaxLength, 8, 64, 1024, ...)
+    - Use Data annotations (*Required*, *MaxLength*, ...)
     - Prefer using `SetDecimalPrecisionConvention` in DbContext over setting precision on each property
 - [ ] Configure **DbContext**
     - Add DbSet collection
     - Configure relationships
     - Prefer Data Annotations over Fluent API when possible
+- [ ] Configure Entity in DI using `.For<TEntity>()`
 - [ ] Create **Controller** *(when using API)*
     - Add custom actions only when necessary, otherwise rely on built-in CRUD actions
     - Prefer extending SearchObject to extend filtering over adding extra actions
+- [ ] Create/apply database migration
 
 *Recommended (when using API)*
 
 - [ ] Create **DTOs** (output DTO, input DTO)
-- [ ] Configure **Mapping**
+- [ ] Configure **Mapping** (+ Aftermappers when needed)
 
 *Optional*
 
@@ -34,11 +47,16 @@ When implementing a new entity in an application:
 - [ ] Add Preppers
 - [ ] Add Primers
 - [ ] Configure child properties with Related method
-- [ ] Register entity services in DI
 
 *Extra*
 - [ ] Add Attachments
+    - Ensure attachments are set up
+    - Implement Owning entity interfaces
+    - Implement DbContext
 - [ ] Add Normalizers
+    - Ensure normalizers are set up
+    - Decorate entity properties with Normalized attribute
+    - Or implement custom (global) normalizer for entity
 
 
 ## Overview

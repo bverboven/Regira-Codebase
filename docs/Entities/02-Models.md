@@ -1,10 +1,10 @@
-# Entity Models & Interfaces - AI Agent Instructions
+# Entity Models
 
 ## Creating Entity Models
 
 - Implement `IEntity<TKey>` (if entity has a serial int ID, use `IEntityWithSerial`))
 - Have a primary key property named `Id`
-- Implement relevant marker interfaces based on properties
+- Implement relevant marker interfaces based on properties (see [Built-in Features: Entity Interfaces](08-Built-in-Features.md))
 - Be a POCO (Plain Old CLR Object) - data only, minimal behavior
 - Use data annotations (MaxLength, Required, ...) directly on entity properties.
 

@@ -28,7 +28,6 @@ A normalized property is usually just a **joined string** (using a space), built
 ```csharp
 // base class
 public abstract class EntityNormalizerBase<T>(INormalizer? normalizer = null) : IEntityNormalizer<T>
-    where T : class
 {
     public virtual bool IsExclusive => false;
 
@@ -128,9 +127,9 @@ services.UseEntities<DbContext>(e =>
 ```csharp
 services
     .UseEntities<DbContext>(/*...*/)
-    .For<Entity>(e =>
+    .For<Entity>(entity =>
     {
-        e.AddNormalizer<MyEntityNormalizer>();
+        entity.AddNormalizer<MyEntityNormalizer>();
     });
 ```
 

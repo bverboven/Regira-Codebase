@@ -25,7 +25,7 @@ Understanding the generic type system is crucial:
 ### Architecture
 
 - An Entity Controller requires an `IEntityService` to perform operations.
-- The Entity Controller should implement all generic types of the service, but can add an extra Dto and InputDto type
+- The Controller should implement all generic types of the service, but can add an extra Dto and InputDto type
 - An `IEntityService` is implemented by `EntityRepository` by default, but can be replaced by any custom implementation.
 
 Main **functionality** of the service:
@@ -39,7 +39,7 @@ Main **functionality** of the service:
 
 ### Processing Pipeline
 
-Assuming a `DbContext Repository` is being used.
+Assuming a `Repository` with a `DbContext` is being used.
 
 **Read Pipeline:**
 
@@ -61,19 +61,20 @@ Assuming a `DbContext Repository` is being used.
    1. Primers (Interceptors)
    1. Submit changes
 
-*\*: only executed when using API controller*
+*\*: only executed when using API controllers*
 
 **Pipeline Details:**
 - **QueryBuilders**: Build IQueryable based on SearchObject, SortBy & Includes
 - **Processors**: Modify entities after fetching (e.g. setting non-mapped properties)
-- **Preppers**: Executed by WriteRepository before saving to prepare entities
-- **Primers**: EF Core SaveChangesInterceptors executed by DbContext during SubmitChanges
+- **Preppers**: Executed by the Repository before saving to prepare entities
+- **Primers**: EF Core SaveChangesInterceptors triggered by DbContext when executing SaveChanges
 - **AfterMapper**: Decorates DTOs or Entities after Mapper completes (e.g. calculating URIs)
 
 ## Dependency Injection
 
+basic sample setup which whill register a `IEntityService` for Category, Product and Order entities, using the default `EntityRepository` implementation.
+
 ```csharp
-// basic sample setup
 builder.Services
     .UseEntities(/* ... */)
     .For<Category>()

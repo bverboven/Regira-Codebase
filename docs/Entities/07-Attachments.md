@@ -58,7 +58,6 @@ public interface IEntityAttachment<TKey, TObjectKey, TAttachmentKey> : IEntityAt
 public interface IEntityAttachment<TKey, TObjectKey, TAttachmentKey, TAttachment> : IEntity<TKey>, IHasObjectId<TObjectKey>, IEntityAttachment, ISortable
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
 {
-    TAttachmentKey AttachmentId { get; set; }
     string? ObjectType { get; } // Name of owning entity type (e.g. Product, Article, ...)
 
     // properties used to update existing attachment values
@@ -66,6 +65,7 @@ public interface IEntityAttachment<TKey, TObjectKey, TAttachmentKey, TAttachment
     string? NewContentType { get; set; }
     byte[]? NewBytes { get; set; }
 
+    TAttachmentKey AttachmentId { get; set; }
     new TAttachment? Attachment { get; set; }
 }
 ```
@@ -128,28 +128,11 @@ public class MyEntityAttachmentController : EntityAttachmentControllerBase<MyEnt
 ```csharp
 builder.Services
     .UseEntities<MyDbContext>(/*...*/)
-    .WithAttachments(_ => {
-        return new BinaryFileService(new FileSystemOptions { 
-            RootFolder = ApiConfiguration.AttachmentsDirectory 
-        };
+    .WithAttachments(_ => new BinaryFileService(
+        new FileSystemOptions { 
+            RootFolder = ApiConfiguration.AttachmentsDirectory
+        }
     ));
-```
-
-## Built-in Features
-
-The service `TypedAttachmentService` returns all attachments with their Owning Entity type.
-
-```csharp
-builder.Services
-    .UseEntities(/*...*/)
-    .WithAttachments(/*...*/)
-    // register as ITypedAttachmentService
-    .ConfigureTypedAttachmentService(db =>
-        [
-            // list all EntityAttachment types here
-            db.MyEntity1Attachments.ToDescriptor<MyEntity1>(),
-            db.MyEntity2Attachments.ToDescriptor<MyEntity2>()
-        ]);
 ```
 
 ## Overview

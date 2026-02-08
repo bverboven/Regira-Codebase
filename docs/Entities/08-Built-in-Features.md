@@ -12,7 +12,7 @@ Samples:
 - Security
 - Validation
 
-### Input Validation
+### Input Exceptions
 
 **EntityInputException**: Caught by Controllers and returned as BadRequest (400).
 
@@ -68,7 +68,9 @@ services.AddDbContext<MyDbContext>((serviceProvider, db) =>
 
 ### Primers
 
-**ArchivablePrimer**: *Sets Created/Modified timestamps and handles archiving logic.*
+**ArchivablePrimer**:
+*Sets IsArchived to true instead of deleting entities implementing `IArchivable`.
+To be combined with `FilterArchivablesQueryBuilder`.*
 
 **HasCreatedDbPrimer**: *Sets Created timestamp on new entities implementing `IHasCreated`.*
 
@@ -150,7 +152,7 @@ public static class EntityExtensions
 | `IHasCreated` | Created (DateTime) | `HasCreatedDbPrimer` | Track creation time |
 | `IHasLastModified` | LastModified (DateTime?) | `HasLastModifiedDbPrimer` | Track modification time |
 | `IHasTimestamps` | Created, LastModified | see `IHasCreated` & `IHasLastModified` | Both timestamps |
-| `IArchivable` | IsArchived (bool) | `ArchivablePrimer` | Soft delete capability |
+| `IArchivable` | IsArchived (bool) | `ArchivablePrimer`, `FilterArchivablesQueryBuilder` | Soft delete capability |
 | `ISortable` | SortOrder (int) | *`Preppers`* -> `EntityExtensions.SetSortOrder` | Sortable as (child) collection |
 | `IHasObjectId` | ObjectId (TKey) | *`Attachments`* | FK to owning entity |
 
