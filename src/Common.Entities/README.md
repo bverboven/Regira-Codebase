@@ -3,7 +3,9 @@
 Read & write entities based on a Repository pattern.
 The base is a ```IEntityService<TEntity, TKey>``` service which can be extended with a search filter, sorting and defining of related entities to include in the resulting collection.
 
-For an API, a ```EntityControllerBase<TEntity, TKey>``` is provided to handle the CRUD operations. This controller will automatically use the matching EntityService. Mapping to DTO is provided by an Automapper implementation.
+For an API, a ```EntityControllerBase<TEntity, TKey>``` is provided to handle the CRUD operations. This controller will automatically use the matching EntityService. Mapping to DTO is provided by an Automapper or Mapster implementation.
+
+[More Info](../../docs/Entities/01-Index.md)
 
 ## Samples
 
@@ -43,7 +45,7 @@ services
     {
         o.UseDefaults();
         o.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
-        o.UseAutoMapper([typeof(Person).Assembly]);
+        o.UseAutoMapper();
     })
     .WithAttachments(_ => new BinaryFileService(new FileSystemOptions { RootFolder = ApiConfiguration.AttachmentsDirectory }))
     .For<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(e =>
@@ -70,44 +72,3 @@ public class PersonController : EntityControllerBase<Person, int, PersonSearchOb
 [Route("persons")]
 public class PersonAttachmentController : EntityAttachmentControllerBase<PersonAttachment>;
 ```
-
-## Composition
-
-### Fetching entities
-
-- DbSet (base query)
-- Filter
-- Sort
-- Include related
-- Paging
-- Process entities
-
-### Saving and removing entities
-
-- Prepare entities
-    - e.g. Sort related entities
-- React to modifications (interceptors)
-    - e.g. [Set Created date](../Entities.EFcore/Primers/HasCreatedDbPrimer.cs)
-    - e.g. [Archive instead of delete entities](../Entities.EFcore/Primers/ArchivablePrimer.cs)
-
-## Supported Formats
-
-```csharp
-// Dependency Injection
-services
-    .For<Person>(e => { /* ... */ })
-    .For<Person, int>(e => { /* ... */ })
-    .For<Person, int, PersonSearchObject>(e => { /* ... */ })
-    .For<Person, PersonSearchObject, PersonSortBy, PersonIncludes>(e => { /* ... */ })
-    .For<Person, int, PersonSearchObject, PersonSortBy, PersonIncludes>(e => { /* ... */ });
-
-// Controllers
-public class PersonController : EntityControllerBase<Person>;
-public class PersonController : EntityControllerBase<Person, PersonDto, PersonInputDto>;
-public class PersonController : EntityControllerBase<Person, PersonSearchObject, PersonDto, PersonInputDto>;
-public class PersonController : EntityControllerBase<Person, PersonSearchObject, PersonSortBy, PersonIncludes, PersonDto, PersonInputDto>;
-public class PersonController : EntityControllerBase<Person, int>;
-public class PersonController : EntityControllerBase<Person, int, PersonSearchObject, PersonDto, PersonInputDto>;
-public class PersonController : EntityControllerBase<Person, int, PersonSearchObject, PersonSortBy, PersonIncludes, PersonDto, PersonInputDto>;
-```
-

@@ -55,7 +55,7 @@ public interface IEntityServiceCollection<TContext>
     public EntityServiceCollection<TContext> WithAttachments(Func<IServiceProvider, IFileService> factory, Action<EntitySearchObjectServiceBuilder<TContext, Attachment, int, AttachmentSearchObject<int>>>? configure = null);
 
     /// <summary>
-    /// Adds <see cref="IAttachmentService"/> to <see cref="IServiceCollection"/> with an implementation of <see cref="IFileService"/>.<br />
+    /// Adds <see cref="IAttachmentFileService{TAttachment, TKey}"/> to <see cref="IServiceCollection"/> with an implementation of <see cref="IFileService"/>.<br />
     /// </summary>
     /// <param name="factory"></param>
     /// <param name="configure"></param>

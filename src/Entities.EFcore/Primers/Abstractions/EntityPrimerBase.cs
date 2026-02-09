@@ -17,8 +17,6 @@ public abstract class EntityPrimerBase<T> : IEntityPrimer<T>
         }
     }
 
-
-
     public abstract Task PrepareAsync(T entity, EntityEntry entry);
     public virtual bool CanPrepare(T? entity) => entity != null;
 

@@ -155,19 +155,32 @@ public static class QueryExtensions
     public static IQueryable<TEntity> SortQuery<TEntity, TKey>(this IQueryable<TEntity> query)
         where TEntity : IEntity<TKey>
     {
+        if (typeof(IOrderedQueryable).IsAssignableFrom(query.Expression.Type) && query is IOrderedQueryable<TEntity> sortedQuery)
+        {
+
+            if (TypeUtility.ImplementsInterface<IHasNormalizedTitle>(typeof(TEntity)))
+            {
+                return sortedQuery
+                    .ThenBy(x => ((IHasNormalizedTitle)x).NormalizedTitle);
+            }
+            if (TypeUtility.ImplementsInterface<IHasTitle>(typeof(TEntity)))
+            {
+                return sortedQuery
+                    .ThenBy(x => ((IHasTitle)x).Title);
+            }
+
+            return sortedQuery.ThenBy(x => x.Id);
+        }
+
         if (TypeUtility.ImplementsInterface<IHasNormalizedTitle>(typeof(TEntity)))
         {
             return query
-                .Cast<IHasNormalizedTitle>()
-                .OrderBy(x => x.NormalizedTitle)
-                .Cast<TEntity>();
+                .OrderBy(x => ((IHasNormalizedTitle)x).NormalizedTitle);
         }
         if (TypeUtility.ImplementsInterface<IHasTitle>(typeof(TEntity)))
         {
             return query
-                .Cast<IHasTitle>()
-                .OrderBy(x => x.Title)
-                .Cast<TEntity>();
+                .OrderBy(x => ((IHasTitle)x).Title);
         }
 
         return query.OrderBy(x => x.Id);
