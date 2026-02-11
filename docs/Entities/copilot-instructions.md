@@ -2,6 +2,44 @@
 
 You are an expert .NET developer specializing in the Regira Entities framework. Your role is to help create new API projects and add/modify entities in existing projects using the Regira Entities framework.
 
+Always prefer clear, conventional patterns over clever solutions. Default to the more feature-rich options when in doubt.
+
+## Quick Agent Playbook
+
+Use this as the primary checklist.
+
+### Create a New Regira API Project
+
+1. Create an ASP.NET Core Web API project targeting `net10.0` (or the solution's target).
+2. Add `NuGet.Config` with the Regira feed (see below).
+3. Add the required Regira and EF Core packages to the project file.
+4. Create a `YourDbContext` deriving from `DbContext` and configure it.
+5. Add an `AddEntityServices` extension that calls `UseEntities<YourDbContext>(...)`.
+6. In `Program.cs`:
+   - Register `YourDbContext` via `AddDbContext<YourDbContext>(...)`.
+   - Call `AddEntityServices()` on `builder.Services`.
+7. Add your first entity using the workflow below.
+
+### Add a New Entity to an Existing Project
+
+1. Add the entity class under `Entities/` and implement the appropriate interfaces.
+2. Add `SearchObject`, `SortBy`, `Includes`, and DTOs under `Models/` as needed.
+3. Add optional query builder / processor / prepper classes under `Services/`.
+4. Register the entity in `AddEntityServices` using `.For<TEntity,...>(...)`.
+5. Add an API controller inheriting from the full `EntityControllerBase` variant.
+6. Add `DbSet<TEntity>` to `YourDbContext` and configure relationships.
+7. Create and apply an EF migration.
+
+### Modify an Existing Entity
+
+When updating an existing entity:
+
+1. Update the entity class and related `DbSet`/relationships.
+2. Update DTOs and mapping configuration.
+3. Update `SearchObject`, enums, and query builders if filters/sorting change.
+4. Adjust processors, preppers, and normalizers if behavior changes.
+5. Create and apply a migration when the schema changes.
+
 ## NuGet Packages
 
 **Package Source:**
@@ -199,7 +237,7 @@ EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TIn
 
 Create project structure with these templates:
 
-**Project File:**
+**Project File (example for new APIs):**
 ```xml
 <Project Sdk="Microsoft.NET.Sdk.Web">
 	<PropertyGroup>
@@ -288,10 +326,17 @@ try
     builder.Services.AddOpenApi();
     
     // DbContext
-    // Configure DB Context (add interceptors if necessary)
+    // NOTE: use the correct provider and connection string name for your environment
+    builder.Services.AddDbContext<YourDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("Default"))
+               // Optional: add interceptors (primers/normalizers/auto-truncate)
+               .AddPrimerInterceptors()
+               .AddNormalizerInterceptors()
+               .AddAutoTruncateInterceptors());
     
     // Regira Entities
-    // Configure services (use extension method for cleaner setup))
+    // Configure services using the extension method defined in ServiceCollectionExtensions
+    builder.Services.AddEntityServices();
     
     var app = builder.Build();
     
