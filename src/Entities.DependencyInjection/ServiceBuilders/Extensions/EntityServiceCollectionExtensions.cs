@@ -2,6 +2,7 @@
 using Regira.Entities.DependencyInjection.Primers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
+using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 
@@ -28,6 +29,7 @@ public static class EntityServiceCollectionExtensions
         else
         {
             options.AddDefaultEntityNormalizer();
+            options.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
         }
         options.AddDefaultGlobalQueryFilters();
 

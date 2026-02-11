@@ -15,6 +15,7 @@ Use this as the primary checklist.
 3. Add the required Regira and EF Core packages to the project file.
 4. Create a `YourDbContext` deriving from `DbContext` and configure it.
 5. Add an `AddEntityServices` extension that calls `UseEntities<YourDbContext>(...)`.
+   - Use .UseDefaults()
 6. In `Program.cs`:
    - Register `YourDbContext` via `AddDbContext<YourDbContext>(...)`.
    - Call `AddEntityServices()` on `builder.Services`.
@@ -39,6 +40,16 @@ When updating an existing entity:
 3. Update `SearchObject`, enums, and query builders if filters/sorting change.
 4. Adjust processors, preppers, and normalizers if behavior changes.
 5. Create and apply a migration when the schema changes.
+
+## Defaults
+
+Use `UseDefaults()` to register the framework's typical batteries-included setup (primers, global query filters, and default normalizers).
+
+```csharp
+using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
+
+services.UseEntities<YourDbContext>(options => options.UseDefaults());
+```
 
 ## NuGet Packages
 
@@ -84,7 +95,8 @@ using Regira.Entities.Web.Controllers.Abstractions;       // EntityControllerBas
 
 ### Dependency Injection
 ```csharp
-using Regira.Entities.DependencyInjection;       // UseEntities(), For<T>() extensions
+using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;       // UseEntities()
+using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;     // .For<TEntity,...>()
 ```
 
 ### Mapping
@@ -216,6 +228,7 @@ EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TIn
 - `IHasCode` - Entities with short identifier code
 - `ISortable` - For sortable child collections
 - `IHasAttachments` - When entity needs file attachments
+- `IHasNormalizedContent` - When using normalization and the entity has a `NormalizedContent` property (enables normalized-content filtering)
 
 ### Service Layer Decisions
 
@@ -399,13 +412,11 @@ public static class ServiceCollectionExtensions
     {
         services.UseEntities<YourDbContext>(options =>
         {
+            // Default services
+            options.UseDefaults();
+
             // Global configuration
             options.UseMapsterMapping();
-            options.AddDefaultEntityNormalizer();
-            
-            // Global filters
-            options.AddGlobalFilterQueryBuilder<FilterIdsQueryBuilder<int>>();
-            options.AddGlobalFilterQueryBuilder<FilterArchivablesQueryBuilder>();
             
             // Global primers
             options.AddPrepper<IHasAggregateKey>(x => x.AggregateKey ??= Guid.NewGuid());
@@ -743,6 +754,9 @@ public static class ServiceCollectionExtensions
     {
         services.UseEntities<YourDbContext>(options =>
         {
+            // Default services
+            options.UseDefaults();
+
             // Global configuration...
         })
         .For<YourEntity, YourEntitySearchObject, YourEntitySortBy, YourEntityIncludes>(e =>
@@ -1131,13 +1145,14 @@ public class UserTrackingPrimer : EntityPrimerBase<IAuditable>
 
 // In ServiceCollectionExtensions.cs
 using Regira.DAL.EFcore.Services;
-using Regira.Entities.DependencyInjection;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 
 services.UseEntities<YourDbContext>(options =>
 {
+    // Default services
+    options.UseDefaults();
+
     // Global primers
-    options.AddPrimer<HasCreatedDbPrimer>();
-    options.AddPrimer<HasLastModifiedDbPrimer>();
     options.AddPrimer<UserTrackingPrimer>();
 });
 ```
@@ -1455,7 +1470,7 @@ public class YourDbContext : DbContext
 ```csharp
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.DependencyInjection;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 using Regira.Entities.Mapping.Mapster;
 using Regira.Entities.Services;
 
@@ -1465,11 +1480,10 @@ public static class ServiceCollectionExtensions
     {
         services.UseEntities<YourDbContext>(options =>
         {
+            // Default services
+            options.UseDefaults();
+
             options.UseMapsterMapping();
-            options.AddDefaultEntityNormalizer();
-            
-            options.AddGlobalFilterQueryBuilder<FilterIdsQueryBuilder<int>>();
-            options.AddGlobalFilterQueryBuilder<FilterArchivablesQueryBuilder>();
         })
         .For<Product, ProductSearchObject, ProductSortBy, ProductIncludes>(e =>
         {

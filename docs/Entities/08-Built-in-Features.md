@@ -55,6 +55,32 @@ services.AddDbContext<MyDbContext>((serviceProvider, db) =>
 
 ## Helper Services
 
+
+### Defaults
+
+```csharp
+using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
+
+services.UseEntities<ContosoContext>(e => e.UseDefaults());
+```
+
+Registers a set of commonly used features for typical applications, including:
+- `AddDefaultPrimers()`
+  - `ArchivablePrimer`
+  - `HasCreatedDbPrimer`
+  - `HasLastModifiedDbPrimer`
+- `AddDefaultGlobalQueryFilters()`
+  - `FilterIdsQueryBuilder`
+  - `FilterArchivablesQueryBuilder`
+  - `FilterHasCreatedQueryBuilder`
+  - `FilterHasLastModifiedQueryBuilder`
+- `AddDefaultEntityNormalizer()`
+  - `DefaultNormalizer`
+  - `ObjectNormalizer`
+  - `DefaultEntityNormalizer`
+  - `QKeywordHelper`
+
+
 ### Preppers
 
 **RelatedCollectionPrepper**: *Prepares related collections for saving by adding, updating, or removing items as necessary.*
