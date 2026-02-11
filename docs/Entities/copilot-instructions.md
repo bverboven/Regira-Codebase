@@ -235,9 +235,6 @@ Create project structure with these templates:
 **appsettings.json:**
 ```json
 {
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=YourDbName;Trusted_Connection=True;MultipleActiveResultSets=true"
-  },
   "AllowedHosts": "*",
   "Serilog": {
     "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File" ],
@@ -253,7 +250,7 @@ Create project structure with these templates:
       {
         "Name": "File",
         "Args": {
-          "path": "logs/YourApp-.log",
+          "path": "logs/{YourApp}-.log",
           "restrictedToMinimumLevel": "Information",
           "rollingInterval": "Day",
           "rollOnFileSizeLimit": true,
@@ -272,8 +269,6 @@ using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
 using Regira.DAL.EFcore.Extensions;
-using YourNamespace.Data;
-using YourNamespace.Extensions;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -284,11 +279,7 @@ try
     var builder = WebApplication.CreateBuilder(args);
     
     // Controllers
-    builder.Services.AddControllers()
-        .AddNewtonsoftJson(options =>
-        {
-            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-        });
+    builder.Services.AddControllers();
     
     // Logging
     builder.Services.AddSerilog(config => config.ReadFrom.Configuration(builder.Configuration));
@@ -297,16 +288,10 @@ try
     builder.Services.AddOpenApi();
     
     // DbContext
-    builder.Services.AddDbContext<YourDbContext>((sp, options) =>
-    {
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-            .AddPrimerInterceptors(sp)
-            .AddNormalizerInterceptors(sp)
-            .AddAutoTruncateInterceptors();
-    });
+    // Configure DB Context (add interceptors if necessary)
     
     // Regira Entities
-    builder.Services.AddEntityServices();
+    // Configure services (use extension method for cleaner setup))
     
     var app = builder.Build();
     
@@ -337,8 +322,6 @@ finally
 using Microsoft.EntityFrameworkCore;
 using Regira.DAL.EFcore.Extensions;
 
-namespace YourNamespace.Data;
-
 public class YourDbContext : DbContext
 {
     public YourDbContext(DbContextOptions<YourDbContext> options) : base(options) { }
@@ -364,10 +347,6 @@ public class YourDbContext : DbContext
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection;
 using Regira.Entities.Mapping.Mapster;
-using Regira.Entities.Services;
-using YourNamespace.Data;
-
-namespace YourNamespace.Extensions;
 
 public static class ServiceCollectionExtensions
 {
@@ -401,8 +380,6 @@ public static class ServiceCollectionExtensions
 using System.ComponentModel.DataAnnotations;
 using Regira.Entities.Models.Abstractions;
 using Regira.Normalizing;
-
-namespace YourNamespace.Entities;
 
 public class YourEntity : IEntity<int>, IHasTimestamps, IHasTitle
 {
@@ -442,8 +419,6 @@ public class YourEntity : IEntity<int>, IHasTimestamps, IHasTitle
 ```csharp
 using Regira.Entities.Models;
 
-namespace YourNamespace.Models;
-
 public class YourEntitySearchObject : SearchObject
 {
     // Add custom filter properties
@@ -471,8 +446,6 @@ public class YourEntitySearchObject : SearchObject
 
 **SortBy Enum:**
 ```csharp
-namespace YourNamespace.Models;
-
 public enum YourEntitySortBy
 {
     Default = 0,
@@ -488,8 +461,6 @@ public enum YourEntitySortBy
 **Includes Enum:**
 ```csharp
 using System;
-
-namespace YourNamespace.Models;
 
 [Flags]
 public enum YourEntityIncludes
@@ -510,8 +481,6 @@ public enum YourEntityIncludes
 
 **Output DTO (for reading):**
 ```csharp
-namespace YourNamespace.Models;
-
 public class YourEntityDto
 {
     public int Id { get; set; }
@@ -529,8 +498,6 @@ public class YourEntityDto
 **Input DTO (for creating/updating):**
 ```csharp
 using System.ComponentModel.DataAnnotations;
-
-namespace YourNamespace.Models;
 
 public class YourEntityInputDto
 {
@@ -571,10 +538,7 @@ e.Filter((query, so) =>
 ```csharp
 using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Services.Abstractions;
-using YourNamespace.Entities;
-using YourNamespace.Models;
-
-namespace YourNamespace.Services;
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 
 public class YourEntityQueryBuilder : FilteredQueryBuilderBase<YourEntity, int, YourEntitySearchObject>
 {
@@ -650,10 +614,6 @@ e.Process((items, includes) =>
 
 // Separate class
 using Regira.Entities.Services.Abstractions;
-using YourNamespace.Entities;
-using YourNamespace.Models;
-
-namespace YourNamespace.Services;
 
 public class YourEntityProcessor : IEntityProcessor<YourEntity, YourEntityIncludes>
 {
@@ -701,10 +661,6 @@ e.Related(x => x.OrderItems, (item, _) => item.OrderItems?.Prepare());
 ```csharp
 using Microsoft.AspNetCore.Mvc;
 using Regira.Entities.Web.Controllers.Abstractions;
-using YourNamespace.Entities;
-using YourNamespace.Models;
-
-namespace YourNamespace.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -735,12 +691,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection;
 using Regira.Entities.Mapping.Mapster;
-using YourNamespace.Data;
-using YourNamespace.Entities;
-using YourNamespace.Models;
-using YourNamespace.Services;
-
-namespace YourNamespace.Extensions;
 
 public static class ServiceCollectionExtensions
 {
@@ -860,8 +810,6 @@ Add to project file:
 ```csharp
 using Regira.Entities.Attachments.Models;
 
-namespace YourNamespace.Entities;
-
 public class YourEntityAttachment : EntityAttachment<int, int>
 {
     public override string ObjectType => nameof(YourEntity);
@@ -872,9 +820,7 @@ public class YourEntityAttachment : EntityAttachment<int, int>
 ```csharp
 using System.ComponentModel.DataAnnotations;
 using Regira.Entities.Models.Abstractions;
-using Regira.Entities.Normalization;
-
-namespace YourNamespace.Entities;
+using Regira.Normalizing;
 
 public class YourEntity : IEntity<int>, IHasAttachments, IHasAttachments<YourEntityAttachment>
 {
@@ -895,9 +841,6 @@ public class YourEntity : IEntity<int>, IHasAttachments, IHasAttachments<YourEnt
 ```csharp
 using Microsoft.AspNetCore.Mvc;
 using Regira.Entities.Web.Attachments.Abstractions;
-using YourNamespace.Entities;
-
-namespace YourNamespace.Controllers;
 
 [ApiController]
 [Route("api/your-entities/{objectId}/attachments")]
@@ -939,9 +882,6 @@ services.UseEntities<YourDbContext>(/* ... */)
 ```csharp
 using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Attachments.Models;
-using YourNamespace.Entities;
-
-namespace YourNamespace.Data;
 
 public class YourDbContext : DbContext
 {
@@ -970,9 +910,6 @@ public class YourDbContext : DbContext
 ```csharp
 using Regira.Normalizing.Abstractions;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
-using YourNamespace.Entities;
-
-namespace YourNamespace.Services;
 
 public class CustomEntityNormalizer : EntityNormalizerBase<YourEntity>
 {
@@ -1112,8 +1049,6 @@ using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Services.Abstractions;
 using Regira.DAL.EFcore.Services;
 
-namespace YourNamespace.Entities;
-
 // Entity
 public class AuditableEntity : IEntity<int>, IHasTimestamps
 {
@@ -1124,9 +1059,9 @@ public class AuditableEntity : IEntity<int>, IHasTimestamps
     public DateTime? LastModified { get; set; }
 }
 
-namespace YourNamespace.Services;
-
 // Custom primer for user tracking
+// NOTE: ICurrentUserService and IAuditable are application-specific abstractions
+// that you define in your own project (they are not part of Regira).
 public class UserTrackingPrimer : EntityPrimerBase<IAuditable>
 {
     private readonly ICurrentUserService _currentUser;
@@ -1167,9 +1102,6 @@ services.UseEntities<YourDbContext>(options =>
 ### Input Validation
 ```csharp
 using Regira.Entities.Exceptions;
-using YourNamespace.Entities;
-
-namespace YourNamespace.Services;
 
 // In service or prepper
 public class ProductValidator
@@ -1302,8 +1234,6 @@ using System.ComponentModel.DataAnnotations;
 using Regira.Entities.Models.Abstractions;
 using Regira.Normalizing;
 
-namespace YourNamespace.Entities;
-
 public class Product : IEntity<int>, IHasTimestamps, IHasTitle, IArchivable
 {
     public int Id { get; set; }
@@ -1334,8 +1264,6 @@ public class Product : IEntity<int>, IHasTimestamps, IHasTitle, IArchivable
 ```csharp
 using Regira.Entities.Models;
 
-namespace YourNamespace.Models;
-
 public class ProductSearchObject : SearchObject
 {
     public int? CategoryId { get; set; }
@@ -1347,8 +1275,6 @@ public class ProductSearchObject : SearchObject
 
 ### Models/ProductSortBy.cs
 ```csharp
-namespace YourNamespace.Models;
-
 public enum ProductSortBy
 {
     Default = 0,
@@ -1363,8 +1289,6 @@ public enum ProductSortBy
 
 ### Models/ProductIncludes.cs
 ```csharp
-namespace YourNamespace.Models;
-
 [Flags]
 public enum ProductIncludes
 {
@@ -1376,8 +1300,6 @@ public enum ProductIncludes
 
 ### Models/ProductDto.cs
 ```csharp
-namespace YourNamespace.Models;
-
 public class ProductDto
 {
     public int Id { get; set; }
@@ -1394,8 +1316,6 @@ public class ProductDto
 ### Models/ProductInputDto.cs
 ```csharp
 using System.ComponentModel.DataAnnotations;
-
-namespace YourNamespace.Models;
 
 public class ProductInputDto
 {
@@ -1416,10 +1336,6 @@ public class ProductInputDto
 ```csharp
 using Microsoft.EntityFrameworkCore;
 using Regira.Entities.Services.Abstractions;
-using YourNamespace.Entities;
-using YourNamespace.Models;
-
-namespace YourNamespace.Services;
 
 public class ProductQueryBuilder : FilteredQueryBuilderBase<Product, int, ProductSearchObject>
 {
@@ -1448,10 +1364,6 @@ public class ProductQueryBuilder : FilteredQueryBuilderBase<Product, int, Produc
 ```csharp
 using Microsoft.AspNetCore.Mvc;
 using Regira.Entities.Web.Controllers.Abstractions;
-using YourNamespace.Entities;
-using YourNamespace.Models;
-
-namespace YourNamespace.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -1470,9 +1382,6 @@ public class ProductsController : EntityControllerBase<
 ```csharp
 using Microsoft.EntityFrameworkCore;
 using Regira.DAL.EFcore.Extensions;
-using YourNamespace.Entities;
-
-namespace YourNamespace.Data;
 
 public class YourDbContext : DbContext
 {
@@ -1504,12 +1413,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection;
 using Regira.Entities.Mapping.Mapster;
 using Regira.Entities.Services;
-using YourNamespace.Data;
-using YourNamespace.Entities;
-using YourNamespace.Models;
-using YourNamespace.Services;
-
-namespace YourNamespace.Extensions;
 
 public static class ServiceCollectionExtensions
 {
@@ -1579,11 +1482,11 @@ public static class ServiceCollectionExtensions
 ## Quick Reference: Built-in Services
 
 ### Global Filters
-- `FilterIdsQueryBuilder` - Filter by ID collection
-- `FilterArchivablesQueryBuilder` - Exclude archived items
-- `FilterHasCreatedQueryBuilder` - Filter by creation date
-- `FilterHasLastModifiedQueryBuilder` - Filter by modification date
-- `FilterHasNormalizedContentQueryBuilder` - Text search on normalized content
+- `FilterIdsQueryBuilder` - Filter by ID collection (added by default)
+- `FilterArchivablesQueryBuilder` - Exclude archived items (added by default)
+- `FilterHasCreatedQueryBuilder` - Filter by creation date (added by default)
+- `FilterHasLastModifiedQueryBuilder` - Filter by modification date (added by default)
+- `FilterHasNormalizedContentQueryBuilder` - Text search on normalized content (available, opt-in)
 
 ### Primers
 - `ArchivablePrimer` - Soft delete (sets IsArchived instead of deleting)
