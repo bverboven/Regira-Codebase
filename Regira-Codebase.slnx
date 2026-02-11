@@ -1,0 +1,168 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Caching/">
+    <Project Path="src/Caching.Runtime/Caching.Runtime.csproj" />
+  </Folder>
+  <Folder Name="/src/Core/">
+    <Project Path="src/Common/Common.csproj" />
+    <Project Path="src/TreeList/TreeList.csproj" />
+  </Folder>
+  <Folder Name="/src/DAL/">
+    <Project Path="src/DAL.EFcore/DAL.EFcore.csproj" />
+    <Project Path="src/DAL.MongoDB/DAL.MongoDB.csproj" />
+    <Project Path="src/DAL.MySQL.MySqlBackup/DAL.MySQL.MySqlBackup.csproj" />
+    <Project Path="src/DAL.MySQL/DAL.MySQL.csproj" />
+    <Project Path="src/DAL.PostgreSQL/DAL.PostgreSQL.csproj" />
+  </Folder>
+  <Folder Name="/src/Entities/">
+    <Project Path="src/Common.Entities/Common.Entities.csproj" />
+    <Project Path="src/Entities.DependencyInjection/Entities.DependencyInjection.csproj" />
+    <Project Path="src/Entities.EFcore/Entities.EFcore.csproj" />
+    <Project Path="src/Entities.Mapping.AutoMapper/Entities.Mapping.AutoMapper.csproj" />
+    <Project Path="src/Entities.Mapping.Mapster/Entities.Mapping.Mapster.csproj" />
+    <Project Path="src/Entities.Web/Entities.Web.csproj" />
+  </Folder>
+  <Folder Name="/src/Entities/docs/">
+    <File Path="docs/Entities/01-Index.md" />
+    <File Path="docs/Entities/02-Models.md" />
+    <File Path="docs/Entities/03-Services.md" />
+    <File Path="docs/Entities/04-Mapping.md" />
+    <File Path="docs/Entities/05-Controllers.md" />
+    <File Path="docs/Entities/06-Normalizing.md" />
+    <File Path="docs/Entities/07-Attachments.md" />
+    <File Path="docs/Entities/08-Built-in-Features.md" />
+    <File Path="docs/Entities/09-Checklist.md" />
+    <File Path="docs/Entities/10-Examples.md" />
+    <File Path="docs/Entities/copilot-instructions.md" />
+  </Folder>
+  <Folder Name="/src/Globalization/">
+    <Project Path="src/Globalization.LibPhoneNumber/Globalization.LibPhoneNumber.csproj" />
+  </Folder>
+  <Folder Name="/src/Invoicing/">
+    <Project Path="src/Common.Invoicing/Common.Invoicing.csproj" />
+  </Folder>
+  <Folder Name="/src/Invoicing/Payments/">
+    <Project Path="src/Payments.Mollie/Payments.Mollie.csproj" />
+    <Project Path="src/Payments.Pom/Payments.Pom.csproj" />
+  </Folder>
+  <Folder Name="/src/Invoicing/Peppol/">
+    <Project Path="src/Invoicing.Billit/Invoicing.Billit.csproj" />
+    <Project Path="src/Invoicing.UblSharp/Invoicing.UblSharp.csproj" />
+    <Project Path="src/Invoicing.ViaAdValvas/Invoicing.ViaAdValvas.csproj" />
+  </Folder>
+  <Folder Name="/src/IO/">
+    <Project Path="src/Common.IO.Storage/Common.IO.Storage.csproj" />
+    <Project Path="src/IO.Compression.SharpZipLib/IO.Compression.SharpZipLib.csproj" />
+    <Project Path="src/IO.Storage.Azure/IO.Storage.Azure.csproj" />
+    <Project Path="src/IO.Storage.GitHub/IO.Storage.GitHub.csproj" />
+    <Project Path="src/IO.Storage.SimpleTCP/IO.Storage.SimpleTCP.csproj" />
+    <Project Path="src/IO.Storage.SSH/IO.Storage.SSH.csproj" />
+  </Folder>
+  <Folder Name="/src/Media/">
+    <Project Path="src/Common.Media/Common.Media.csproj" />
+    <Project Path="src/Drawing.GDI/Drawing.GDI.csproj" />
+    <Project Path="src/Drawing.SkiaSharp/Drawing.SkiaSharp.csproj" />
+    <Project Path="src/Media.FFMpeg/Media.FFMpeg.csproj" />
+  </Folder>
+  <Folder Name="/src/Office/">
+    <Project Path="src/Common.Office/Common.Office.csproj" />
+  </Folder>
+  <Folder Name="/src/Office/Barcodes/">
+    <Project Path="src/Barcodes.QRCoder/Barcodes.QRCoder.csproj" />
+    <Project Path="src/Barcodes.Spire/Barcodes.Spire.csproj" />
+    <Project Path="src/Barcodes.UziGranot/Barcodes.UziGranot.csproj" />
+    <Project Path="src/Barcodes.ZXing/Barcodes.ZXing.csproj" />
+  </Folder>
+  <Folder Name="/src/Office/Csv/">
+    <Project Path="src/Csv.CsvHelper/Csv.CsvHelper.csproj" />
+  </Folder>
+  <Folder Name="/src/Office/Excel/">
+    <Project Path="src/Excel.ClosedXML/Excel.ClosedXML.csproj" />
+    <Project Path="src/Excel.EPPlus/Excel.EPPlus.csproj" />
+    <Project Path="src/Excel.MiniExcel/Excel.MiniExcel.csproj" />
+    <Project Path="src/Excel.NpoiMapper/Excel.NpoiMapper.csproj" />
+  </Folder>
+  <Folder Name="/src/Office/Mail/">
+    <Project Path="src/Mail.MailGun/Mail.MailGun.csproj" />
+    <Project Path="src/Mail.MSGReader/Mail.MSGReader.csproj" />
+    <Project Path="src/Mail.SendGrid/Mail.SendGrid.csproj" />
+    <Project Path="src/Mail.Web/Mail.Web.csproj" />
+  </Folder>
+  <Folder Name="/src/Office/OCR/">
+    <Project Path="src/OCR.PaddleOCR/OCR.PaddleOCR.csproj" />
+    <Project Path="src/OCR.Tesseract/OCR.Tesseract.csproj" />
+  </Folder>
+  <Folder Name="/src/Office/PDF/">
+    <Project Path="src/PDF.DocNET/PDF.DocNET.csproj" />
+    <Project Path="src/PDF.PDFtoPrinter/PDF.PDFtoPrinter.csproj" />
+    <Project Path="src/PDF.PockyBum522/PDF.PockyBum522.csproj" />
+    <Project Path="src/PDF.Puppeteer/PDF.Puppeteer.csproj" />
+    <Project Path="src/PDF.SelectPdf/PDF.SelectPdf.csproj" />
+    <Project Path="src/PDF.Spire/PDF.Spire.csproj" />
+  </Folder>
+  <Folder Name="/src/Office/vCards/">
+    <Project Path="src/VCards.FolkerKinzel/VCards.FolkerKinzel.csproj" />
+  </Folder>
+  <Folder Name="/src/Office/Word/">
+    <Project Path="src/Word.Mini/Word.Mini.csproj" />
+    <Project Path="src/Word.Spire/Word.Spire.csproj" />
+  </Folder>
+  <Folder Name="/src/Security/">
+    <Project Path="src/Common.Security/Common.Security.csproj" />
+    <Project Path="src/Security.Authentication.Web/Security.Authentication.Web.csproj" />
+    <Project Path="src/Security.Authentication/Security.Authentication.csproj" />
+    <Project Path="src/Security.Hashing.BCryptNet/Security.Hashing.BCryptNet.csproj" />
+  </Folder>
+  <Folder Name="/src/Serializing/">
+    <Project Path="src/Serializing.Newtonsoft/Serializing.Newtonsoft.csproj" />
+  </Folder>
+  <Folder Name="/src/System/">
+    <Project Path="src/Common.System/Common.System.csproj" />
+    <Project Path="src/System.Hosting/System.Hosting.csproj" />
+    <Project Path="src/System.Projects/System.Projects.csproj" />
+  </Folder>
+  <Folder Name="/src/Web/">
+    <Project Path="src/Common.Web/Common.Web.csproj" />
+    <Project Path="src/Web.HTML.RazorLight/Web.HTML.RazorLight.csproj" />
+    <Project Path="src/Web.Swagger/Web.Swagger.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Common.Testing/Common.Testing.csproj" />
+    <Project Path="tests/DAL.EFcore.Testing/DAL.EFcore.Testing.csproj" />
+    <Project Path="tests/DAL.MongoDB.Testing/DAL.MongoDB.Testing.csproj" />
+    <Project Path="tests/Drawing.Testing/Drawing.Testing.csproj" />
+    <Project Path="tests/Entities.DependencyInjection.Testing/Entities.DependencyInjection.Testing.csproj" />
+    <Project Path="tests/Entities.TestApi/Entities.TestApi.csproj" />
+    <Project Path="tests/Entities.Testing/Entities.Testing.csproj" />
+    <Project Path="tests/Entities.Web.Testing/Entities.Web.Testing.csproj" />
+    <Project Path="tests/Hosting.Testing/Hosting.Testing.csproj" />
+    <Project Path="tests/IO.Testing/IO.Testing.csproj" />
+    <Project Path="tests/Normalizing.Testing/Normalizing.Testing.csproj" />
+    <Project Path="tests/Office.Barcodes.Testing/Office.Barcodes.Testing.csproj" />
+    <Project Path="tests/Office.Csv.Testing/Office.Csv.Testing.csproj" />
+    <Project Path="tests/Office.Excel.Testing/Office.Excel.Testing.csproj" />
+    <Project Path="tests/Office.Mail.Testing/Office.Mail.Testing.csproj" />
+    <Project Path="tests/Office.OCR.Testing/Office.OCR.Testing.csproj" />
+    <Project Path="tests/Office.PDF.Testing/Office.PDF.Testing.csproj" />
+    <Project Path="tests/Office.VCards.Testing/Office.VCards.Testing.csproj" />
+    <Project Path="tests/Office.Word.testing/Office.Word.testing.csproj" />
+    <Project Path="tests/Payments.Testing/Payments.Testing.csproj" />
+    <Project Path="tests/Security.Testing/Security.Testing.csproj" />
+    <Project Path="tests/Serializing.Testing/Serializing.Testing.csproj" />
+    <Project Path="tests/Testing.Library/_Testing.Library.csproj" />
+    <Project Path="tests/TreeList.Testing/TreeList.Testing.csproj" />
+    <Project Path="tests/Web.HTML.Testing/Web.HTML.Testing.csproj" />
+    <Project Path="tests/Web.Security.Testing/Web.Security.Testing.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/ProjectBackupConsole/ProjectBackupConsole.csproj" />
+    <Project Path="tools/ProjectFilesProcessor/ProjectFilesProcessor.csproj" />
+    <Project Path="tools/ProjectsCleanerConsole/ProjectsCleanerConsole.csproj" />
+    <Project Path="tools/VideoTestConsole/VideoTestConsole.csproj" />
+  </Folder>
+</Solution>

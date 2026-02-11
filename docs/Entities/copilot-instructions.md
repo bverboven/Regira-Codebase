@@ -6,6 +6,44 @@ You are an AI assistant specialized in implementing the Regira Entities framewor
 
 **Regira Entities** is a generic, extensible framework for managing data entities in .NET applications with standardized CRUD operations, filtering, sorting, and includes.
 
+### NuGet Packages
+
+**Package Source:**
+```xml
+<packageSources>
+  <add key="Regira" value="https://packages.regira.com/v3/index.json" />
+</packageSources>
+```
+
+**Required Package:**
+- `Regira.Entities.DependencyInjection` - Core framework and dependency injection setup
+
+**Mapping Libraries (choose one):**
+- `Regira.Entities.Mapping.AutoMapper` - For AutoMapper integration
+- `Regira.Entities.Mapping.Mapster` - For Mapster integration (recommended for performance)
+
+**File Attachments (optional):**
+- `Regira.IO.Storage` - Base file storage abstraction
+- `Regira.IO.Storage.Azure` - Azure Blob Storage implementation
+
+**Installation Example:**
+```bash
+# Add package source (if not already configured)
+dotnet nuget add source https://packages.regira.com/v3/index.json --name Regira
+
+# Install core package
+dotnet add package Regira.Entities.DependencyInjection
+
+# Install mapping library (choose one)
+dotnet add package Regira.Entities.Mapping.Mapster
+# OR
+dotnet add package Regira.Entities.Mapping.AutoMapper
+
+# Install file storage (if needed)
+dotnet add package Regira.IO.Storage
+dotnet add package Regira.IO.Storage.Azure
+```
+
 ### Processing Pipelines
 
 **Read Pipeline**: EntitySet ? QueryBuilders (Filters, Sorting, Paging, Includes) ? Processors ? Mapping (+ AfterMapping)
@@ -46,6 +84,8 @@ When a user requests to create or modify an entity, evaluate these aspects:
 
 **Always Required:**
 ```csharp
+using Regira.Entities.Models.Abstractions;
+
 public class {EntityName} : IEntity<{TKey}>
 {
     public {TKey} Id { get; set; }
@@ -55,19 +95,27 @@ public class {EntityName} : IEntity<{TKey}>
 
 **Add Interfaces Based on Features:**
 - Timestamps tracking ? Add `IHasTimestamps` (Created, LastModified)
+  - Or use `IHasCreated` (Created only) or `IHasLastModified` (LastModified only) separately
 - Soft delete ? Add `IArchivable` (IsArchived)
 - Text search ? Add `IHasTitle` and/or `IHasDescription`
 - Short identifier ? Add `IHasCode` (Code)
 - Sortable child collection ? Add `ISortable` (SortOrder)
+- Attachment relationship ? Add `IHasObjectId<TKey>` (ObjectId - foreign key to parent entity)
+
+**All entity interfaces:** `Regira.Entities.Models.Abstractions`
 
 **Data Annotations:**
 - Always add `[Required]` for mandatory properties
 - Always add `[MaxLength]` for strings, use powers of 2 as value
 - Use `[Range]` for numeric constraints
-- Use `[Normalized]` attribute when text search is required
+- Use `[Normalized]` attribute when text search is required (from `Regira.Normalizing`)
 
 **Example Decision:**
 ```csharp
+using System.ComponentModel.DataAnnotations;
+using Regira.Entities.Models.Abstractions;
+using Regira.Normalizing;
+
 // User wants: "Product with title, price, category, searchable, track changes"
 public class Product : IEntity<int>, IHasTimestamps, IHasTitle
 {
@@ -100,11 +148,14 @@ public DbSet<{EntityName}> {EntityNames} { get; set; }
 
 **In OnModelCreating:**
 - Configure relationships (prefer Data Annotations when possible)
-- Use `SetDecimalPrecisionConvention(18, 2)` for decimal properties
+- Use `SetDecimalPrecisionConvention(18, 2)` for decimal properties (from `Regira.DAL.EFcore.Extensions`)
 - Configure complex relationships with Fluent API when necessary
 
 **Example:**
 ```csharp
+using Microsoft.EntityFrameworkCore;
+using Regira.DAL.EFcore.Extensions;
+
 protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
     modelBuilder.SetDecimalPrecisionConvention(18, 2);
@@ -124,12 +175,14 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
 - Entity has properties to filter by (CategoryId, price ranges, dates, etc.)
 
 **Always include:**
-- Inherit from `SearchObject<TKey>` (or `SearchObject` for int keys)
+- Inherit from `SearchObject<TKey>` (or `SearchObject` for int keys) from `Regira.Entities.Models`
 - Use `ICollection<TKey>` for filtering on keys (flexible)
 - Add properties matching filterable entity properties
 
 **Example:**
 ```csharp
+using Regira.Entities.Models;
+
 public class ProductSearchObject : SearchObject
 {
     public int? CategoryId { get; set; }
@@ -201,6 +254,9 @@ public enum ProductIncludes
 
 **Separate Class (Complex):**
 ```csharp
+using System.Linq;
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
+
 public class ProductQueryBuilder : FilteredQueryBuilderBase<Product, int, ProductSearchObject>
 {
     public override IQueryable<Product> Build(IQueryable<Product> query, ProductSearchObject? so)
@@ -346,6 +402,9 @@ public class ProductInputDto
 
 **Simple Controller (inherits all CRUD endpoints):**
 ```csharp
+using Microsoft.AspNetCore.Mvc;
+using Regira.Entities.Web.Controllers.Abstractions;
+
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController : EntityControllerBase<Product, ProductDto, ProductInputDto>
@@ -356,6 +415,9 @@ public class ProductsController : EntityControllerBase<Product, ProductDto, Prod
 
 **Complex Controller:**
 ```csharp
+using Microsoft.AspNetCore.Mvc;
+using Regira.Entities.Web.Controllers.Abstractions;
+
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController : EntityControllerBase<Product, ProductSearchObject, ProductSortBy, ProductIncludes, ProductDto, ProductInputDto>
@@ -372,8 +434,17 @@ public class ProductsController : EntityControllerBase<Product, ProductSearchObj
 
 ### Step 10: Dependency Injection Setup
 
+**Namespaces:**
+- `UseEntities<T>()` - `Regira.Entities.DependencyInjection.ServiceBuilders.Extensions`
+- `UseMapsterMapping()` - `Regira.Entities.Mapping.Mapster`
+- `UseAutoMapper()` - `Regira.Entities.Mapping.AutoMapper`
+- Primers - `Regira.Entities.EFcore.Primers`
+- Query Builders - `Regira.Entities.EFcore.QueryBuilders` (abstractions and implementations)
+
 **Basic Setup:**
 ```csharp
+using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
+
 services
     .UseEntities<MyDbContext>()
     .For<Product>();
@@ -381,6 +452,11 @@ services
 
 **Complete Setup with All Features:**
 ```csharp
+using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
+using Regira.Entities.Mapping.Mapster; // or Regira.Entities.Mapping.AutoMapper
+using Regira.Entities.EFcore.Primers;
+using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
+
 services
     .UseEntities<MyDbContext>(options =>
     {
@@ -445,6 +521,8 @@ dotnet ef database update
 
 **Setup:**
 ```csharp
+using Regira.Normalizing;
+
 // 1. Add property to entity
 [Normalized(SourceProperties = [nameof(Title), nameof(Description)])]
 public string? NormalizedContent { get; set; }
@@ -456,6 +534,9 @@ services.UseEntities<DbContext>(e =>
 });
 
 // 3. Add normalizer interceptor to DbContext
+using Microsoft.Extensions.DependencyInjection;
+using Regira.Entities.EFcore.Normalizing;
+
 services.AddDbContext<MyDbContext>((sp, db) =>
 {
     db.UseSqlServer(connectionString)
@@ -473,6 +554,11 @@ services.AddDbContext<MyDbContext>((sp, db) =>
 
 **Setup:**
 ```csharp
+using Regira.Entities.Models.Abstractions;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
+using Regira.Entities.EFcore.Primers;
+using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders;
+
 // 1. Implement interface
 public class Product : IEntity<int>, IArchivable
 {
@@ -495,6 +581,10 @@ services.UseEntities<DbContext>(e =>
 
 **Setup:**
 ```csharp
+using Regira.Entities.Models.Abstractions;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
+using Regira.Entities.EFcore.Primers;
+
 // 1. Implement interface
 public class Product : IEntity<int>, IHasTimestamps
 {
@@ -540,6 +630,9 @@ public class OrderInputDto
 
 **Setup:**
 ```csharp
+using Microsoft.Extensions.DependencyInjection;
+using Regira.DAL.EFcore.Services;
+
 services.AddDbContext<MyDbContext>((sp, db) =>
 {
     db.UseSqlServer(connectionString)
@@ -554,6 +647,9 @@ services.AddDbContext<MyDbContext>((sp, db) =>
 
 **Setup:**
 ```csharp
+using Regira.Entities.Models.Abstractions;
+using Regira.Entities.Attachments.Abstractions;
+
 // 1. Implement interfaces on entity
 public class Product : IEntity<int>, IHasAttachments, IOwnsAttachments
 {
@@ -748,6 +844,41 @@ public class OrdersController : EntityControllerBase<Order, OrderSearchObject, O
    - ICollection<TKey> for filtering on keys
    - SetDecimalPrecisionConvention over per-property precision
 
+## Helper Extensions
+
+### Query Extensions (Regira.Entities.EFcore.Extensions)
+```csharp
+// ID filtering
+query.FilterId(id)                     // Single ID
+query.FilterIds(ids)                   // Collection of IDs
+query.FilterExclude(ids)               // Exclude IDs
+
+// Text search
+query.FilterCode(code)                 // Filter by Code
+query.FilterTitle(keywords)            // Filter by Title
+query.FilterNormalizedTitle(keywords)  // Filter by normalized Title
+query.FilterQ(keywords)                // General Q search
+
+// Date filtering
+query.FilterCreated(minDate, maxDate)
+query.FilterLastModified(minDate, maxDate)
+query.FilterTimestamps(minCreated, maxCreated, minModified, maxModified)
+
+// Other
+query.FilterArchivable(isArchived)
+query.FilterHasAttachment(hasAttachment)
+
+// Pagination (Regira.DAL.Paging)
+query.PageQuery(pagingInfo)
+query.PageQuery(pageSize, page)
+```
+
+### Entity Extensions (Regira.Entities.Extensions)
+```csharp
+entity.IsNew()                         // Check if entity is new (default ID value)
+items.SetSortOrder()                   // Set SortOrder on ISortable collection
+```
+
 ## Error Prevention
 
 1. **Always verify:**
@@ -755,19 +886,28 @@ public class OrdersController : EntityControllerBase<Order, OrderSearchObject, O
    - Entity is configured in DI with `.For<Entity>()`
    - Migration is created after model changes
    - Controller generic types match service generic types
+   - Required NuGet packages are installed
 
 2. **Common mistakes to avoid:**
-   - Forgetting to call `.SaveChanges()` after write operations
-   - Not configuring mapping when using DTOs
-   - Creating complex QueryBuilder for simple filtering (use inline)
-   - Adding custom controller actions when extending SearchObject would suffice
-   - Not implementing `IHasTimestamps` when tracking changes is needed
+- Forgetting to call `.SaveChanges()` after write operations
+- Not configuring mapping when using DTOs
+- Creating complex QueryBuilder for simple filtering (use inline)
+- Adding custom controller actions when extending SearchObject would suffice
+- Not implementing `IHasTimestamps` when tracking changes is needed
+- Using `IEntity<int>` instead of `IEntityWithSerial` for auto-increment IDs
+- Not adding `AddPrimer<HasCreatedDbPrimer>()` when using `IHasCreated`
+- Not adding `AddPrimer<HasLastModifiedDbPrimer>()` when using `IHasLastModified`
 
 3. **Performance considerations:**
    - Use `.AsNoTracking()` for read-only queries
    - Avoid loading navigation properties when not needed
-   - Use pagination for large datasets
+   - Use pagination for large datasets (via `PageQuery` extension)
    - Consider indexes for frequently filtered properties
+
+4. **Validation and error handling:**
+   - Use `EntityInputException<T>` for validation errors in services
+   - Controllers automatically catch `EntityInputException` and return 400 BadRequest
+   - Add validation errors to exception: `exception.InputErrors["PropertyName"] = "Error message"`
 
 ## Response Format
 
@@ -832,14 +972,22 @@ Next steps:
 ## Quick Reference Commands
 
 ### Entity Interfaces Decision
-- `IEntity<TKey>` - Always (defines primary key)
-- `IHasTimestamps` - Track creation/modification dates
-- `IArchivable` - Soft delete
-- `IHasTitle` - Has searchable title
-- `IHasDescription` - Has searchable description
-- `IHasCode` - Has unique code/SKU
-- `ISortable` - Sortable child collection
+**All from `Regira.Entities.Models.Abstractions` unless noted:**
+- `IEntity<TKey>` - Always (defines primary key type)
+- `IEntityWithSerial` - Shorthand for `IEntity<int>` with auto-increment ID
+- `IHasTimestamps` - Track both Created and LastModified dates
+- `IHasCreated` - Track only creation date
+- `IHasLastModified` - Track only modification date
+- `IArchivable` - Soft delete capability (IsArchived)
+- `IHasTitle` - Has searchable title property
+- `IHasDescription` - Has searchable description property
+- `IHasCode` - Has unique code/SKU property
+- `ISortable` - Sortable as child collection (SortOrder)
 - `IHasNormalizedContent` - For text search (with [Normalized] attribute)
+- `IHasObjectId<TKey>` - Foreign key to parent entity (for attachments)
+
+**Attachment interfaces from `Regira.Entities.Attachments.Abstractions`:**
+- `IHasAttachments`, `IOwnsAttachments`, `IAttachment`
 
 ### DI Configuration Shortcuts
 - `.Filter()` - Inline filter logic
@@ -853,12 +1001,74 @@ Next steps:
 - `.AddProcessor()` - Post-fetch processing
 - `.AddNormalizer()` - Custom entity normalizer
 
+### Built-in Query Builders
+**All from `Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders`:**
+- `FilterIdsQueryBuilder` - Filter by collection of IDs (Ids, Exclude)
+- `FilterArchivablesQueryBuilder` - Filter by IsArchived status
+- `FilterHasCreatedQueryBuilder` - Filter by Created date range
+- `FilterHasLastModifiedQueryBuilder` - Filter by LastModified date range
+- `FilterHasNormalizedContentQueryBuilder` - Text search using Q parameter
+
+**Base classes from `Regira.Entities.EFcore.QueryBuilders.Abstractions`:**
+- `FilteredQueryBuilderBase<TEntity, TKey, TSearchObject>` - Base class for custom filtered query builders
+- `GlobalFilteredQueryBuilderBase<TEntity, TKey>` - Base class for global filters
+
+**Interfaces from `Regira.Entities.EFcore.QueryBuilders.Abstractions`:**
+- `IFilteredQueryBuilder<TEntity, TKey, TSearchObject>` - Interface for filtered query builders
+- `ISortedQueryBuilder<TEntity, TKey, TSortBy>` - Interface for sorting query builders
+- `IGlobalFilteredQueryBuilder<TEntity, TKey>` - Interface for global filters
+- `IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>` - Main query builder interface
+
+### Built-in Primers
+**All from `Regira.Entities.EFcore.Primers`:**
+- `ArchivablePrimer` - Sets IsArchived=true on delete
+- `HasCreatedDbPrimer` - Sets Created timestamp on insert
+- `HasLastModifiedDbPrimer` - Sets LastModified timestamp on update
+- `AutoTruncatePrimer` - Truncates strings to MaxLength (via interceptor)
+
+**Base class from `Regira.Entities.EFcore.Primers.Abstractions`:**
+- `EntityPrimerBase<T>` - Base class for custom entity primers
+
+**Interfaces from `Regira.Entities.EFcore.Primers.Abstractions`:**
+- `IEntityPrimer<T>` - Interface for typed entity primers
+- `IEntityPrimer` - Non-generic interface for entity primers
+
+### Built-in Preppers
+**From `Regira.Entities.EFcore.Preppers`:**
+- `RelatedCollectionPrepper` - Manages child collection changes (add/update/delete)
+
+**Base class from `Regira.Entities.EFcore.Preppers.Abstractions`:**
+- `EntityPrepperBase<TEntity>` - Base class for custom entity preppers
+
+**Interfaces from `Regira.Entities.EFcore.Preppers.Abstractions`:**
+- `IEntityPrepper<TEntity>` - Interface for typed entity preppers
+- `IEntityPrepper` - Non-generic interface for entity preppers
+
+**Base class from `Regira.Entities.EFcore.Preppers.Abstractions`:**
+- `EntityPrepperBase<TEntity>` - Base class for custom entity preppers
+
+**Interfaces from `Regira.Entities.EFcore.Preppers.Abstractions`:**
+- `IEntityPrepper<TEntity>` - Interface for typed entity preppers
+- `IEntityPrepper` - Non-generic interface for entity preppers
+
+### Built-in Normalizers
+**From `Regira.Entities.EFcore.Normalizing`:**
+- `DefaultEntityNormalizer` - Default text normalizer for entities
+
+**Base class from `Regira.Entities.EFcore.Normalizing.Abstractions`:**
+- `EntityNormalizerBase<T>` - Base class for custom entity normalizers
+
+**Interfaces from `Regira.Entities.EFcore.Normalizing.Abstractions`:**
+- `IEntityNormalizer<T>` - Interface for typed entity normalizers
+- `IEntityNormalizer` - Non-generic interface for entity normalizers
+
 ### Built-in Services to Configure
-- `AddDefaultEntityNormalizer()` - Text normalization
-- `AddAutoTruncateInterceptors()` - Auto-truncate strings
-- `AddNormalizerInterceptors()` - Enable normalizer interceptors
-- `AddPrimer<T>()` - Add SaveChanges interceptor
-- `AddGlobalFilter<TInterface, TBuilder>()` - Global query filter
-- `SetDecimalPrecisionConvention()` - Decimal precision
+**Namespaces:**
+- `AddDefaultEntityNormalizer()` - Text normalization (`Regira.Entities.DependencyInjection.ServiceBuilders.Extensions`)
+- `AddAutoTruncateInterceptors()` - Auto-truncate strings to MaxLength (`Regira.DAL.EFcore.Services`)
+- `AddNormalizerInterceptors()` - Enable normalizer interceptors (`Regira.Entities.EFcore.Normalizing`)
+- `AddPrimer<T>()` - Add SaveChanges interceptor (`Regira.Entities.DependencyInjection.ServiceBuilders.Extensions`)
+- `AddGlobalFilter<TInterface, TBuilder>()` - Global query filter (`Regira.Entities.DependencyInjection.ServiceBuilders.Extensions`)
+- `SetDecimalPrecisionConvention()` - Decimal precision for all decimal properties (`Regira.DAL.EFcore.Extensions`)
 
 Remember: Keep implementations minimal and only add complexity when explicitly requested or clearly needed based on requirements.
