@@ -726,10 +726,11 @@ public class TestFor1Services
         var manager3 = sp.GetService<IEntityManager<Course, int, SearchObject<int>>>();
 
         Assert.That(entityNormalizer, Is.TypeOf<DefaultEntityNormalizer>());
-        Assert.That(globalFilters.Length, Is.EqualTo(5));
+        Assert.That(globalFilters.Length, Is.EqualTo(6));
         Assert.That(globalFilters.OfType<FilterIdsQueryBuilder<int>>(), Is.Not.Empty);
         Assert.That(globalFilters.OfType<FilterArchivablesQueryBuilder<int>>(), Is.Not.Empty);
         Assert.That(globalFilters.OfType<FilterHasCreatedQueryBuilder<int>>(), Is.Not.Empty);
+        Assert.That(globalFilters.OfType<FilterHasNormalizedContentQueryBuilder>(), Is.Not.Empty);
         Assert.That(globalFilters.OfType<FilterHasLastModifiedQueryBuilder<int>>(), Is.Not.Empty);
         Assert.That(globalFilters.OfType<HasAttachmentGlobalQueryFilter>(), Is.Not.Empty);
         Assert.That(queryFilters.First(), Is.TypeOf<CourseQueryFilter1>());
