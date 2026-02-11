@@ -11,8 +11,11 @@
     <AssemblyName>Regira.Entities.Web</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.0.2</Version>
+    <Version>5.0.3</Version>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(OutputPath)$(AssemblyName).xml" Pack="true" PackagePath="lib\$(TargetFramework)\" Visible="false" Condition="Exists('$(OutputPath)$(AssemblyName).xml')" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Web\Common.Web.csproj" />
     <ProjectReference Include="..\Entities.EFcore\Entities.EFcore.csproj" />
