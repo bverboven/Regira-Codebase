@@ -315,7 +315,7 @@ services
         e.SortBy((query, sortBy) =>
         {
             // Support ThenBy sorting
-            if (query is IOrderedQueryable<Order> sortedQuery){
+            if (typeof(IOrderedQueryable).IsAssignableFrom(query.Expression.Type) && query is IOrderedQueryable<Order> sortedQuery){
                 return sortBy switch
                 {
                     OrderSortBy.OrderNumber => sortedQuery.ThenBy(x => x.OrderNumber),

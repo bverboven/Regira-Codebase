@@ -137,6 +137,11 @@ public static class QueryExtensions
         {
             query = query.Where(x => x.IsArchived == isArchived);
         }
+        // by default, only return non-archived items
+        else
+        {
+            query = query.Where(x => x.IsArchived == false);
+        }
 
         return query;
     }

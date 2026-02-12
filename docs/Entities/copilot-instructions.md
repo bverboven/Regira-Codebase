@@ -10,26 +10,26 @@ Use this as the primary checklist.
 
 ### Create a New Regira API Project
 
-1. Create an ASP.NET Core Web API project targeting `net10.0` (or the solution's target).
+1. Create an ASP.NET Core Web API project targeting the latest .NET version (or the solution's target).
 2. Add `NuGet.Config` with the Regira feed (see below).
 3. Add the required Regira and EF Core packages to the project file.
 4. Create a `YourDbContext` deriving from `DbContext` and configure it.
-5. Add an `AddEntityServices` extension that calls `UseEntities<YourDbContext>(...)`.
-   - Use .UseDefaults()
-6. In `Program.cs`:
-   - Register `YourDbContext` via `AddDbContext<YourDbContext>(...)`.
-   - Call `AddEntityServices()` on `builder.Services`.
-7. Add your first entity using the workflow below.
+5. In `Program.cs`:
+   - Register `YourDbContext` via `AddDbContext<YourDbContext>(...)`
+   - Inside de DbContext configuration, add any interceptors (primers, normalizers, auto-truncate) as needed.
+   - Call `UseEntities<YourDbContext>(...)` on `builder.Services` to return a `EntityServiceCollection`, preferably via an extension method.
+   - Inside UseEntities config, add .UseDefaults() by default, but customize as needed (mapping, global query filters, primers, etc.).
+6. Add entities using the workflow below.
 
 ### Add a New Entity to an Existing Project
 
-1. Add the entity class under `Entities/` and implement the appropriate interfaces.
-2. Add `SearchObject`, `SortBy`, `Includes`, and DTOs under `Models/` as needed.
-3. Add optional query builder / processor / prepper classes under `Services/`.
-4. Register the entity in `AddEntityServices` using `.For<TEntity,...>(...)`.
+1. Add the entity class and implement the appropriate interfaces.
+2. Add `SearchObject`, `SortBy`, `Includes`, and DTOs as needed.
+3. Add optional query builder / processor / prepper classes.
+4. Register the entity on the `EntityServiceCollection` using `.For<TEntity,...>(...)`.
 5. Add an API controller inheriting from the full `EntityControllerBase` variant.
 6. Add `DbSet<TEntity>` to `YourDbContext` and configure relationships.
-7. Create and apply an EF migration.
+7. Create and apply an EF migration as needed.
 
 ### Modify an Existing Entity
 
@@ -185,13 +185,14 @@ using Microsoft.AspNetCore.Mvc;                  // [ApiController], [Route]
 ### When to Use Inline vs Separate Classes
 
 **Use INLINE configuration when:**
-- Simple logic (< 10 lines)
+- Simple logic
 - Entity-specific, not reusable
 - Rapid prototyping
 - Single filter condition
 
 **Use SEPARATE classes when:**
-- Complex logic (> 10 lines)
+- Complex logic
+- Dependency injection is needed
 - Reusable across entities
 - Multiple conditions/operations
 - Team needs explicit, testable classes
@@ -228,7 +229,7 @@ EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TIn
 - `IHasCode` - Entities with short identifier code
 - `ISortable` - For sortable child collections
 - `IHasAttachments` - When entity needs file attachments
-- `IHasNormalizedContent` - When using normalization and the entity has a `NormalizedContent` property (enables normalized-content filtering)
+- `IHasNormalizedContent` - When using normalization and the entity has a `NormalizedContent` property
 
 ### Service Layer Decisions
 
@@ -236,6 +237,7 @@ EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TIn
 - Standard CRUD is sufficient
 - Using EF Core DbContext
 - No complex business logic
+- In most cases, the Helper Services should manage the custom logic
 
 **Create custom service when:**
 - Complex business rules
@@ -260,25 +262,14 @@ Create project structure with these templates:
 	</PropertyGroup>
 	<ItemGroup>
 		<!-- Core packages -->
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
-		<PackageReference Include="Scalar.AspNetCore" Version="2.11.1" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="*" />
+		<PackageReference Include="Scalar.AspNetCore" Version="*" />
 		
 		<!-- Logging -->
-		<PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
-		<PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
-		<PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
-		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-		
-		<!-- Regira Entities (from https://packages.regira.com/v3/index.json) -->
-		<PackageReference Include="Regira.Entities.DependencyInjection" Version="*" />
-		<PackageReference Include="Regira.Entities.Mapping.Mapster" Version="*" />
-		<!-- Optional: For attachments -->
-		<!-- <PackageReference Include="Regira.IO.Storage" Version="*" /> -->
-		
-		<!-- Entity Framework -->
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0" />
+		<PackageReference Include="Serilog.Extensions.Hosting" Version="*" />
+		<PackageReference Include="Serilog.Settings.Configuration" Version="*" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="*" />
+		<PackageReference Include="Serilog.Sinks.File" Version="*" />
 	</ItemGroup>
 </Project>
 ```
@@ -437,14 +428,14 @@ using System.ComponentModel.DataAnnotations;
 using Regira.Entities.Models.Abstractions;
 using Regira.Normalizing;
 
-public class YourEntity : IEntity<int>, IHasTimestamps, IHasTitle
+public class YourEntity : IEntityWithSerial, IHasTimestamps, IHasTitle, IHasNormalizedContent
 {
     public int Id { get; set; }
     
-    [Required, MaxLength(200)]
+    [Required, MaxLength(64)]
     public string Title { get; set; } = null!;
     
-    [MaxLength(1000)]
+    [MaxLength(1024)]
     public string? Description { get; set; }
     
     // Normalized content for searching
@@ -452,7 +443,7 @@ public class YourEntity : IEntity<int>, IHasTimestamps, IHasTitle
     public string? NormalizedContent { get; set; }
     
     // Timestamps
-    public DateTime Created { get; set; }
+    public DateTime Created { get; set; } = DateTime.Now;
     public DateTime? LastModified { get; set; }
     
     // Add your properties here
@@ -466,7 +457,7 @@ public class YourEntity : IEntity<int>, IHasTimestamps, IHasTitle
 - Add `IHasTimestamps` for audit trail (recommended for most entities)
 - Add `IArchivable` for soft delete capability
 - Add `IHasTitle` and/or `IHasDescription` for searchable entities
-- Use `[Normalized]` attribute when normalization is needed for search
+- Use `[Normalized]` attribute when normalization is needed for search (can be combined with `IHasNormalizedContent` interface)
 - Use appropriate validation attributes (`[Required]`, `[MaxLength]`, etc.)
 
 ### Step 2: Create SearchObject (Optional but Recommended)
@@ -478,8 +469,7 @@ using Regira.Entities.Models;
 public class YourEntitySearchObject : SearchObject
 {
     // Add custom filter properties
-    public int? CategoryId { get; set; }
-    public ICollection<int>? CategoryIds { get; set; }
+    public ICollection<int>? CategoryId { get; set; } // prefer using singular
     public decimal? MinPrice { get; set; }
     public decimal? MaxPrice { get; set; }
     
@@ -544,9 +534,11 @@ public class YourEntityDto
     public string? Description { get; set; }
     public DateTime Created { get; set; }
     public DateTime? LastModified { get; set; }
+
+    // prefer using (optional) navigation properties in output DTOs for display purposes, but avoid in input DTOs to prevent overposting
+    public CategoryDto? Category { get; set; }
     
     // Add computed or flattened properties
-    public string? CategoryName { get; set; }
     public int RelatedItemsCount { get; set; }
 }
 ```
@@ -557,15 +549,20 @@ using System.ComponentModel.DataAnnotations;
 
 public class YourEntityInputDto
 {
-    [Required, MaxLength(200)]
+    // include Id to support 'Save' action
+    public int Id { get; set; }
+
+    [Required, MaxLength(64)]
     public string Title { get; set; } = null!;
     
-    [MaxLength(1000)]
+    [MaxLength(1024)]
     public string? Description { get; set; }
     
     public int CategoryId { get; set; }
     
-    // Do NOT include: Id, Created, LastModified, computed properties
+    // Do NOT include: Created, LastModified, computed properties
+
+    // Only include navigation (child) properties when they are configured using Related method
 }
 ```
 
@@ -573,7 +570,6 @@ public class YourEntityInputDto
 - Output DTO: Include all displayable data, flatten navigation properties
 - Input DTO: Only editable fields, exclude auto-generated fields
 - Use validation attributes on Input DTO
-- Keep DTOs in Models namespace separate from Entities
 
 ### Step 5: Create Query Builders
 
@@ -603,11 +599,8 @@ public class YourEntityQueryBuilder : FilteredQueryBuilderBase<YourEntity, int, 
         if (so == null) return query;
         
         // Category filtering
-        if (so.CategoryId.HasValue)
-            query = query.Where(x => x.CategoryId == so.CategoryId.Value);
-        
-        if (so.CategoryIds?.Any() == true)
-            query = query.Where(x => so.CategoryIds.Contains(x.CategoryId));
+        if (so.CategoryId?.Any() == true)
+            query = query.Where(x => so.CategoryId.Contains(x.CategoryId));
         
         // Price range
         if (so.MinPrice.HasValue)
@@ -789,7 +782,7 @@ public static class ServiceCollectionExtensions
                 .After((entity, dto) =>
                 {
                     // AfterMapper: enrich DTO after mapping
-                    dto.CategoryName = entity.Category?.Title;
+                    dto.ProductUrl = GenerateUrl(entity);
                 })
                 .AfterInput((dto, entity) =>
                 {
@@ -800,6 +793,8 @@ public static class ServiceCollectionExtensions
             e.Process((items, includes) =>
             {
                 // Set [NotMapped] properties
+                // Use seperate class when logic is complex or requires DI (DbContext)
+                // e.g. Product count
                 return Task.CompletedTask;
             });
             
@@ -1066,24 +1061,24 @@ e.AddNormalizer<CustomEntityNormalizer>();
 
 ### Hierarchical Data
 ```csharp
-public class Category : IEntity<int>
+public class Category : IEntityWithSerial, IHasParentEntity<Category>
 {
-    public int? ParentId { get; set; }
-    public Category? Parent { get; set; }
+    public int? ParentEntityId { get; set; }
+    public Category? ParentEntity { get; set; }
     public ICollection<Category>? Children { get; set; }
 }
 
 // In query builder
 if (so?.ParentId != null)
-    query = query.Where(x => x.ParentId == so.ParentId);
+    query = query.Where(x => x.ParentEntityId == so.ParentId);
 if (so?.RootOnly == true)
-    query = query.Where(x => x.ParentId == null);
+    query = query.Where(x => x.ParentEntity == null);
 ```
 
 ### Soft Delete
 ```csharp
 // Entity implements IArchivable
-public class Product : IEntity<int>, IArchivable
+public class Product : IEntityWithSerial, IArchivable
 {
     public bool IsArchived { get; set; }
 }
@@ -1109,12 +1104,12 @@ using Regira.Entities.Services.Abstractions;
 using Regira.DAL.EFcore.Services;
 
 // Entity
-public class AuditableEntity : IEntity<int>, IHasTimestamps
+public class AuditableEntity : IEntityWithSerial, IHasTimestamps
 {
     public int Id { get; set; }
     public int CreatedBy { get; set; }
     public int? ModifiedBy { get; set; }
-    public DateTime Created { get; set; }
+    public DateTime Created { get; set; } = DateTime.Now;
     public DateTime? LastModified { get; set; }
 }
 
@@ -1149,8 +1144,7 @@ using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 
 services.UseEntities<YourDbContext>(options =>
 {
-    // Default services
-    options.UseDefaults();
+    // ...
 
     // Global primers
     options.AddPrimer<UserTrackingPrimer>();
@@ -1251,6 +1245,33 @@ public class ProductValidator
 Here's a complete example showing all files with proper namespaces for a Product entity:
 
 ### Project Structure
+Per entity
+```
+YourProject/
+├── YourProject.csproj
+├── NuGet.Config
+├── appsettings.json
+├── Program.cs
+├── Data/
+│   └── YourDbContext.cs
+├── Entities/
+│   └── Categories/
+│       ├── Category.cs
+│   └── Products/
+│       ├── Product.cs
+│       ├── ProductSearchObject.cs
+│       ├── ProductSortBy.cs
+│       ├── ProductIncludes.cs
+│       ├── ProductDto.cs
+│       ├── ProductInputDto.cs
+│       └── ProductQueryBuilder.cs
+├── Controllers/
+│   └── ProductsController.cs
+└── Extensions/
+    └── ServiceCollectionExtensions.cs
+```
+
+All models in one folder
 ```
 YourProject/
 ├── YourProject.csproj
@@ -1294,14 +1315,14 @@ using System.ComponentModel.DataAnnotations;
 using Regira.Entities.Models.Abstractions;
 using Regira.Normalizing;
 
-public class Product : IEntity<int>, IHasTimestamps, IHasTitle, IArchivable
+public class Product : IEntityWithSerial, IHasTimestamps, IHasTitle, IArchivable, IHasNormalizedContent
 {
     public int Id { get; set; }
     
-    [Required, MaxLength(200)]
+    [Required, MaxLength(64)]
     public string Title { get; set; } = null!;
     
-    [MaxLength(1000)]
+    [MaxLength(1024)]
     public string? Description { get; set; }
     
     public decimal Price { get; set; }
@@ -1311,7 +1332,7 @@ public class Product : IEntity<int>, IHasTimestamps, IHasTitle, IArchivable
     [Normalized(SourceProperties = [nameof(Title), nameof(Description)])]
     public string? NormalizedContent { get; set; }
     
-    public DateTime Created { get; set; }
+    public DateTime Created { get; set; } = DateTime.Now;
     public DateTime? LastModified { get; set; }
     public bool IsArchived { get; set; }
     
@@ -1326,8 +1347,7 @@ using Regira.Entities.Models;
 
 public class ProductSearchObject : SearchObject
 {
-    public int? CategoryId { get; set; }
-    public ICollection<int>? CategoryIds { get; set; }
+    public ICollection<int>? CategoryId { get; set; }
     public decimal? MinPrice { get; set; }
     public decimal? MaxPrice { get; set; }
 }
@@ -1367,7 +1387,7 @@ public class ProductDto
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public int CategoryId { get; set; }
-    public string? CategoryTitle { get; set; }
+    public CategoryDto? Category { get; set; }
     public DateTime Created { get; set; }
     public DateTime? LastModified { get; set; }
 }
@@ -1379,13 +1399,15 @@ using System.ComponentModel.DataAnnotations;
 
 public class ProductInputDto
 {
-    [Required, MaxLength(200)]
+    // include Id to support 'Save' action
+    public int Id { get; set; }
+
+    [Required, MaxLength(64)]
     public string Title { get; set; } = null!;
     
-    [MaxLength(1000)]
+    [MaxLength(1024)]
     public string? Description { get; set; }
     
-    [Range(0, 999999)]
     public decimal Price { get; set; }
     
     public int CategoryId { get; set; }
@@ -1403,11 +1425,8 @@ public class ProductQueryBuilder : FilteredQueryBuilderBase<Product, int, Produc
     {
         if (so == null) return query;
         
-        if (so.CategoryId.HasValue)
-            query = query.Where(x => x.CategoryId == so.CategoryId.Value);
-        
-        if (so.CategoryIds?.Any() == true)
-            query = query.Where(x => so.CategoryIds.Contains(x.CategoryId));
+        if (so.CategoryId?.Any() == true)
+            query = query.Where(x => so.CategoryId.Contains(x.CategoryId));
         
         if (so.MinPrice.HasValue)
             query = query.Where(x => x.Price >= so.MinPrice.Value);
@@ -1491,6 +1510,17 @@ public static class ServiceCollectionExtensions
             
             e.SortBy((query, sortBy) =>
             {
+                // Support ThenBy sorting
+                if (typeof(IOrderedQueryable).IsAssignableFrom(query.Expression.Type) && query is IOrderedQueryable<Product> sortedQuery){
+                    return sortBy switch
+                    {
+                        ProductSortBy.Title => sortedQuery.ThenBy(x => x.Title),
+                        ProductSortBy.Price => sortedQuery.ThenBy(x => x.Price),
+                        ProductSortBy.PriceDesc => sortedQuery.ThenBy(x => x.PriceDesc),
+                        // ...
+                        _ => sortedQuery.ThenByDescending(x => x.Created)
+                    };
+                }
                 return sortBy switch
                 {
                     ProductSortBy.Title => query.OrderBy(x => x.Title),
@@ -1513,7 +1543,7 @@ public static class ServiceCollectionExtensions
             e.UseMapping<ProductDto, ProductInputDto>()
                 .After((product, dto) =>
                 {
-                    dto.CategoryTitle = product.Category?.Title;
+                    // Enrich DTO after mapping
                 });
         });
         
@@ -1531,6 +1561,7 @@ public static class ServiceCollectionExtensions
 | `IHasCode` | Code | Short identifier code |
 | `IHasTitle` | Title | Display name |
 | `IHasDescription` | Description | Long text field |
+| `IHasNormalizedContent` | NormalizedContent | Pre-normalized text for search |
 | `IHasCreated` | Created | Creation timestamp |
 | `IHasLastModified` | LastModified | Modification timestamp |
 | `IHasTimestamps` | Created, LastModified | Both timestamps |
