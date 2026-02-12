@@ -1,14 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Regira.DAL.Paging;
 using Regira.Entities.Extensions;
 using Regira.Entities.Mapping.Abstractions;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Services.Abstractions;
-using Regira.Entities.Web.Attachments.Abstractions;
 using Regira.Entities.Web.Models;
 using Regira.Utilities;
 using System.Diagnostics;
@@ -149,7 +146,7 @@ public static class ControllerExtensions
         {
             var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
             var item = mapper.Map<TEntity>(model!);
-            if (id != null)
+            if (!default(TKey).Equals(id))
             {
                 item.Id = id;
             }

@@ -172,6 +172,18 @@ public class CourseControllerTests : IDisposable
 
         Assert.NotEqual(insertResult.Item.Title, updateResult!.Item.Title);
         Assert.Equal(courseInput.Credits, updateResult.Item.Credits);
+
+        // also test 'Save' action
+        courseInput.Title = "Course (saved)";
+        courseInput.Credits = 4;
+        var saveResponse = await client.PostAsJsonAsync($"/courses/save", courseInput);
+
+        Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
+        var saveResult = await saveResponse.Content.ReadFromJsonAsync<SaveResult<CourseDto>>();
+
+        Assert.NotEqual(updateResult.Item.Title, saveResult!.Item.Title);
+        Assert.Equal(courseInput.Id, saveResult.Item.Id);
+        Assert.Equal(courseInput.Credits, saveResult.Item.Credits);
     }
     [Fact]
     public async Task Delete()
