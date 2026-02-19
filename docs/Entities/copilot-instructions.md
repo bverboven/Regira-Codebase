@@ -141,8 +141,8 @@ using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders; // FilterIdsQue
 
 ### Processors & Preppers
 ```csharp
-using Regira.Entities.Services.Abstractions;               // IEntityProcessor<TEntity, TIncludes>
-                                                           // IEntityPrepper<TEntity>, EntityPrepperBase<TEntity>
+using Regira.Entities.EFcore.Processing.Abstractions;      // IEntityProcessor<TEntity, TIncludes>
+using Regira.Entities.EFcore.Preppers.Abstractions;        // IEntityPrepper<TEntity>, EntityPrepperBase<TEntity>
 ```
 
 ### Primers (EF Core Interceptors)
@@ -154,16 +154,18 @@ using Regira.Entities.EFcore.Primers.Abstractions;         // EntityPrimerBase<T
 
 ### Normalizing
 ```csharp
-using Regira.Normalizing;                                  // [NormalizedAttribute]
-using Regira.Normalizing.Abstractions;                     // INormalizer, IQKeywordHelper, IObjectNormalizer
+using Regira.Normalizing;                                  // [NormalizedAttribute], ObjectNormalizer
+using Regira.Normalizing.Abstractions;                     // INormalizer, IObjectNormalizer
 using Regira.Entities.EFcore.Normalizing;                  // DefaultEntityNormalizer
 using Regira.Entities.EFcore.Normalizing.Abstractions;     // IEntityNormalizer<T>, EntityNormalizerBase<T>
+using Regira.Entities.Keywords.Abstractions;               // IQKeywordHelper
+using Regira.Entities.Keywords;                            // QKeywordHelper
 ```
 
 ### Custom/Wrapping Services
 ```csharp
-using Regira.Entities.Services;                            // EntityWrappingServiceBase<TEntity, TKey, ...>
-using Regira.Entities.Exceptions;                          // EntityInputException<T>
+using Regira.Entities.Services.Abstractions;               // EntityWrappingServiceBase<TEntity, TKey, ...>
+using Regira.Entities.Models;                              // EntityInputException<T>
 ```
 
 ### Dependency Injection
@@ -200,7 +202,7 @@ using Regira.IO.Storage.Abstractions;              // IFileService
 // Azure Blob Storage:
 using Regira.IO.Storage.Azure;                     // BinaryBlobService, AzureOptions, AzureCommunicator
 // SFTP:
-using Regira.IO.Storage.Sftp;                      // SftpService
+using Regira.IO.Storage.SSH;                       // SftpService, SftpConfig
 ```
 
 ### Controllers
@@ -983,7 +985,6 @@ Use `EntityWrappingServiceBase` to wrap the default `EntityRepository` and add c
 The wrapper delegates all calls to an inner `IEntityService` and you override only what you need.
 
 ```csharp
-using Regira.Entities.Services;
 using Regira.Entities.Services.Abstractions;
 
 // Define a custom interface (optional but enables typed injection)
@@ -1160,7 +1161,7 @@ options.AddPrimer<ArchivablePrimer>();
 
 **Normalizer services:**
 - `DefaultNormalizer` (`INormalizer`) — removes diacritics, lowercases, normalizes whitespace
-- `DefaultObjectNormalizer` (`IObjectNormalizer`) — processes `[Normalized]` attributes
+- `ObjectNormalizer` (`IObjectNormalizer`) — processes `[Normalized]` attributes
 - `DefaultEntityNormalizer<IEntity>` (`IEntityNormalizer`) — orchestrates attribute-based normalization
 - `QKeywordHelper` (`IQKeywordHelper`) — parses Q search strings with wildcard support
 
@@ -1408,16 +1409,16 @@ services.UseEntities<YourDbContext>(/* ... */)
 
 **SFTP:**
 ```csharp
-using Regira.IO.Storage.Sftp;
+using Regira.IO.Storage.SSH;
 
 services.UseEntities<YourDbContext>(/* ... */)
-    .WithAttachments(_ => new SftpService(new SftpOptions
+    .WithAttachments(_ => new SftpService(new SftpCommunicator(new SftpConfig
     {
         Host = "sftp.example.com",
-        Username = "user",
+        UserName = "user",
         Password = "pass",
-        RootFolder = "/uploads"
-    }));
+        ContainerName = "/uploads"
+    })));
 ```
 
 ---
@@ -1429,7 +1430,7 @@ services.UseEntities<YourDbContext>(/* ... */)
 Controllers automatically catch `EntityInputException` and return `BadRequest (400)`.
 
 ```csharp
-using Regira.Entities.Exceptions;
+using Regira.Entities.Models;
 
 // Throw in a prepper, service, or wrapping service
 throw new EntityInputException<Product>("Validation failed")
@@ -1742,7 +1743,7 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 | Interface | Implementation | Role |
 |-----------|---------------|------|
 | `INormalizer` | `DefaultNormalizer` | Normalizes a string value |
-| `IObjectNormalizer` | `DefaultObjectNormalizer` | Processes `[Normalized]` attributes |
+| `IObjectNormalizer` | `ObjectNormalizer` | Processes `[Normalized]` attributes |
 | `IEntityNormalizer` | `DefaultEntityNormalizer<IEntity>` | Orchestrates entity normalization |
 | `IQKeywordHelper` | `QKeywordHelper` | Parses Q search strings with wildcard support |
 
