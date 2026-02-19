@@ -15,6 +15,7 @@ IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
 
 - The default implementation is `EntityRepository`, which uses EF Core `DbContext` for data access
 - The `EntityRepository` is enriched by multiple helper services (QueryBuilders, Processors, Preppers, Primers)
+- Replace the default EntityService using `UseEntityService` with a custom implementation (e.g., `CachedEntityService` that adds caching on top of the repository))
 
 ## Standard EntityRepository Methods
 

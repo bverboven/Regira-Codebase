@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
+using Regira.Entities.EFcore.Processing.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
@@ -190,6 +191,24 @@ public partial class ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchOb
     public new ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> Includes(Func<IQueryable<TEntity>, TIncludes?, IQueryable<TEntity>> addIncludes)
     {
         base.Includes(addIncludes);
+        return this;
+    }
+
+    // Entity Processor
+    public new ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> Process(Func<IList<TEntity>, TIncludes?, Task> process)
+    {
+        base.Process(process);
+        return this;
+    }
+    public new ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> Process(Action<TEntity, TIncludes?> process)
+    {
+        base.Process(process);
+        return this;
+    }
+    public new ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> Process<TImplementation>()
+        where TImplementation : class, IEntityProcessor<TEntity, TIncludes>
+    {
+        base.Process<TImplementation>();
         return this;
     }
 

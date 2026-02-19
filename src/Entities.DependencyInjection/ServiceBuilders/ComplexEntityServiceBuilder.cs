@@ -1,9 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection.QueryBuilders;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
+using Regira.Entities.EFcore.Processing;
+using Regira.Entities.EFcore.Processing.Abstractions;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
+using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Services.Abstractions;
 using System.Linq.Expressions;
@@ -194,6 +198,32 @@ public partial class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearc
         return this;
     }
     
+    // Entity Processor
+    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> Process(Func<IList<TEntity>, TIncludes?, Task> process)
+    {
+        Services.AddTransient<IEntityProcessor<TEntity, TIncludes>>(_ => new EntityProcessor<TEntity, TIncludes>(process));
+        return this;
+    }
+    public ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> Process(Action<TEntity, TIncludes?> process)
+    {
+        Services.AddTransient<IEntityProcessor<TEntity, TIncludes>>(_ => new EntityProcessor<TEntity, TIncludes>((items, includes) =>
+        {
+            foreach (var item in items)
+            {
+                process(item, includes);
+            }
+            return Task.CompletedTask;
+        }));
+
+        return this;
+    }
+    public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> Process<TImplementation>()
+        where TImplementation : class, IEntityProcessor<TEntity, TIncludes>
+    {
+        Services.AddTransient<IEntityProcessor<TEntity, TIncludes>, TImplementation>();
+        return this;
+    }
+
     // Related
     public new ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes> Related<TRelated, TRelatedKey>(
         Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression, Action<TEntity>? prepareFunc = null)

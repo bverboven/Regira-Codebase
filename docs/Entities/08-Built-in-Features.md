@@ -10,7 +10,17 @@ Different responsibilities can be implemented in separate services.*
 Samples:
 - Auditing (Can also be done using Primers for write operations)
 - Security
+- Caching
 - Validation
+
+```csharp
+.For<Order>(e =>
+{
+    // define custom EntityService interface
+    e.AddTransient<IOrderService, OrderService>(); // optional: if you want to inject the service by custom interface
+    e.UseEntityService<OrderService>();
+})
+```
 
 ### Input Exceptions
 

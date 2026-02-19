@@ -528,7 +528,7 @@ public class TestFor4Services
         var sortableBuilder = sp.GetService<ISortedQueryBuilder<Course, int>>();
         var includableBuilder = sp.GetService<IIncludableQueryBuilder<Course, int, CourseIncludes>>();
         var queryBuilder = sp.GetService<IQueryBuilder<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
-        var entityProcessors = sp.GetServices<IEntityProcessor<Course, EntityIncludes>>().ToArray();
+        var entityProcessors = sp.GetServices<IEntityProcessor<Course, CourseIncludes>>().ToArray();
         var entityReadService2 = sp.GetService<IEntityReadService<Course, int>>();
         var entityReadService3 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject>>();
         var entityReadService5 = sp.GetService<IEntityReadService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
@@ -546,7 +546,7 @@ public class TestFor4Services
         var entityService5 = sp.GetService<IEntityService<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>>();
 
         Assert.That(entityProcessors.Length, Is.EqualTo(1));
-        Assert.That(entityProcessors.OfType<EntityProcessor<Course, EntityIncludes>>(), Is.Not.Empty);
+        Assert.That(entityProcessors.OfType<EntityProcessor<Course, CourseIncludes>>(), Is.Not.Empty);
 
         Assert.That(entityNormalizer, Is.Null);
         Assert.That(globalFilters, Is.Empty);
