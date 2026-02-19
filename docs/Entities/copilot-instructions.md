@@ -583,8 +583,8 @@ public class YourEntityDto
     public decimal Price { get; set; }
     public int? CategoryId { get; set; }
 
-    // Flattened/enriched navigation data
-    public string? CategoryTitle { get; set; }
+    // Navigation properties
+    public CategoryDto? Category { get; set; }
 
     public DateTime Created { get; set; }
     public DateTime? LastModified { get; set; }
@@ -844,11 +844,11 @@ options.AddPrimer<GlobalPrimerClass>();
 **Configure mapping on the entity:**
 ```csharp
 e.UseMapping<YourEntityDto, YourEntityInputDto>()
-    // AfterMapper: enrich DTO after Entity→DTO mapping
+    // AfterMapper: enrich DTO after Entity→DTO mapping (for computed properties)
     .After((entity, dto) =>
     {
-        dto.CategoryTitle = entity.Category?.Title;
         dto.AttachmentCount = entity.Attachments?.Count ?? 0;
+        dto.FullDisplayName = $"{dto.Title} ({dto.Id})";
     })
     // AfterInputMapper: modify entity after InputDto→Entity mapping
     .AfterInput((dto, entity) =>
@@ -857,7 +857,7 @@ e.UseMapping<YourEntityDto, YourEntityInputDto>()
     });
 ```
 
-**Additional DTO mappings (for child types):**
+**Additional DTO mappings (for related entity types):**
 ```csharp
 e.AddMapping<OrderItem, OrderItemDto>();
 e.AddMapping<OrderItemInputDto, OrderItem>();
@@ -878,7 +878,9 @@ public class YourEntityAfterMapper : EntityAfterMapperBase<YourEntity, YourEntit
 
     public override void AfterMap(YourEntity source, YourEntityDto target)
     {
-        target.CategoryTitle = source.Category?.Title;
+        // Use for computed properties or enrichment based on request context
+        target.ImageUrl = $"https://{_httpContextAccessor.HttpContext?.Request.Host}/images/{source.Id}";
+        target.AttachmentCount = source.Attachments?.Count ?? 0;
     }
 }
 
@@ -1689,8 +1691,11 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 
 ### DTO Strategy
 - Include `Id` in `InputDto` to support the Save (upsert) action
+- Exclude normalized fields from DTOs — they are for internal use only
 - Exclude auto-generated fields (`Created`, `LastModified`, `NormalizedContent`) from `InputDto`
 - Only include child collections in `InputDto` when they are configured with `e.Related(...)`
+- **Use navigation properties in DTOs instead of flattening related entity data** — this preserves structure and enables richer client-side handling
+- Use `AfterMapper` for computed/calculated properties (e.g. URLs, display names) in DTO
 
 ### Database
 - Always use migrations for schema changes
@@ -1815,7 +1820,7 @@ public class CategoryDto
 {
     public int Id { get; set; }
     public string Title { get; set; } = null!;
-    public int ProductCount { get; set; }
+    public int ProductCount { get; set; }  // Computed property (via AfterMapper)
 }
 ```
 
@@ -1942,9 +1947,10 @@ public class ProductDto
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public int CategoryId { get; set; }
-    public string? CategoryTitle { get; set; }
+    public CategoryDto? Category { get; set; }
     public DateTime Created { get; set; }
     public DateTime? LastModified { get; set; }
+    public string? DisplayName { get; set; }  // Computed property (via AfterMapper)
 }
 ```
 
@@ -2042,7 +2048,8 @@ public static class ProductServiceCollectionExtensions
             e.UseMapping<ProductDto, ProductInputDto>()
                 .After((product, dto) =>
                 {
-                    dto.CategoryTitle = product.Category?.Title;
+                    // Computed property example
+                    dto.DisplayName = $"{product.Title} - €{product.Price:F2}";
                 });
         });
 
