@@ -698,8 +698,10 @@ e.Includes((query, includes) =>
 {
     if (includes?.HasFlag(YourEntityIncludes.Category) == true)
         query = query.Include(x => x.Category);
-    if (includes?.HasFlag(YourEntityIncludes.Reviews) == true)
-        query = query.Include(x => x.Reviews);
+    if (includes?.HasFlag(YourEntityIncludes.Reviews) == true) {
+        // Example of including sorted collection (if Review implements SortOrder)
+        query = query.Include(x => x.Reviews!.OrderBy(r => r.SortOrder));
+    }
     return query;
 });
 ```
@@ -800,13 +802,7 @@ e.Prepare<YourEntityPrepper>();
 **Child collections (RelatedCollectionPrepper):**
 ```csharp
 // Shortcut — creates RelatedCollectionPrepper internally
-e.Related(x => x.OrderItems, (order, _) =>
-{
-    // Optional: additional preparation for child items
-    order.OrderItems?.Prepare();
-    foreach (var item in order.OrderItems ?? [])
-        item.OrderId = order.Id;
-});
+e.Related(x => x.OrderItems, , (order, _) => order.OrderItems?.SetSortOrder());
 
 // Minimal (no extra preparation):
 e.Related(x => x.OrderItems);
@@ -1508,12 +1504,7 @@ public class OrderItem : IEntityWithSerial, ISortable
 .For<Order, OrderSearchObject, OrderSortBy, OrderIncludes>(e =>
 {
     // Child collection management
-    e.Related(x => x.OrderItems, (order, _) =>
-    {
-        order.OrderItems?.Prepare(); // updates SortOrder, removes deleted
-        foreach (var item in order.OrderItems ?? [])
-            item.OrderId = order.Id;
-    });
+    e.Related(x => x.OrderItems, (order, _) => order.OrderItems?.SetSortOrder());
 
     // Recalculate total
     e.Prepare(item =>
@@ -1693,6 +1684,7 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 - Include `Id` in `InputDto` to support the Save (upsert) action
 - Exclude normalized fields from DTOs — they are for internal use only
 - Exclude auto-generated fields (`Created`, `LastModified`, `NormalizedContent`) from `InputDto`
+- Try to facilitate mapping by keeping DTO structure similar to the entity (e.g. nested related entities instead of flattening)
 - Only include child collections in `InputDto` when they are configured with `e.Related(...)`
 - **Use navigation properties in DTOs instead of flattening related entity data** — this preserves structure and enables richer client-side handling
 - Use `AfterMapper` for computed/calculated properties (e.g. URLs, display names) in DTO
