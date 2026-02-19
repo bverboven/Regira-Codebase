@@ -668,7 +668,7 @@ e.AddQueryFilter<YourEntityQueryBuilder>();
 e.SortBy((query, sortBy) =>
 {
     // Support ThenBy when query is already sorted
-    if (query is IOrderedQueryable<YourEntity> sorted)
+    if (typeof(IOrderedQueryable).IsAssignableFrom(query.Expression.Type) && query is IOrderedQueryable<YourEntity> sorted)
     {
         return sortBy switch
         {
@@ -2010,7 +2010,7 @@ public static class ProductServiceCollectionExtensions
 
             e.SortBy((query, sortBy) =>
             {
-                if (query is IOrderedQueryable<Product> sorted)
+                if (typeof(IOrderedQueryable).IsAssignableFrom(query.Expression.Type) && query is IOrderedQueryable<Product> sorted)
                     return sortBy switch
                     {
                         ProductSortBy.Title    => sorted.ThenBy(x => x.Title),
