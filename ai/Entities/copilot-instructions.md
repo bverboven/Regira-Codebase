@@ -727,28 +727,25 @@ e.Process((items, includes) =>
 ```csharp
 using Regira.Entities.Services.Abstractions;
 
-public class YourEntityProcessor : IEntityProcessor<YourEntity, YourEntityIncludes>
+public class CategoryProcessor(YourDbContext dbContext) : IEntityProcessor<Category, CategoryIncludes>
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public YourEntityProcessor(IHttpContextAccessor httpContextAccessor)
+    public async Task Process(IList<Category> items, CategoryIncludes? includes)
     {
-        _httpContextAccessor = httpContextAccessor;
-    }
-
-    public Task Process(IList<YourEntity> items, YourEntityIncludes? includes)
-    {
-        var baseUrl = _httpContextAccessor.HttpContext?.Request.Host.ToString();
+        // Example: fill ProductCount based on related Products count (Category → Products)
+        const itemIds = items.Select(i => i.Id).ToList();
+        const productCountPerCategory = await dbContext.Products
+            .Where(p => itemIds.Contains(p.CategoryId ?? 0))
+            .GroupBy(p => p.CategoryId)
+            .ToDictionaryAsync(g => g.Key, g => g.Count());
         foreach (var item in items)
         {
-            item.ImageUrl = $"https://{baseUrl}/images/{item.Id}";
+            item.ProductCount = productCountPerCategory.TryGetValue(item.Id, out var count) ? count : 0;
         }
-        return Task.CompletedTask;
     }
 }
 
 // Register with:
-e.Process<YourEntityProcessor>();
+e.Process<CategoryProcessor>();
 ```
 
 ### Step 8: Preppers (Optional)
@@ -1676,7 +1673,7 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 - Use inline config for simple logic; separate classes for complex logic or when DI is needed
 
 ### Controller Design
-- Never expose entity classes directly in API responses — always use DTOs
+- Don't expose entity classes directly in API responses — prefer DTOs
 - Add custom controller actions only when base methods are insufficient
 - Extend `SearchObject` to add filtering rather than creating extra endpoints
 
@@ -1684,9 +1681,11 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 - Include `Id` in `InputDto` to support the Save (upsert) action
 - Exclude normalized fields from DTOs — they are for internal use only
 - Exclude auto-generated fields (`Created`, `LastModified`, `NormalizedContent`) from `InputDto`
+- Exclude secured fields (e.g. `Password`) from DTOs
+- Exclude full File paths, since the FileService accepts relative paths (identifiers)
 - Try to facilitate mapping by keeping DTO structure similar to the entity (e.g. nested related entities instead of flattening)
+- Use navigation properties in DTOs instead of flattening related entity data: this preserves structure and enables richer client-side handling (e.g. avoid `CategoryTitle`, but use `Category`=>`Title`)
 - Only include child collections in `InputDto` when they are configured with `e.Related(...)`
-- **Use navigation properties in DTOs instead of flattening related entity data** — this preserves structure and enables richer client-side handling
 - Use `AfterMapper` for computed/calculated properties (e.g. URLs, display names) in DTO
 
 ### Database

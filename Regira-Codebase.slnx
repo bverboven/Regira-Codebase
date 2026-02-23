@@ -27,6 +27,20 @@
     <Project Path="src/Entities.Mapping.Mapster/Entities.Mapping.Mapster.csproj" />
     <Project Path="src/Entities.Web/Entities.Web.csproj" />
   </Folder>
+  <Folder Name="/src/Entities/ai/">
+    <File Path="ai/Entities/copilot-instructions.md" />
+  </Folder>
+  <Folder Name="/src/Entities/ai/agents/">
+    <File Path="ai/Entities/agents/regira-attachments.agent.md" />
+    <File Path="ai/Entities/agents/regira-controllers.agent.md" />
+    <File Path="ai/Entities/agents/regira-database.agent.md" />
+    <File Path="ai/Entities/agents/regira-models.agent.md" />
+    <File Path="ai/Entities/agents/regira-namespaces.instructions.md" />
+    <File Path="ai/Entities/agents/regira-normalizing.agent.md" />
+    <File Path="ai/Entities/agents/regira-orchestrator.agent.md" />
+    <File Path="ai/Entities/agents/regira-services.agent.md" />
+    <File Path="ai/Entities/agents/regira-wrapping-service.agent.md" />
+  </Folder>
   <Folder Name="/src/Entities/docs/">
     <File Path="docs/Entities/01-Index.md" />
     <File Path="docs/Entities/02-Models.md" />
@@ -38,7 +52,6 @@
     <File Path="docs/Entities/08-Built-in-Features.md" />
     <File Path="docs/Entities/09-Checklist.md" />
     <File Path="docs/Entities/10-Examples.md" />
-    <File Path="docs/Entities/copilot-instructions.md" />
   </Folder>
   <Folder Name="/src/Globalization/">
     <Project Path="src/Globalization.LibPhoneNumber/Globalization.LibPhoneNumber.csproj" />
