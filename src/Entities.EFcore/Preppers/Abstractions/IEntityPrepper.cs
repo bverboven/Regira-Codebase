@@ -1,6 +1,4 @@
-﻿using Regira.Entities.Models.Abstractions;
-
-namespace Regira.Entities.EFcore.Preppers.Abstractions;
+﻿namespace Regira.Entities.EFcore.Preppers.Abstractions;
 
 public interface IEntityPrepper
 {

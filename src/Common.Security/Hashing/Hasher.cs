@@ -2,7 +2,6 @@
 using Regira.Security.Abstractions;
 using Regira.Security.Core;
 using Regira.Security.Utilities;
-using System.Security.Cryptography;
 
 namespace Regira.Security.Hashing;
 

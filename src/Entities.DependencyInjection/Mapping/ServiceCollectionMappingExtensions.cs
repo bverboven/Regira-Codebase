@@ -1,9 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.DependencyInjection.ServiceBuilders;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 using Regira.Entities.Mapping.Abstractions;
-using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.DependencyInjection.Mapping;
 
@@ -43,8 +40,8 @@ public static class ServiceCollectionMappingExtensions
 
 
     // AfterMappers
-    public static EntityServiceCollectionOptions AfterMap<TSource, TTarget, TAfterMapper>(this EntityServiceCollectionOptions options)
-        where TAfterMapper : class, IEntityAfterMapper<TSource, TTarget>
+    public static EntityServiceCollectionOptions AddAfterMapper<TAfterMapper>(this EntityServiceCollectionOptions options)
+        where TAfterMapper : class, IEntityAfterMapper
     {
         options.Services.AddTransient<IEntityAfterMapper, TAfterMapper>();
         return options;

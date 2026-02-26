@@ -1,5 +1,4 @@
-﻿using Entities.TestApi;
-using Entities.TestApi.Infrastructure;
+﻿using Entities.TestApi.Infrastructure;
 using Entities.TestApi.Infrastructure.Courses;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;

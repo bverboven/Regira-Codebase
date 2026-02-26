@@ -268,12 +268,14 @@ Input → Mapping* → AfterInput* → Preppers → SaveChanges → Primers (Int
 - Simple logic (< 10 lines)
 - Entity-specific, not reusable
 - Rapid prototyping
+- Testing whole EntityService is sufficient (no need to test Helper Services separately)
 
 **Use SEPARATE classes when:**
 - Complex logic
 - Needs dependency injection (DbContext, services)
 - Reusable across entities
 - Production-quality code requiring testability
+- Testing complex logic in isolation is beneficial
 
 ### Choosing Base Controller
 
@@ -878,7 +880,11 @@ public class YourEntityAfterMapper : EntityAfterMapperBase<YourEntity, YourEntit
 }
 
 // Global AfterMapper (applies to all entities implementing IMyInterface):
-options.AfterMap<IMyInterface, MyDto, MyGlobalAfterMapper>();
+options.AddAfterMapper<MyGlobalAfterMapper>();
+
+// Dedicated AfterMapper for YourEntity:
+e.UseMapping<YourEntityDto, YourEntityInputDto>()
+    .After<YourEntityAfterMapper>();
 ```
 
 ### Step 11: Configure Controller
