@@ -110,6 +110,7 @@ services.UseEntities<DbContext>(e =>
 {
     // Registers all default services
     e.AddDefaultEntityNormalizer();
+    // or e.UseDefaults(); to also register other default helper services
 });
 ```
 

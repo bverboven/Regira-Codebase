@@ -28,18 +28,16 @@
     <Project Path="src/Entities.Web/Entities.Web.csproj" />
   </Folder>
   <Folder Name="/src/Entities/ai/">
+    <File Path="ai/Entities/attachments.instructions.md" />
+    <File Path="ai/Entities/controllers.instructions.md" />
     <File Path="ai/Entities/copilot-instructions.md" />
-  </Folder>
-  <Folder Name="/src/Entities/ai/agents/">
-    <File Path="ai/Entities/agents/regira-attachments.agent.md" />
-    <File Path="ai/Entities/agents/regira-controllers.agent.md" />
-    <File Path="ai/Entities/agents/regira-database.agent.md" />
-    <File Path="ai/Entities/agents/regira-models.agent.md" />
-    <File Path="ai/Entities/agents/regira-namespaces.instructions.md" />
-    <File Path="ai/Entities/agents/regira-normalizing.agent.md" />
-    <File Path="ai/Entities/agents/regira-orchestrator.agent.md" />
-    <File Path="ai/Entities/agents/regira-services.agent.md" />
-    <File Path="ai/Entities/agents/regira-wrapping-service.agent.md" />
+    <File Path="ai/Entities/mapping.instructions.md" />
+    <File Path="ai/Entities/models.instructions.md" />
+    <File Path="ai/Entities/normalizing.instructions.md" />
+    <File Path="ai/Entities/orchestrator.instructions.md" />
+    <File Path="ai/Entities/services.instructions.md" />
+    <File Path="ai/Entities/setup.instructions.md" />
+    <File Path="ai/Entities/troubleshooting.instructions.md" />
   </Folder>
   <Folder Name="/src/Entities/docs/">
     <File Path="docs/Entities/01-Index.md" />

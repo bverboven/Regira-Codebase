@@ -202,7 +202,7 @@ using Regira.IO.Storage.Abstractions;              // IFileService
 // Azure Blob Storage:
 using Regira.IO.Storage.Azure;                     // BinaryBlobService, AzureOptions, AzureCommunicator
 // SFTP:
-using Regira.IO.Storage.SSH;                       // SftpService, SftpConfig
+using Regira.IO.Storage.SSH;                       // SftpService, SftpCommunicator, SftpConfig
 ```
 
 ### Controllers
@@ -343,9 +343,11 @@ EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TIn
 **Program.cs:**
 ```csharp
 using Microsoft.EntityFrameworkCore;
+using Regira.DAL.EFcore.Services;
+using Regira.Entities.EFcore.Normalizing;
+using Regira.Entities.EFcore.Primers;
 using Scalar.AspNetCore;
 using Serilog;
-using Regira.DAL.EFcore.Extensions;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -363,8 +365,8 @@ try
     builder.Services.AddDbContext<YourDbContext>((sp, options) =>
         options.UseSqlite(builder.Configuration.GetConnectionString("Default"))
                .AddPrimerInterceptors(sp)          // Enables Primer interceptors
-               .AddNormalizerInterceptors(sp)       // Enables Normalizer interceptors
-               .AddAutoTruncateInterceptors());      // Auto-truncates strings to MaxLength
+               .AddNormalizerInterceptors(sp)      // Enables Normalizer interceptors
+               .AddAutoTruncateInterceptors());    // Auto-truncates strings to MaxLength
 
     // Regira Entities — register via extension method
     builder.Services.AddEntityServices();
@@ -727,7 +729,7 @@ e.Process((items, includes) =>
 
 **Separate class (with DI):**
 ```csharp
-using Regira.Entities.Services.Abstractions;
+using Regira.Entities.EFcore.Processing.Abstractions;
 
 public class CategoryProcessor(YourDbContext dbContext) : IEntityProcessor<Category, CategoryIncludes>
 {
@@ -783,7 +785,7 @@ e.Prepare(async (item, dbContext) =>
 
 **Separate class:**
 ```csharp
-using Regira.Entities.Services.Abstractions;
+using Regira.Entities.EFcore.Preppers.Abstractions;
 
 public class YourEntityPrepper : EntityPrepperBase<YourEntity>
 {
