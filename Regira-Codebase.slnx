@@ -28,6 +28,7 @@
     <Project Path="src/Entities.Web/Entities.Web.csproj" />
   </Folder>
   <Folder Name="/src/Entities/ai/">
+    <File Path="ai/copilot-instructions.md" />
     <File Path="ai/Entities/attachments.instructions.md" />
     <File Path="ai/Entities/controllers.instructions.md" />
     <File Path="ai/Entities/copilot-instructions.md" />
