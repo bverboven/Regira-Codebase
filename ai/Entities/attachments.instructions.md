@@ -49,13 +49,14 @@ public interface IAttachment<TKey> : IAttachment, IEntity<TKey>;
 ```csharp
 using Regira.Entities.Attachments.Models;
 
-public class ProductAttachment : EntityAttachment<int, int>
-// EntityAttachment<TKey, TObjectKey>
-// TKey = PK of this join record (int)
-// TObjectKey = PK type of the owning entity (int)
+// Standard int-keyed attachment — inherits from the non-generic EntityAttachment
+public class ProductAttachment : EntityAttachment
 {
     public override string ObjectType => nameof(Product);
 }
+
+// For custom key types use the full generic form:
+// public class ProductAttachment : EntityAttachment<TKey, TObjectKey, TAttachmentKey, TAttachment>
 ```
 
 **Interface (simplified):**
@@ -82,8 +83,9 @@ public interface IEntityAttachment<TKey, TObjectKey, TAttachmentKey, TAttachment
 Implement both `IHasAttachments` and `IHasAttachments<TEntityAttachment>`:
 
 ```csharp
-using Regira.Entities.Models.Abstractions;
-using Regira.Entities.Attachments.Models;
+using Regira.Entities.Models.Abstractions;      // IEntityWithSerial
+using Regira.Entities.Attachments.Abstractions; // IHasAttachments, IHasAttachments<T>
+using Regira.Entities.Attachments.Models;       // EntityAttachment, Attachment
 
 public class Product : IEntityWithSerial, IHasAttachments, IHasAttachments<ProductAttachment>
 {
@@ -271,8 +273,9 @@ public class AttachmentFileService<TAttachment, TKey>(IFileService fileService)
 ## Key Namespaces
 
 ```csharp
-using Regira.Entities.Attachments.Models;           // EntityAttachment<TKey, TObjectKey>, Attachment
-using Regira.Entities.Models.Abstractions;          // IHasAttachments, IHasAttachments<T>
+using Regira.Entities.Attachments.Models;           // EntityAttachment, Attachment (non-generic defaults)
+using Regira.Entities.Attachments.Abstractions;     // IHasAttachments, IHasAttachments<T>, IEntityAttachment
+using Regira.Entities.Mapping.Models;               // EntityAttachmentDto, EntityAttachmentInputDto
 using Regira.Entities.Web.Attachments.Abstractions; // EntityAttachmentControllerBase
 using Regira.IO.Storage.FileSystem;                 // BinaryFileService, FileSystemOptions
 using Regira.IO.Storage.Abstractions;               // IFileService

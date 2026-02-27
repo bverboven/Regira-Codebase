@@ -18,8 +18,9 @@ You are a specialized agent responsible for designing and implementing **entity 
 
 ```csharp
 using System.ComponentModel.DataAnnotations;
-using Regira.Entities.Models.Abstractions; // IEntity<TKey>, IEntityWithSerial, IHasTimestamps, etc.
-using Regira.Normalizing;                  // [Normalized]
+using Regira.Entities.Models.Abstractions;      // IEntity<TKey>, IEntityWithSerial, IHasTimestamps, etc.
+using Regira.Entities.Attachments.Abstractions; // IHasAttachments, IHasAttachments<T>
+using Regira.Normalizing;                       // [Normalized]
 ```
 
 ### Example
@@ -74,7 +75,7 @@ public class Product : IEntityWithSerial, IHasTimestamps, IHasTitle, IArchivable
 Static helpers for working with entity instances:
 
 ```csharp
-using Regira.Entities.Models.Abstractions; // EntityExtensions
+using Regira.Entities.Extensions; // EntityExtensions (IsNew, SetSortOrder)
 
 // Check if an entity has not yet been persisted (Id is default value)
 bool isNew = item.IsNew<TKey>();

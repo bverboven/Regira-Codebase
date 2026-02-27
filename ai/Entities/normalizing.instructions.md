@@ -269,7 +269,7 @@ services.UseEntities<YourDbContext>(/* ... */)
 ## Key Namespaces
 
 ```csharp
-using Regira.Normalizing;                                  // [Normalized]
+using Regira.Normalizing;                                  // [Normalized], ObjectNormalizer
 using Regira.Normalizing.Abstractions;                     // INormalizer, IObjectNormalizer
 using Regira.Entities.EFcore.Normalizing;                  // DefaultEntityNormalizer<T>
 using Regira.Entities.EFcore.Normalizing.Abstractions;     // IEntityNormalizer<T>, EntityNormalizerBase<T>

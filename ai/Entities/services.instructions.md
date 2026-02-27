@@ -580,7 +580,8 @@ services.UseEntities<MyDbContext>(/* ... */)
 ## Built-in LINQ Query Extensions
 
 ```csharp
-using Regira.Entities.EFcore.QueryBuilders; // QueryExtensions
+using Regira.Entities.EFcore.Extensions; // FilterId, FilterIds, FilterExclude, FilterCode, FilterTitle, FilterQ, FilterArchivable, FilterHasAttachment, SortQuery
+using Regira.DAL.Paging;                 // PageQuery, PagingInfo
 
 // ID filters
 query.FilterId<TEntity, TKey>(TKey? id)
@@ -606,7 +607,6 @@ query.FilterHasAttachment<TEntity>(bool? hasAttachment)
 query.SortQuery<TEntity, TKey>()
 
 // Pagination
-using Regira.DAL.Paging;
 query.PageQuery<T>(PagingInfo? info)
 query.PageQuery<T>(int pageSize, int page = 1)
 ```
@@ -755,6 +755,9 @@ if (so?.RootOnly == true)
 using Regira.Entities.Services.Abstractions;               // IEntityService<...>, EntityWrappingServiceBase<...>
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;   // FilteredQueryBuilderBase<...>, GlobalFilteredQueryBuilderBase<...>
 using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders; // FilterIdsQueryBuilder, FilterArchivablesQueryBuilder, etc.
+using Regira.Entities.EFcore.Extensions;                         // QueryExtensions (FilterId, FilterIds, FilterTitle, FilterArchivable, etc.)
+using Regira.Entities.Keywords.Abstractions;               // IQKeywordHelper
+using Regira.Entities.Keywords;                            // QKeywordHelper
 using Regira.Entities.EFcore.Processing.Abstractions;      // IEntityProcessor<TEntity, TIncludes>
 using Regira.Entities.EFcore.Preppers.Abstractions;        // IEntityPrepper<TEntity>, EntityPrepperBase<TEntity>
 using Regira.Entities.EFcore.Primers.Abstractions;         // EntityPrimerBase<T>, IEntityPrimer<T>

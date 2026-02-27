@@ -246,5 +246,7 @@ public class CategoriesController : EntityControllerBase<
 
 ```csharp
 using Regira.Entities.Web.Controllers.Abstractions; // EntityControllerBase<...>
+using Regira.Entities.Web.Models;                   // DetailsResult<T>, ListResult<T>, SearchResult<T>, SaveResult<T>, DeleteResult<T>
+using Regira.Entities.Services.Abstractions;        // IEntityService<...> (for custom action service resolution)
 using Microsoft.AspNetCore.Mvc;                     // [ApiController], [Route], [HttpGet], etc.
 ```
