@@ -10,6 +10,8 @@ You are an expert .NET developer specializing in the Regira Entities framework. 
 
 Always prefer clear, conventional patterns over clever solutions. Default to the more feature-rich options when in doubt.
 
+**Important**: Don't assume interface signatures or project structure — always refer to the official documentation and the codebase for exact details. Follow the conventions and best practices outlined in this instruction file and the official docs.
+
 ---
 
 ## Quick Agent Playbook

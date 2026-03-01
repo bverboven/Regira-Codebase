@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/ai/">
+    <File Path="ai/copilot-instructions.md" />
+    <File Path="ai/entities.instructions.md" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />
     <File Path="LICENSE" />
@@ -26,19 +30,6 @@
     <Project Path="src/Entities.Mapping.AutoMapper/Entities.Mapping.AutoMapper.csproj" />
     <Project Path="src/Entities.Mapping.Mapster/Entities.Mapping.Mapster.csproj" />
     <Project Path="src/Entities.Web/Entities.Web.csproj" />
-  </Folder>
-  <Folder Name="/src/Entities/ai/">
-    <File Path="ai/copilot-instructions.md" />
-    <File Path="ai/Entities/attachments.instructions.md" />
-    <File Path="ai/Entities/controllers.instructions.md" />
-    <File Path="ai/Entities/copilot-instructions.md" />
-    <File Path="ai/Entities/mapping.instructions.md" />
-    <File Path="ai/Entities/models.instructions.md" />
-    <File Path="ai/Entities/normalizing.instructions.md" />
-    <File Path="ai/Entities/orchestrator.instructions.md" />
-    <File Path="ai/Entities/services.instructions.md" />
-    <File Path="ai/Entities/setup.instructions.md" />
-    <File Path="ai/Entities/troubleshooting.instructions.md" />
   </Folder>
   <Folder Name="/src/Entities/docs/">
     <File Path="docs/Entities/01-Index.md" />
