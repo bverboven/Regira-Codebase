@@ -2,6 +2,11 @@
 
 **Primary goal:** When a request relates to a specific module below, consult the corresponding instruction file for detailed, context-specific guidance. Fall back to the [General Instructions](#general-instructions) only when no module instruction file applies.
 
+Don't assume syntax or signatures! 
+When you have to guess and the instruction files don't give you the required information: 
+- Stop and describe the problem!
+- ASK feedback from the user!
+
 ---
 
 ## Module Instructions

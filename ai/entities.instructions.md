@@ -7,6 +7,7 @@ You are an expert .NET developer specializing in the Regira Entities framework. 
 - **Mapping**: Mapster (`Regira.Entities.Mapping.Mapster`)
 - **Project structure**: Per-entity folder structure
 - **Service layer**: Default `EntityRepository` (unless complex logic requires wrapping)
+- **Many-to-many relationships**: prefer option A
 
 Always prefer clear, conventional patterns over clever solutions. Default to the more feature-rich options when in doubt.
 
@@ -350,6 +351,7 @@ using Regira.Entities.EFcore.Normalizing;
 using Regira.Entities.EFcore.Primers;
 using Scalar.AspNetCore;
 using Serilog;
+using System.Text.Json.Serialization;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -359,7 +361,13 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Services.AddControllers();
+    builder.Services.AddControllers()
+    builder.Services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        });
     builder.Services.AddSerilog(config => config.ReadFrom.Configuration(builder.Configuration));
     builder.Services.AddOpenApi();
 
@@ -1520,6 +1528,215 @@ public class OrderItem : IEntityWithSerial, ISortable
     });
 });
 ```
+
+### Many-to-Many Relations
+
+**Treat Many-to-Many as two One-to-Many relations** using a middle/join table. If the join table only contains IDs (no additional data), handle the relationship through DTOs and mapping.
+
+#### Option A (preferred): Join Table with Additional Data (Explicit Entity)
+
+Use when the relationship itself has properties (e.g., enrollment date, role, quantity).
+
+```csharp
+// Entities
+public class Student : IEntityWithSerial
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = null!;
+    public ICollection<StudentCourse>? StudentCourses { get; set; }
+}
+
+public class Course : IEntityWithSerial
+{
+    public int Id { get; set; }
+    public string Title { get; set; } = null!;
+    public ICollection<StudentCourse>? StudentCourses { get; set; }
+}
+
+// Join table with additional data
+public class StudentCourse : IEntityWithSerial
+{
+    public int Id { get; set; }
+    public int StudentId { get; set; }
+    public int CourseId { get; set; }
+    public DateTime EnrolledDate { get; set; }  // Additional property
+    public int? Grade { get; set; }             // Additional property
+
+    public Student? Student { get; set; }
+    public Course? Course { get; set; }
+}
+
+// DTOs
+public class StudentDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = null!;
+    public ICollection<StudentCourseDto>? StudentCourses { get; set; }
+}
+
+public class StudentInputDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = null!;
+    public ICollection<StudentCourseInputDto>? StudentCourses { get; set; }
+}
+
+public class StudentCourseDto
+{
+    public int Id { get; set; }
+    public int StudentId { get; set; }
+    public int CourseId { get; set; }
+    public DateTime EnrolledDate { get; set; }
+    public int? Grade { get; set; }
+    
+    public StudentDto? Student { get; set; }
+    public CourseDto? Course { get; set; }
+}
+
+public class StudentCourseInputDto
+{
+    public int Id { get; set; }
+    public int StudentId { get; set; }
+    public int CourseId { get; set; }
+    public DateTime EnrolledDate { get; set; }
+    public int? Grade { get; set; }
+}
+
+// DbContext
+modelBuilder.Entity<StudentCourse>(entity =>
+{
+    entity.HasOne(sc => sc.Student)
+          .WithMany(s => s.StudentCourses)
+          .HasForeignKey(sc => sc.StudentId);
+
+    entity.HasOne(sc => sc.Course)
+          .WithMany(c => c.StudentCourses)
+          .HasForeignKey(sc => sc.CourseId);
+});
+
+// DI — manage join table as a related collection
+.For<Student, StudentSearchObject, StudentSortBy, StudentIncludes>(e =>
+{
+    e.Includes((query, includes) =>
+    {
+        if (includes?.HasFlag(StudentIncludes.Courses) == true)
+            query = query.Include(x => x.StudentCourses!)
+                        .ThenInclude(sc => sc.Course);
+        return query;
+    });
+
+    e.Related(x => x.StudentCourses);
+
+    e.UseMapping<StudentDto, StudentInputDto>();
+    e.AddMapping<StudentCourse, StudentCourseDto>();
+    e.AddMapping<StudentCourseInputDto, StudentCourse>();
+});
+```
+
+#### Option B: Simple Join Table (ID-Only, Mapping Phase)
+
+Use when the relationship has **no additional properties** — handle it purely through DTOs and AfterMappers.
+This option requires a custom handling of adding/removing relationships (in `Prepare()`) since `e.Related()` needs a single Primary Key.
+
+```csharp
+// Entities (no explicit join entity in C# code)
+public class Product : IEntityWithSerial
+{
+    public int Id { get; set; }
+    public string Title { get; set; } = null!;
+    public ICollection<ProductTag>? ProductTags { get; set; }
+}
+
+public class Tag : IEntityWithSerial, IHasTitle
+{
+    public int Id { get; set; }
+    public string Title { get; set; } = null!;
+    public ICollection<ProductTag>? ProductTags { get; set; }
+}
+
+// Join table entity (minimal, just for EF Core)
+public class ProductTag
+{
+    public int ProductId { get; set; }
+    public int TagId { get; set; }
+
+    public Product? Product { get; set; }
+    public Tag? Tag { get; set; }
+}
+
+// DTOs
+public class ProductDto
+{
+    public int Id { get; set; }
+    public string Title { get; set; } = null!;
+    public ICollection<TagDto>? Tags { get; set; }
+}
+
+public class TagDto // No need for TagInputDto if tags are managed by ID only
+{
+    public int Id { get; set; }
+    public string? Title { get; set; }
+}
+
+// DbContext (no DbSet for ProductTag needed)
+modelBuilder.Entity<ProductTag>(entity =>
+{
+    entity.HasKey(pt => new { pt.ProductId, pt.TagId });  // Composite key
+
+    entity.HasOne(pt => pt.Product)
+          .WithMany(p => p.ProductTags)
+          .HasForeignKey(pt => pt.ProductId);
+
+    entity.HasOne(pt => pt.Tag)
+          .WithMany(t => t.ProductTags)
+          .HasForeignKey(pt => pt.TagId);
+});
+
+// DI — handle relationship in mapping
+.For<Product, ProductSearchObject, ProductSortBy, ProductIncludes>(e =>
+{
+    e.Includes((query, includes) =>
+    {
+        if (includes?.HasFlag(ProductIncludes.Tags) == true)
+            query = query.Include(x => x.ProductTags!)
+                        .ThenInclude(pt => pt.Tag);
+        return query;
+    });
+
+    e.Related(x => x.ProductTags);
+
+    e.UseMapping<ProductDto, ProductInputDto>()
+        // Entity → DTO
+        .After((product, dto) =>
+        {
+            dto.Tags = product.ProductTags?.Select(pt => new TagDto
+            {
+                Id = pt.Tag!.Id,
+                Name = pt.Tag.Name
+            }).ToList();
+        })
+        // DTO → Entity: reconstruct relationship
+        .AfterInput((inputDto, product) =>
+        {
+            if (inputDto.TagIds != null)
+            {
+                product.ProductTags = inputDto.TagIds
+                    .Select(tagId => new ProductTag
+                    {
+                        ProductId = product.Id,
+                        TagId = tagId
+                    })
+                    .ToList();
+            }
+        });
+});
+```
+
+**Key Points:**
+- **Option A** (explicit join entity): Use when the relationship has properties — manage via `e.Related()`
+- **Option B** (ID-only): Use for simple relationships — handle in `AfterMapper` and `AfterInput`
+- Always configure the relationship in `DbContext.OnModelCreating`
+- Use a prepper to synchronize join table changes when updating
 
 ### Soft Delete
 
