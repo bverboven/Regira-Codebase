@@ -161,7 +161,7 @@ EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TIn
 
 ### Step 2: Create DbContext
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §2 DbContext
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — DbContext
 
 ### Step 3: Create the DI Extension Method
 
@@ -169,7 +169,7 @@ Create `Extensions/ServiceCollectionExtensions.cs`.
 
 **Tip:** Create separate extension methods per entity for cleaner code — one `Add{EntityNameInPlural}()` method per entity.
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §3 DI Extension Methods
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Setup
 
 ---
 
@@ -177,7 +177,7 @@ Create `Extensions/ServiceCollectionExtensions.cs`.
 
 ### Step 1: Create Entity Model
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §4 Entity Model
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
 
 **Interface selection checklist:**
 
@@ -196,7 +196,7 @@ Create `Extensions/ServiceCollectionExtensions.cs`.
 
 ### Step 2: Create SearchObject
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §5 SearchObject
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
 
 > Use `ICollection<TKey>` (not a single value) for FK filter properties — enables filtering by multiple values.
 
@@ -204,17 +204,17 @@ Create `Extensions/ServiceCollectionExtensions.cs`.
 
 > `SortBy` is a plain (non-`[Flags]`) enum — values are applied one at a time, not combined.
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §6 SortBy Enum
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Product entity
 
 ### Step 4: Create Includes Enum
 
 > `Includes` is a `[Flags]` enum — values are combined with bitwise OR.
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §7 Includes Enum
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
 
 ### Step 5: Create DTOs
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §8 DTOs
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
 
 **Rules:**
 - Include `Id` in `InputDto` to support the Save (upsert) action
@@ -224,7 +224,7 @@ Create `Extensions/ServiceCollectionExtensions.cs`.
 
 ### Step 6: Create Query Builders
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §9 Query Builders
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Product entity
 
 **Option A: Inline** — use for simple logic (< 10 lines), entity-specific, no DI needed.  
 **Option B: Separate class** — use when complex logic, DI, or reuse is required.
@@ -233,13 +233,13 @@ Create `Extensions/ServiceCollectionExtensions.cs`.
 
 Use processors to fill `[NotMapped]` properties or enrich entities **after** fetching from the database.
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §10 Processors
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity (CategoryProcessor) / Additional Patterns > Inline processor
 
 ### Step 8: Preppers (Optional)
 
 Use preppers to prepare entities **before saving** — e.g. generate codes, set FKs, recalculate totals.
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §11 Preppers
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Prepper
 
 **Variants:** inline (simple), inline with original (create vs update), inline with DbContext, separate class, `e.Related(x => x.ChildCollection)` shortcut.
 
@@ -247,11 +247,11 @@ Use preppers to prepare entities **before saving** — e.g. generate codes, set 
 
 Primers are EF Core `SaveChangesInterceptors` — they run **when DbContext executes SaveChanges**. They must be registered via `AddPrimerInterceptors(sp)` in `AddDbContext`.
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §12 Primers
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Primers
 
 ### Step 10: Mapping & AfterMappers
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §13 Mapping & AfterMappers
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > AfterMapper
 
 **Key points:**
 - Use `.After(...)` to enrich the DTO after `Entity→DTO` mapping (computed properties, URLs)
@@ -261,7 +261,7 @@ Primers are EF Core `SaveChangesInterceptors` — they run **when DbContext exec
 
 ### Step 11: Configure Controller
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §14 Controllers
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Controllers
 
 The base controller provides:
 - `GET /{id}`
@@ -278,7 +278,7 @@ The base controller provides:
 
 Add `DbSet<YourEntity>` and configure any relationships in `OnModelCreating`.
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §2 DbContext
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — DbContext
 
 ### Step 13: Create and Apply Migration
 
@@ -289,7 +289,7 @@ dotnet ef database update
 
 ### Step 14: Wire Up DI
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §3 DI Extension Methods
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Setup
 
 ---
 
@@ -301,7 +301,7 @@ Use `EntityWrappingServiceBase` to wrap the default `EntityRepository` and add c
 
 The wrapper delegates all calls to an inner `IEntityService` and you override only what you need.
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §15 Custom Entity Service
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Order + OrderLine entities (OrderManager)
 
 **Registration:**
 - `e.AddTransient<IProductService, ProductService>()` — enables typed injection by interface
@@ -333,15 +333,15 @@ Global services apply to **all entities implementing a given interface**. They a
 
 ### Global Filter Query Builders
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §16 Global Services
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Global filter query builder
 
 ### Global Preppers (Inline)
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §16 Global Services
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Setup
 
 ### Global Primers
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §12 Primers
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Primers
 
 ### UseDefaults() — What It Registers
 
@@ -372,7 +372,7 @@ Normalization facilitates text search by removing diacritics, special characters
 
 ### Attribute-Based (Recommended)
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §17 Normalizing
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
 
 **`[Normalized]` attribute options:**
 
@@ -385,7 +385,7 @@ Normalization facilitates text search by removing diacritics, special characters
 
 ### Custom Normalizer
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §17 Normalizing
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Global normalizer
 
 - Register per entity: `e.AddNormalizer<ProductNormalizer>()`
 - Register globally: `options.AddNormalizer<IHasPhone, PhoneNormalizer>()`
@@ -395,7 +395,7 @@ Normalization facilitates text search by removing diacritics, special characters
 
 Use `IQKeywordHelper.Parse(q)` to parse `Q` into keywords with wildcard support (e.g. `"blue*"` → `"blue%"`). Use `keyword.QW` with `EF.Functions.Like`.
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §9 Query Builders (IQKeywordHelper variant)
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > IQKeywordHelper — Q full-text search
 
 **Or use the built-in global filter** (applies to all `IHasNormalizedContent` entities):
 `options.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>()`
@@ -404,13 +404,13 @@ Use `IQKeywordHelper.Parse(q)` to parse `Q` into keywords with wildcard support 
 
 Normalizers run automatically when saving. Use the `(sp, options) =>` factory overload in `AddDbContext` and call `.AddNormalizerInterceptors(sp)`.
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §17 Normalizing
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Setup
 
 ---
 
 ## Attachments
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §18 Attachments
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Attachments
 
 ### 1. EntityAttachment Model
 
@@ -440,7 +440,7 @@ Call `.WithAttachments(_ => new BinaryFileService(...))` (or Azure/SFTP variant)
 
 Controllers automatically catch `EntityInputException` and return `BadRequest (400)`.
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §19 Error Handling
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Order + OrderLine entities (OrderManager)
 
 ---
 
@@ -448,7 +448,7 @@ Controllers automatically catch `EntityInputException` and return `BadRequest (4
 
 These LINQ extension methods are available for use inside query builders:
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §20 Built-in Query Extensions
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Query extensions reference
 
 ---
 
@@ -456,13 +456,13 @@ These LINQ extension methods are available for use inside query builders:
 
 ### Master-Detail (Order + OrderItems)
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §21 Common Patterns
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Order + OrderLine entities
 
 ### Many-to-Many Relations
 
 **Treat Many-to-Many as two One-to-Many relations** using a middle/join table with an explicit join entity. Always create an explicit join entity — even if the join table carries no extra properties, having a dedicated entity makes the collection easier to manage via `e.Related()`.
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §21 Common Patterns (Many-to-Many)
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Product entity
 
 **Key Points:**
 - Use an explicit join entity and manage the collection via `e.Related()`
@@ -485,7 +485,7 @@ Use a global `EntityPrimerBase<TInterface>` to stamp `CreatedBy`/`ModifiedBy` on
 - Register globally via `options.AddPrimer<UserTrackingPrimer>()`
 - Requires `AddPrimerInterceptors(sp)` in `AddDbContext`
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §12 Primers (global primer variant)
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Primers
 
 ### Caching with EntityWrappingServiceBase
 
@@ -496,13 +496,13 @@ Wrap the default `EntityRepository` with `IMemoryCache` to avoid repeated databa
 - Override `Save(item)` (and `Remove(item)` if needed) — call base, then invalidate the cache entry
 - Register via `e.UseEntityService<Cached{EntityName}Service>()` to replace the default repository
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §15 Custom Entity Service (caching variant)
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Order + OrderLine entities (OrderManager)
 
 ### Hierarchical Data (Self-referencing)
 
 Add `ParentId`, `Parent`, and `Children` navigation properties. Filter on `ParentId` in the query builder; use `x.ParentId == null` to return only root items.
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §21 Common Patterns (Hierarchical Data)
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
 
 ---
 
@@ -623,7 +623,7 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 
 ## Complete File Example
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — §22 Complete Example
+> *(not yet available in `entities.examples.md`)*
 
 ---
 

@@ -1,333 +1,573 @@
-# Regira Entities — Code Examples Reference
+# Webshop API — Regira Entities Example
 
-> **AI Agent Rule**: Use this file to copy correct, working code patterns.
-> Always combine with `entities.namespaces.md` for exact `using` directives.
-> Do NOT invent variations — adapt the examples below to the entity at hand.
-> For project setup templates (`.csproj`, `Program.cs`, config files), see [`entities.setup.md`](entities.setup.md).
+*Sample files are incomplete and only show relevant parts for brevity.*
 
----
+For the correct **namespaces**: see [`entities.namespaces.md`](./entities.namespaces.md).
 
-## 1. Project Setup
+## Structure
 
-> **→ See:** [`entities.setup.md`](./entities.setup.md)
+```
+Webshop.API/
+├── Controllers/
+│   ├── CategoryController.cs
+│   ├── CustomerController.cs
+│   ├── OrderController.cs
+│   └── ProductController.cs
+├── Data/
+│   └── WebshopDbContext.cs
+├── Entities/
+│   ├── Categories/
+│   │   ├── Category.cs
+│   │   ├── CategoryDto.cs
+│   │   ├── CategoryIncludes.cs
+│   │   ├── CategoryInputDto.cs
+│   │   ├── CategoryProcessor.cs
+│   │   ├── CategorySearchObject.cs
+│   │   ├── CategoryServiceConfiguration.cs
+│   │   ├── RelatedCategory.cs
+│   │   ├── RelatedCategoryDto.cs
+│   │   └── RelatedCategoryInputDto.cs
+│   ├── Customers/
+│   │   ├── Customer.cs
+│   │   ├── CustomerDto.cs
+│   │   ├── CustomerInputDto.cs
+│   │   └── CustomerServiceConfiguration.cs
+│   ├── Orders/
+│   │   ├── Order.cs
+│   │   ├── OrderDto.cs
+│   │   ├── OrderIncludes.cs
+│   │   ├── OrderInputDto.cs
+│   │   ├── OrderLine.cs
+│   │   ├── OrderLineDto.cs
+│   │   ├── OrderLineInputDto.cs
+│   │   ├── OrderManager.cs
+│   │   ├── OrderNormalizer.cs
+│   │   ├── OrderQueryBuilder.cs
+│   │   ├── OrderSearchObject.cs
+│   │   ├── OrderServiceConfiguration.cs
+│   │   └── OrderStatus.cs
+│   └── Products/
+│       ├── Product.cs
+│       ├── ProductCategory.cs
+│       ├── ProductCategoryDto.cs
+│       ├── ProductCategoryInputDto.cs
+│       ├── ProductDto.cs
+│       ├── ProductInputDto.cs
+│       ├── ProductQueryBuilder.cs
+│       ├── ProductSearchObject.cs
+│       ├── ProductServiceConfiguration.cs
+│       └── ProductSortBy.cs
+├── Extensions/
+│   └── ServiceCollectionExtensions.cs
+└── Program.cs
+```
 
----
-
-## 2. DbContext
+## Setup
 
 ```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.DAL.EFcore.Extensions;
+// Program.cs
+builder.Services.AddDbContext<WebshopDbContext>((sp, options) =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("Default"))
+           .AddPrimerInterceptors(sp)
+           .AddNormalizerInterceptors(sp)
+           .AddAutoTruncateInterceptors());
+builder.Services.AddEntityServices();
 
-public class AppDbContext : DbContext
+// Extensions/ServiceCollectionExtensions.cs
+public static IServiceCollection AddEntityServices(this IServiceCollection services)
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    services
+        .UseEntities<WebshopDbContext>(options =>
+        {
+            options.UseDefaults();
+            options.UseMapsterMapping();
+            options.AddPrepper<IHasAggregateKey>(x => x.AggregateKey ??= Guid.NewGuid()); // global inline prepper
+        })
+        .AddCategories()
+        .AddProducts()
+        .AddCustomers()
+        .AddOrders();
+    return services;
+}
+```
 
+## DbContext
+
+```csharp
+// Data/WebshopDbContext.cs
+public class WebshopDbContext(DbContextOptions<WebshopDbContext> options) : DbContext(options)
+{
     public DbSet<Category> Categories { get; set; } = null!;
+    public DbSet<RelatedCategory> RelatedCategories { get; set; } = null!;
     public DbSet<Product> Products { get; set; } = null!;
+    public DbSet<ProductCategory> ProductCategories { get; set; } = null!;
+    public DbSet<Customer> Customers { get; set; } = null!;
+    public DbSet<Order> Orders { get; set; } = null!;
+    public DbSet<OrderLine> OrderLines { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.SetDecimalPrecisionConvention(18, 2);
+        modelBuilder.SetDecimalPrecisionConvention(18, 2); // Regira.DAL.EFcore.Extensions
 
-        // Configure relationships:
-        modelBuilder.Entity<Product>(entity =>
+        modelBuilder.Entity<RelatedCategory>(e =>
         {
-            entity.HasOne(e => e.Category)
-                  .WithMany(c => c.Products)
-                  .HasForeignKey(e => e.CategoryId);
+            e.HasOne(c => c.Parent).WithMany(e => e.ChildEntities).HasForeignKey(c => c.ParentId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(c => c.Child).WithMany(e => e.ParentEntities).HasForeignKey(c => c.ChildId).OnDelete(DeleteBehavior.Restrict);
         });
+        modelBuilder.Entity<ProductCategory>(e =>
+        {
+            e.HasKey(pc => pc.Id);
+            e.HasIndex(pc => new { pc.ProductId, pc.CategoryId }).IsUnique();
+            e.HasOne(pc => pc.Product).WithMany(p => p.Categories).HasForeignKey(pc => pc.ProductId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(pc => pc.Category).WithMany().HasForeignKey(pc => pc.CategoryId).OnDelete(DeleteBehavior.Cascade);
+        });
+        modelBuilder.Entity<Customer>(e =>
+        {
+            e.HasIndex(c => c.Email).IsUnique();
+            e.HasMany(c => c.Orders).WithOne(o => o.Customer).HasForeignKey(o => o.CustomerId).OnDelete(DeleteBehavior.Cascade);
+        });
+        modelBuilder.Entity<Order>(e =>
+        {
+            e.HasIndex(o => o.Code).IsUnique();
+            e.HasMany(o => o.OrderLines).WithOne(ol => ol.Order).HasForeignKey(ol => ol.OrderId).OnDelete(DeleteBehavior.Cascade);
+        });
+        modelBuilder.Entity<OrderLine>(e =>
+            e.HasOne(ol => ol.Product).WithMany().HasForeignKey(ol => ol.ProductId).OnDelete(DeleteBehavior.Restrict));
     }
 }
 ```
 
----
-
-## 3. DI Extension Methods
+## Controllers
 
 ```csharp
-using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
-using Regira.Entities.Mapping.Mapster;
+// Controllers/CategoryController.cs
+[ApiController, Route("categories")]
+public class CategoryController : EntityControllerBase<Category, CategorySearchObject, EntitySortBy, CategoryIncludes, CategoryDto, CategoryInputDto>;
 
-// Global registration:
-public static class ServiceCollectionExtensions
-{
-    public static IServiceCollection AddEntityServices(this IServiceCollection services)
-    {
-        services
-            .UseEntities<AppDbContext>(options =>
-            {
-                options.UseDefaults();
-                options.UseMapsterMapping();
-            })
-            .AddCategories()
-            .AddProducts();
+// Controllers/ProductController.cs
+[ApiController, Route("products")]
+public class ProductController : EntityControllerBase<Product, ProductSearchObject, ProductSortBy, EntityIncludes, ProductDto, ProductInputDto>;
 
-        return services;
-    }
-}
+// Controllers/CustomerController.cs — Guid key: uses TKey overload with SearchObject<Guid>
+[ApiController, Route("customers")]
+public class CustomerController : EntityControllerBase<Customer, Guid, SearchObject<Guid>, CustomerDto, CustomerInputDto>;
 
-// Per-entity extension:
-public static class ProductServiceCollectionExtensions
-{
-    public static IEntityServiceCollection<TContext> AddProducts<TContext>(
-        this IEntityServiceCollection<TContext> services)
-        where TContext : DbContext
-    {
-        services.For<Product, ProductSearchObject, ProductSortBy, ProductIncludes>(e =>
-        {
-            // configure filters, sorting, mapping, etc.
-        });
-        return services;
-    }
-}
+// Controllers/OrderController.cs
+[ApiController, Route("orders")]
+public class OrderController : EntityControllerBase<Order, OrderSearchObject, EntitySortBy, OrderIncludes, OrderDto, OrderInputDto>;
 ```
 
----
-
-## 4. Entity Models
+## Category entity
 
 ```csharp
-using System.ComponentModel.DataAnnotations;
-using Regira.Entities.Models.Abstractions;
-using Regira.Normalizing;
-
-// Standard entity with all common interfaces:
-public class Product : IEntityWithSerial, IHasTimestamps, IHasTitle, IArchivable, IHasNormalizedContent
+// Entities/Categories/Category.cs
+public class Category : IEntityWithSerial, IHasTimestamps, IHasTitle, IHasNormalizedContent, IArchivable
 {
     public int Id { get; set; }
-
-    [Required, MaxLength(64)]
-    public string Title { get; set; } = null!;
-
-    [MaxLength(1024)]
-    public string? Description { get; set; }
-
-    public decimal Price { get; set; }
-
-    [Normalized(SourceProperties = [nameof(Title), nameof(Description)])]
+    [Required, MaxLength(64)] public string Title { get; set; } = null!;
+    [MaxLength(1024)] public string? Description { get; set; }
+    [MaxLength(1024), Normalized(SourceProperties = [nameof(Title), nameof(Description)])]
     public string? NormalizedContent { get; set; }
-
+    public bool IsArchived { get; set; }
     public DateTime Created { get; set; }
     public DateTime? LastModified { get; set; }
-    public bool IsArchived { get; set; }
+    public ICollection<RelatedCategory>? ParentEntities { get; set; }
+    public ICollection<RelatedCategory>? ChildEntities { get; set; }
+    [NotMapped] public int? ProductCount { get; set; }  // filled by CategoryProcessor
+}
 
-    // Navigation
-    public int? CategoryId { get; set; }
+// Entities/Categories/RelatedCategory.cs — self-referential join entity
+public class RelatedCategory : IEntityWithSerial
+{
+    public int Id { get; set; }
+    public int ChildId { get; set; }
+    public int ParentId { get; set; }
+    public Category Child { get; set; } = null!;
+    public Category Parent { get; set; } = null!;
+}
+
+// Entities/Categories/CategorySearchObject.cs
+public class CategorySearchObject : SearchObject
+{
+    public ICollection<int>? ParentId { get; set; }
+    public ICollection<int>? ChildId { get; set; }
+    public bool? IsRoot { get; set; }
+}
+
+// Entities/Categories/CategoryIncludes.cs
+[Flags] public enum CategoryIncludes { Default=0, Parents=1<<0, Children=1<<1, All=Parents|Children }
+
+// Entities/Categories/CategoryDto.cs
+public class CategoryCoreDto { public int Id; public string Title=null!; public string? Description; public DateTime Created; public DateTime? LastModified; }
+public class CategoryDto : CategoryCoreDto
+{
+    public ICollection<ParentCategoryDto>? ParentEntities { get; set; }
+    public ICollection<ChildCategoryDto>? ChildEntities { get; set; }
+    public int? ProductCount { get; set; }
+}
+
+// Entities/Categories/RelatedCategoryDto.cs
+public class RelatedCategoryDto { public int Id,ChildId,ParentId; }
+public class ParentCategoryDto : RelatedCategoryDto { public CategoryCoreDto Parent { get; set; } = null!; }
+public class ChildCategoryDto  : RelatedCategoryDto { public CategoryCoreDto Child { get; set; } = null!; }
+
+// Entities/Categories/CategoryInputDto.cs + RelatedCategoryInputDto.cs
+public class CategoryInputDto
+{
+    public int Id { get; set; }
+    [Required, MaxLength(64)] public string Title { get; set; } = null!;
+    [MaxLength(1024)] public string? Description { get; set; }
+    public ICollection<RelatedCategoryInputDto>? ParentEntities { get; set; }
+    public ICollection<RelatedCategoryInputDto>? ChildEntities { get; set; }
+}
+public class RelatedCategoryInputDto { public int Id,ChildId,ParentId; }
+
+// Entities/Categories/CategoryProcessor.cs — separate class processor using DbContext DI
+public class CategoryProcessor(WebshopDbContext dbContext) : IEntityProcessor<Category, CategoryIncludes>
+{
+    public async Task Process(IList<Category> items, CategoryIncludes? includes)
+    {
+        var itemIds = items.Select(x => x.Id).ToList();
+        var counts = await dbContext.Categories
+            .Where(x => itemIds.Contains(x.Id))
+            .Select(x => new { x.Id, Count = dbContext.ProductCategories.Count(pc => pc.CategoryId == x.Id) })
+            .ToDictionaryAsync(x => x.Id, v => v.Count);
+        foreach (var item in items)
+            item.ProductCount = counts.TryGetValue(item.Id, out var count) ? count : null;
+    }
+}
+
+// Entities/Categories/CategoryServiceConfiguration.cs
+public static IEntityServiceCollection<WebshopDbContext> AddCategories(this IEntityServiceCollection<WebshopDbContext> services)
+{
+    services.For<Category, CategorySearchObject, EntitySortBy, CategoryIncludes>(e =>
+    {
+        e.Filter((query, so) =>
+        {
+            if (so?.ParentId?.Any() == true) query = query.Where(x => x.ParentEntities!.Any(pe => so.ParentId.Contains(pe.ParentId)));
+            if (so?.ChildId?.Any() == true) query = query.Where(x => x.ChildEntities!.Any(ce => so.ChildId.Contains(ce.ChildId)));
+            if (so?.IsRoot != null)
+                query = so.IsRoot.Value ? query.Where(x => !x.ParentEntities!.Any()) : query.Where(x => x.ParentEntities!.Any());
+            return query;
+        });
+        e.SortBy((query, _) => query.OrderByDescending(x => x.Title));
+        e.Includes((query, includes) =>
+        {
+            if (includes?.HasFlag(CategoryIncludes.Parents) == true)
+                query = query.Include(x => x.ParentEntities!).ThenInclude(x => x.Parent);
+            if (includes?.HasFlag(CategoryIncludes.Children) == true)
+                query = query.Include(x => x.ChildEntities!).ThenInclude(x => x.Child);
+            return query;
+        });
+        e.Process<CategoryProcessor>();
+        e.Related(x => x.ParentEntities);
+        e.Related(x => x.ChildEntities);
+        e.UseMapping<CategoryDto, CategoryInputDto>();
+        e.AddMapping<CategoryCoreDto, CategoryCoreDto>();
+        e.AddMapping<RelatedCategoryInputDto, RelatedCategory>();
+    });
+    return services;
+}
+```
+
+## Product entity
+
+```csharp
+// Entities/Products/Product.cs
+public class Product : IEntityWithSerial, IHasTimestamps, IHasTitle, IHasDescription, IHasNormalizedContent
+{
+    public int Id { get; set; }
+    [Required, MaxLength(64)] public string Title { get; set; } = null!;
+    [MaxLength(1024)] public string? Description { get; set; }
+    public decimal Price { get; set; }
+    [MaxLength(1024), Normalized(SourceProperties = [nameof(Title), nameof(Description)])]
+    public string? NormalizedContent { get; set; }
+    public DateTime Created { get; set; }
+    public DateTime? LastModified { get; set; }
+    public ICollection<ProductCategory>? Categories { get; set; }
+}
+
+// Entities/Products/ProductCategory.cs — many-to-many join
+public class ProductCategory : IEntityWithSerial
+{
+    public int Id { get; set; }
+    public int ProductId { get; set; }
+    public Product? Product { get; set; }
+    public int CategoryId { get; set; }
     public Category? Category { get; set; }
 }
 
-// Entity with Guid key: use IEntity<Guid>
-// Child entity: implement ISortable (adds SortOrder property)
-```
-
----
-
-## 5. SearchObject, SortBy, Includes
-
-```csharp
-using Regira.Entities.Models;
-
-// SearchObject: Use ICollection<TKey> for FK filters (enables multi-value)
+// Entities/Products/ProductSearchObject.cs
 public class ProductSearchObject : SearchObject
 {
     public ICollection<int>? CategoryId { get; set; }
     public decimal? MinPrice { get; set; }
     public decimal? MaxPrice { get; set; }
-    // Inherited: Id, Ids, Exclude, Q, MinCreated, MaxCreated,
-    //            MinLastModified, MaxLastModified, IsArchived
 }
 
-// SortBy: NOT [Flags] — values applied one at a time
-public enum ProductSortBy
-{
-    Default = 0,
-    Title, TitleDesc,
-    Price, PriceDesc,
-    Created, CreatedDesc
-}
+// Entities/Products/ProductSortBy.cs
+public enum ProductSortBy { Default=0, Title, TitleDesc, Price, PriceDesc }
 
-// Includes: IS [Flags] — values combined with bitwise OR
-[Flags]
-public enum ProductIncludes
-{
-    Default  = 0,
-    Category = 1 << 0,
-    Reviews  = 1 << 1,
-    All      = Category | Reviews
-}
-```
+// Entities/Products/ProductDto.cs
+public class ProductDto { public int Id; public string Title=null!; public string? Description; public decimal Price; public DateTime Created; public DateTime? LastModified; public ICollection<ProductCategoryDto>? Categories; }
+public class ProductCategoryDto { public int Id,ProductId,CategoryId; public CategoryDto? Category; }
 
----
-
-## 6. DTOs
-
-```csharp
-using System.ComponentModel.DataAnnotations;
-
-// Output DTO: includes computed properties
-public class ProductDto
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = null!;
-    public string? Description { get; set; }
-    public decimal Price { get; set; }
-    public int? CategoryId { get; set; }
-    public CategoryDto? Category { get; set; }   // navigation (not flattened)
-    public DateTime Created { get; set; }
-    public DateTime? LastModified { get; set; }
-    public string? DisplayName { get; set; }      // computed in AfterMapper
-}
-
-// Input DTO: only editable properties
+// Entities/Products/ProductInputDto.cs
 public class ProductInputDto
 {
-    public int Id { get; set; }   // required for upsert
-
-    [Required, MaxLength(64)]
-    public string Title { get; set; } = null!;
-
-    [MaxLength(1024)]
-    public string? Description { get; set; }
-
-    [Range(0, double.MaxValue)]
+    public int Id { get; set; }
+    [Required, MaxLength(64)] public string Title { get; set; } = null!;
+    [MaxLength(1024)] public string? Description { get; set; }
     public decimal Price { get; set; }
-
-    public int? CategoryId { get; set; }
-
-    // DO NOT include: Created, LastModified, NormalizedContent, computed properties
-    // Only include child collections when configured with e.Related(...)
+    public ICollection<ProductCategoryInputDto>? Categories { get; set; }
 }
-```
+public class ProductCategoryInputDto { public int Id,ProductId,CategoryId; }
 
----
-
-## 7. Query Builders (Filter, Sort, Includes)
-
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.Entities.EFcore.QueryBuilders.Abstractions;
-using Regira.Entities.Keywords.Abstractions;
-
-// Inline filter:
-e.Filter((query, so) =>
+// Entities/Products/ProductQueryBuilder.cs — separate class, handles all product filtering
+public class ProductQueryBuilder(WebshopDbContext dbContext)
+    : FilteredQueryBuilderBase<Product, int, ProductSearchObject>
 {
-    if (so?.CategoryId?.Any() == true)
-        query = query.Where(x => so.CategoryId.Contains(x.CategoryId ?? 0));
-    if (so?.MinPrice != null)
-        query = query.Where(x => x.Price >= so.MinPrice);
-    return query;
-});
-
-// Separate class (with DI for IQKeywordHelper):
-public class ProductQueryBuilder : FilteredQueryBuilderBase<Product, int, ProductSearchObject>
-{
-    private readonly IQKeywordHelper _qHelper;
-
-    public ProductQueryBuilder(IQKeywordHelper qHelper) => _qHelper = qHelper;
-
     public override IQueryable<Product> Build(IQueryable<Product> query, ProductSearchObject? so)
     {
-        if (!string.IsNullOrWhiteSpace(so?.Q))
-        {
-            var keywords = _qHelper.Parse(so.Q);
-            foreach (var keyword in keywords)
-                query = query.Where(x => EF.Functions.Like(x.NormalizedContent, keyword.QW));
-        }
+        if (so == null) return query;
+        if (so.CategoryId?.Any() == true) query = query.Where(x => x.Categories!.Any(pc => so.CategoryId.Contains(pc.CategoryId)));
+        if (so.MinPrice.HasValue) query = query.Where(p => p.Price >= so.MinPrice.Value);
+        if (so.MaxPrice.HasValue) query = query.Where(p => p.Price <= so.MaxPrice.Value);
         return query;
     }
 }
-// Registration: e.AddQueryFilter<ProductQueryBuilder>();
 
-// Inline sorting:
-e.SortBy((query, sortBy) =>
+// Entities/Products/ProductServiceConfiguration.cs
+public static IEntityServiceCollection<WebshopDbContext> AddProducts(this IEntityServiceCollection<WebshopDbContext> services)
 {
-    if (typeof(IOrderedQueryable).IsAssignableFrom(query.Expression.Type)
-        && query is IOrderedQueryable<Product> sorted)
-        return sortBy switch
-        {
-            ProductSortBy.Title => sorted.ThenBy(x => x.Title),
-            ProductSortBy.Price => sorted.ThenBy(x => x.Price),
-            _ => sorted.ThenByDescending(x => x.Created)
-        };
-
-    return sortBy switch
+    services.For<Product, ProductSearchObject, ProductSortBy, EntityIncludes>(e =>
     {
-        ProductSortBy.Title => query.OrderBy(x => x.Title),
-        ProductSortBy.Price => query.OrderBy(x => x.Price),
-        _ => query.OrderByDescending(x => x.Created)
-    };
-});
+        e.AddQueryFilter<ProductQueryBuilder>();
+        e.SortBy((query, sortBy) =>
+        {
+            if (typeof(IOrderedQueryable).IsAssignableFrom(query.Expression.Type) && query is IOrderedQueryable<Product> sorted)
+                return sortBy switch
+                {
+                    ProductSortBy.Title => sorted.ThenBy(x => x.Title),
+                    ProductSortBy.TitleDesc => sorted.ThenByDescending(x => x.Title),
+                    ProductSortBy.Price => sorted.ThenBy(x => x.Price),
+                    ProductSortBy.PriceDesc => sorted.ThenByDescending(x => x.Price),
+                    _ => sorted.ThenByDescending(x => x.Title)
+                };
+            return sortBy switch
+            {
+                ProductSortBy.Title => query.OrderBy(x => x.Title),
+                ProductSortBy.TitleDesc => query.OrderByDescending(x => x.Title),
+                ProductSortBy.Price => query.OrderBy(x => x.Price),
+                ProductSortBy.PriceDesc => query.OrderByDescending(x => x.Price),
+                _ => query.OrderByDescending(x => x.Title)
+            };
+        });
+        e.Related(x => x.Categories);
+        e.Includes((query, includes) => query.Include(x => x.Categories!).ThenInclude(pc => pc.Category));
+        e.UseMapping<ProductDto, ProductInputDto>();
+        e.AddMapping<ProductCategoryDto, ProductCategoryDto>();
+        e.AddMapping<ProductCategoryInputDto, ProductCategory>();
+    });
+    return services;
+}
+```
 
-// Inline includes:
-e.Includes((query, includes) =>
+## Customer entity
+
+```csharp
+// Entities/Customers/Customer.cs — uses IEntity<Guid> (non-int key)
+public class Customer : IEntity<Guid>, IHasTimestamps, IHasNormalizedContent
 {
-    if (includes?.HasFlag(ProductIncludes.Category) == true)
-        query = query.Include(x => x.Category);
-    if (includes?.HasFlag(ProductIncludes.Reviews) == true)
-        query = query.Include(x => x.Reviews!.OrderBy(r => r.SortOrder));
-    return query;
-});
+    public Guid Id { get; set; }
+    [Required, MaxLength(256)] public string Name { get; set; } = null!;
+    [Required, MaxLength(256)] public string Email { get; set; } = null!;
+    [MaxLength(512), Normalized(SourceProperties = [nameof(Name), nameof(Email)])]
+    public string? NormalizedContent { get; set; }
+    public DateTime Created { get; set; }
+    public DateTime? LastModified { get; set; }
+    public ICollection<Order>? Orders { get; set; }
+}
+
+// Entities/Customers/CustomerDto.cs + CustomerInputDto.cs
+public class CustomerDto { public Guid Id; public string Name=null!,Email=null!; public DateTime Created; public DateTime? LastModified; }
+public class CustomerInputDto
+{
+    public Guid? Id { get; set; }  // nullable — omit on create, set on update
+    [Required, MaxLength(256)] public string Name { get; set; } = null!;
+    [Required, MaxLength(256), EmailAddress] public string Email { get; set; } = null!;
+}
+
+// Entities/Customers/CustomerServiceConfiguration.cs — For<TEntity, TKey> overload for non-int key
+public static IEntityServiceCollection<WebshopDbContext> AddCustomers(this IEntityServiceCollection<WebshopDbContext> services)
+{
+    services.For<Customer, Guid>(e =>
+    {
+        e.SortBy(query => query.OrderBy(x => x.Name));
+        e.Prepare(item => item.Id = item.Id == Guid.Empty ? Guid.NewGuid() : item.Id); // inline prepper
+        e.UseMapping<CustomerDto, CustomerInputDto>();
+    });
+    return services;
+}
+```
+
+## Order + OrderLine entities
+
+```csharp
+// Entities/Orders/OrderStatus.cs
+public enum OrderStatus { Pending=0, Processing, Shipped, Delivered, Cancelled }
+
+// Entities/Orders/Order.cs — IHasAggregateKey for event-sourcing/idempotency; IHasNormalizedContent for search
+public class Order : IEntityWithSerial, IHasAggregateKey, IHasTimestamps, IHasCode, IHasNormalizedContent
+{
+    public int Id { get; set; }
+    public Guid? AggregateKey { get; set; }
+    [MaxLength(16)] public string? Code { get; set; }
+    public Guid CustomerId { get; set; }  // FK matches Customer's Guid key
+    public Customer? Customer { get; set; }
+    public OrderStatus Status { get; set; } = OrderStatus.Pending;
+    public decimal Total { get; set; }
+    public DateTime Created { get; set; }
+    public DateTime? LastModified { get; set; }
+    public ICollection<OrderLine>? OrderLines { get; set; }
+    [MaxLength(1024)] public string? NormalizedContent { get; set; }
+}
+
+// Entities/Orders/OrderLine.cs
+public class OrderLine : IEntityWithSerial, IHasTimestamps, ISortable
+{
+    public int Id { get; set; }
+    public int OrderId { get; set; }
+    public Order? Order { get; set; }
+    public int ProductId { get; set; }
+    public Product? Product { get; set; }
+    public int Quantity { get; set; }
+    public decimal UnitPrice { get; set; }
+    public decimal SubTotal { get; set; }
+    public int SortOrder { get; set; }
+    public DateTime Created { get; set; }
+    public DateTime? LastModified { get; set; }
+}
+
+// Entities/Orders/OrderSearchObject.cs
+public class OrderSearchObject : SearchObject
+{
+    public string? Code { get; set; }
+    public ICollection<Guid>? CustomerId { get; set; }  // Guid FK
+    public ICollection<int>? ProductId { get; set; }
+    public ICollection<int>? CategoryId { get; set; }
+    public ICollection<OrderStatus>? Status { get; set; }
+}
+
+// Entities/Orders/OrderIncludes.cs
+[Flags] public enum OrderIncludes { Default=0, Customer=1<<0, OrderLines=1<<1, All=Customer|OrderLines }
+
+// Entities/Orders/OrderDto.cs + OrderLineDto.cs
+public class OrderDto { public int Id; public Guid? AggregateKey; public string? Code; public Guid CustomerId; public CustomerDto? Customer; public OrderStatus Status; public decimal Total; public DateTime Created; public DateTime? LastModified; public ICollection<OrderLineDto>? OrderLines; }
+public class OrderLineDto { public int Id,OrderId,ProductId,Quantity,SortOrder; public ProductDto? Product; public decimal UnitPrice,SubTotal; }
+
+// Entities/Orders/OrderInputDto.cs + OrderLineInputDto.cs
+public class OrderInputDto { public int Id; public Guid? AggregateKey; [MaxLength(16)] public string? Code; public Guid CustomerId; public OrderStatus Status=OrderStatus.Pending; public ICollection<OrderLineInputDto>? OrderLines; }
+public class OrderLineInputDto { public int Id,OrderId,ProductId,Quantity; public decimal UnitPrice; }
+
+// Entities/Orders/OrderNormalizer.cs — enriches NormalizedContent with customer + product text
+public class OrderNormalizer(WebshopDbContext dbContext) : EntityNormalizerBase<Order>
+{
+    public override async Task HandleNormalize(Order item)
+    {
+        await base.HandleNormalize(item);
+        var productIds = item.OrderLines!.Select(ol => ol.ProductId).ToList();
+        var productContents = await dbContext.Products
+            .Where(p => productIds.Contains(p.Id))
+            .ToDictionaryAsync(p => p.Id, p => p.NormalizedContent);
+        var linesContent = item.OrderLines != null
+            ? string.Join(" ", item.OrderLines.Select(ol => productContents.TryGetValue(ol.ProductId, out var c) ? c : null))
+            : string.Empty;
+        item.NormalizedContent = $"{item.NormalizedContent} {item.Customer?.NormalizedContent} {linesContent}".Trim();
+    }
+}
+
+// Entities/Orders/OrderQueryBuilder.cs — implements IFilteredQueryBuilder directly; uses QueryExtensions
+public class OrderQueryBuilder : IFilteredQueryBuilder<Order, int, OrderSearchObject>
+{
+    public IQueryable<Order> Build(IQueryable<Order> query, OrderSearchObject? so)
+    {
+        if (so == null) return query;
+        if (!string.IsNullOrWhiteSpace(so.Code)) query = query.FilterCode(so.Code); // QueryExtensions helper
+        if (so.CustomerId?.Any() == true) query = query.Where(x => so.CustomerId.Contains(x.CustomerId));
+        if (so.ProductId?.Any() == true) query = query.Where(x => x.OrderLines!.Any(ol => so.ProductId.Contains(ol.ProductId)));
+        if (so.CategoryId?.Any() == true) query = query.Where(x => x.OrderLines!.Any(ol => ol.Product!.Categories!.Any(pc => so.CategoryId.Contains(pc.CategoryId))));
+        if (so.Status != null) query = query.Where(x => so.Status.Contains(x.Status));
+        return query;
+    }
+}
+
+// Entities/Orders/OrderManager.cs — EntityWrappingServiceBase with validation + EntityInputException
+public interface IOrderService : IEntityService<Order, OrderSearchObject, EntitySortBy, OrderIncludes>;
+public class OrderManager(IEntityRepository<Order, OrderSearchObject, EntitySortBy, OrderIncludes> service)
+    : EntityWrappingServiceBase<Order, OrderSearchObject, EntitySortBy, OrderIncludes>(service), IOrderService
+{
+    public override Task Add(Order item) { Validate(item); if (string.IsNullOrWhiteSpace(item.Code)) item.Code = $"ORD-{DateTime.UtcNow:yyyyMMddHHmmssfff}"; return base.Add(item); }
+    public override Task<Order?> Modify(Order item) { Validate(item); return base.Modify(item); }
+    public override Task Save(Order item) { Validate(item); return base.Save(item); }
+    private static void Validate(Order item)
+    {
+        if (item.OrderLines?.Any() != true)
+            throw new EntityInputException<Order>("Saving order failed")
+            {
+                InputErrors = { ["OrderLines"] = "Order must contain at least one order line." }
+            };
+    }
+}
+
+// Entities/Orders/OrderServiceConfiguration.cs
+public static IEntityServiceCollection<WebshopDbContext> AddOrders(this IEntityServiceCollection<WebshopDbContext> services)
+{
+    services.For<Order, OrderSearchObject, EntitySortBy, OrderIncludes>(e =>
+    {
+        e.AddQueryFilter<OrderQueryBuilder>();
+        e.SortBy((query, _) => query.OrderByDescending(x => x.Created));
+        e.Includes((query, includes) => query
+            .Include(x => x.Customer!)
+            .Include(x => x.OrderLines!.OrderBy(l => l.SortOrder))
+                .ThenInclude(ol => ol.Product!));
+        e.Related(x => x.OrderLines, item => item.OrderLines?.SetSortOrder());
+        e.Prepare((order, original) =>
+        {
+            if (order.OrderLines?.Any() == true)
+                order.Total = order.OrderLines.Sum(ol => ol.Quantity * ol.UnitPrice);
+            return Task.CompletedTask;
+        });
+        e.AddNormalizer<OrderNormalizer>();
+        e.AddTransient<IOrderService, OrderManager>();  // enables typed IOrderService injection
+        e.UseEntityService<OrderManager>();             // replaces default EntityRepository
+        e.UseMapping<OrderDto, OrderInputDto>();
+        e.AddMapping<OrderLine, OrderLineDto>();
+        e.AddMapping<OrderLineInputDto, OrderLine>();
+    });
+    return services;
+}
 ```
 
 ---
 
-## 8. Processors
+## Additional Patterns
+
+### Inline processor
 
 ```csharp
-using Regira.Entities.EFcore.Processing.Abstractions;
-
-// Inline processor:
 e.Process((items, includes) =>
 {
     foreach (var item in items)
-    {
         item.DisplayPrice = $"€{item.Price:F2}";
-        item.IsOnSale = item.SalePrice.HasValue && item.SalePrice < item.Price;
-    }
     return Task.CompletedTask;
 });
-
-// Separate class with DI (for complex logic):
-public class CategoryProcessor(AppDbContext dbContext) : IEntityProcessor<Category, CategoryIncludes>
-{
-    public async Task Process(IList<Category> items, CategoryIncludes? includes)
-    {
-        var itemIds = items.Select(i => i.Id).ToList();
-        var productCountPerCategory = await dbContext.Products
-            .Where(p => itemIds.Contains(p.CategoryId ?? 0))
-            .GroupBy(p => p.CategoryId)
-            .ToDictionaryAsync(g => g.Key, g => g.Count());
-
-        foreach (var item in items)
-            item.ProductCount = productCountPerCategory.TryGetValue(item.Id, out var count) ? count : 0;
-    }
-}
-// Registration: e.Process<CategoryProcessor>();
 ```
 
----
-
-## 9. Preppers
+### Prepper — with DbContext / separate class
 
 ```csharp
-using Regira.Entities.EFcore.Preppers.Abstractions;
-
-// Inline (simple):
-e.Prepare(item =>
-{
-    item.Slug ??= item.Title.ToLowerInvariant().Replace(' ', '-');
-});
-
-// With original (create vs update — original is null when creating):
-e.Prepare((modified, original) =>
-{
-    if (original == null)
-        modified.CreatedBy = "system";
-});
-
 // With DbContext:
 e.Prepare(async (item, dbContext) =>
 {
@@ -345,21 +585,11 @@ public class ProductPrepper : EntityPrepperBase<Product>
     }
 }
 // Registration: e.Prepare<ProductPrepper>();
-
-// Child collection management:
-e.Related(x => x.OrderItems, (order, _) => order.OrderItems?.SetSortOrder());
-// Or minimal: e.Related(x => x.OrderItems);
 ```
 
----
-
-## 10. Primers
+### Primers
 
 ```csharp
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Regira.Entities.EFcore.Primers.Abstractions;
-
 // Entity-specific primer:
 public class ProductPrimer : EntityPrimerBase<Product>
 {
@@ -372,288 +602,93 @@ public class ProductPrimer : EntityPrimerBase<Product>
 }
 // Registration: e.AddPrimer<ProductPrimer>();
 
-// Global primer (interface-based, applies to all entities implementing interface):
-public class UserTrackingPrimer : EntityPrimerBase<IAuditable>
-{
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public UserTrackingPrimer(IHttpContextAccessor httpContextAccessor)
-        => _httpContextAccessor = httpContextAccessor;
-
-    public override Task PrepareAsync(IAuditable entity, EntityEntry entry)
-    {
-        var userId = int.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("sub")?.Value ?? "0");
-
-        if (entry.State == EntityState.Added)
-            entity.CreatedBy = userId;
-        else if (entry.State == EntityState.Modified)
-            entity.ModifiedBy = userId;
-
-        return Task.CompletedTask;
-    }
-}
-// Registration: options.AddPrimer<UserTrackingPrimer>();
-
-// Built-in primers (registered by UseDefaults()):
-// - HasCreatedDbPrimer, HasLastModifiedDbPrimer, ArchivablePrimer
+// Global primer: options.AddPrimer<YourGlobalPrimer>();
 ```
 
----
-
-## 11. Mapping & AfterMappers
+### AfterMapper
 
 ```csharp
-using Regira.Entities.Mapping.Abstractions;
-
-// Inline mapping with AfterMapper:
+// Inline:
 e.UseMapping<ProductDto, ProductInputDto>()
     .After((entity, dto) =>
     {
         dto.DisplayName = $"{entity.Title} - €{entity.Price:F2}";
-        dto.AttachmentCount = entity.Attachments?.Count ?? 0;
     })
     .AfterInput((inputDto, entity) =>
     {
         // runs after InputDto → Entity mapping
     });
 
-// Additional DTO mappings (for child collections):
-e.AddMapping<OrderItem, OrderItemDto>();
-e.AddMapping<OrderItemInputDto, OrderItem>();
-
-// Separate AfterMapper class (with DI):
-public class ProductAfterMapper : EntityAfterMapperBase<Product, ProductDto>
+// Separate class (with DI):
+public class ProductAfterMapper(IHttpContextAccessor httpContextAccessor) : EntityAfterMapperBase<Product, ProductDto>
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public ProductAfterMapper(IHttpContextAccessor httpContextAccessor)
-        => _httpContextAccessor = httpContextAccessor;
-
     public override void AfterMap(Product source, ProductDto target)
-    {
-        target.ImageUrl = $"https://{_httpContextAccessor.HttpContext?.Request.Host}/images/{source.Id}";
-        target.AttachmentCount = source.Attachments?.Count ?? 0;
-    }
+        => target.ImageUrl = $"https://{httpContextAccessor.HttpContext?.Request.Host}/images/{source.Id}";
 }
 // Registration: e.UseMapping<ProductDto, ProductInputDto>().After<ProductAfterMapper>();
-// Global: options.AddAfterMapper<MyGlobalAfterMapper>();
+// Global:       options.AddAfterMapper<MyGlobalAfterMapper>();
 ```
 
----
-
-## 12. Controllers
+### IQKeywordHelper — Q full-text search
 
 ```csharp
-using Microsoft.AspNetCore.Mvc;
-using Regira.Entities.Web.Controllers.Abstractions;
-
-// Full-featured controller (recommended):
-[ApiController]
-[Route("api/[controller]")]
-public class ProductsController : EntityControllerBase<
-    Product,
-    ProductSearchObject,
-    ProductSortBy,
-    ProductIncludes,
-    ProductDto,
-    ProductInputDto>
+public class ProductQueryBuilder(IQKeywordHelper qHelper) : FilteredQueryBuilderBase<Product, int, ProductSearchObject>
 {
-    // Provides: GET /list, GET /search, GET /{id}, POST, PUT /{id},
-    //           POST /save, DELETE /{id}, POST /list, POST /search
-}
-
-// Variants (use minimal sufficient base):
-// EntityControllerBase<TEntity, TDto, TInputDto>  // minimal
-// EntityControllerBase<TEntity, TSearchObject, TDto, TInputDto>  // with search
-// EntityControllerBase<TEntity, TKey, TSearchObject, TDto, TInputDto>  // + custom key
-// EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TInputDto>  // full
-```
-
----
-
-## 13. Custom Entity Service (EntityWrappingServiceBase)
-
-```csharp
-using Regira.Entities.Services.Abstractions;
-using Regira.Entities.Models;
-using Microsoft.Extensions.Caching.Memory;
-
-// Interface + wrapper (for custom business logic):
-public interface IProductService
-    : IEntityService<Product, int, ProductSearchObject, ProductSortBy, ProductIncludes> { }
-
-public class ProductService
-    : EntityWrappingServiceBase<Product, int, ProductSearchObject, ProductSortBy, ProductIncludes>,
-      IProductService
-{
-    private readonly ILogger<ProductService> _logger;
-
-    public ProductService(
-        IEntityService<Product, int, ProductSearchObject, ProductSortBy, ProductIncludes> inner,
-        ILogger<ProductService> logger)
-        : base(inner) => _logger = logger;
-
-    public override async Task<Product?> Details(int id)
+    public override IQueryable<Product> Build(IQueryable<Product> query, ProductSearchObject? so)
     {
-        _logger.LogDebug("Fetching product {Id}", id);
-        return await base.Details(id);
-    }
-
-    public override async Task Save(Product item)
-    {
-        if (item.Price < 0)
-            throw new EntityInputException<Product>("Price cannot be negative")
-            {
-                Item = item,
-                InputErrors = new Dictionary<string, string>
-                {
-                    [nameof(Product.Price)] = "Must be >= 0"
-                }
-            };
-
-        await base.Save(item);
-    }
-}
-
-// Registration:
-e.AddTransient<IProductService, ProductService>();  // enables typed injection
-e.UseEntityService<ProductService>();               // replaces default EntityRepository
-
-// Caching example:
-public class CachedProductService
-    : EntityWrappingServiceBase<Product, int, ProductSearchObject, ProductSortBy, ProductIncludes>
-{
-    private readonly IMemoryCache _cache;
-    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
-
-    public CachedProductService(
-        IEntityService<Product, int, ProductSearchObject, ProductSortBy, ProductIncludes> inner,
-        IMemoryCache cache)
-        : base(inner) => _cache = cache;
-
-    public override async Task<Product?> Details(int id)
-    {
-        var key = $"product:{id}";
-        if (_cache.TryGetValue(key, out Product? cached))
-            return cached;
-
-        var result = await base.Details(id);
-        if (result != null)
-            _cache.Set(key, result, CacheDuration);
-        return result;
-    }
-
-    public override async Task Save(Product item)
-    {
-        await base.Save(item);
-        _cache.Remove($"product:{item.Id}");
+        if (!string.IsNullOrWhiteSpace(so?.Q))
+        {
+            var keywords = qHelper.Parse(so.Q);
+            foreach (var keyword in keywords)
+                query = query.Where(x => EF.Functions.Like(x.NormalizedContent, keyword.QW));
+        }
+        return query;
     }
 }
 ```
 
----
-
-## 14. Global Services
+### Global filter query builder
 
 ```csharp
-using Regira.Entities.EFcore.QueryBuilders.Abstractions;
-using Regira.Entities.Models.Abstractions;
-
-// Global filter (applies to all entities implementing interface):
-public class FilterByTenantQueryBuilder : GlobalFilteredQueryBuilderBase<ITenantEntity, int>
+// Separate class — applies to all entities implementing the interface:
+public class FilterByTenantQueryBuilder(ITenantContext tenantContext) : GlobalFilteredQueryBuilderBase<ITenantEntity, int>
 {
-    private readonly ITenantContext _tenantContext;
-
-    public FilterByTenantQueryBuilder(ITenantContext tenantContext)
-        => _tenantContext = tenantContext;
-
     public override IQueryable<ITenantEntity> Build(IQueryable<ITenantEntity> query, ISearchObject<int>? so)
-    {
-        return query.Where(x => x.TenantId == _tenantContext.CurrentTenantId);
-    }
+        => query.Where(x => x.TenantId == tenantContext.CurrentTenantId);
 }
 // Registration: options.AddGlobalFilterQueryBuilder<FilterByTenantQueryBuilder>();
 
-// Global prepper (inline):
-options.AddPrepper<IHasSlug>(entity =>
-{
-    entity.Slug ??= entity.Title?.ToLowerInvariant().Replace(' ', '-');
-});
-
-// Built-in global filter (normalized content Q search):
+// Built-in Q search for all IHasNormalizedContent entities:
 options.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
 ```
 
----
-
-## 15. Normalizing
+### Global normalizer
 
 ```csharp
-using Regira.Normalizing;
-using Regira.Normalizing.Abstractions;
-using Regira.Entities.EFcore.Normalizing.Abstractions;
-
-// Attribute-based (recommended):
-public class Product : IEntityWithSerial
+// Uses INormalizer to manually control normalization output:
+public class ProductNormalizer(INormalizer normalizer) : EntityNormalizerBase<Product>
 {
-    public string Title { get; set; } = null!;
-    public string? Description { get; set; }
-
-    // Multiple sources (concatenated):
-    [Normalized(SourceProperties = [nameof(Title), nameof(Description)])]
-    public string? NormalizedContent { get; set; }
-
-    // Single source:
-    [Normalized(SourceProperty = nameof(Title))]
-    public string? NormalizedTitle { get; set; }
-}
-
-// Custom normalizer:
-public class ProductNormalizer : EntityNormalizerBase<Product>
-{
-    private readonly INormalizer _normalizer;
-
-    public ProductNormalizer(INormalizer normalizer) => _normalizer = normalizer;
-
     public override async Task HandleNormalize(Product item)
-    {
-        var content = $"{item.Title} {item.Description}".Trim();
-        item.NormalizedContent = await _normalizer.Normalize(content);
-    }
+        => item.NormalizedContent = await normalizer.Normalize($"{item.Title} {item.Description}".Trim());
 }
 // Per-entity: e.AddNormalizer<ProductNormalizer>();
-// Global: options.AddNormalizer<IHasPhone, PhoneNormalizer>();
-
-// Enable normalizer interceptors (required in AddDbContext):
-builder.Services.AddDbContext<AppDbContext>((sp, options) =>
-    options.UseSqlite(connectionString)
-           .AddNormalizerInterceptors(sp));
+// Global:     options.AddNormalizer<IHasPhone, PhoneNormalizer>();
 ```
 
----
-
-## 16. Attachments
+### Attachments
 
 ```csharp
-using Regira.Entities.Models.Abstractions;
-using Regira.Entities.Attachments.Models;
-using Regira.Entities.Web.Attachments.Abstractions;
-using Regira.IO.Storage.FileSystem;
-using Microsoft.AspNetCore.Mvc;
-
-// EntityAttachment model:
+// Attachment entity:
 public class ProductAttachment : EntityAttachment<int, int>
 {
     public override string ObjectType => nameof(Product);
 }
 
-// Entity with IHasAttachments:
+// Entity:
 public class Product : IEntityWithSerial, IHasAttachments, IHasAttachments<ProductAttachment>
 {
-    public int Id { get; set; }
     public bool? HasAttachment { get; set; }
     public ICollection<ProductAttachment>? Attachments { get; set; }
-
     ICollection<IEntityAttachment>? IHasAttachments.Attachments
     {
         get => Attachments?.Cast<IEntityAttachment>().ToArray();
@@ -662,51 +697,28 @@ public class Product : IEntityWithSerial, IHasAttachments, IHasAttachments<Produ
 }
 
 // Controller:
-[ApiController]
-[Route("api/products/{objectId}/attachments")]
+[ApiController, Route("api/products/{objectId}/attachments")]
 public class ProductAttachmentsController : EntityAttachmentControllerBase<ProductAttachment, int, int> { }
 
 // DbContext:
 public DbSet<Attachment> Attachments { get; set; } = null!;
 public DbSet<ProductAttachment> ProductAttachments { get; set; } = null!;
-
-// In OnModelCreating:
+// OnModelCreating:
 modelBuilder.Entity<ProductAttachment>()
     .HasOne(x => x.Attachment).WithMany().HasForeignKey(x => x.AttachmentId);
 modelBuilder.Entity<Product>(entity =>
-{
-    entity.HasMany(e => e.Attachments).WithOne().HasForeignKey(e => e.ObjectId).HasPrincipalKey(e => e.Id);
-});
+    entity.HasMany(e => e.Attachments).WithOne().HasForeignKey(e => e.ObjectId).HasPrincipalKey(e => e.Id));
 
-// DI — File system:
+// DI:
 services.UseEntities<AppDbContext>(/* ... */)
     .WithAttachments(_ => new BinaryFileService(
         new FileSystemOptions { RootFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads") }));
-
-// DI — Azure Blob (see entities.namespaces.md for full Azure/SFTP examples)
 ```
 
----
-
-## 17. Error Handling & Query Extensions
+### Query extensions reference
 
 ```csharp
-using Regira.Entities.Models;
-using Regira.Entities.EFcore.QueryBuilders;  // QueryExtensions
-using Regira.DAL.Paging;                     // PagingInfo, PageQuery
-
-// EntityInputException (returns HTTP 400):
-throw new EntityInputException<Product>("Validation failed")
-{
-    Item = item,
-    InputErrors = new Dictionary<string, string>
-    {
-        [nameof(Product.Price)] = "Price must be greater than 0",
-        [nameof(Product.Title)] = "Title is required"
-    }
-};
-
-// Built-in query extensions:
+// From Regira.Entities.EFcore.QueryBuilders (QueryExtensions):
 query.FilterId(so.Id)
 query.FilterIds(so.Ids)
 query.FilterExclude(so.Exclude)
@@ -723,133 +735,3 @@ query.SortQuery<TEntity, TKey>()
 query.PageQuery(pagingInfo)
 query.PageQuery(pageSize: 20, page: 1)
 ```
-
----
-
-## 18. Common Patterns
-
-### Master-Detail (Order + OrderItems)
-```csharp
-public class Order : IEntityWithSerial, IHasTimestamps
-{
-    public int Id { get; set; }
-    public decimal TotalAmount { get; set; }
-    public ICollection<OrderItem>? OrderItems { get; set; }
-    public DateTime Created { get; set; }
-    public DateTime? LastModified { get; set; }
-}
-
-public class OrderItem : IEntityWithSerial, ISortable
-{
-    public int Id { get; set; }
-    public int OrderId { get; set; }
-    public int Quantity { get; set; }
-    public decimal UnitPrice { get; set; }
-    public int SortOrder { get; set; }
-}
-
-// DI:
-.For<Order, OrderSearchObject, OrderSortBy, OrderIncludes>(e =>
-{
-    e.Related(x => x.OrderItems, (order, _) => order.OrderItems?.SetSortOrder());
-    e.Prepare(item => item.TotalAmount = item.OrderItems?.Sum(x => x.Quantity * x.UnitPrice) ?? 0);
-});
-```
-
-### Many-to-Many (always use explicit join entity)
-```csharp
-public class Student : IEntityWithSerial
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = null!;
-    public ICollection<StudentCourse>? StudentCourses { get; set; }
-}
-
-public class Course : IEntityWithSerial
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = null!;
-    public ICollection<StudentCourse>? StudentCourses { get; set; }
-}
-
-public class StudentCourse : IEntityWithSerial
-{
-    public int Id { get; set; }
-    public int StudentId { get; set; }
-    public int CourseId { get; set; }
-    public DateTime EnrolledDate { get; set; }
-    public int? Grade { get; set; }
-    public Student? Student { get; set; }
-    public Course? Course { get; set; }
-}
-
-// DTOs mirror entity structure:
-public class StudentInputDto
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = null!;
-    public ICollection<StudentCourseInputDto>? StudentCourses { get; set; }
-}
-
-public class StudentCourseInputDto
-{
-    public int Id { get; set; }
-    public int StudentId { get; set; }
-    public int CourseId { get; set; }
-    public DateTime EnrolledDate { get; set; }
-    public int? Grade { get; set; }
-}
-
-// DbContext:
-modelBuilder.Entity<StudentCourse>(entity =>
-{
-    entity.HasOne(sc => sc.Student).WithMany(s => s.StudentCourses).HasForeignKey(sc => sc.StudentId);
-    entity.HasOne(sc => sc.Course).WithMany(c => c.StudentCourses).HasForeignKey(sc => sc.CourseId);
-});
-
-// DI:
-.For<Student, StudentSearchObject, StudentSortBy, StudentIncludes>(e =>
-{
-    e.Includes((query, includes) =>
-    {
-        if (includes?.HasFlag(StudentIncludes.Courses) == true)
-            query = query.Include(x => x.StudentCourses!).ThenInclude(sc => sc.Course);
-        return query;
-    });
-    e.Related(x => x.StudentCourses);
-    e.UseMapping<StudentDto, StudentInputDto>();
-    e.AddMapping<StudentCourse, StudentCourseDto>();
-    e.AddMapping<StudentCourseInputDto, StudentCourse>();
-});
-```
-
-### Soft Delete
-```csharp
-public class Product : IEntityWithSerial, IArchivable
-{
-    public int Id { get; set; }
-    public bool IsArchived { get; set; }
-}
-// UseDefaults() registers ArchivablePrimer + FilterArchivablesQueryBuilder automatically
-// SearchObject.IsArchived: null = active only (default), true = archived only
-```
-
-### Hierarchical / Self-referencing
-```csharp
-public class Category : IEntityWithSerial, IHasTitle
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = null!;
-    public int? ParentId { get; set; }
-    public Category? Parent { get; set; }
-    public ICollection<Category>? Children { get; set; }
-}
-
-// In query builder:
-if (so?.ParentId != null)
-    query = query.Where(x => x.ParentId == so.ParentId);
-if (so?.RootOnly == true)
-    query = query.Where(x => x.ParentId == null);
-```
-
----
