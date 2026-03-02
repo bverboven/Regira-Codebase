@@ -9,32 +9,12 @@
 
 ## 1. Project Setup
 
-> **→ See:** [`entities.setup.md`](entities.setup.md)
+> **→ See:** [`entities.setup.md`](./entities.setup.md)
 
 ---
 
 ## 2. DbContext
 
-### Data/AppDbContext.cs (minimal)
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.DAL.EFcore.Extensions;
-
-public class AppDbContext : DbContext
-{
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
-    // public DbSet<Product> Products { get; set; } = null!;
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.SetDecimalPrecisionConvention(18, 2);
-    }
-}
-```
-
-### Data/AppDbContext.cs (with entity relationship)
 ```csharp
 using Microsoft.EntityFrameworkCore;
 using Regira.DAL.EFcore.Extensions;
@@ -51,6 +31,7 @@ public class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.SetDecimalPrecisionConvention(18, 2);
 
+        // Configure relationships:
         modelBuilder.Entity<Product>(entity =>
         {
             entity.HasOne(e => e.Category)
@@ -65,12 +46,12 @@ public class AppDbContext : DbContext
 
 ## 3. DI Extension Methods
 
-### Extensions/ServiceCollectionExtensions.cs
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 using Regira.Entities.Mapping.Mapster;
 
+// Global registration:
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddEntityServices(this IServiceCollection services)
@@ -87,13 +68,8 @@ public static class ServiceCollectionExtensions
         return services;
     }
 }
-```
 
-### Entities/Products/ProductServiceCollectionExtensions.cs (per-entity pattern)
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
-
+// Per-entity extension:
 public static class ProductServiceCollectionExtensions
 {
     public static IEntityServiceCollection<TContext> AddProducts<TContext>(
@@ -102,7 +78,7 @@ public static class ProductServiceCollectionExtensions
     {
         services.For<Product, ProductSearchObject, ProductSortBy, ProductIncludes>(e =>
         {
-            // configure here
+            // configure filters, sorting, mapping, etc.
         });
         return services;
     }
@@ -111,14 +87,14 @@ public static class ProductServiceCollectionExtensions
 
 ---
 
-## 4. Entity Model
+## 4. Entity Models
 
-### Basic entity (all common interfaces)
 ```csharp
 using System.ComponentModel.DataAnnotations;
 using Regira.Entities.Models.Abstractions;
 using Regira.Normalizing;
 
+// Standard entity with all common interfaces:
 public class Product : IEntityWithSerial, IHasTimestamps, IHasTitle, IArchivable, IHasNormalizedContent
 {
     public int Id { get; set; }
@@ -142,82 +118,38 @@ public class Product : IEntityWithSerial, IHasTimestamps, IHasTitle, IArchivable
     public int? CategoryId { get; set; }
     public Category? Category { get; set; }
 }
-```
 
-### Entity with Guid primary key
-```csharp
-using System.ComponentModel.DataAnnotations;
-using Regira.Entities.Models.Abstractions;
-
-public class Document : IEntity<Guid>, IHasTimestamps, IHasTitle
-{
-    public Guid Id { get; set; }
-
-    [Required, MaxLength(128)]
-    public string Title { get; set; } = null!;
-
-    public DateTime Created { get; set; }
-    public DateTime? LastModified { get; set; }
-}
-```
-
-### Child entity (ISortable)
-```csharp
-using Regira.Entities.Models.Abstractions;
-
-public class OrderItem : IEntityWithSerial, ISortable
-{
-    public int Id { get; set; }
-    public int OrderId { get; set; }
-    public int Quantity { get; set; }
-    public decimal UnitPrice { get; set; }
-    public int SortOrder { get; set; }
-}
+// Entity with Guid key: use IEntity<Guid>
+// Child entity: implement ISortable (adds SortOrder property)
 ```
 
 ---
 
-## 5. SearchObject
+## 5. SearchObject, SortBy, Includes
 
 ```csharp
 using Regira.Entities.Models;
 
+// SearchObject: Use ICollection<TKey> for FK filters (enables multi-value)
 public class ProductSearchObject : SearchObject
 {
-    // Use ICollection<TKey> for FK filters (enables multi-value filtering)
     public ICollection<int>? CategoryId { get; set; }
     public decimal? MinPrice { get; set; }
     public decimal? MaxPrice { get; set; }
-
     // Inherited: Id, Ids, Exclude, Q, MinCreated, MaxCreated,
     //            MinLastModified, MaxLastModified, IsArchived
 }
-```
 
----
-
-## 6. SortBy Enum
-
-```csharp
-// NOT [Flags] — values are applied one at a time, not combined
+// SortBy: NOT [Flags] — values applied one at a time
 public enum ProductSortBy
 {
     Default = 0,
-    Title,
-    TitleDesc,
-    Price,
-    PriceDesc,
-    Created,
-    CreatedDesc
+    Title, TitleDesc,
+    Price, PriceDesc,
+    Created, CreatedDesc
 }
-```
 
----
-
-## 7. Includes Enum
-
-```csharp
-// IS [Flags] — values are combined with bitwise OR
+// Includes: IS [Flags] — values combined with bitwise OR
 [Flags]
 public enum ProductIncludes
 {
@@ -230,10 +162,12 @@ public enum ProductIncludes
 
 ---
 
-## 8. DTOs
+## 6. DTOs
 
-### Output DTO
 ```csharp
+using System.ComponentModel.DataAnnotations;
+
+// Output DTO: includes computed properties
 public class ProductDto
 {
     public int Id { get; set; }
@@ -241,20 +175,16 @@ public class ProductDto
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public int? CategoryId { get; set; }
-    public CategoryDto? Category { get; set; }   // navigation property, not flattened
+    public CategoryDto? Category { get; set; }   // navigation (not flattened)
     public DateTime Created { get; set; }
     public DateTime? LastModified { get; set; }
-    public string? DisplayName { get; set; }      // computed — set in AfterMapper
+    public string? DisplayName { get; set; }      // computed in AfterMapper
 }
-```
 
-### Input DTO
-```csharp
-using System.ComponentModel.DataAnnotations;
-
+// Input DTO: only editable properties
 public class ProductInputDto
 {
-    public int Id { get; set; }   // required for Save (upsert)
+    public int Id { get; set; }   // required for upsert
 
     [Required, MaxLength(64)]
     public string Title { get; set; } = null!;
@@ -274,63 +204,29 @@ public class ProductInputDto
 
 ---
 
-## 9. Query Builders
+## 7. Query Builders (Filter, Sort, Includes)
 
-### Inline filter
 ```csharp
+using Microsoft.EntityFrameworkCore;
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
+using Regira.Entities.Keywords.Abstractions;
+
+// Inline filter:
 e.Filter((query, so) =>
 {
     if (so?.CategoryId?.Any() == true)
         query = query.Where(x => so.CategoryId.Contains(x.CategoryId ?? 0));
     if (so?.MinPrice != null)
         query = query.Where(x => x.Price >= so.MinPrice);
-    if (so?.MaxPrice != null)
-        query = query.Where(x => x.Price <= so.MaxPrice);
     return query;
 });
-```
 
-### Separate class
-```csharp
-using Regira.Entities.EFcore.QueryBuilders.Abstractions;
-
-public class ProductQueryBuilder : FilteredQueryBuilderBase<Product, int, ProductSearchObject>
-{
-    public override IQueryable<Product> Build(IQueryable<Product> query, ProductSearchObject? so)
-    {
-        if (so == null) return query;
-
-        if (so.CategoryId?.Any() == true)
-            query = query.Where(x => so.CategoryId.Contains(x.CategoryId ?? 0));
-
-        if (so.MinPrice.HasValue)
-            query = query.Where(x => x.Price >= so.MinPrice.Value);
-
-        if (so.MaxPrice.HasValue)
-            query = query.Where(x => x.Price <= so.MaxPrice.Value);
-
-        return query;
-    }
-}
-
-// Registration:
-e.AddQueryFilter<ProductQueryBuilder>();
-```
-
-### Separate class with IQKeywordHelper (normalized text search)
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.Entities.EFcore.QueryBuilders.Abstractions;
-using Regira.Entities.Keywords.Abstractions;
-
+// Separate class (with DI for IQKeywordHelper):
 public class ProductQueryBuilder : FilteredQueryBuilderBase<Product, int, ProductSearchObject>
 {
     private readonly IQKeywordHelper _qHelper;
 
-    public ProductQueryBuilder(IQKeywordHelper qHelper)
-    {
-        _qHelper = qHelper;
-    }
+    public ProductQueryBuilder(IQKeywordHelper qHelper) => _qHelper = qHelper;
 
     public override IQueryable<Product> Build(IQueryable<Product> query, ProductSearchObject? so)
     {
@@ -343,39 +239,29 @@ public class ProductQueryBuilder : FilteredQueryBuilderBase<Product, int, Produc
         return query;
     }
 }
-```
+// Registration: e.AddQueryFilter<ProductQueryBuilder>();
 
-### Inline sorting
-```csharp
+// Inline sorting:
 e.SortBy((query, sortBy) =>
 {
     if (typeof(IOrderedQueryable).IsAssignableFrom(query.Expression.Type)
         && query is IOrderedQueryable<Product> sorted)
-    {
         return sortBy switch
         {
-            ProductSortBy.Title     => sorted.ThenBy(x => x.Title),
-            ProductSortBy.TitleDesc => sorted.ThenByDescending(x => x.Title),
-            ProductSortBy.Price     => sorted.ThenBy(x => x.Price),
-            ProductSortBy.PriceDesc => sorted.ThenByDescending(x => x.Price),
-            _                       => sorted.ThenByDescending(x => x.Created)
+            ProductSortBy.Title => sorted.ThenBy(x => x.Title),
+            ProductSortBy.Price => sorted.ThenBy(x => x.Price),
+            _ => sorted.ThenByDescending(x => x.Created)
         };
-    }
+
     return sortBy switch
     {
-        ProductSortBy.Title      => query.OrderBy(x => x.Title),
-        ProductSortBy.TitleDesc  => query.OrderByDescending(x => x.Title),
-        ProductSortBy.Price      => query.OrderBy(x => x.Price),
-        ProductSortBy.PriceDesc  => query.OrderByDescending(x => x.Price),
-        ProductSortBy.Created    => query.OrderBy(x => x.Created),
-        ProductSortBy.CreatedDesc => query.OrderByDescending(x => x.Created),
-        _                        => query.OrderByDescending(x => x.Created)
+        ProductSortBy.Title => query.OrderBy(x => x.Title),
+        ProductSortBy.Price => query.OrderBy(x => x.Price),
+        _ => query.OrderByDescending(x => x.Created)
     };
 });
-```
 
-### Inline includes
-```csharp
+// Inline includes:
 e.Includes((query, includes) =>
 {
     if (includes?.HasFlag(ProductIncludes.Category) == true)
@@ -388,10 +274,12 @@ e.Includes((query, includes) =>
 
 ---
 
-## 10. Processors
+## 8. Processors
 
-### Inline
 ```csharp
+using Regira.Entities.EFcore.Processing.Abstractions;
+
+// Inline processor:
 e.Process((items, includes) =>
 {
     foreach (var item in items)
@@ -401,12 +289,8 @@ e.Process((items, includes) =>
     }
     return Task.CompletedTask;
 });
-```
 
-### Separate class (with DI)
-```csharp
-using Regira.Entities.EFcore.Processing.Abstractions;
-
+// Separate class with DI (for complex logic):
 public class CategoryProcessor(AppDbContext dbContext) : IEntityProcessor<Category, CategoryIncludes>
 {
     public async Task Process(IList<Category> items, CategoryIncludes? includes)
@@ -421,46 +305,37 @@ public class CategoryProcessor(AppDbContext dbContext) : IEntityProcessor<Catego
             item.ProductCount = productCountPerCategory.TryGetValue(item.Id, out var count) ? count : 0;
     }
 }
-
-// Registration:
-e.Process<CategoryProcessor>();
+// Registration: e.Process<CategoryProcessor>();
 ```
 
 ---
 
-## 11. Preppers
+## 9. Preppers
 
-### Inline (simple)
 ```csharp
+using Regira.Entities.EFcore.Preppers.Abstractions;
+
+// Inline (simple):
 e.Prepare(item =>
 {
     item.Slug ??= item.Title.ToLowerInvariant().Replace(' ', '-');
 });
-```
 
-### Inline with original (create vs update)
-```csharp
-// original is null when creating, non-null when updating
+// With original (create vs update — original is null when creating):
 e.Prepare((modified, original) =>
 {
     if (original == null)
         modified.CreatedBy = "system";
 });
-```
 
-### Inline with DbContext
-```csharp
+// With DbContext:
 e.Prepare(async (item, dbContext) =>
 {
     item.TotalAmount = item.OrderItems?.Sum(x => x.Quantity * x.UnitPrice) ?? 0;
     await Task.CompletedTask;
 });
-```
 
-### Separate class
-```csharp
-using Regira.Entities.EFcore.Preppers.Abstractions;
-
+// Separate class:
 public class ProductPrepper : EntityPrepperBase<Product>
 {
     public override Task Prepare(Product modified, Product? original)
@@ -469,59 +344,41 @@ public class ProductPrepper : EntityPrepperBase<Product>
         return Task.CompletedTask;
     }
 }
+// Registration: e.Prepare<ProductPrepper>();
 
-// Registration:
-e.Prepare<ProductPrepper>();
-```
-
-### Child collection (Related)
-```csharp
-// Manage child collection + apply sort order
+// Child collection management:
 e.Related(x => x.OrderItems, (order, _) => order.OrderItems?.SetSortOrder());
-
-// Minimal (no extra preparation)
-e.Related(x => x.OrderItems);
+// Or minimal: e.Related(x => x.OrderItems);
 ```
 
 ---
 
-## 12. Primers
+## 10. Primers
 
-### Separate class (entity-specific)
 ```csharp
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Regira.Entities.EFcore.Primers.Abstractions;
 
+// Entity-specific primer:
 public class ProductPrimer : EntityPrimerBase<Product>
 {
     public override Task PrepareAsync(Product entity, EntityEntry entry)
     {
         if (entry.State == EntityState.Added)
             entity.Code ??= Guid.NewGuid().ToString("N")[..8].ToUpper();
-
         return Task.CompletedTask;
     }
 }
+// Registration: e.AddPrimer<ProductPrimer>();
 
-// Registration on entity:
-e.AddPrimer<ProductPrimer>();
-```
-
-### Global primer (interface-based)
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Regira.Entities.EFcore.Primers.Abstractions;
-
+// Global primer (interface-based, applies to all entities implementing interface):
 public class UserTrackingPrimer : EntityPrimerBase<IAuditable>
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public UserTrackingPrimer(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
+        => _httpContextAccessor = httpContextAccessor;
 
     public override Task PrepareAsync(IAuditable entity, EntityEntry entry)
     {
@@ -535,24 +392,20 @@ public class UserTrackingPrimer : EntityPrimerBase<IAuditable>
         return Task.CompletedTask;
     }
 }
+// Registration: options.AddPrimer<UserTrackingPrimer>();
 
-// Global registration (runs for all entities implementing IAuditable):
-options.AddPrimer<UserTrackingPrimer>();
-```
-
-### Built-in primers (registered by UseDefaults)
-```csharp
-options.AddPrimer<HasCreatedDbPrimer>();
-options.AddPrimer<HasLastModifiedDbPrimer>();
-options.AddPrimer<ArchivablePrimer>();
+// Built-in primers (registered by UseDefaults()):
+// - HasCreatedDbPrimer, HasLastModifiedDbPrimer, ArchivablePrimer
 ```
 
 ---
 
-## 13. Mapping & AfterMappers
+## 11. Mapping & AfterMappers
 
-### Inline mapping with AfterMapper
 ```csharp
+using Regira.Entities.Mapping.Abstractions;
+
+// Inline mapping with AfterMapper:
 e.UseMapping<ProductDto, ProductInputDto>()
     .After((entity, dto) =>
     {
@@ -563,26 +416,18 @@ e.UseMapping<ProductDto, ProductInputDto>()
     {
         // runs after InputDto → Entity mapping
     });
-```
 
-### Additional DTO mappings (for related entities in child collections)
-```csharp
+// Additional DTO mappings (for child collections):
 e.AddMapping<OrderItem, OrderItemDto>();
 e.AddMapping<OrderItemInputDto, OrderItem>();
-```
 
-### Separate AfterMapper class (with DI)
-```csharp
-using Regira.Entities.Mapping.Abstractions;
-
+// Separate AfterMapper class (with DI):
 public class ProductAfterMapper : EntityAfterMapperBase<Product, ProductDto>
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public ProductAfterMapper(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
+        => _httpContextAccessor = httpContextAccessor;
 
     public override void AfterMap(Product source, ProductDto target)
     {
@@ -590,24 +435,19 @@ public class ProductAfterMapper : EntityAfterMapperBase<Product, ProductDto>
         target.AttachmentCount = source.Attachments?.Count ?? 0;
     }
 }
-
-// Registration:
-e.UseMapping<ProductDto, ProductInputDto>()
-    .After<ProductAfterMapper>();
-
-// Global AfterMapper (applies to all entities implementing IMyInterface):
-options.AddAfterMapper<MyGlobalAfterMapper>();
+// Registration: e.UseMapping<ProductDto, ProductInputDto>().After<ProductAfterMapper>();
+// Global: options.AddAfterMapper<MyGlobalAfterMapper>();
 ```
 
 ---
 
-## 14. Controllers
+## 12. Controllers
 
-### Full-featured controller
 ```csharp
 using Microsoft.AspNetCore.Mvc;
 using Regira.Entities.Web.Controllers.Abstractions;
 
+// Full-featured controller (recommended):
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController : EntityControllerBase<
@@ -621,33 +461,24 @@ public class ProductsController : EntityControllerBase<
     // Provides: GET /list, GET /search, GET /{id}, POST, PUT /{id},
     //           POST /save, DELETE /{id}, POST /list, POST /search
 }
-```
 
-### Controller variants (choose the minimal sufficient one)
-```csharp
-// Minimal — no search, no sorting
-EntityControllerBase<TEntity, TDto, TInputDto>
-
-// With search only
-EntityControllerBase<TEntity, TSearchObject, TDto, TInputDto>
-
-// With search + non-default key type
-EntityControllerBase<TEntity, TKey, TSearchObject, TDto, TInputDto>
-
-// Full-featured (recommended)
-EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TInputDto>
+// Variants (use minimal sufficient base):
+// EntityControllerBase<TEntity, TDto, TInputDto>  // minimal
+// EntityControllerBase<TEntity, TSearchObject, TDto, TInputDto>  // with search
+// EntityControllerBase<TEntity, TKey, TSearchObject, TDto, TInputDto>  // + custom key
+// EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TInputDto>  // full
 ```
 
 ---
 
-## 15. Custom Entity Service (EntityWrappingServiceBase)
+## 13. Custom Entity Service (EntityWrappingServiceBase)
 
-### Interface + wrapper
 ```csharp
 using Regira.Entities.Services.Abstractions;
 using Regira.Entities.Models;
-using Regira.DAL.Paging;
+using Microsoft.Extensions.Caching.Memory;
 
+// Interface + wrapper (for custom business logic):
 public interface IProductService
     : IEntityService<Product, int, ProductSearchObject, ProductSortBy, ProductIncludes> { }
 
@@ -660,10 +491,7 @@ public class ProductService
     public ProductService(
         IEntityService<Product, int, ProductSearchObject, ProductSortBy, ProductIncludes> inner,
         ILogger<ProductService> logger)
-        : base(inner)
-    {
-        _logger = logger;
-    }
+        : base(inner) => _logger = logger;
 
     public override async Task<Product?> Details(int id)
     {
@@ -686,20 +514,12 @@ public class ProductService
         await base.Save(item);
     }
 }
-```
 
-### Registration
-```csharp
+// Registration:
 e.AddTransient<IProductService, ProductService>();  // enables typed injection
 e.UseEntityService<ProductService>();               // replaces default EntityRepository
-```
 
-### Caching variant
-```csharp
-using Microsoft.Extensions.Caching.Memory;
-using Regira.Entities.Services.Abstractions;
-using Regira.DAL.Paging;
-
+// Caching example:
 public class CachedProductService
     : EntityWrappingServiceBase<Product, int, ProductSearchObject, ProductSortBy, ProductIncludes>
 {
@@ -709,10 +529,7 @@ public class CachedProductService
     public CachedProductService(
         IEntityService<Product, int, ProductSearchObject, ProductSortBy, ProductIncludes> inner,
         IMemoryCache cache)
-        : base(inner)
-    {
-        _cache = cache;
-    }
+        : base(inner) => _cache = cache;
 
     public override async Task<Product?> Details(int id)
     {
@@ -723,7 +540,6 @@ public class CachedProductService
         var result = await base.Details(id);
         if (result != null)
             _cache.Set(key, result, CacheDuration);
-
         return result;
     }
 
@@ -733,88 +549,71 @@ public class CachedProductService
         _cache.Remove($"product:{item.Id}");
     }
 }
-
-// Registration:
-e.UseEntityService<CachedProductService>();
 ```
 
 ---
 
-## 16. Global Services
+## 14. Global Services
 
-### Global filter query builder (separate class)
 ```csharp
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.Models.Abstractions;
 
+// Global filter (applies to all entities implementing interface):
 public class FilterByTenantQueryBuilder : GlobalFilteredQueryBuilderBase<ITenantEntity, int>
 {
     private readonly ITenantContext _tenantContext;
 
     public FilterByTenantQueryBuilder(ITenantContext tenantContext)
-    {
-        _tenantContext = tenantContext;
-    }
+        => _tenantContext = tenantContext;
 
     public override IQueryable<ITenantEntity> Build(IQueryable<ITenantEntity> query, ISearchObject<int>? so)
     {
         return query.Where(x => x.TenantId == _tenantContext.CurrentTenantId);
     }
 }
+// Registration: options.AddGlobalFilterQueryBuilder<FilterByTenantQueryBuilder>();
 
-// Registration:
-options.AddGlobalFilterQueryBuilder<FilterByTenantQueryBuilder>();
-```
-
-### Global prepper (inline)
-```csharp
+// Global prepper (inline):
 options.AddPrepper<IHasSlug>(entity =>
 {
     entity.Slug ??= entity.Title?.ToLowerInvariant().Replace(' ', '-');
 });
-```
 
-### Built-in global filter (normalized content Q search)
-```csharp
+// Built-in global filter (normalized content Q search):
 options.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
 ```
 
 ---
 
-## 17. Normalizing
+## 15. Normalizing
 
-### Attribute-based (recommended)
 ```csharp
 using Regira.Normalizing;
+using Regira.Normalizing.Abstractions;
+using Regira.Entities.EFcore.Normalizing.Abstractions;
 
+// Attribute-based (recommended):
 public class Product : IEntityWithSerial
 {
     public string Title { get; set; } = null!;
     public string? Description { get; set; }
 
-    // Multiple sources — concatenated with space
+    // Multiple sources (concatenated):
     [Normalized(SourceProperties = [nameof(Title), nameof(Description)])]
     public string? NormalizedContent { get; set; }
 
-    // Single source
+    // Single source:
     [Normalized(SourceProperty = nameof(Title))]
     public string? NormalizedTitle { get; set; }
 }
-```
 
-### Custom normalizer
-```csharp
-using Regira.Normalizing.Abstractions;
-using Regira.Entities.EFcore.Normalizing.Abstractions;
-
+// Custom normalizer:
 public class ProductNormalizer : EntityNormalizerBase<Product>
 {
     private readonly INormalizer _normalizer;
 
-    public ProductNormalizer(INormalizer normalizer)
-    {
-        _normalizer = normalizer;
-    }
+    public ProductNormalizer(INormalizer normalizer) => _normalizer = normalizer;
 
     public override async Task HandleNormalize(Product item)
     {
@@ -822,16 +621,10 @@ public class ProductNormalizer : EntityNormalizerBase<Product>
         item.NormalizedContent = await _normalizer.Normalize(content);
     }
 }
+// Per-entity: e.AddNormalizer<ProductNormalizer>();
+// Global: options.AddNormalizer<IHasPhone, PhoneNormalizer>();
 
-// Per-entity registration:
-e.AddNormalizer<ProductNormalizer>();
-
-// Global registration (applies to all entities implementing interface):
-options.AddNormalizer<IHasPhone, PhoneNormalizer>();
-```
-
-### Enable normalizer interceptors (required in AddDbContext)
-```csharp
+// Enable normalizer interceptors (required in AddDbContext):
 builder.Services.AddDbContext<AppDbContext>((sp, options) =>
     options.UseSqlite(connectionString)
            .AddNormalizerInterceptors(sp));
@@ -839,27 +632,25 @@ builder.Services.AddDbContext<AppDbContext>((sp, options) =>
 
 ---
 
-## 18. Attachments
+## 16. Attachments
 
-### EntityAttachment model
 ```csharp
+using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Attachments.Models;
+using Regira.Entities.Web.Attachments.Abstractions;
+using Regira.IO.Storage.FileSystem;
+using Microsoft.AspNetCore.Mvc;
 
+// EntityAttachment model:
 public class ProductAttachment : EntityAttachment<int, int>
 {
     public override string ObjectType => nameof(Product);
 }
-```
 
-### Entity with IHasAttachments
-```csharp
-using Regira.Entities.Models.Abstractions;
-using Regira.Entities.Attachments.Models;
-
+// Entity with IHasAttachments:
 public class Product : IEntityWithSerial, IHasAttachments, IHasAttachments<ProductAttachment>
 {
     public int Id { get; set; }
-
     public bool? HasAttachment { get; set; }
     public ICollection<ProductAttachment>? Attachments { get; set; }
 
@@ -869,91 +660,42 @@ public class Product : IEntityWithSerial, IHasAttachments, IHasAttachments<Produ
         set => Attachments = value?.Cast<ProductAttachment>().ToArray();
     }
 }
-```
 
-### Attachment controller
-```csharp
-using Microsoft.AspNetCore.Mvc;
-using Regira.Entities.Web.Attachments.Abstractions;
-
+// Controller:
 [ApiController]
 [Route("api/products/{objectId}/attachments")]
-public class ProductAttachmentsController : EntityAttachmentControllerBase<ProductAttachment, int, int>
-{
-}
-```
+public class ProductAttachmentsController : EntityAttachmentControllerBase<ProductAttachment, int, int> { }
 
-### DbContext for attachments
-```csharp
-using Regira.Entities.Attachments.Models;
-
+// DbContext:
 public DbSet<Attachment> Attachments { get; set; } = null!;
 public DbSet<ProductAttachment> ProductAttachments { get; set; } = null!;
 
 // In OnModelCreating:
 modelBuilder.Entity<ProductAttachment>()
-    .HasOne(x => x.Attachment)
-    .WithMany()
-    .HasForeignKey(x => x.AttachmentId);
-
+    .HasOne(x => x.Attachment).WithMany().HasForeignKey(x => x.AttachmentId);
 modelBuilder.Entity<Product>(entity =>
 {
-    entity.HasMany(e => e.Attachments)
-          .WithOne()
-          .HasForeignKey(e => e.ObjectId)
-          .HasPrincipalKey(e => e.Id);
+    entity.HasMany(e => e.Attachments).WithOne().HasForeignKey(e => e.ObjectId).HasPrincipalKey(e => e.Id);
 });
-```
 
-### DI — file system storage
-```csharp
-using Regira.IO.Storage.FileSystem;
-
+// DI — File system:
 services.UseEntities<AppDbContext>(/* ... */)
     .WithAttachments(_ => new BinaryFileService(
-        new FileSystemOptions
-        {
-            RootFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads")
-        }
-    ));
-```
+        new FileSystemOptions { RootFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads") }));
 
-### DI — Azure Blob Storage
-```csharp
-using Regira.IO.Storage.Azure;
-
-services.UseEntities<AppDbContext>(/* ... */)
-    .WithAttachments(_ => new BinaryBlobService(
-        new AzureCommunicator(new AzureOptions
-        {
-            ConnectionString = configuration["Azure:StorageConnectionString"],
-            ContainerName = "attachments"
-        })
-    ));
-```
-
-### DI — SFTP storage
-```csharp
-using Regira.IO.Storage.SSH;
-
-services.UseEntities<AppDbContext>(/* ... */)
-    .WithAttachments(_ => new SftpService(new SftpCommunicator(new SftpConfig
-    {
-        Host = "sftp.example.com",
-        UserName = "user",
-        Password = "pass",
-        ContainerName = "/uploads"
-    })));
+// DI — Azure Blob (see entities.namespaces.md for full Azure/SFTP examples)
 ```
 
 ---
 
-## 19. Error Handling
+## 17. Error Handling & Query Extensions
 
-### EntityInputException (returns HTTP 400)
 ```csharp
 using Regira.Entities.Models;
+using Regira.Entities.EFcore.QueryBuilders;  // QueryExtensions
+using Regira.DAL.Paging;                     // PagingInfo, PageQuery
 
+// EntityInputException (returns HTTP 400):
 throw new EntityInputException<Product>("Validation failed")
 {
     Item = item,
@@ -963,16 +705,8 @@ throw new EntityInputException<Product>("Validation failed")
         [nameof(Product.Title)] = "Title is required"
     }
 };
-```
 
----
-
-## 20. Built-in Query Extensions
-
-```csharp
-using Regira.Entities.EFcore.QueryBuilders; // QueryExtensions
-using Regira.DAL.Paging;                    // PagingInfo, PageQuery
-
+// Built-in query extensions:
 query.FilterId(so.Id)
 query.FilterIds(so.Ids)
 query.FilterExclude(so.Exclude)
@@ -992,10 +726,9 @@ query.PageQuery(pageSize: 20, page: 1)
 
 ---
 
-## 21. Common Patterns
+## 18. Common Patterns
 
 ### Master-Detail (Order + OrderItems)
-
 ```csharp
 public class Order : IEntityWithSerial, IHasTimestamps
 {
@@ -1019,21 +752,12 @@ public class OrderItem : IEntityWithSerial, ISortable
 .For<Order, OrderSearchObject, OrderSortBy, OrderIncludes>(e =>
 {
     e.Related(x => x.OrderItems, (order, _) => order.OrderItems?.SetSortOrder());
-    e.Prepare(item =>
-    {
-        item.TotalAmount = item.OrderItems?.Sum(x => x.Quantity * x.UnitPrice) ?? 0;
-    });
+    e.Prepare(item => item.TotalAmount = item.OrderItems?.Sum(x => x.Quantity * x.UnitPrice) ?? 0);
 });
 ```
 
-### Many-to-Many (explicit join entity)
-
-Always use an explicit join entity. 
-- compatible with `e.Related()` prepper
-- easy mapping: keep DTOs structure in sync with entities
-
+### Many-to-Many (always use explicit join entity)
 ```csharp
-// Entities
 public class Student : IEntityWithSerial
 {
     public int Id { get; set; }
@@ -1055,12 +779,11 @@ public class StudentCourse : IEntityWithSerial
     public int CourseId { get; set; }
     public DateTime EnrolledDate { get; set; }
     public int? Grade { get; set; }
-
     public Student? Student { get; set; }
     public Course? Course { get; set; }
 }
 
-// DTOs
+// DTOs mirror entity structure:
 public class StudentInputDto
 {
     public int Id { get; set; }
@@ -1093,9 +816,7 @@ modelBuilder.Entity<StudentCourse>(entity =>
             query = query.Include(x => x.StudentCourses!).ThenInclude(sc => sc.Course);
         return query;
     });
-
     e.Related(x => x.StudentCourses);
-
     e.UseMapping<StudentDto, StudentInputDto>();
     e.AddMapping<StudentCourse, StudentCourseDto>();
     e.AddMapping<StudentCourseInputDto, StudentCourse>();
@@ -1104,15 +825,13 @@ modelBuilder.Entity<StudentCourse>(entity =>
 
 ### Soft Delete
 ```csharp
-// Entity — implement IArchivable
 public class Product : IEntityWithSerial, IArchivable
 {
     public int Id { get; set; }
     public bool IsArchived { get; set; }
 }
-
 // UseDefaults() registers ArchivablePrimer + FilterArchivablesQueryBuilder automatically
-// SearchObject.IsArchived:  null = active only (default), true = archived only, false = active only
+// SearchObject.IsArchived: null = active only (default), true = archived only
 ```
 
 ### Hierarchical / Self-referencing
@@ -1134,356 +853,3 @@ if (so?.RootOnly == true)
 ```
 
 ---
-
-## 22. Complete Example (Product + Category)
-
-### Entities/Categories/Category.cs
-```csharp
-using System.ComponentModel.DataAnnotations;
-using Regira.Entities.Models.Abstractions;
-
-public class Category : IEntityWithSerial, IHasTitle
-{
-    public int Id { get; set; }
-
-    [Required, MaxLength(100)]
-    public string Title { get; set; } = null!;
-
-    public ICollection<Product>? Products { get; set; }
-}
-```
-
-### Entities/Categories/CategorySearchObject.cs
-```csharp
-using Regira.Entities.Models;
-
-public class CategorySearchObject : SearchObject { }
-```
-
-### Entities/Categories/CategoryDto.cs
-```csharp
-public class CategoryDto
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = null!;
-    public int ProductCount { get; set; }
-}
-```
-
-### Entities/Categories/CategoryInputDto.cs
-```csharp
-using System.ComponentModel.DataAnnotations;
-
-public class CategoryInputDto
-{
-    public int Id { get; set; }
-
-    [Required, MaxLength(100)]
-    public string Title { get; set; } = null!;
-}
-```
-
-### Entities/Categories/CategoryServiceCollectionExtensions.cs
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
-
-public static class CategoryServiceCollectionExtensions
-{
-    public static IEntityServiceCollection<TContext> AddCategories<TContext>(
-        this IEntityServiceCollection<TContext> services)
-        where TContext : DbContext
-    {
-        services.For<Category, CategorySearchObject>(e =>
-        {
-            e.Filter((query, so) =>
-            {
-                if (!string.IsNullOrWhiteSpace(so?.Q))
-                    query = query.Where(x => EF.Functions.Like(x.Title, $"%{so.Q}%"));
-                return query;
-            });
-
-            e.UseMapping<CategoryDto, CategoryInputDto>()
-                .After((category, dto) =>
-                {
-                    dto.ProductCount = category.Products?.Count ?? 0;
-                });
-        });
-
-        return services;
-    }
-}
-```
-
-### Entities/Products/Product.cs
-```csharp
-using System.ComponentModel.DataAnnotations;
-using Regira.Entities.Models.Abstractions;
-using Regira.Normalizing;
-
-public class Product : IEntityWithSerial, IHasTimestamps, IHasTitle, IArchivable, IHasNormalizedContent
-{
-    public int Id { get; set; }
-
-    [Required, MaxLength(64)]
-    public string Title { get; set; } = null!;
-
-    [MaxLength(1024)]
-    public string? Description { get; set; }
-
-    public decimal Price { get; set; }
-
-    public int CategoryId { get; set; }
-
-    [Normalized(SourceProperties = [nameof(Title), nameof(Description)])]
-    public string? NormalizedContent { get; set; }
-
-    public DateTime Created { get; set; }
-    public DateTime? LastModified { get; set; }
-    public bool IsArchived { get; set; }
-
-    public Category? Category { get; set; }
-}
-```
-
-### Entities/Products/ProductSearchObject.cs
-```csharp
-using Regira.Entities.Models;
-
-public class ProductSearchObject : SearchObject
-{
-    public ICollection<int>? CategoryId { get; set; }
-    public decimal? MinPrice { get; set; }
-    public decimal? MaxPrice { get; set; }
-}
-```
-
-### Entities/Products/ProductSortBy.cs
-```csharp
-public enum ProductSortBy
-{
-    Default = 0,
-    Title, TitleDesc,
-    Price, PriceDesc,
-    Created, CreatedDesc
-}
-```
-
-### Entities/Products/ProductIncludes.cs
-```csharp
-[Flags]
-public enum ProductIncludes
-{
-    Default  = 0,
-    Category = 1 << 0,
-    All      = Category
-}
-```
-
-### Entities/Products/ProductDto.cs
-```csharp
-public class ProductDto
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = null!;
-    public string? Description { get; set; }
-    public decimal Price { get; set; }
-    public int CategoryId { get; set; }
-    public CategoryDto? Category { get; set; }
-    public DateTime Created { get; set; }
-    public DateTime? LastModified { get; set; }
-    public string? DisplayName { get; set; }
-}
-```
-
-### Entities/Products/ProductInputDto.cs
-```csharp
-using System.ComponentModel.DataAnnotations;
-
-public class ProductInputDto
-{
-    public int Id { get; set; }
-
-    [Required, MaxLength(64)]
-    public string Title { get; set; } = null!;
-
-    [MaxLength(1024)]
-    public string? Description { get; set; }
-
-    [Range(0, double.MaxValue)]
-    public decimal Price { get; set; }
-
-    public int CategoryId { get; set; }
-}
-```
-
-### Entities/Products/ProductQueryBuilder.cs
-```csharp
-using Regira.Entities.EFcore.QueryBuilders.Abstractions;
-
-public class ProductQueryBuilder : FilteredQueryBuilderBase<Product, int, ProductSearchObject>
-{
-    public override IQueryable<Product> Build(IQueryable<Product> query, ProductSearchObject? so)
-    {
-        if (so == null) return query;
-
-        if (so.CategoryId?.Any() == true)
-            query = query.Where(x => so.CategoryId.Contains(x.CategoryId));
-
-        if (so.MinPrice.HasValue)
-            query = query.Where(x => x.Price >= so.MinPrice.Value);
-
-        if (so.MaxPrice.HasValue)
-            query = query.Where(x => x.Price <= so.MaxPrice.Value);
-
-        return query;
-    }
-}
-```
-
-### Entities/Products/ProductServiceCollectionExtensions.cs
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
-
-public static class ProductServiceCollectionExtensions
-{
-    public static IEntityServiceCollection<TContext> AddProducts<TContext>(
-        this IEntityServiceCollection<TContext> services)
-        where TContext : DbContext
-    {
-        services.For<Product, ProductSearchObject, ProductSortBy, ProductIncludes>(e =>
-        {
-            e.AddQueryFilter<ProductQueryBuilder>();
-
-            e.SortBy((query, sortBy) =>
-            {
-                if (typeof(IOrderedQueryable).IsAssignableFrom(query.Expression.Type)
-                    && query is IOrderedQueryable<Product> sorted)
-                    return sortBy switch
-                    {
-                        ProductSortBy.Title     => sorted.ThenBy(x => x.Title),
-                        ProductSortBy.TitleDesc => sorted.ThenByDescending(x => x.Title),
-                        ProductSortBy.Price     => sorted.ThenBy(x => x.Price),
-                        ProductSortBy.PriceDesc => sorted.ThenByDescending(x => x.Price),
-                        _                       => sorted.ThenByDescending(x => x.Created)
-                    };
-
-                return sortBy switch
-                {
-                    ProductSortBy.Title      => query.OrderBy(x => x.Title),
-                    ProductSortBy.TitleDesc  => query.OrderByDescending(x => x.Title),
-                    ProductSortBy.Price      => query.OrderBy(x => x.Price),
-                    ProductSortBy.PriceDesc  => query.OrderByDescending(x => x.Price),
-                    ProductSortBy.Created    => query.OrderBy(x => x.Created),
-                    ProductSortBy.CreatedDesc => query.OrderByDescending(x => x.Created),
-                    _                        => query.OrderByDescending(x => x.Created)
-                };
-            });
-
-            e.Includes((query, includes) =>
-            {
-                if (includes?.HasFlag(ProductIncludes.Category) == true)
-                    query = query.Include(x => x.Category);
-                return query;
-            });
-
-            e.UseMapping<ProductDto, ProductInputDto>()
-                .After((product, dto) =>
-                {
-                    dto.DisplayName = $"{product.Title} - €{product.Price:F2}";
-                });
-        });
-
-        return services;
-    }
-}
-```
-
-### Controllers/CategoriesController.cs
-```csharp
-using Microsoft.AspNetCore.Mvc;
-using Regira.Entities.Web.Controllers.Abstractions;
-
-[ApiController]
-[Route("api/[controller]")]
-public class CategoriesController
-    : EntityControllerBase<Category, CategorySearchObject, CategoryDto, CategoryInputDto>
-{
-}
-```
-
-### Controllers/ProductsController.cs
-```csharp
-using Microsoft.AspNetCore.Mvc;
-using Regira.Entities.Web.Controllers.Abstractions;
-
-[ApiController]
-[Route("api/[controller]")]
-public class ProductsController : EntityControllerBase<
-    Product,
-    ProductSearchObject,
-    ProductSortBy,
-    ProductIncludes,
-    ProductDto,
-    ProductInputDto>
-{
-}
-```
-
-### Data/AppDbContext.cs
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.DAL.EFcore.Extensions;
-
-public class AppDbContext : DbContext
-{
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
-    public DbSet<Category> Categories { get; set; } = null!;
-    public DbSet<Product> Products { get; set; } = null!;
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.SetDecimalPrecisionConvention(18, 2);
-
-        modelBuilder.Entity<Product>(entity =>
-        {
-            entity.HasOne(e => e.Category)
-                  .WithMany(c => c.Products)
-                  .HasForeignKey(e => e.CategoryId);
-        });
-    }
-}
-```
-
-### Extensions/ServiceCollectionExtensions.cs
-```csharp
-using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
-using Regira.Entities.Mapping.Mapster;
-
-public static class ServiceCollectionExtensions
-{
-    public static IServiceCollection AddEntityServices(this IServiceCollection services)
-    {
-        services
-            .UseEntities<AppDbContext>(options =>
-            {
-                options.UseDefaults();
-                options.UseMapsterMapping();
-            })
-            .AddCategories()
-            .AddProducts();
-
-        return services;
-    }
-}
-```
-
-### Migration commands
-```bash
-dotnet ef migrations add Add_Product
-dotnet ef database update
-```

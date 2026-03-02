@@ -93,6 +93,9 @@ Input → Mapping* → AfterInput* → Preppers → SaveChanges → Primers (Int
 ```
 *Only executed in API controllers
 
+**⚠️ Important**: `SaveChanges()` must be called explicitly to persist changes, similar to standard EF Core behavior.
+Base controllers call `SaveChanges()` automatically, but when using `IEntityService` directly, you must call it yourself.
+
 ---
 
 ## Decision-Making Guidelines
@@ -539,6 +542,14 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 - Use extension methods per entity for clean, composable DI registration
 - Use inline config for simple logic; separate classes for complex logic or when DI is needed
 
+### Service Layer & SaveChanges Pattern
+- **Always call `SaveChanges()`** after write operations when using `IEntityService` directly - this is standard EF Core behavior
+- `Add()`, `Modify()`, `Remove()`, and `Save()` only track changes - they do NOT persist to the database
+- Base controllers call `SaveChanges()` automatically after write endpoints (POST, PUT, DELETE)
+- Custom code (services, background jobs, console apps) must explicitly call `await service.SaveChanges()` or `await dbContext.SaveChangesAsync()`
+- Preppers run before `SaveChanges()` - they prepare entities for persistence but don't commit them
+- Primers run during `SaveChanges()` via EF Core interceptors
+
 ### Controller Design
 - Don't expose entity classes directly in API responses — prefer DTOs
 - Add custom controller actions only when base methods are insufficient
@@ -556,8 +567,6 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 - Use `AfterMapper` for computed/calculated properties (e.g. URLs, display names) in DTO
 
 ### Database
-- Always use migrations for schema changes
-- Add indexes on foreign keys and frequently filtered columns
 - Use `AddAutoTruncateInterceptors()` to prevent string truncation exceptions
 
 ---
@@ -627,7 +636,7 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 | Mapping errors | Mapster/AutoMapper not configured or property name mismatch | Ensure `options.UseMapsterMapping()` is called; check DTO property names |
 | Normalizer not running | `AddNormalizerInterceptors(sp)` missing or wrong overload | Use `(sp, options) =>` factory overload in `AddDbContext` |
 | Primers not running | `AddPrimerInterceptors(sp)` missing | Same as above |
-| Save not persisting | `SaveChanges()` not called | The base controller calls it; custom code must call it explicitly |
+| Save not persisting | `SaveChanges()` not called | ⚠️ **EF Core Pattern**: Write operations only track changes. Must call `SaveChanges()` to persist. Base controllers do this automatically; custom code (services, jobs, direct `IEntityService` usage) must call `await service.SaveChanges()` explicitly. |
 | Soft delete not working | `IArchivable` not implemented or `ArchivablePrimer` not registered | Check entity implements `IArchivable`; use `UseDefaults()` |
 | `AddPrimerInterceptors` has no overload taking 0 args | Missing `IServiceProvider` | Use `AddDbContext<T>((sp, options) => ...)` and pass `sp` |
 | `EntityWrappingServiceBase` — infinite loop | Inner service is the wrapper itself | Ensure `UseEntityService<T>()` registers the wrapper; `AddTransient` registers the interface |
