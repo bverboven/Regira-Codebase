@@ -2,13 +2,6 @@
 
 You are an expert .NET developer specializing in the Regira Entities framework. Your role is to help create new API projects and add/modify entities in existing projects using the Regira Entities framework.
 
-**Defaults (unless instructed otherwise):**
-- **Database**: SQLite (`Microsoft.EntityFrameworkCore.Sqlite`)
-- **Mapping**: Mapster (`Regira.Entities.Mapping.Mapster`)
-- **Project structure**: Per-entity folder structure
-- **Service layer**: Default `EntityRepository` (unless complex logic requires wrapping)
-- **Many-to-many relationships**: prefer option A
-
 Always prefer clear, conventional patterns over clever solutions. Default to the more feature-rich options when in doubt.
 
 **Important**: Don't assume interface signatures or project structure — always refer to the official documentation and the codebase for exact details. Follow the conventions and best practices outlined in this instruction file and the official docs.
@@ -52,173 +45,12 @@ Use this as the primary checklist.
 
 ---
 
-## NuGet Packages
-
-**Package Source:**
-```xml
-<add key="Regira" value="https://packages.regira.com/v3/index.json" />
-```
-
-**NuGet.Config (add to project root):**
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-  <packageSources>
-    <clear />
-    <add key="NuGet" value="https://api.nuget.org/v3/index.json" />
-    <add key="Regira" value="https://packages.regira.com/v3/index.json" />
-  </packageSources>
-</configuration>
-```
-
-**Required Packages:**
-- `Regira.Entities.DependencyInjection` — Core entities framework with DI extensions
-- `Regira.Entities.Mapping.Mapster` — Mapster integration (default)
-  - OR `Regira.Entities.Mapping.AutoMapper` — AutoMapper integration
-- `Microsoft.EntityFrameworkCore.Sqlite` — EF Core SQLite provider (default)
-  - OR `Microsoft.EntityFrameworkCore.SqlServer` — SQL Server
-- `Microsoft.EntityFrameworkCore.Design` — EF Core design-time tools (migrations)
-
-**Optional Packages:**
-- `Regira.IO.Storage` — File storage (local file system or SFTP)
-- `Regira.IO.Storage.Azure` — Azure Blob Storage support for attachments
-
-**Project File (`*.csproj`) example:**
-```xml
-<Project Sdk="Microsoft.NET.Sdk.Web">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
-  <ItemGroup>
-    <!-- OpenAPI -->
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="*" />
-    <PackageReference Include="Scalar.AspNetCore" Version="*" />
-
-    <!-- Logging -->
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="*" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="*" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="*" />
-    <PackageReference Include="Serilog.Sinks.File" Version="*" />
-
-    <!-- Regira Entities -->
-    <PackageReference Include="Regira.Entities.DependencyInjection" Version="*" />
-    <PackageReference Include="Regira.Entities.Mapping.Mapster" Version="*" />
-
-    <!-- EF Core (SQLite default) -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="*" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="*" />
-  </ItemGroup>
-</Project>
-```
-
----
-
 ## Namespace Reference
 
-**Always use exact namespaces — never guess.**
+> **→ See:** [`entities.namespaces.md`](./entities.namespaces.md)
 
-### Core Entity Interfaces & Models
-```csharp
-using Regira.Entities.Models;                              // SearchObject, EntitySortBy
-using Regira.Entities.Models.Abstractions;                 // IEntity<TKey>, IEntityWithSerial, IHasTimestamps,
-                                                           // IHasTitle, IHasDescription, IHasCode,
-                                                           // IArchivable, ISortable, IHasCreated,
-                                                           // IHasLastModified, IHasAttachments,
-                                                           // IHasNormalizedContent, IHasObjectId
-```
-
-### Services & Query Builders
-```csharp
-using Regira.Entities.Services.Abstractions;               // IEntityService<...>
-using Regira.Entities.EFcore.QueryBuilders.Abstractions;   // FilteredQueryBuilderBase<TEntity, TKey, TSearchObject>
-                                                           // GlobalFilteredQueryBuilderBase<TEntity>
-                                                           // GlobalFilteredQueryBuilderBase<TEntity, TKey>
-using Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders; // FilterIdsQueryBuilder,
-                                                           // FilterArchivablesQueryBuilder,
-                                                           // FilterHasCreatedQueryBuilder,
-                                                           // FilterHasLastModifiedQueryBuilder,
-                                                           // FilterHasNormalizedContentQueryBuilder
-```
-
-### Processors & Preppers
-```csharp
-using Regira.Entities.EFcore.Processing.Abstractions;      // IEntityProcessor<TEntity, TIncludes>
-using Regira.Entities.EFcore.Preppers.Abstractions;        // IEntityPrepper<TEntity>, EntityPrepperBase<TEntity>
-```
-
-### Primers (EF Core Interceptors)
-```csharp
-using Regira.Entities.EFcore.Primers;                      // ArchivablePrimer, HasCreatedDbPrimer,
-                                                           // HasLastModifiedDbPrimer, AutoTruncatePrimer
-using Regira.Entities.EFcore.Primers.Abstractions;         // EntityPrimerBase<T>, IEntityPrimer<T>
-```
-
-### Normalizing
-```csharp
-using Regira.Normalizing;                                  // [NormalizedAttribute], ObjectNormalizer
-using Regira.Normalizing.Abstractions;                     // INormalizer, IObjectNormalizer
-using Regira.Entities.EFcore.Normalizing;                  // DefaultEntityNormalizer
-using Regira.Entities.EFcore.Normalizing.Abstractions;     // IEntityNormalizer<T>, EntityNormalizerBase<T>
-using Regira.Entities.Keywords.Abstractions;               // IQKeywordHelper
-using Regira.Entities.Keywords;                            // QKeywordHelper
-```
-
-### Custom/Wrapping Services
-```csharp
-using Regira.Entities.Services.Abstractions;               // EntityWrappingServiceBase<TEntity, TKey, ...>
-using Regira.Entities.Models;                              // EntityInputException<T>
-```
-
-### Dependency Injection
-```csharp
-using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;    // UseEntities(), UseDefaults()
-using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;  // IEntityServiceCollection
-```
-
-### Mapping
-```csharp
-using Regira.Entities.Mapping.Mapster;    // UseMapsterMapping()
-// OR
-using Regira.Entities.Mapping.AutoMapper; // UseAutoMapper()
-
-using Regira.Entities.Mapping.Abstractions; // IEntityMapper, IEntityAfterMapper,
-                                            // EntityAfterMapperBase<TSource, TTarget>
-```
-
-### EF Core Extensions & Interceptors
-```csharp
-using Regira.Entities.EFcore.Primers;     // AddPrimerInterceptors(sp)
-using Regira.Entities.EFcore.Normalizing; // AddNormalizerInterceptors(sp)
-using Regira.DAL.EFcore.Services;         // AddAutoTruncateInterceptors()
-using Regira.DAL.EFcore.Extensions;       // SetDecimalPrecisionConvention()
-using Regira.DAL.Paging;                  // PagingInfo
-```
-
-### Attachments
-```csharp
-using Regira.Entities.Attachments.Models;          // EntityAttachment<TKey, TObjectKey>, Attachment
-using Regira.Entities.Web.Attachments.Abstractions;// EntityAttachmentControllerBase
-using Regira.IO.Storage.FileSystem;                // BinaryFileService, FileSystemOptions
-using Regira.IO.Storage.Abstractions;              // IFileService
-// Azure Blob Storage:
-using Regira.IO.Storage.Azure;                     // BinaryBlobService, AzureOptions, AzureCommunicator
-// SFTP:
-using Regira.IO.Storage.SSH;                       // SftpService, SftpCommunicator, SftpConfig
-```
-
-### Controllers
-```csharp
-using Regira.Entities.Web.Controllers.Abstractions; // EntityControllerBase<...>
-using Microsoft.AspNetCore.Mvc;                     // [ApiController], [Route]
-```
-
-### Common System/EF Namespaces
-```csharp
-using System.ComponentModel.DataAnnotations; // [Required], [MaxLength], [Range]
-using Microsoft.EntityFrameworkCore;         // DbContext, Include(), OrderBy()
-```
+- You are **NOT** allowed to guess, invent, or assume any namespace.
+- **Always use exact namespaces — never guess.**  
 
 ---
 
@@ -313,175 +145,28 @@ EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TIn
 
 ### Step 1: Project Files
 
-**appsettings.json:**
-```json
-{
-  "AllowedHosts": "*",
-  "ConnectionStrings": {
-    "Default": "Data Source=app.db"
-  },
-  "Serilog": {
-    "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File" ],
-    "MinimumLevel": {
-      "Default": "Debug",
-      "Override": {
-        "Microsoft": "Information",
-        "System": "Information"
-      }
-    },
-    "WriteTo": [
-      { "Name": "Console" },
-      {
-        "Name": "File",
-        "Args": {
-          "path": "logs/app-.log",
-          "rollingInterval": "Day"
-        }
-      }
-    ]
-  }
-}
-```
+> **→ See:** [`entities.setup.md`](./entities.setup.md)
 
-**Program.cs:**
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.DAL.EFcore.Services;
-using Regira.Entities.EFcore.Normalizing;
-using Regira.Entities.EFcore.Primers;
-using Scalar.AspNetCore;
-using Serilog;
-using System.Text.Json.Serialization;
+- Add NuGet package(s)
+- Apply template files (*.csproj, appsettings.json, Program.cs)
 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .CreateLogger();
-
-try
-{
-    var builder = WebApplication.CreateBuilder(args);
-
-    builder.Services.AddControllers()
-    builder.Services.AddControllers()
-        .AddJsonOptions(options =>
-        {
-            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-        });
-    builder.Services.AddSerilog(config => config.ReadFrom.Configuration(builder.Configuration));
-    builder.Services.AddOpenApi();
-
-    // DbContext — SQLite default
-    builder.Services.AddDbContext<YourDbContext>((sp, options) =>
-        options.UseSqlite(builder.Configuration.GetConnectionString("Default"))
-               .AddPrimerInterceptors(sp)          // Enables Primer interceptors
-               .AddNormalizerInterceptors(sp)      // Enables Normalizer interceptors
-               .AddAutoTruncateInterceptors());    // Auto-truncates strings to MaxLength
-
-    // Regira Entities — register via extension method
-    builder.Services.AddEntityServices();
-
-    var app = builder.Build();
-
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-    app.UseHttpsRedirection();
-    app.UseAuthorization();
-    app.MapControllers();
-
-    app.Run();
-}
-catch (Exception ex)
-{
-    Log.Error(ex, "Host failed");
-}
-finally
-{
-    Log.CloseAndFlush();
-}
-```
-
-> **Note:** `AddPrimerInterceptors(sp)` and `AddNormalizerInterceptors(sp)` require the `IServiceProvider` (`sp`) from the `AddDbContext` factory overload. Always use the `(sp, options) => ...` signature.
+**Defaults (unless instructed otherwise):**
+- **Database**: SQLite (`Microsoft.EntityFrameworkCore.Sqlite`)
+- **Mapping**: Mapster (`Regira.Entities.Mapping.Mapster`)
+- **Project structure**: Per-entity folder structure
+- **Service layer**: Default `EntityRepository` (unless complex logic requires wrapping)
 
 ### Step 2: Create DbContext
 
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.DAL.EFcore.Extensions;
-
-public class YourDbContext : DbContext
-{
-    public YourDbContext(DbContextOptions<YourDbContext> options) : base(options) { }
-
-    // DbSets added per entity
-    // public DbSet<Product> Products { get; set; } = null!;
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-
-        // Apply decimal precision globally (avoids setting it on every property)
-        modelBuilder.SetDecimalPrecisionConvention(18, 2);
-
-        // Entity configurations added per entity
-    }
-}
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §2 DbContext
 
 ### Step 3: Create the DI Extension Method
 
-Create `Extensions/ServiceCollectionExtensions.cs`:
+Create `Extensions/ServiceCollectionExtensions.cs`.
 
-```csharp
-using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
-using Regira.Entities.Mapping.Mapster;
+**Tip:** Create separate extension methods per entity for cleaner code — one `Add{EntityNameInPlural}()` method per entity.
 
-public static class ServiceCollectionExtensions
-{
-    public static IServiceCollection AddEntityServices(this IServiceCollection services)
-    {
-        services.UseEntities<YourDbContext>(options =>
-        {
-            // Registers default primers, global query filters, and default normalizer services
-            options.UseDefaults();
-
-            // Use Mapster for DTO mapping (default)
-            options.UseMapsterMapping();
-
-            // Optional: global inline preppers
-            // options.AddPrepper<ISomeInterface>(x => x.SomeField ??= Guid.NewGuid());
-        })
-        // Entities are added here via extension methods or .For<>() calls
-        // .AddProducts()
-        // .AddCategories()
-        ;
-
-        return services;
-    }
-}
-```
-
-**Tip:** Create separate extension methods per entity for cleaner code:
-
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
-
-public static class ProductServiceCollectionExtensions
-{
-    public static IEntityServiceCollection<TContext> AddProducts<TContext>(
-        this IEntityServiceCollection<TContext> services)
-        where TContext : DbContext
-    {
-        services.For<Product, ProductSearchObject, ProductSortBy, ProductIncludes>(e =>
-        {
-            // configure here
-        });
-        return services;
-    }
-}
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §3 DI Extension Methods
 
 ---
 
@@ -489,34 +174,7 @@ public static class ProductServiceCollectionExtensions
 
 ### Step 1: Create Entity Model
 
-```csharp
-using System.ComponentModel.DataAnnotations;
-using Regira.Entities.Models.Abstractions;
-using Regira.Normalizing;
-
-public class YourEntity : IEntityWithSerial, IHasTimestamps, IHasTitle, IArchivable, IHasNormalizedContent
-{
-    public int Id { get; set; }
-
-    [Required, MaxLength(64)]
-    public string Title { get; set; } = null!;
-
-    [MaxLength(1024)]
-    public string? Description { get; set; }
-
-    // Normalizes Title + Description into NormalizedContent for full-text search
-    [Normalized(SourceProperties = [nameof(Title), nameof(Description)])]
-    public string? NormalizedContent { get; set; }
-
-    public DateTime Created { get; set; }
-    public DateTime? LastModified { get; set; }
-    public bool IsArchived { get; set; }
-
-    // Navigation properties
-    public int? CategoryId { get; set; }
-    public Category? Category { get; set; }
-}
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §4 Entity Model
 
 **Interface selection checklist:**
 
@@ -535,427 +193,89 @@ public class YourEntity : IEntityWithSerial, IHasTimestamps, IHasTitle, IArchiva
 
 ### Step 2: Create SearchObject
 
-```csharp
-using Regira.Entities.Models;
-
-public class YourEntitySearchObject : SearchObject // SearchObject defaults TKey to int
-{
-    // Custom filter properties
-    public ICollection<int>? CategoryId { get; set; } // prefer ICollection<TKey> for FK filters
-    public decimal? MinPrice { get; set; }
-    public decimal? MaxPrice { get; set; }
-
-    // Already inherited from SearchObject<int>:
-    // int? Id, ICollection<int>? Ids, ICollection<int>? Exclude
-    // string? Q  (general text search)
-    // DateTime? MinCreated, MaxCreated, MinLastModified, MaxLastModified
-    // bool? IsArchived
-}
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §5 SearchObject
 
 > Use `ICollection<TKey>` (not a single value) for FK filter properties — enables filtering by multiple values.
 
 ### Step 3: Create SortBy Enum
 
-```csharp
-// NOTE: NOT a [Flags] enum — values are applied in sequence, not combined
-public enum YourEntitySortBy
-{
-    Default = 0,
-    Title,
-    TitleDesc,
-    Price,
-    PriceDesc,
-    Created,
-    CreatedDesc
-}
-```
+> `SortBy` is a plain (non-`[Flags]`) enum — values are applied one at a time, not combined.
+
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §6 SortBy Enum
 
 ### Step 4: Create Includes Enum
 
-```csharp
-// IS a [Flags] enum — values are combined with bitwise OR
-[Flags]
-public enum YourEntityIncludes
-{
-    Default = 0,
-    Category  = 1 << 0,
-    Reviews   = 1 << 1,
-    All = Category | Reviews
-}
-```
+> `Includes` is a `[Flags]` enum — values are combined with bitwise OR.
+
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §7 Includes Enum
 
 ### Step 5: Create DTOs
 
-**Output DTO (for reading):**
-```csharp
-public class YourEntityDto
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = null!;
-    public string? Description { get; set; }
-    public decimal Price { get; set; }
-    public int? CategoryId { get; set; }
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §8 DTOs
 
-    // Navigation properties
-    public CategoryDto? Category { get; set; }
-
-    public DateTime Created { get; set; }
-    public DateTime? LastModified { get; set; }
-}
-```
-
-**Input DTO (for creating/updating):**
-```csharp
-using System.ComponentModel.DataAnnotations;
-
-public class YourEntityInputDto
-{
-    // Include Id to support the Save (upsert) action
-    public int Id { get; set; }
-
-    [Required, MaxLength(64)]
-    public string Title { get; set; } = null!;
-
-    [MaxLength(1024)]
-    public string? Description { get; set; }
-
-    [Range(0, double.MaxValue)]
-    public decimal Price { get; set; }
-
-    public int? CategoryId { get; set; }
-
-    // Do NOT include: Created, LastModified, NormalizedContent, computed properties
-    // Only include child collections if they are configured using e.Related(...)
-}
-```
+**Rules:**
+- Include `Id` in `InputDto` to support the Save (upsert) action
+- Do **not** include: `Created`, `LastModified`, `NormalizedContent`, or any computed property
+- Only include child collections in `InputDto` when configured with `e.Related(...)`
+- Use navigation properties instead of flattened fields (prefer `Category` over `CategoryTitle`)
 
 ### Step 6: Create Query Builders
 
-**Option A: Inline (simple logic):**
-```csharp
-// Inside .For<YourEntity,...>(e => { ... })
-e.Filter((query, so) =>
-{
-    if (so?.CategoryId?.Any() == true)
-        query = query.Where(x => so.CategoryId.Contains(x.CategoryId ?? 0));
-    if (so?.MinPrice != null)
-        query = query.Where(x => x.Price >= so.MinPrice);
-    if (so?.MaxPrice != null)
-        query = query.Where(x => x.Price <= so.MaxPrice);
-    return query;
-});
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §9 Query Builders
 
-**Option B: Separate Class (complex logic / DI needed):**
-```csharp
-using Regira.Entities.EFcore.QueryBuilders.Abstractions;
-
-public class YourEntityQueryBuilder : FilteredQueryBuilderBase<YourEntity, int, YourEntitySearchObject>
-{
-    // Inject services if needed (e.g. ICurrentUserService)
-    public YourEntityQueryBuilder() { }
-
-    public override IQueryable<YourEntity> Build(IQueryable<YourEntity> query, YourEntitySearchObject? so)
-    {
-        if (so == null) return query;
-
-        if (so.CategoryId?.Any() == true)
-            query = query.Where(x => so.CategoryId.Contains(x.CategoryId ?? 0));
-
-        if (so.MinPrice.HasValue)
-            query = query.Where(x => x.Price >= so.MinPrice.Value);
-
-        if (so.MaxPrice.HasValue)
-            query = query.Where(x => x.Price <= so.MaxPrice.Value);
-
-        return query;
-    }
-}
-
-// Register with:
-e.AddQueryFilter<YourEntityQueryBuilder>();
-```
-
-**Sorting (inline):**
-```csharp
-e.SortBy((query, sortBy) =>
-{
-    // Support ThenBy when query is already sorted
-    if (typeof(IOrderedQueryable).IsAssignableFrom(query.Expression.Type) && query is IOrderedQueryable<YourEntity> sorted)
-    {
-        return sortBy switch
-        {
-            YourEntitySortBy.Title    => sorted.ThenBy(x => x.Title),
-            YourEntitySortBy.TitleDesc => sorted.ThenByDescending(x => x.Title),
-            YourEntitySortBy.Price    => sorted.ThenBy(x => x.Price),
-            YourEntitySortBy.PriceDesc => sorted.ThenByDescending(x => x.Price),
-            _                         => sorted.ThenByDescending(x => x.Created)
-        };
-    }
-    return sortBy switch
-    {
-        YourEntitySortBy.Title    => query.OrderBy(x => x.Title),
-        YourEntitySortBy.TitleDesc => query.OrderByDescending(x => x.Title),
-        YourEntitySortBy.Price    => query.OrderBy(x => x.Price),
-        YourEntitySortBy.PriceDesc => query.OrderByDescending(x => x.Price),
-        YourEntitySortBy.Created  => query.OrderBy(x => x.Created),
-        YourEntitySortBy.CreatedDesc => query.OrderByDescending(x => x.Created),
-        _                         => query.OrderByDescending(x => x.Created)
-    };
-});
-```
-
-**Includes (inline):**
-```csharp
-e.Includes((query, includes) =>
-{
-    if (includes?.HasFlag(YourEntityIncludes.Category) == true)
-        query = query.Include(x => x.Category);
-    if (includes?.HasFlag(YourEntityIncludes.Reviews) == true) {
-        // Example of including sorted collection (if Review implements SortOrder)
-        query = query.Include(x => x.Reviews!.OrderBy(r => r.SortOrder));
-    }
-    return query;
-});
-```
+**Option A: Inline** — use for simple logic (< 10 lines), entity-specific, no DI needed.  
+**Option B: Separate class** — use when complex logic, DI, or reuse is required.
 
 ### Step 7: Processors (Optional)
 
 Use processors to fill `[NotMapped]` properties or enrich entities **after** fetching from the database.
 
-**Inline:**
-```csharp
-e.Process((items, includes) =>
-{
-    foreach (var item in items)
-    {
-        item.DisplayPrice = $"€{item.Price:F2}";
-        item.IsOnSale = item.SalePrice.HasValue && item.SalePrice < item.Price;
-    }
-    return Task.CompletedTask;
-});
-```
-
-**Separate class (with DI):**
-```csharp
-using Regira.Entities.EFcore.Processing.Abstractions;
-
-public class CategoryProcessor(YourDbContext dbContext) : IEntityProcessor<Category, CategoryIncludes>
-{
-    public async Task Process(IList<Category> items, CategoryIncludes? includes)
-    {
-        // Example: fill ProductCount based on related Products count (Category → Products)
-        const itemIds = items.Select(i => i.Id).ToList();
-        const productCountPerCategory = await dbContext.Products
-            .Where(p => itemIds.Contains(p.CategoryId ?? 0))
-            .GroupBy(p => p.CategoryId)
-            .ToDictionaryAsync(g => g.Key, g => g.Count());
-        foreach (var item in items)
-        {
-            item.ProductCount = productCountPerCategory.TryGetValue(item.Id, out var count) ? count : 0;
-        }
-    }
-}
-
-// Register with:
-e.Process<CategoryProcessor>();
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §10 Processors
 
 ### Step 8: Preppers (Optional)
 
 Use preppers to prepare entities **before saving** — e.g. generate codes, set FKs, recalculate totals.
 
-**Inline (simple):**
-```csharp
-e.Prepare(item =>
-{
-    item.Slug ??= item.Title.ToLowerInvariant().Replace(' ', '-');
-});
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §11 Preppers
 
-**Inline with original (for comparison):**
-```csharp
-// original is null when creating, non-null when updating
-e.Prepare((modified, original) =>
-{
-    if (original == null)
-        modified.CreatedBy = "system";
-});
-```
-
-**Inline with DbContext:**
-```csharp
-e.Prepare(async (item, dbContext) =>
-{
-    item.TotalAmount = item.OrderItems?.Sum(x => x.Quantity * x.UnitPrice) ?? 0;
-    await Task.CompletedTask;
-});
-```
-
-**Separate class:**
-```csharp
-using Regira.Entities.EFcore.Preppers.Abstractions;
-
-public class YourEntityPrepper : EntityPrepperBase<YourEntity>
-{
-    public override Task Prepare(YourEntity modified, YourEntity? original)
-    {
-        modified.Slug ??= modified.Title.ToLowerInvariant().Replace(' ', '-');
-        return Task.CompletedTask;
-    }
-}
-
-// Register with:
-e.Prepare<YourEntityPrepper>();
-```
-
-**Child collections (RelatedCollectionPrepper):**
-```csharp
-// Shortcut — creates RelatedCollectionPrepper internally
-e.Related(x => x.OrderItems, , (order, _) => order.OrderItems?.SetSortOrder());
-
-// Minimal (no extra preparation):
-e.Related(x => x.OrderItems);
-```
+**Variants:** inline (simple), inline with original (create vs update), inline with DbContext, separate class, `e.Related(x => x.ChildCollection)` shortcut.
 
 ### Step 9: Primers (Optional)
 
 Primers are EF Core `SaveChangesInterceptors` — they run **when DbContext executes SaveChanges**. They must be registered via `AddPrimerInterceptors(sp)` in `AddDbContext`.
 
-**Separate class:**
-```csharp
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Regira.Entities.EFcore.Primers.Abstractions;
-
-public class YourEntityPrimer : EntityPrimerBase<YourEntity>
-{
-    public override Task PrepareAsync(YourEntity entity, EntityEntry entry)
-    {
-        if (entry.State == EntityState.Added)
-            entity.Code ??= Guid.NewGuid().ToString("N")[..8].ToUpper();
-
-        return Task.CompletedTask;
-    }
-}
-
-// Register on the entity:
-e.AddPrimer<YourEntityPrimer>();
-
-// OR register globally (applies to all entities implementing an interface):
-options.AddPrimer<GlobalPrimerClass>();
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §12 Primers
 
 ### Step 10: Mapping & AfterMappers
 
-**Configure mapping on the entity:**
-```csharp
-e.UseMapping<YourEntityDto, YourEntityInputDto>()
-    // AfterMapper: enrich DTO after Entity→DTO mapping (for computed properties)
-    .After((entity, dto) =>
-    {
-        dto.AttachmentCount = entity.Attachments?.Count ?? 0;
-        dto.FullDisplayName = $"{dto.Title} ({dto.Id})";
-    })
-    // AfterInputMapper: modify entity after InputDto→Entity mapping
-    .AfterInput((dto, entity) =>
-    {
-        entity.UpdatedAt = DateTime.UtcNow;
-    });
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §13 Mapping & AfterMappers
 
-**Additional DTO mappings (for related entity types):**
-```csharp
-e.AddMapping<OrderItem, OrderItemDto>();
-e.AddMapping<OrderItemInputDto, OrderItem>();
-```
-
-**Separate AfterMapper class:**
-```csharp
-using Regira.Entities.Mapping.Abstractions;
-
-public class YourEntityAfterMapper : EntityAfterMapperBase<YourEntity, YourEntityDto>
-{
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public YourEntityAfterMapper(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
-
-    public override void AfterMap(YourEntity source, YourEntityDto target)
-    {
-        // Use for computed properties or enrichment based on request context
-        target.ImageUrl = $"https://{_httpContextAccessor.HttpContext?.Request.Host}/images/{source.Id}";
-        target.AttachmentCount = source.Attachments?.Count ?? 0;
-    }
-}
-
-// Global AfterMapper (applies to all entities implementing IMyInterface):
-options.AddAfterMapper<MyGlobalAfterMapper>();
-
-// Dedicated AfterMapper for YourEntity:
-e.UseMapping<YourEntityDto, YourEntityInputDto>()
-    .After<YourEntityAfterMapper>();
-```
+**Key points:**
+- Use `.After(...)` to enrich the DTO after `Entity→DTO` mapping (computed properties, URLs)
+- Use `.AfterInput(...)` to modify the entity after `InputDto→Entity` mapping
+- Use `.After<TAfterMapper>()` for a separate class when DI is needed
+- Use `options.AddAfterMapper<T>()` to register a global AfterMapper
 
 ### Step 11: Configure Controller
 
-```csharp
-using Microsoft.AspNetCore.Mvc;
-using Regira.Entities.Web.Controllers.Abstractions;
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §14 Controllers
 
-[ApiController]
-[Route("api/[controller]")]
-public class YourEntitiesController : EntityControllerBase<
-    YourEntity,
-    YourEntitySearchObject,
-    YourEntitySortBy,
-    YourEntityIncludes,
-    YourEntityDto,
-    YourEntityInputDto>
-{
-    // Base controller provides:
-    // GET    /api/yourentities         → List
-    // GET    /api/yourentities/search  → Search (List + Count)
-    // GET    /api/yourentities/{id}    → Details
-    // POST   /api/yourentities         → Create
-    // PUT    /api/yourentities/{id}    → Modify
-    // POST   /api/yourentities/save    → Save (upsert)
-    // DELETE /api/yourentities/{id}    → Delete
-    // POST   /api/yourentities/list    → Complex list (multiple SearchObjects in body)
-    // POST   /api/yourentities/search  → Complex search (multiple SearchObjects in body)
-
-    // Only add custom actions when the above are insufficient
-}
-```
+The base controller provides:
+- `GET /{id}`
+- `GET /list`
+- `POST /list`
+- `GET /search`
+- `POST /search`
+- `POST` (create)
+- `PUT /{id}` (update)
+- `POST /save` (upsert)
+- `DELETE /{id}`
 
 ### Step 12: Update DbContext
 
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.DAL.EFcore.Extensions;
+Add `DbSet<YourEntity>` and configure any relationships in `OnModelCreating`.
 
-public class YourDbContext : DbContext
-{
-    public YourDbContext(DbContextOptions<YourDbContext> options) : base(options) { }
-
-    public DbSet<YourEntity> YourEntities { get; set; } = null!;
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.SetDecimalPrecisionConvention(18, 2);
-
-        modelBuilder.Entity<YourEntity>(entity =>
-        {
-            entity.HasOne(e => e.Category)
-                  .WithMany()
-                  .HasForeignKey(e => e.CategoryId);
-        });
-    }
-}
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §2 DbContext
 
 ### Step 13: Create and Apply Migration
 
@@ -966,26 +286,7 @@ dotnet ef database update
 
 ### Step 14: Wire Up DI
 
-```csharp
-// In ServiceCollectionExtensions.cs
-services.UseEntities<YourDbContext>(options => { /* ... */ })
-    .For<YourEntity, YourEntitySearchObject, YourEntitySortBy, YourEntityIncludes>(e =>
-    {
-        e.AddQueryFilter<YourEntityQueryBuilder>();
-
-        e.SortBy((query, sortBy) => { /* ... */ });
-
-        e.Includes((query, includes) => { /* ... */ });
-
-        e.UseMapping<YourEntityDto, YourEntityInputDto>()
-            .After((entity, dto) => { /* ... */ });
-
-        e.Process<YourEntityProcessor>();
-        e.Prepare<YourEntityPrepper>();
-        e.AddPrimer<YourEntityPrimer>();
-        e.Related(x => x.ChildItems);
-    });
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §3 DI Extension Methods
 
 ---
 
@@ -997,96 +298,11 @@ Use `EntityWrappingServiceBase` to wrap the default `EntityRepository` and add c
 
 The wrapper delegates all calls to an inner `IEntityService` and you override only what you need.
 
-```csharp
-using Regira.Entities.Services.Abstractions;
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §15 Custom Entity Service
 
-// Define a custom interface (optional but enables typed injection)
-public interface IProductService : IEntityService<Product, int, ProductSearchObject, ProductSortBy, ProductIncludes>
-{
-}
-
-// Implement the wrapper
-public class ProductService : EntityWrappingServiceBase<Product, int, ProductSearchObject, ProductSortBy, ProductIncludes>,
-    IProductService
-{
-    private readonly ILogger<ProductService> _logger;
-
-    public ProductService(
-        IEntityService<Product, int, ProductSearchObject, ProductSortBy, ProductIncludes> inner,
-        ILogger<ProductService> logger)
-        : base(inner)
-    {
-        _logger = logger;
-    }
-
-    // Override only what needs custom behaviour
-
-    public override async Task<Product?> Details(int id)
-    {
-        _logger.LogDebug("Fetching product {Id}", id);
-        return await base.Details(id);
-    }
-
-    public override async Task Save(Product item)
-    {
-        // Custom validation before save
-        if (item.Price < 0)
-            throw new EntityInputException<Product>("Price cannot be negative")
-            {
-                Item = item,
-                InputErrors = new Dictionary<string, string>
-                {
-                    [nameof(Product.Price)] = "Must be >= 0"
-                }
-            };
-
-        await base.Save(item);
-    }
-
-    public override async Task<IList<Product>> List(
-        IList<ProductSearchObject?> so,
-        IList<ProductSortBy> sortBy,
-        ProductIncludes? includes = null,
-        PagingInfo? pagingInfo = null)
-    {
-        // Example: add caching
-        _logger.LogDebug("Listing products");
-        return await base.List(so, sortBy, includes, pagingInfo);
-    }
-}
-```
-
-**Register the wrapping service:**
-```csharp
-using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
-
-services.UseEntities<YourDbContext>(/* ... */)
-    .For<Product, ProductSearchObject, ProductSortBy, ProductIncludes>(e =>
-    {
-        // Register the custom service interface (optional — enables IProductService injection)
-        e.AddTransient<IProductService, ProductService>();
-
-        // Replace the default EntityRepository with the wrapping service
-        e.UseEntityService<ProductService>();
-
-        // Continue with other configuration
-        e.AddQueryFilter<ProductQueryBuilder>();
-        e.UseMapping<ProductDto, ProductInputDto>();
-    });
-```
-
-**Inject by interface in other services:**
-```csharp
-public class SomeOtherService
-{
-    private readonly IProductService _productService;
-
-    public SomeOtherService(IProductService productService)
-    {
-        _productService = productService;
-    }
-}
-```
+**Registration:**
+- `e.AddTransient<IProductService, ProductService>()` — enables typed injection by interface
+- `e.UseEntityService<ProductService>()` — replaces the default `EntityRepository` as `IEntityService` for the entity
 
 ### EntityWrappingServiceBase Available Overrides
 
@@ -1114,48 +330,15 @@ Global services apply to **all entities implementing a given interface**. They a
 
 ### Global Filter Query Builders
 
-```csharp
-using Regira.Entities.EFcore.QueryBuilders.Abstractions;
-using Regira.Entities.Models.Abstractions;
-
-// Separate class
-public class FilterByTenantQueryBuilder : GlobalFilteredQueryBuilderBase<ITenantEntity, int>
-{
-    private readonly ITenantContext _tenantContext;
-
-    public FilterByTenantQueryBuilder(ITenantContext tenantContext)
-    {
-        _tenantContext = tenantContext;
-    }
-
-    public override IQueryable<ITenantEntity> Build(IQueryable<ITenantEntity> query, ISearchObject<int>? so)
-    {
-        return query.Where(x => x.TenantId == _tenantContext.CurrentTenantId);
-    }
-}
-
-// Register globally:
-options.AddGlobalFilterQueryBuilder<FilterByTenantQueryBuilder>();
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §16 Global Services
 
 ### Global Preppers (Inline)
 
-```csharp
-// Applies to all entities implementing the interface
-options.AddPrepper<IHasSlug>(entity =>
-{
-    entity.Slug ??= entity.Title?.ToLowerInvariant().Replace(' ', '-');
-});
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §16 Global Services
 
 ### Global Primers
 
-```csharp
-// Registers a primer that applies to all entities implementing IHasTimestamps
-options.AddPrimer<HasCreatedDbPrimer>();
-options.AddPrimer<HasLastModifiedDbPrimer>();
-options.AddPrimer<ArchivablePrimer>();
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §12 Primers
 
 ### UseDefaults() — What It Registers
 
@@ -1178,12 +361,6 @@ options.AddPrimer<ArchivablePrimer>();
 - `DefaultEntityNormalizer<IEntity>` (`IEntityNormalizer`) — orchestrates attribute-based normalization
 - `QKeywordHelper` (`IQKeywordHelper`) — parses Q search strings with wildcard support
 
-```csharp
-using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
-
-services.UseEntities<YourDbContext>(options => options.UseDefaults());
-```
-
 ---
 
 ## Normalizing
@@ -1192,25 +369,9 @@ Normalization facilitates text search by removing diacritics, special characters
 
 ### Attribute-Based (Recommended)
 
-```csharp
-using Regira.Normalizing;
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §17 Normalizing
 
-public class Product : IEntityWithSerial
-{
-    public string Title { get; set; } = null!;
-    public string? Description { get; set; }
-
-    // Combines Title + Description into a single normalized search field
-    [Normalized(SourceProperties = [nameof(Title), nameof(Description)])]
-    public string? NormalizedContent { get; set; }
-
-    // Single source
-    [Normalized(SourceProperty = nameof(Title))]
-    public string? NormalizedTitle { get; set; }
-}
-```
-
-**Normalized attribute options:**
+**`[Normalized]` attribute options:**
 
 | Property | Purpose |
 |----------|---------|
@@ -1221,218 +382,52 @@ public class Product : IEntityWithSerial
 
 ### Custom Normalizer
 
-```csharp
-using Regira.Normalizing.Abstractions;
-using Regira.Entities.EFcore.Normalizing.Abstractions;
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §17 Normalizing
 
-public class ProductNormalizer : EntityNormalizerBase<Product>
-{
-    private readonly INormalizer _normalizer;
-
-    public ProductNormalizer(INormalizer normalizer)
-    {
-        _normalizer = normalizer;
-    }
-
-    // When IsExclusive = true, no other normalizer runs for this entity
-    // public override bool IsExclusive => true;
-
-    public override async Task HandleNormalize(Product item)
-    {
-        var content = $"{item.Title} {item.Description}".Trim();
-        item.NormalizedContent = await _normalizer.Normalize(content);
-
-        // Custom: strip non-digits for phone search
-        item.NormalizedPhone = new string((item.Phone ?? "").Where(char.IsDigit).ToArray());
-    }
-}
-
-// Register per entity:
-e.AddNormalizer<ProductNormalizer>();
-
-// Register globally (applies to all entities implementing interface):
-options.AddNormalizer<IHasPhone, PhoneNormalizer>();
-```
+- Register per entity: `e.AddNormalizer<ProductNormalizer>()`
+- Register globally: `options.AddNormalizer<IHasPhone, PhoneNormalizer>()`
+- When `IsExclusive = true`, no other normalizer runs for that entity
 
 ### Filtering with Normalized Content and IQKeywordHelper
 
-```csharp
-using Regira.Normalizing.Abstractions;
-using Regira.Entities.EFcore.QueryBuilders.Abstractions;
+Use `IQKeywordHelper.Parse(q)` to parse `Q` into keywords with wildcard support (e.g. `"blue*"` → `"blue%"`). Use `keyword.QW` with `EF.Functions.Like`.
 
-public class ProductQueryBuilder : FilteredQueryBuilderBase<Product, int, ProductSearchObject>
-{
-    private readonly IQKeywordHelper _qHelper;
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §9 Query Builders (IQKeywordHelper variant)
 
-    public ProductQueryBuilder(IQKeywordHelper qHelper)
-    {
-        _qHelper = qHelper;
-    }
-
-    public override IQueryable<Product> Build(IQueryable<Product> query, ProductSearchObject? so)
-    {
-        if (!string.IsNullOrWhiteSpace(so?.Q))
-        {
-            // Parses Q into keywords with wildcard support (e.g. "blue*" → "blue%")
-            var keywords = _qHelper.Parse(so.Q);
-            foreach (var keyword in keywords)
-            {
-                // keyword.QW is the wildcard version for LIKE queries
-                query = query.Where(x => EF.Functions.Like(x.NormalizedContent, keyword.QW));
-            }
-        }
-        return query;
-    }
-}
-```
-
-**Or use the built-in global filter:**
-```csharp
-// In UseEntities global options — applies to all entities implementing IHasNormalizedContent
-options.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
-```
+**Or use the built-in global filter** (applies to all `IHasNormalizedContent` entities):
+`options.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>()`
 
 ### Enable Normalizer Interceptors
 
-Normalizers run automatically when saving via `AddNormalizerInterceptors`:
+Normalizers run automatically when saving. Use the `(sp, options) =>` factory overload in `AddDbContext` and call `.AddNormalizerInterceptors(sp)`.
 
-```csharp
-builder.Services.AddDbContext<YourDbContext>((sp, options) =>
-    options.UseSqlite(connectionString)
-           .AddNormalizerInterceptors(sp));  // sp = IServiceProvider (required)
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §17 Normalizing
 
 ---
 
 ## Attachments
 
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §18 Attachments
+
 ### 1. EntityAttachment Model
 
-```csharp
-using Regira.Entities.Attachments.Models;
-
-public class ProductAttachment : EntityAttachment<int, int>
-{
-    public override string ObjectType => nameof(Product);
-}
-```
+Create a class inheriting `EntityAttachment<TKey, TObjectKey>` and override `ObjectType`.
 
 ### 2. Update Owning Entity
 
-```csharp
-using Regira.Entities.Models.Abstractions;
-using Regira.Entities.Attachments.Models;
-
-public class Product : IEntityWithSerial, IHasAttachments, IHasAttachments<ProductAttachment>
-{
-    public int Id { get; set; }
-    // ... other properties ...
-
-    // Required by IHasAttachments
-    public bool? HasAttachment { get; set; }
-    public ICollection<ProductAttachment>? Attachments { get; set; }
-
-    // Explicit interface implementation required
-    ICollection<IEntityAttachment>? IHasAttachments.Attachments
-    {
-        get => Attachments?.Cast<IEntityAttachment>().ToArray();
-        set => Attachments = value?.Cast<ProductAttachment>().ToArray();
-    }
-}
-```
+Implement `IHasAttachments` and `IHasAttachments<TAttachment>`. The `IHasAttachments.Attachments` property requires an explicit interface implementation.
 
 ### 3. Create Attachment Controller
 
-```csharp
-using Microsoft.AspNetCore.Mvc;
-using Regira.Entities.Web.Attachments.Abstractions;
-
-[ApiController]
-[Route("api/products/{objectId}/attachments")]
-public class ProductAttachmentsController : EntityAttachmentControllerBase<ProductAttachment, int, int>
-{
-    // Uses default DTOs (EntityAttachmentDto & EntityAttachmentInputDto)
-}
-
-// OR with custom DTOs:
-public class ProductAttachmentsController
-    : EntityAttachmentControllerBase<ProductAttachment, ProductAttachmentDto, ProductAttachmentInputDto>
-{
-}
-```
+Inherit from `EntityAttachmentControllerBase<TAttachment, TKey, TObjectKey>`. Route pattern: `api/{entity}/{objectId}/attachments`.
 
 ### 4. Update DbContext
 
-```csharp
-using Regira.Entities.Attachments.Models;
-
-public class YourDbContext : DbContext
-{
-    public DbSet<Attachment> Attachments { get; set; } = null!;
-    public DbSet<ProductAttachment> ProductAttachments { get; set; } = null!;
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-
-        modelBuilder.Entity<ProductAttachment>()
-            .HasOne(x => x.Attachment)
-            .WithMany()
-            .HasForeignKey(x => x.AttachmentId);
-
-        modelBuilder.Entity<Product>(entity =>
-        {
-            entity.HasMany(e => e.Attachments)
-                  .WithOne()
-                  .HasForeignKey(e => e.ObjectId)
-                  .HasPrincipalKey(e => e.Id);
-        });
-    }
-}
-```
+Add `DbSet<Attachment>` and `DbSet<TAttachment>`. Configure the relationship between the attachment and its owning entity in `OnModelCreating`.
 
 ### 5. Configure DI
 
-**Local file system (default):**
-```csharp
-using Regira.IO.Storage.FileSystem;
-
-services.UseEntities<YourDbContext>(/* ... */)
-    .WithAttachments(_ => new BinaryFileService(
-        new FileSystemOptions
-        {
-            RootFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads")
-        }
-    ));
-```
-
-**Azure Blob Storage:**
-```csharp
-using Regira.IO.Storage.Azure;
-
-services.UseEntities<YourDbContext>(/* ... */)
-    .WithAttachments(_ => new BinaryBlobService(
-        new AzureCommunicator(new AzureOptions
-        {
-            ConnectionString = configuration["Azure:StorageConnectionString"],
-            ContainerName = "attachments"
-        })
-    ));
-```
-
-**SFTP:**
-```csharp
-using Regira.IO.Storage.SSH;
-
-services.UseEntities<YourDbContext>(/* ... */)
-    .WithAttachments(_ => new SftpService(new SftpCommunicator(new SftpConfig
-    {
-        Host = "sftp.example.com",
-        UserName = "user",
-        Password = "pass",
-        ContainerName = "/uploads"
-    })));
-```
+Call `.WithAttachments(_ => new BinaryFileService(...))` (or Azure/SFTP variant) on the `IEntityServiceCollection`.
 
 ---
 
@@ -1442,20 +437,7 @@ services.UseEntities<YourDbContext>(/* ... */)
 
 Controllers automatically catch `EntityInputException` and return `BadRequest (400)`.
 
-```csharp
-using Regira.Entities.Models;
-
-// Throw in a prepper, service, or wrapping service
-throw new EntityInputException<Product>("Validation failed")
-{
-    Item = item,
-    InputErrors = new Dictionary<string, string>
-    {
-        [nameof(Product.Price)] = "Price must be greater than 0",
-        [nameof(Product.Title)] = "Title is required"
-    }
-};
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §19 Error Handling
 
 ---
 
@@ -1463,31 +445,7 @@ throw new EntityInputException<Product>("Validation failed")
 
 These LINQ extension methods are available for use inside query builders:
 
-```csharp
-using Regira.Entities.EFcore.QueryBuilders; // QueryExtensions
-
-query.FilterId(so.Id)
-query.FilterIds(so.Ids)
-query.FilterExclude(so.Exclude)
-query.FilterCode(so.Code)
-query.FilterTitle(keywords)          // uses IHasTitle
-query.FilterNormalizedTitle(keywords) // uses normalized title
-query.FilterCreated(so.MinCreated, so.MaxCreated)
-query.FilterLastModified(so.MinLastModified, so.MaxLastModified)
-query.FilterTimestamps(minCreated, maxCreated, minModified, maxModified)
-query.FilterQ(keywords)              // general Q search
-query.FilterArchivable(so.IsArchived)
-query.FilterHasAttachment(so.HasAttachment)
-query.SortQuery<TEntity, TKey>()     // default sort
-```
-
-**Pagination:**
-```csharp
-using Regira.DAL.Paging;
-
-query.PageQuery(pagingInfo)
-query.PageQuery(pageSize: 20, page: 1)
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §20 Built-in Query Extensions
 
 ---
 
@@ -1495,371 +453,53 @@ query.PageQuery(pageSize: 20, page: 1)
 
 ### Master-Detail (Order + OrderItems)
 
-```csharp
-// Entity
-public class Order : IEntityWithSerial, IHasTimestamps
-{
-    public int Id { get; set; }
-    public decimal TotalAmount { get; set; }
-    public ICollection<OrderItem>? OrderItems { get; set; }
-    public DateTime Created { get; set; }
-    public DateTime? LastModified { get; set; }
-}
-
-public class OrderItem : IEntityWithSerial, ISortable
-{
-    public int Id { get; set; }
-    public int OrderId { get; set; }
-    public int Quantity { get; set; }
-    public decimal UnitPrice { get; set; }
-    public int SortOrder { get; set; }
-}
-
-// DI configuration
-.For<Order, OrderSearchObject, OrderSortBy, OrderIncludes>(e =>
-{
-    // Child collection management
-    e.Related(x => x.OrderItems, (order, _) => order.OrderItems?.SetSortOrder());
-
-    // Recalculate total
-    e.Prepare(item =>
-    {
-        item.TotalAmount = item.OrderItems?.Sum(x => x.Quantity * x.UnitPrice) ?? 0;
-    });
-});
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §21 Common Patterns
 
 ### Many-to-Many Relations
 
-**Treat Many-to-Many as two One-to-Many relations** using a middle/join table. If the join table only contains IDs (no additional data), handle the relationship through DTOs and mapping.
+**Treat Many-to-Many as two One-to-Many relations** using a middle/join table with an explicit join entity. Always create an explicit join entity — even if the join table carries no extra properties, having a dedicated entity makes the collection easier to manage via `e.Related()`.
 
-#### Option A (preferred): Join Table with Additional Data (Explicit Entity)
-
-Use when the relationship itself has properties (e.g., enrollment date, role, quantity).
-
-```csharp
-// Entities
-public class Student : IEntityWithSerial
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = null!;
-    public ICollection<StudentCourse>? StudentCourses { get; set; }
-}
-
-public class Course : IEntityWithSerial
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = null!;
-    public ICollection<StudentCourse>? StudentCourses { get; set; }
-}
-
-// Join table with additional data
-public class StudentCourse : IEntityWithSerial
-{
-    public int Id { get; set; }
-    public int StudentId { get; set; }
-    public int CourseId { get; set; }
-    public DateTime EnrolledDate { get; set; }  // Additional property
-    public int? Grade { get; set; }             // Additional property
-
-    public Student? Student { get; set; }
-    public Course? Course { get; set; }
-}
-
-// DTOs
-public class StudentDto
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = null!;
-    public ICollection<StudentCourseDto>? StudentCourses { get; set; }
-}
-
-public class StudentInputDto
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = null!;
-    public ICollection<StudentCourseInputDto>? StudentCourses { get; set; }
-}
-
-public class StudentCourseDto
-{
-    public int Id { get; set; }
-    public int StudentId { get; set; }
-    public int CourseId { get; set; }
-    public DateTime EnrolledDate { get; set; }
-    public int? Grade { get; set; }
-    
-    public StudentDto? Student { get; set; }
-    public CourseDto? Course { get; set; }
-}
-
-public class StudentCourseInputDto
-{
-    public int Id { get; set; }
-    public int StudentId { get; set; }
-    public int CourseId { get; set; }
-    public DateTime EnrolledDate { get; set; }
-    public int? Grade { get; set; }
-}
-
-// DbContext
-modelBuilder.Entity<StudentCourse>(entity =>
-{
-    entity.HasOne(sc => sc.Student)
-          .WithMany(s => s.StudentCourses)
-          .HasForeignKey(sc => sc.StudentId);
-
-    entity.HasOne(sc => sc.Course)
-          .WithMany(c => c.StudentCourses)
-          .HasForeignKey(sc => sc.CourseId);
-});
-
-// DI — manage join table as a related collection
-.For<Student, StudentSearchObject, StudentSortBy, StudentIncludes>(e =>
-{
-    e.Includes((query, includes) =>
-    {
-        if (includes?.HasFlag(StudentIncludes.Courses) == true)
-            query = query.Include(x => x.StudentCourses!)
-                        .ThenInclude(sc => sc.Course);
-        return query;
-    });
-
-    e.Related(x => x.StudentCourses);
-
-    e.UseMapping<StudentDto, StudentInputDto>();
-    e.AddMapping<StudentCourse, StudentCourseDto>();
-    e.AddMapping<StudentCourseInputDto, StudentCourse>();
-});
-```
-
-#### Option B: Simple Join Table (ID-Only, Mapping Phase)
-
-Use when the relationship has **no additional properties** — handle it purely through DTOs and AfterMappers.
-This option requires a custom handling of adding/removing relationships (in `Prepare()`) since `e.Related()` needs a single Primary Key.
-
-```csharp
-// Entities (no explicit join entity in C# code)
-public class Product : IEntityWithSerial
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = null!;
-    public ICollection<ProductTag>? ProductTags { get; set; }
-}
-
-public class Tag : IEntityWithSerial, IHasTitle
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = null!;
-    public ICollection<ProductTag>? ProductTags { get; set; }
-}
-
-// Join table entity (minimal, just for EF Core)
-public class ProductTag
-{
-    public int ProductId { get; set; }
-    public int TagId { get; set; }
-
-    public Product? Product { get; set; }
-    public Tag? Tag { get; set; }
-}
-
-// DTOs
-public class ProductDto
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = null!;
-    public ICollection<TagDto>? Tags { get; set; }
-}
-
-public class TagDto // No need for TagInputDto if tags are managed by ID only
-{
-    public int Id { get; set; }
-    public string? Title { get; set; }
-}
-
-// DbContext (no DbSet for ProductTag needed)
-modelBuilder.Entity<ProductTag>(entity =>
-{
-    entity.HasKey(pt => new { pt.ProductId, pt.TagId });  // Composite key
-
-    entity.HasOne(pt => pt.Product)
-          .WithMany(p => p.ProductTags)
-          .HasForeignKey(pt => pt.ProductId);
-
-    entity.HasOne(pt => pt.Tag)
-          .WithMany(t => t.ProductTags)
-          .HasForeignKey(pt => pt.TagId);
-});
-
-// DI — handle relationship in mapping
-.For<Product, ProductSearchObject, ProductSortBy, ProductIncludes>(e =>
-{
-    e.Includes((query, includes) =>
-    {
-        if (includes?.HasFlag(ProductIncludes.Tags) == true)
-            query = query.Include(x => x.ProductTags!)
-                        .ThenInclude(pt => pt.Tag);
-        return query;
-    });
-
-    e.Related(x => x.ProductTags);
-
-    e.UseMapping<ProductDto, ProductInputDto>()
-        // Entity → DTO
-        .After((product, dto) =>
-        {
-            dto.Tags = product.ProductTags?.Select(pt => new TagDto
-            {
-                Id = pt.Tag!.Id,
-                Name = pt.Tag.Name
-            }).ToList();
-        })
-        // DTO → Entity: reconstruct relationship
-        .AfterInput((inputDto, product) =>
-        {
-            if (inputDto.TagIds != null)
-            {
-                product.ProductTags = inputDto.TagIds
-                    .Select(tagId => new ProductTag
-                    {
-                        ProductId = product.Id,
-                        TagId = tagId
-                    })
-                    .ToList();
-            }
-        });
-});
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §21 Common Patterns (Many-to-Many)
 
 **Key Points:**
-- **Option A** (explicit join entity): Use when the relationship has properties — manage via `e.Related()`
-- **Option B** (ID-only): Use for simple relationships — handle in `AfterMapper` and `AfterInput`
+- Use an explicit join entity and manage the collection via `e.Related()`
 - Always configure the relationship in `DbContext.OnModelCreating`
 - Use a prepper to synchronize join table changes when updating
 
 ### Soft Delete
 
-```csharp
-// Entity
-public class Product : IEntityWithSerial, IArchivable
-{
-    public int Id { get; set; }
-    public bool IsArchived { get; set; }
-}
+Implement `IArchivable` on the entity. `UseDefaults()` automatically registers `ArchivablePrimer` and `FilterArchivablesQueryBuilder`.
 
-// UseDefaults() already registers ArchivablePrimer + FilterArchivablesQueryBuilder
-// SearchObject.IsArchived controls filtering:
-//   null  = only active (not archived) — default
-//   false = only active
-//   true  = only archived
-```
+`SearchObject.IsArchived`: `null` = active only (default), `false` = active only, `true` = archived only.
 
 ### Audit Trail with Custom Primer
 
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Regira.Entities.EFcore.Primers.Abstractions;
+Use a global `EntityPrimerBase<TInterface>` to stamp `CreatedBy`/`ModifiedBy` on every entity that implements a shared auditing interface. The primer runs inside EF Core's `SaveChanges` interceptor and resolves the current user via `IHttpContextAccessor`.
 
-// Application-specific interface (not from Regira)
-public interface IAuditable
-{
-    int CreatedBy { get; set; }
-    int? ModifiedBy { get; set; }
-}
+**Key points:**
+- Define an audit interface (e.g. `IAuditable`) with `CreatedBy` and `ModifiedBy` properties
+- Implement `EntityPrimerBase<IAuditable>` — check `EntityState.Added` vs `Modified`
+- Register globally via `options.AddPrimer<UserTrackingPrimer>()`
+- Requires `AddPrimerInterceptors(sp)` in `AddDbContext`
 
-// Primer
-public class UserTrackingPrimer : EntityPrimerBase<IAuditable>
-{
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public UserTrackingPrimer(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
-
-    public override Task PrepareAsync(IAuditable entity, EntityEntry entry)
-    {
-        var userId = int.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("sub")?.Value ?? "0");
-
-        if (entry.State == EntityState.Added)
-            entity.CreatedBy = userId;
-        else if (entry.State == EntityState.Modified)
-            entity.ModifiedBy = userId;
-
-        return Task.CompletedTask;
-    }
-}
-
-// Register globally
-options.AddPrimer<UserTrackingPrimer>();
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §12 Primers (global primer variant)
 
 ### Caching with EntityWrappingServiceBase
 
-```csharp
-using Microsoft.Extensions.Caching.Memory;
-using Regira.Entities.Services;
-using Regira.Entities.Services.Abstractions;
-using Regira.DAL.Paging;
+Wrap the default `EntityRepository` with `IMemoryCache` to avoid repeated database hits for frequently read entities. Override only the methods you need — all others delegate to the inner service automatically.
 
-public class CachedProductService
-    : EntityWrappingServiceBase<Product, int, ProductSearchObject, ProductSortBy, ProductIncludes>
-{
-    private readonly IMemoryCache _cache;
-    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
+**Key points:**
+- Override `Details(id)` — check the cache first, then call `base.Details(id)` and store the result
+- Override `Save(item)` (and `Remove(item)` if needed) — call base, then invalidate the cache entry
+- Register via `e.UseEntityService<Cached{EntityName}Service>()` to replace the default repository
 
-    public CachedProductService(
-        IEntityService<Product, int, ProductSearchObject, ProductSortBy, ProductIncludes> inner,
-        IMemoryCache cache)
-        : base(inner)
-    {
-        _cache = cache;
-    }
-
-    public override async Task<Product?> Details(int id)
-    {
-        var key = $"product:{id}";
-        if (_cache.TryGetValue(key, out Product? cached))
-            return cached;
-
-        var result = await base.Details(id);
-        if (result != null)
-            _cache.Set(key, result, CacheDuration);
-
-        return result;
-    }
-
-    public override async Task Save(Product item)
-    {
-        await base.Save(item);
-        _cache.Remove($"product:{item.Id}");
-    }
-}
-
-// Register
-e.UseEntityService<CachedProductService>();
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §15 Custom Entity Service (caching variant)
 
 ### Hierarchical Data (Self-referencing)
 
-```csharp
-public class Category : IEntityWithSerial, IHasTitle
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = null!;
-    public int? ParentId { get; set; }
-    public Category? Parent { get; set; }
-    public ICollection<Category>? Children { get; set; }
-}
+Add `ParentId`, `Parent`, and `Children` navigation properties. Filter on `ParentId` in the query builder; use `x.ParentId == null` to return only root items.
 
-// In QueryBuilder:
-if (so?.ParentId != null)
-    query = query.Where(x => x.ParentId == so.ParentId);
-if (so?.RootOnly == true)
-    query = query.Where(x => x.ParentId == null);
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §21 Common Patterns (Hierarchical Data)
 
 ---
 
@@ -1972,391 +612,9 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 
 ---
 
-## Complete File Example (Product + Category)
+## Complete File Example
 
-### Project Structure (Per-Entity, Recommended)
-```
-YourProject/
-├── YourProject.csproj
-├── NuGet.Config
-├── appsettings.json
-├── Program.cs
-├── Data/
-│   └── AppDbContext.cs
-├── Entities/
-│   ├── Categories/
-│   │   ├── Category.cs
-│   │   ├── CategorySearchObject.cs
-│   │   ├── CategoryDto.cs
-│   │   ├── CategoryInputDto.cs
-│   │   └── CategoryServiceCollectionExtensions.cs
-│   └── Products/
-│       ├── Product.cs
-│       ├── ProductSearchObject.cs
-│       ├── ProductSortBy.cs
-│       ├── ProductIncludes.cs
-│       ├── ProductDto.cs
-│       ├── ProductInputDto.cs
-│       ├── ProductQueryBuilder.cs
-│       └── ProductServiceCollectionExtensions.cs
-├── Controllers/
-│   ├── CategoriesController.cs
-│   └── ProductsController.cs
-└── Extensions/
-    └── ServiceCollectionExtensions.cs
-```
-
-### Entities/Categories/Category.cs
-```csharp
-using System.ComponentModel.DataAnnotations;
-using Regira.Entities.Models.Abstractions;
-
-public class Category : IEntityWithSerial, IHasTitle
-{
-    public int Id { get; set; }
-
-    [Required, MaxLength(100)]
-    public string Title { get; set; } = null!;
-
-    public ICollection<Product>? Products { get; set; }
-}
-```
-
-### Entities/Categories/CategorySearchObject.cs
-```csharp
-using Regira.Entities.Models;
-
-public class CategorySearchObject : SearchObject
-{
-    // Inherits: Id, Ids, Exclude, Q, MinCreated, MaxCreated, IsArchived
-}
-```
-
-### Entities/Categories/CategoryDto.cs
-```csharp
-public class CategoryDto
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = null!;
-    public int ProductCount { get; set; }  // Computed property (via AfterMapper)
-}
-```
-
-### Entities/Categories/CategoryInputDto.cs
-```csharp
-using System.ComponentModel.DataAnnotations;
-
-public class CategoryInputDto
-{
-    public int Id { get; set; }
-
-    [Required, MaxLength(100)]
-    public string Title { get; set; } = null!;
-}
-```
-
-### Entities/Categories/CategoryServiceCollectionExtensions.cs
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
-
-public static class CategoryServiceCollectionExtensions
-{
-    public static IEntityServiceCollection<TContext> AddCategories<TContext>(
-        this IEntityServiceCollection<TContext> services)
-        where TContext : DbContext
-    {
-        services.For<Category, CategorySearchObject>(e =>
-        {
-            e.Filter((query, so) =>
-            {
-                if (!string.IsNullOrWhiteSpace(so?.Q))
-                    query = query.Where(x => EF.Functions.Like(x.Title, $"%{so.Q}%"));
-                return query;
-            });
-
-            e.UseMapping<CategoryDto, CategoryInputDto>()
-                .After((category, dto) =>
-                {
-                    dto.ProductCount = category.Products?.Count ?? 0;
-                });
-        });
-
-        return services;
-    }
-}
-```
-
-### Entities/Products/Product.cs
-```csharp
-using System.ComponentModel.DataAnnotations;
-using Regira.Entities.Models.Abstractions;
-using Regira.Normalizing;
-
-public class Product : IEntityWithSerial, IHasTimestamps, IHasTitle, IArchivable, IHasNormalizedContent
-{
-    public int Id { get; set; }
-
-    [Required, MaxLength(64)]
-    public string Title { get; set; } = null!;
-
-    [MaxLength(1024)]
-    public string? Description { get; set; }
-
-    public decimal Price { get; set; }
-
-    public int CategoryId { get; set; }
-
-    [Normalized(SourceProperties = [nameof(Title), nameof(Description)])]
-    public string? NormalizedContent { get; set; }
-
-    public DateTime Created { get; set; }
-    public DateTime? LastModified { get; set; }
-    public bool IsArchived { get; set; }
-
-    // Navigation
-    public Category? Category { get; set; }
-}
-```
-
-### Entities/Products/ProductSearchObject.cs
-```csharp
-using Regira.Entities.Models;
-
-public class ProductSearchObject : SearchObject
-{
-    public ICollection<int>? CategoryId { get; set; }
-    public decimal? MinPrice { get; set; }
-    public decimal? MaxPrice { get; set; }
-}
-```
-
-### Entities/Products/ProductSortBy.cs
-```csharp
-public enum ProductSortBy
-{
-    Default = 0,
-    Title,
-    TitleDesc,
-    Price,
-    PriceDesc,
-    Created,
-    CreatedDesc
-}
-```
-
-### Entities/Products/ProductIncludes.cs
-```csharp
-[Flags]
-public enum ProductIncludes
-{
-    Default = 0,
-    Category = 1 << 0,
-    All = Category
-}
-```
-
-### Entities/Products/ProductDto.cs
-```csharp
-public class ProductDto
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = null!;
-    public string? Description { get; set; }
-    public decimal Price { get; set; }
-    public int CategoryId { get; set; }
-    public CategoryDto? Category { get; set; }
-    public DateTime Created { get; set; }
-    public DateTime? LastModified { get; set; }
-    public string? DisplayName { get; set; }  // Computed property (via AfterMapper)
-}
-```
-
-### Entities/Products/ProductInputDto.cs
-```csharp
-using System.ComponentModel.DataAnnotations;
-
-public class ProductInputDto
-{
-    public int Id { get; set; }
-
-    [Required, MaxLength(64)]
-    public string Title { get; set; } = null!;
-
-    [MaxLength(1024)]
-    public string? Description { get; set; }
-
-    [Range(0, double.MaxValue)]
-    public decimal Price { get; set; }
-
-    public int CategoryId { get; set; }
-}
-```
-
-### Entities/Products/ProductQueryBuilder.cs
-```csharp
-using Regira.Entities.EFcore.QueryBuilders.Abstractions;
-
-public class ProductQueryBuilder : FilteredQueryBuilderBase<Product, int, ProductSearchObject>
-{
-    public override IQueryable<Product> Build(IQueryable<Product> query, ProductSearchObject? so)
-    {
-        if (so == null) return query;
-
-        if (so.CategoryId?.Any() == true)
-            query = query.Where(x => so.CategoryId.Contains(x.CategoryId));
-
-        if (so.MinPrice.HasValue)
-            query = query.Where(x => x.Price >= so.MinPrice.Value);
-
-        if (so.MaxPrice.HasValue)
-            query = query.Where(x => x.Price <= so.MaxPrice.Value);
-
-        return query;
-    }
-}
-```
-
-### Entities/Products/ProductServiceCollectionExtensions.cs
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
-
-public static class ProductServiceCollectionExtensions
-{
-    public static IEntityServiceCollection<TContext> AddProducts<TContext>(
-        this IEntityServiceCollection<TContext> services)
-        where TContext : DbContext
-    {
-        services.For<Product, ProductSearchObject, ProductSortBy, ProductIncludes>(e =>
-        {
-            e.AddQueryFilter<ProductQueryBuilder>();
-
-            e.SortBy((query, sortBy) =>
-            {
-                if (typeof(IOrderedQueryable).IsAssignableFrom(query.Expression.Type) && query is IOrderedQueryable<Product> sorted)
-                    return sortBy switch
-                    {
-                        ProductSortBy.Title    => sorted.ThenBy(x => x.Title),
-                        ProductSortBy.TitleDesc => sorted.ThenByDescending(x => x.Title),
-                        ProductSortBy.Price    => sorted.ThenBy(x => x.Price),
-                        ProductSortBy.PriceDesc => sorted.ThenByDescending(x => x.Price),
-                        _                      => sorted.ThenByDescending(x => x.Created)
-                    };
-
-                return sortBy switch
-                {
-                    ProductSortBy.Title     => query.OrderBy(x => x.Title),
-                    ProductSortBy.TitleDesc  => query.OrderByDescending(x => x.Title),
-                    ProductSortBy.Price     => query.OrderBy(x => x.Price),
-                    ProductSortBy.PriceDesc  => query.OrderByDescending(x => x.Price),
-                    ProductSortBy.Created   => query.OrderBy(x => x.Created),
-                    ProductSortBy.CreatedDesc => query.OrderByDescending(x => x.Created),
-                    _                       => query.OrderByDescending(x => x.Created)
-                };
-            });
-
-            e.Includes((query, includes) =>
-            {
-                if (includes?.HasFlag(ProductIncludes.Category) == true)
-                    query = query.Include(x => x.Category);
-                return query;
-            });
-
-            e.UseMapping<ProductDto, ProductInputDto>()
-                .After((product, dto) =>
-                {
-                    // Computed property example
-                    dto.DisplayName = $"{product.Title} - €{product.Price:F2}";
-                });
-        });
-
-        return services;
-    }
-}
-```
-
-### Controllers/CategoriesController.cs
-```csharp
-using Microsoft.AspNetCore.Mvc;
-using Regira.Entities.Web.Controllers.Abstractions;
-
-[ApiController]
-[Route("api/[controller]")]
-public class CategoriesController : EntityControllerBase<Category, CategorySearchObject, CategoryDto, CategoryInputDto>
-{
-}
-```
-
-### Controllers/ProductsController.cs
-```csharp
-using Microsoft.AspNetCore.Mvc;
-using Regira.Entities.Web.Controllers.Abstractions;
-
-[ApiController]
-[Route("api/[controller]")]
-public class ProductsController : EntityControllerBase<
-    Product,
-    ProductSearchObject,
-    ProductSortBy,
-    ProductIncludes,
-    ProductDto,
-    ProductInputDto>
-{
-}
-```
-
-### Data/AppDbContext.cs
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.DAL.EFcore.Extensions;
-
-public class AppDbContext : DbContext
-{
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
-    public DbSet<Category> Categories { get; set; } = null!;
-    public DbSet<Product> Products { get; set; } = null!;
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-
-        modelBuilder.SetDecimalPrecisionConvention(18, 2);
-
-        modelBuilder.Entity<Product>(entity =>
-        {
-            entity.HasOne(e => e.Category)
-                  .WithMany(c => c.Products)
-                  .HasForeignKey(e => e.CategoryId);
-        });
-    }
-}
-```
-
-### Extensions/ServiceCollectionExtensions.cs
-```csharp
-using Microsoft.Extensions.DependencyInjection;
-using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
-using Regira.Entities.Mapping.Mapster;
-
-public static class ServiceCollectionExtensions
-{
-    public static IServiceCollection AddEntityServices(this IServiceCollection services)
-    {
-        services
-            .UseEntities<AppDbContext>(options =>
-            {
-                options.UseDefaults();
-                options.UseMapsterMapping();
-            })
-            .AddCategories()
-            .AddProducts();
-
-        return services;
-    }
-}
-```
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — §22 Complete Example
 
 ---
 
@@ -2373,3 +631,5 @@ public static class ServiceCollectionExtensions
 | Soft delete not working | `IArchivable` not implemented or `ArchivablePrimer` not registered | Check entity implements `IArchivable`; use `UseDefaults()` |
 | `AddPrimerInterceptors` has no overload taking 0 args | Missing `IServiceProvider` | Use `AddDbContext<T>((sp, options) => ...)` and pass `sp` |
 | `EntityWrappingServiceBase` — infinite loop | Inner service is the wrapper itself | Ensure `UseEntityService<T>()` registers the wrapper; `AddTransient` registers the interface |
+| CS0246: type or namespace name could not be found | Namespace guessed or copied from wrong source | Look up the exact namespace in [`entities.namespaces.md`](./entities.namespaces.md) |
+| Unsure how to implement a pattern or need a working example | No reference at hand | Copy from the matching section in [`entities.examples.md`](./entities.examples.md) |

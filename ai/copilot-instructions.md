@@ -57,7 +57,7 @@ Apply the following conventions when no module instruction file applies, or as a
 
 ### Project Conventions
 
-- **Target frameworks**: Use the latest .NET version for new projects unless the user specifies otherwise.
+- **Target frameworks**: Use the latest .NET framework for new projects unless the user specifies otherwise.
 - **Language version**: use the latest C# features (primary constructors, collection expressions, pattern matching, etc.)
 - **File-scoped namespaces**: `namespace My.Something;` (not block form)
 - **NuGet feed**: Regira packages are published at `https://packages.regira.com/v3/index.json` — add this source to `NuGet.Config` alongside the default nuget.org feed

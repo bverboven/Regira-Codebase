@@ -1,7 +1,10 @@
 <Solution>
   <Folder Name="/ai/">
     <File Path="ai/copilot-instructions.md" />
+    <File Path="ai/entities.examples.md" />
     <File Path="ai/entities.instructions.md" />
+    <File Path="ai/entities.namespaces.md" />
+    <File Path="ai/entities.setup.md" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />
