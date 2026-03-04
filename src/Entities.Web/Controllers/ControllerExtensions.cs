@@ -146,7 +146,7 @@ public static class ControllerExtensions
         {
             var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
             var item = mapper.Map<TEntity>(model!);
-            if (!default(TKey).Equals(id))
+            if (!id?.Equals(default(TKey)) ?? false)
             {
                 item.Id = id;
             }

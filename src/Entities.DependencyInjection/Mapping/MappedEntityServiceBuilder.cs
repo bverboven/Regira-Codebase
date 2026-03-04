@@ -40,12 +40,12 @@ public class MappedEntityServiceBuilder<TContext, TEntity, TKey, TDto, TInputDto
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
 {
-    public MappedEntityServiceBuilder<TContext, TEntity, TKey> After(Action<TEntity, TDto> afterMapAction)
+    public MappedEntityServiceBuilder<TContext, TEntity, TKey, TDto, TInputDto> After(Action<TEntity, TDto> afterMapAction)
     {
         After<TEntity, TDto>(afterMapAction);
         return this;
     }
-    public MappedEntityServiceBuilder<TContext, TEntity, TKey> AfterInput(Action<TInputDto, TEntity> afterMapAction)
+    public MappedEntityServiceBuilder<TContext, TEntity, TKey, TDto, TInputDto> AfterInput(Action<TInputDto, TEntity> afterMapAction)
     {
         After(afterMapAction);
         return this;

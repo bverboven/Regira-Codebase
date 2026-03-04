@@ -41,7 +41,7 @@ public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, 
     // Details
     public virtual async Task<TEntity?> Details(TKey id)
     {
-        if (id?.Equals(default(TKey)) == true)
+        if (id == null || id.Equals(default(TKey)))
         {
             return null;
         }
