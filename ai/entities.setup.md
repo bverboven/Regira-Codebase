@@ -85,10 +85,6 @@ Basic JSON configuration is included for System.Text.Json, but you can replace w
     <PackageReference Include="Serilog.Settings.Configuration" Version="*" />
     <PackageReference Include="Serilog.Sinks.Console" Version="*" />
     <PackageReference Include="Serilog.Sinks.File" Version="*" />
-    <PackageReference Include="Regira.Entities.DependencyInjection" Version="*" />
-    <PackageReference Include="Regira.Entities.Mapping.Mapster" Version="*" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="*" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="*" />
   </ItemGroup>
 </Project>
 ```

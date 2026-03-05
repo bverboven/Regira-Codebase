@@ -64,6 +64,26 @@ Webshop.API/
 
 ## Setup
 
+```xml
+<!-- Webshop.API.csproj -->
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="*" />
+    <PackageReference Include="Scalar.AspNetCore" Version="*" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="*" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="*" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="*" />
+    <PackageReference Include="Serilog.Sinks.File" Version="*" />
+  </ItemGroup>
+</Project>
+```
+
 ```csharp
 // Program.cs
 builder.Services.AddDbContext<WebshopDbContext>((sp, options) =>
@@ -199,7 +219,15 @@ public class CategorySearchObject : SearchObject
 [Flags] public enum CategoryIncludes { Default=0, Parents=1<<0, Children=1<<1, All=Parents|Children }
 
 // Entities/Categories/CategoryDto.cs
-public class CategoryCoreDto { public int Id; public string Title=null!; public string? Description; public DateTime Created; public DateTime? LastModified; }
+public class CategoryCoreDto
+{
+    public int Id { get; set; }
+    public string Title { get; set; } = null!;
+    public string? Description { get; set; }
+    public DateTime Created { get; set; }
+    public DateTime? LastModified { get; set; }
+    public int? ArticleCount { get; set; }
+}
 public class CategoryDto : CategoryCoreDto
 {
     public ICollection<ParentCategoryDto>? ParentEntities { get; set; }
@@ -208,7 +236,11 @@ public class CategoryDto : CategoryCoreDto
 }
 
 // Entities/Categories/RelatedCategoryDto.cs
-public class RelatedCategoryDto { public int Id,ChildId,ParentId; }
+public class RelatedCategoryDto {
+    public int Id { get; set; }
+    public int ChildId { get; set; }
+    public int ParentId { get; set; }
+}
 public class ParentCategoryDto : RelatedCategoryDto { public CategoryCoreDto Parent { get; set; } = null!; }
 public class ChildCategoryDto  : RelatedCategoryDto { public CategoryCoreDto Child { get; set; } = null!; }
 
@@ -251,7 +283,7 @@ public static IEntityServiceCollection<WebshopDbContext> AddCategories(this IEnt
                 query = so.IsRoot.Value ? query.Where(x => !x.ParentEntities!.Any()) : query.Where(x => x.ParentEntities!.Any());
             return query;
         });
-        e.SortBy((query, _) => query.OrderByDescending(x => x.Title));
+        e.SortBy((query, sortBy) => query.OrderByDescending(x => x.Title));
         e.Includes((query, includes) =>
         {
             if (includes?.HasFlag(CategoryIncludes.Parents) == true)
@@ -375,6 +407,9 @@ public static IEntityServiceCollection<WebshopDbContext> AddProducts(this IEntit
 ```
 
 ## Customer entity
+
+> **Note:** This entity uses `Guid` as the primary key to demonstrate the non-int key workflow. 
+In real projects, choose the key type based on your requirements — `int` (auto-increment) is the default and most common choice.
 
 ```csharp
 // Entities/Customers/Customer.cs — uses IEntity<Guid> (non-int key)
@@ -527,7 +562,7 @@ public static IEntityServiceCollection<WebshopDbContext> AddOrders(this IEntityS
     services.For<Order, OrderSearchObject, EntitySortBy, OrderIncludes>(e =>
     {
         e.AddQueryFilter<OrderQueryBuilder>();
-        e.SortBy((query, _) => query.OrderByDescending(x => x.Created));
+        e.SortBy((query, sortBy) => query.OrderByDescending(x => x.Created));
         e.Includes((query, includes) => query
             .Include(x => x.Customer!)
             .Include(x => x.OrderLines!.OrderBy(l => l.SortOrder))
@@ -711,7 +746,7 @@ modelBuilder.Entity<Product>(entity =>
 
 // DI:
 services.UseEntities<AppDbContext>(/* ... */)
-    .WithAttachments(_ => new BinaryFileService(
+    .WithAttachments(sp => new BinaryFileService(
         new FileSystemOptions { RootFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads") }));
 ```
 

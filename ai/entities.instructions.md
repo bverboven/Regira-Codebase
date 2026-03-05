@@ -4,7 +4,9 @@ You are an expert .NET developer specializing in the Regira Entities framework. 
 
 Always prefer clear, conventional patterns over clever solutions. Default to the more feature-rich options when in doubt.
 
-**Important**: Don't assume interface signatures or project structure — always refer to the official documentation and the codebase for exact details. Follow the conventions and best practices outlined in this instruction file and the official docs.
+🚨 CRITICAL RULE - READ BEFORE EVERY METHOD USE:
+If the exact signature is not in the documentation, STOP.
+DO NOT invent. DO NOT combine patterns. ASK the user.
 
 ---
 
@@ -51,6 +53,16 @@ Use this as the primary checklist.
 
 - You are **NOT** allowed to guess, invent, or assume any namespace.
 - **Always use exact namespaces — never guess.**  
+
+---
+
+## Signatures Reference
+
+> **→ See:** [`entities.signatures.md`](./entities.signatures.md)
+
+- Use this file to look up the **exact signatures** of all interfaces, classes, and extension methods in the framework.
+- **Do not guess method names, parameter types, or return types** — always verify against this reference.
+- Covers: entity interfaces, service interfaces, controller base classes, service builders, mapping types, response types, and more.
 
 ---
 
@@ -145,6 +157,8 @@ EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TIn
 ---
 
 ## Project Creation Workflow
+
+Don't copy the example code, use it as a reference and follow the steps to create your own implementation.
 
 ### Step 1: Project Files
 
@@ -263,16 +277,15 @@ Primers are EF Core `SaveChangesInterceptors` — they run **when DbContext exec
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Controllers
 
-The base controller provides:
-- `GET /{id}`
-- `GET /list`
-- `POST /list`
-- `GET /search`
-- `POST /search`
-- `POST` (create)
-- `PUT /{id}` (update)
-- `POST /save` (upsert)
-- `DELETE /{id}`
+**Rule:** The generic type arguments on the controller must **exactly match** the type arguments used in `.For<>()`. The controller adds `TDto` and `TInputDto` on top.
+
+| `.For<>()` registration | Required controller base |
+|---|---|
+| `.For<TEntity>()` | `EntityControllerBase<TEntity, TDto, TInputDto>` |
+| `.For<TEntity, TKey>()` | `EntityControllerBase<TEntity, TKey, SearchObject<TKey>, TDto, TInputDto>` |
+| `.For<TEntity, TKey, TSearchObject>()` | `EntityControllerBase<TEntity, TKey, TSearchObject, TDto, TInputDto>` |
+| `.For<TEntity, TSearchObject, TSortBy, TIncludes>()` | `EntityControllerBase<TEntity, TSearchObject, TSortBy, TIncludes, TDto, TInputDto>` |
+| `.For<TEntity, TKey, TSearchObject, TSortBy, TIncludes>()` | `EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TInputDto>` |
 
 ### Step 12: Update DbContext
 
@@ -280,14 +293,7 @@ Add `DbSet<YourEntity>` and configure any relationships in `OnModelCreating`.
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — DbContext
 
-### Step 13: Create and Apply Migration
-
-```bash
-dotnet ef migrations add Add_YourEntity
-dotnet ef database update
-```
-
-### Step 14: Wire Up DI
+### Step 13: Setup and add Entity services to DI
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Setup
 
@@ -641,4 +647,6 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 | `AddPrimerInterceptors` has no overload taking 0 args | Missing `IServiceProvider` | Use `AddDbContext<T>((sp, options) => ...)` and pass `sp` |
 | `EntityWrappingServiceBase` — infinite loop | Inner service is the wrapper itself | Ensure `UseEntityService<T>()` registers the wrapper; `AddTransient` registers the interface |
 | CS0246: type or namespace name could not be found | Namespace guessed or copied from wrong source | Look up the exact namespace in [`entities.namespaces.md`](./entities.namespaces.md) |
+| Wrong method name, parameters, or return type | Signature guessed or assumed | Look up the exact signature in [`entities.signatures.md`](./entities.signatures.md) |
 | Unsure how to implement a pattern or need a working example | No reference at hand | Copy from the matching section in [`entities.examples.md`](./entities.examples.md) |
+| `dotnet restore` fails with "Detected package downgrade" | Project targets a framework that is lower than what a dependency requires | Use latest `<TargetFramework>` in the `.csproj` |

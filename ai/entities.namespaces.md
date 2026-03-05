@@ -21,6 +21,7 @@
 |-----------|-------|
 | `Regira.Entities.Services.Abstractions` | `IEntityService<>`, `IEntityReadService<>`, `IEntityWriteService<>`, `IEntityRepository<>`, `IEntityManager<>`, `EntityWrappingServiceBase<>` |
 | `Regira.Entities.Services` | `EntityManager<>` |
+| `Regira.Entities.EFcore.Services` | `EntityRepository<>`, `EntityReadService<>`, `EntityWriteService<>` |
 
 ---
 
@@ -28,9 +29,11 @@
 
 | Namespace | Types |
 |-----------|-------|
-| `Regira.Entities.EFcore.QueryBuilders.Abstractions` | `FilteredQueryBuilderBase<>`, `GlobalFilteredQueryBuilderBase<>` |
+| `Regira.Entities.EFcore.QueryBuilders.Abstractions` | `IQueryBuilder<>`, `IFilteredQueryBuilder<>`, `IGlobalFilteredQueryBuilder<>`, `ISortedQueryBuilder<>`, `IIncludableQueryBuilder<>`, `FilteredQueryBuilderBase<>`, `GlobalFilteredQueryBuilderBase<>` |
+| `Regira.Entities.EFcore.QueryBuilders` | `QueryBuilder<>`, `EntityQueryFilter<>`, `SortedQueryBuilder<>`, `IncludableQueryBuilder<>` |
 | `Regira.Entities.EFcore.QueryBuilders.GlobalFilterBuilders` | `FilterIdsQueryBuilder`, `FilterArchivablesQueryBuilder`, `FilterHasCreatedQueryBuilder`, `FilterHasLastModifiedQueryBuilder`, `FilterHasNormalizedContentQueryBuilder` |
-| `Regira.Entities.EFcore.QueryBuilders` | `QueryExtensions` (LINQ helpers: `FilterId`, `FilterIds`, `FilterExclude`, `FilterCode`, `FilterTitle`, `FilterNormalizedTitle`, `FilterCreated`, `FilterLastModified`, `FilterTimestamps`, `FilterQ`, `FilterArchivable`, `FilterHasAttachment`, `SortQuery`, `PageQuery`) |
+| `Regira.Entities.EFcore.Extensions` | `QueryExtensions` *(EF Core LINQ helpers: `FilterId`, `FilterIds`, `FilterExclude`, `FilterCode`, `FilterTitle`, `FilterNormalizedTitle`, `FilterCreated`, `FilterLastModified`, `FilterTimestamps`, `FilterQ`, `FilterArchivable`, `FilterHasAttachment`, `SortQuery`)* |
+| `Regira.DAL.Paging` | `QueryExtensions` *(`PageQuery`)* |
 
 ---
 
@@ -39,6 +42,7 @@
 | Namespace | Types |
 |-----------|-------|
 | `Regira.Entities.EFcore.Processing.Abstractions` | `IEntityProcessor<>` |
+| `Regira.Entities.EFcore.Processing` | `EntityProcessor<>` |
 
 ---
 
@@ -47,6 +51,7 @@
 | Namespace | Types |
 |-----------|-------|
 | `Regira.Entities.EFcore.Preppers.Abstractions` | `IEntityPrepper<>`, `EntityPrepperBase<>` |
+| `Regira.Entities.EFcore.Preppers` | `EntityPrepper<>`, `RelatedCollectionPrepper<>` |
 
 ---
 
@@ -54,8 +59,9 @@
 
 | Namespace | Types |
 |-----------|-------|
-| `Regira.Entities.EFcore.Primers` | `ArchivablePrimer`, `HasCreatedDbPrimer`, `HasLastModifiedDbPrimer`, `AutoTruncatePrimer`, `AddPrimerInterceptors(IServiceProvider)` *(DbContextOptionsBuilder extension)* |
+| `Regira.Entities.EFcore.Primers` | `ArchivablePrimer`, `HasCreatedDbPrimer`, `HasLastModifiedDbPrimer`, `AutoTruncatePrimer`, `AutoNormalizingPrimer`, `AddPrimerInterceptors(IServiceProvider)` *(DbContextOptionsBuilder extension)* |
 | `Regira.Entities.EFcore.Primers.Abstractions` | `IEntityPrimer<>`, `EntityPrimerBase<>` |
+| `Regira.Entities.DependencyInjection.Primers` | `ServiceCollectionPrimerExtensions` *(`AddPrimer<>()`, `AddDefaultPrimers()`, `AddAutoTruncatePrimer()`, `AddDefaultEntityNormalizerPrimer()` — on `IServiceCollection` and `EntityServiceCollectionOptions`)* |
 
 ---
 
@@ -63,11 +69,13 @@
 
 | Namespace | Types |
 |-----------|-------|
-| `Regira.Normalizing` | `[NormalizedAttribute]`, `ObjectNormalizer` |
+| `Regira.Normalizing` | `[NormalizedAttribute]`, `ObjectNormalizer`, `DefaultNormalizer`, `NormalizingDefaults` |
 | `Regira.Normalizing.Abstractions` | `INormalizer`, `IObjectNormalizer` |
+| `Regira.Normalizing.Models` | `NormalizingOptions` |
 | `Regira.Entities.EFcore.Normalizing` | `DefaultEntityNormalizer`, `AddNormalizerInterceptors(IServiceProvider)` *(DbContextOptionsBuilder extension)* |
-| `Regira.Entities.EFcore.Normalizing.Abstractions` | `IEntityNormalizer<>`, `EntityNormalizerBase<>` |
-| `Regira.Entities.Keywords` | `QKeywordHelper` |
+| `Regira.Entities.EFcore.Normalizing.Abstractions` | `IEntityNormalizer<>`, `EntityNormalizerBase<>`, `EntityNormalizingOptions` |
+| `Regira.Entities.DependencyInjection.Normalizers` | `ServiceCollectionNormalizerExtensions` *(`AddNormalizer<>()`, `AddDefaultEntityNormalizer()`, `AddDefaultQKeywordHelper()` — on `IServiceCollection` and `EntityServiceCollectionOptions`)*, `EntityDefaultNormalizingOptions` |
+| `Regira.Entities.Keywords` | `QKeywordHelper`, `QKeywordHelperOptions`, `QKeyword`, `ParsedKeywordCollection` |
 | `Regira.Entities.Keywords.Abstractions` | `IQKeywordHelper` |
 
 ---
@@ -76,8 +84,13 @@
 
 | Namespace | Types |
 |-----------|-------|
-| `Regira.Entities.DependencyInjection.ServiceBuilders.Extensions` | `UseEntities<TContext>(IServiceCollection, ...)` *(IServiceCollection extension)*, `UseDefaults()`, `For<TEntity,...>(...)` |
+| `Regira.Entities.DependencyInjection.ServiceBuilders.Extensions` | `ServiceCollectionExtensions` *(`UseEntities<TContext>()` — on `IServiceCollection`)*, `EntityServiceCollectionExtensions` *(`UseDefaults()` — on `EntityServiceCollectionOptions`)* |
+| `Regira.Entities.DependencyInjection.ServiceBuilders` | `EntityServiceCollection<>`, `EntityServiceBuilder<>`, `EntityIntServiceBuilder<>`, `EntitySearchObjectServiceBuilder<>`, `ComplexEntityServiceBuilder<>`, `ComplexEntityIntServiceBuilder<>` |
+| `Regira.Entities.DependencyInjection.ServiceBuilders.Models` | `EntityServiceCollectionOptions` |
 | `Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions` | `IEntityServiceCollection<>` |
+| `Regira.Entities.DependencyInjection.QueryBuilders` | `ServiceCollectionQueryFilterExtensions` *(`AddQueryFilter<>()`, `AddGlobalFilterQueryBuilder<>()`, `RemoveGlobalQueryFilters()`, `AddDefaultGlobalQueryFilters()` — on `IServiceCollection` and `EntityServiceCollectionOptions`)* |
+| `Regira.Entities.DependencyInjection.Preppers` | `ServiceCollectionPrepperExtensions` *(`AddPrepper<>()` — on `IServiceCollection` and `EntityServiceCollectionOptions`)* |
+| `Regira.Entities.DependencyInjection.Mapping` | `ServiceCollectionMappingExtensions` *(`AddMapping<>()`, `AddAfterMapper<>()`, `AfterMap<>()` — on `EntityServiceCollectionOptions`)*, `MappedEntityServiceBuilder<>` |
 
 ---
 
@@ -87,7 +100,7 @@
 |-----------|-------|-------|
 | `Regira.Entities.Mapping.Mapster` | `UseMapsterMapping()` | **Default** mapping provider |
 | `Regira.Entities.Mapping.AutoMapper` | `UseAutoMapper()` | Alternative mapping provider |
-| `Regira.Entities.Mapping.Abstractions` | `IEntityMapper`, `IEntityAfterMapper`, `IEntityMapConfigurator`, `EntityAfterMapperBase<>`, `EntityAfterMapper<>` | |
+| `Regira.Entities.Mapping.Abstractions` | `IEntityMapper`, `IEntityAfterMapper<>`, `IEntityMapConfigurator`, `EntityAfterMapperBase<>`, `EntityAfterMapper<>` | |
 | `Regira.Entities.Mapping.Models` | `AttachmentDto<>`, `AttachmentInputDto<>`, `EntityAttachmentDto<>`, `EntityAttachmentInputDto<>` | DTO classes for mapping |
 | `Regira.Entities.Attachments.Mapping.Abstractions` | `IEntityAttachmentInput<>` | Attachment input contracts |
 
@@ -110,6 +123,8 @@
 | `Regira.Entities.Attachments.Abstractions` | `IAttachment<>`, `IEntityAttachment<>`, `IHasAttachments<>`, `IAttachmentService<>`, `IAttachmentFileService<>`, `IAttachmentSearchObject<>`, `IEntityAttachmentSearchObject<>`, `IAttachmentUriResolver<>`, `IFileIdentifierGenerator` |
 | `Regira.Entities.Attachments.Models` | `Attachment<>`, `EntityAttachment<>`, `AttachmentSearchObject<>`, `EntityAttachmentSearchObject<>` |
 | `Regira.Entities.Attachments` | `EntityAttachmentUriAfterMapper<>` |
+| `Regira.Entities.EFcore.Attachments` | `ITypedAttachmentService`, `TypedAttachmentService<>`, `AttachmentFilteredQueryBuilder<>`, `EntityAttachmentFilteredQueryBuilder<>`, `AttachmentProcessor<>`, `EntityAttachmentProcessor<>`, `AttachmentPrimer`, `EntityAttachmentPrimer`, `DefaultFileIdentifierGenerator<>` |
+| `Regira.Entities.DependencyInjection.Attachments` | `EntityAttachmentServiceBuilder<>`, `EntityServiceBuilderExtensions` *(`HasAttachments<>()` — on `EntityServiceBuilder<>`)*, `IEntityAttachmentServiceBuilder<>` |
 | `Regira.Entities.Web.Attachments.Abstractions` | `EntityAttachmentControllerBase<>` |
 | `Regira.IO.Storage.Abstractions` | `IFileService` |
 | `Regira.IO.Storage.FileSystem` | `BinaryFileService`, `FileSystemOptions` |
@@ -150,7 +165,8 @@
 
 ### Setting up a new project
 ```
-Regira.Entities.DependencyInjection.ServiceBuilders.Extensions   → UseEntities(), UseDefaults()
+Regira.Entities.DependencyInjection.ServiceBuilders.Extensions   → UseEntities<TContext>() (on IServiceCollection)
+Regira.Entities.DependencyInjection.ServiceBuilders.Extensions   → UseDefaults() (on EntityServiceCollectionOptions)
 Regira.Entities.Mapping.Mapster                                  → UseMapsterMapping()
 Regira.Entities.EFcore.Primers                                   → AddPrimerInterceptors(sp)
 Regira.Entities.EFcore.Normalizing                               → AddNormalizerInterceptors(sp)
@@ -174,12 +190,24 @@ Regira.Entities.Models   → SearchObject<>, EntityIncludes
 ```
 *(SortBy is a plain enum — no using required. `EntityIncludes` is the base `[Flags]` enum; extend it for project-specific Includes enums.)*
 
+### Full-text search (Q / keywords)
+```
+Regira.Entities.Keywords            → QKeyword, ParsedKeywordCollection, QKeywordHelper
+Regira.Entities.Keywords.Abstractions → IQKeywordHelper
+Regira.Entities.EFcore.Extensions   → QueryExtensions (FilterQ)
+```
+
 ### Building a query builder
 ```
-Regira.Entities.EFcore.QueryBuilders.Abstractions   → FilteredQueryBuilderBase<TEntity, TKey, TSearchObject>
-Regira.Entities.EFcore.QueryBuilders                → QueryExtensions (FilterId, FilterQ, etc.)
-Regira.Entities.Keywords.Abstractions               → IQKeywordHelper
-Microsoft.EntityFrameworkCore                       → EF.Functions.Like(...)
+Regira.Entities.EFcore.QueryBuilders.Abstractions   → IFilteredQueryBuilder<TEntity, TKey, TSearchObject>
+                                                       ISortedQueryBuilder<TEntity, TKey, TSortBy>
+                                                       IIncludableQueryBuilder<TEntity, TKey, TIncludes>
+                                                       FilteredQueryBuilderBase<TEntity, TKey, TSearchObject>
+                                                       GlobalFilteredQueryBuilderBase<TEntity, TKey>
+Regira.Entities.EFcore.Extensions                  → QueryExtensions (FilterId, FilterQ, etc.)
+Regira.DAL.Paging                                  → QueryExtensions (PageQuery)
+Regira.Entities.Keywords.Abstractions              → IQKeywordHelper
+Microsoft.EntityFrameworkCore                      → EF.Functions.Like(...)
 ```
 
 ### Creating a processor
@@ -203,6 +231,7 @@ Microsoft.EntityFrameworkCore                 → EntityState
 ```
 Regira.Entities.EFcore.Normalizing.Abstractions   → EntityNormalizerBase<T>, IEntityNormalizer<T>
 Regira.Normalizing.Abstractions                   → INormalizer
+Regira.Normalizing.Models                         → NormalizingOptions
 ```
 
 ### Creating a wrapping service
@@ -220,8 +249,10 @@ Microsoft.AspNetCore.Mvc                       → [ApiController], [Route]
 
 ### Registering an entity in DI
 ```
-Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions   → IEntityServiceCollection<TContext>
-Microsoft.EntityFrameworkCore                                       → DbContext (constraint)
+Regira.Entities.DependencyInjection.ServiceBuilders              → EntityServiceCollection<TContext> (returned by UseEntities())
+Regira.Entities.DependencyInjection.ServiceBuilders.Models       → EntityServiceCollectionOptions
+Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions → IEntityServiceCollection<TContext>
+Microsoft.EntityFrameworkCore                                    → DbContext (constraint)
 ```
 
 ### Setting up attachments
