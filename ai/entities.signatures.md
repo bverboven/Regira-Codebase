@@ -176,6 +176,19 @@ public interface IEntityReadService<TEntity, in TKey, in TSearchObject>
     Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null);
     Task<long> Count(TSearchObject? so);
 }
+```
+
+> ⚠️ **`Count(null)` ambiguity:** On a strongly-typed `IEntityService<TEntity, TKey, TSearchObject, ...>`,
+> calling `Count(null)` causes a **compiler error** (ambiguous call between `Count(TSearchObject? so)` and
+> `Count(object? so)`). Always pass a concrete instance:
+> ```csharp
+> // ❌ Compiler error — ambiguous
+> await service.Count(null);
+>
+> // ✅ Correct — pass an empty search object
+> await service.Count(new TSearchObject());
+> ```
+> The same applies to `List(null)` on the typed overload.
 
 // Full-featured (with sorting, includes)
 public interface IEntityReadService<TEntity, in TKey, TSearchObject, TSortBy, TIncludes> 
@@ -652,6 +665,13 @@ public static class EntityExtensions
 **Namespace:** `Regira.Entities.EFcore.Extensions`  
 **Class:** `QueryExtensions`
 
+> **Interface constraints:** Every `QueryExtensions` method enforces a compile-time `where TEntity : <Interface>` constraint.
+> Your entity **must implement the listed interface** for the method to be available.
+> If the entity does not implement the interface, use inline LINQ instead — e.g.:
+> - `query.FilterCode(so.Code)` → requires `IHasCode`; alternative: `query.Where(x => x.Code == so.Code)`
+> - `query.FilterTitle(keywords)` → requires `IHasTitle`; alternative: `query.Where(x => x.Title!.Contains(term))`
+> - `query.FilterQ(keywords)` → requires `IHasNormalizedContent`; alternative: `query.Where(x => EF.Functions.Like(x.NormalizedContent, kw))`
+
 ```csharp
 public static class QueryExtensions
 {
@@ -859,14 +879,173 @@ public static EntityServiceCollection<TContext> UseEntities<TContext>(
     where TContext : DbContext;
 ```
 
+---
+
+### EntityServiceCollectionOptions Extension Methods
+
+The `EntityServiceCollectionOptions` object is passed to the `UseEntities` configure lambda. All methods below are **extension methods** on `EntityServiceCollectionOptions` from the listed namespaces.
+
+#### Setup Helpers
+
 **Namespace:** `Regira.Entities.DependencyInjection.ServiceBuilders.Extensions`
 
 ```csharp
-// Registers default primers, normalizers, and global query filters
+// Convenience method: registers default primers, normalizer services,
+// FilterHasNormalizedContentQueryBuilder, and all default global query filters.
+// Equivalent to calling AddDefaultPrimers() + AddDefaultEntityNormalizer()
+//   + AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>()
+//   + AddDefaultGlobalQueryFilters()
 public static EntityServiceCollectionOptions UseDefaults(
     this EntityServiceCollectionOptions options,
     Action<EntityDefaultNormalizingOptions>? configure = null);
+
+// Registers only the default normalizer services (no primers, no query filters).
+// Use when you want fine-grained control instead of UseDefaults().
+public static EntityServiceCollectionOptions UseNormalizerDefaults(
+    this EntityServiceCollectionOptions options,
+    Action<EntityDefaultNormalizingOptions>? configure = null);
 ```
+
+#### Mapping
+
+**Namespace:** `Regira.Entities.Mapping.Mapster` (package: `Regira.Entities.Mapping.Mapster`)
+
+```csharp
+// Registers Mapster as the IEntityMapper. Default mapping choice.
+public static EntityServiceCollectionOptions UseMapsterMapping(
+    this EntityServiceCollectionOptions options,
+    Action<TypeAdapterConfig>? configure = null);
+```
+
+**Namespace:** `Regira.Entities.Mapping.AutoMapper` (package: `Regira.Entities.Mapping.AutoMapper`)
+
+```csharp
+// Registers AutoMapper as the IEntityMapper.
+public static EntityServiceCollectionOptions UseAutoMapper(
+    this EntityServiceCollectionOptions options,
+    Action<IServiceProvider, IMapperConfigurationExpression>? configure = null);
+```
+
+**Namespace:** `Regira.Entities.DependencyInjection.Mapping`
+
+```csharp
+// Register a global after-mapper class (runs after every Entity→DTO mapping
+// where CanMap() returns true).
+public static EntityServiceCollectionOptions AddAfterMapper<TAfterMapper>(
+    this EntityServiceCollectionOptions options)
+    where TAfterMapper : class, IEntityAfterMapper;
+
+// Register a global inline after-mapper for a specific source/target pair.
+public static EntityServiceCollectionOptions AfterMap<TSource, TTarget>(
+    this EntityServiceCollectionOptions options,
+    Action<TSource, TTarget> afterMapAction);
+
+public static EntityServiceCollectionOptions AfterMap<TSource, TTarget>(
+    this EntityServiceCollectionOptions options,
+    Func<IServiceProvider, Action<TSource, TTarget>> afterMapAction);
+```
+
+#### Preppers (global, run before SaveChanges for matching entities)
+
+**Namespace:** `Regira.Entities.DependencyInjection.Preppers`
+
+```csharp
+// Register a global prepper class — runs for every entity that passes CanPrepare().
+public static EntityServiceCollectionOptions AddPrepper<TImplementation>(
+    this EntityServiceCollectionOptions options)
+    where TImplementation : class, IEntityPrepper;
+
+// Register a global prepper class scoped to a specific entity interface/type.
+public static EntityServiceCollectionOptions AddPrepper<TImplementation, TKey>(
+    this EntityServiceCollectionOptions options)
+    where TImplementation : class, IEntityPrepper<TKey>;
+
+// Register an inline prepper for entities implementing a specific interface/type.
+// TEntity can be an interface (e.g. IHasAggregateKey) — runs for all entities that implement it.
+public static EntityServiceCollectionOptions AddPrepper<TEntity>(
+    this EntityServiceCollectionOptions options,
+    Action<TEntity> prepareFunc)
+    where TEntity : class;
+
+// Register an inline async prepper that receives the DbContext.
+public static EntityServiceCollectionOptions AddPrepper<TContext, TEntity, TKey>(
+    this EntityServiceCollectionOptions options,
+    Func<TEntity, TContext, Task> prepareFunc)
+    where TContext : DbContext
+    where TEntity : class, IEntity<TKey>;
+```
+
+#### Normalizers (global, run on save for matching entities)
+
+**Namespace:** `Regira.Entities.DependencyInjection.Normalizers`
+
+```csharp
+// Register a global entity normalizer class.
+public static EntityServiceCollectionOptions AddNormalizer<TNormalizer>(
+    this EntityServiceCollectionOptions options)
+    where TNormalizer : class, IEntityNormalizer;
+
+// Register a global entity normalizer scoped to a specific entity interface/type.
+public static EntityServiceCollectionOptions AddNormalizer<TEntity, TNormalizer>(
+    this EntityServiceCollectionOptions options)
+    where TNormalizer : class, IEntityNormalizer<TEntity>;
+
+// Register the default normalizer stack (DefaultNormalizer, ObjectNormalizer,
+// DefaultEntityNormalizer, QKeywordHelper). Called automatically by UseDefaults().
+public static EntityServiceCollectionOptions AddDefaultEntityNormalizer(
+    this EntityServiceCollectionOptions options,
+    Action<NormalizeOptions>? configure = null);
+```
+
+#### Primers (global, run inside EF Core SaveChanges interceptor)
+
+**Namespace:** `Regira.Entities.DependencyInjection.Primers`
+
+```csharp
+// Register a global primer class.
+public static EntityServiceCollectionOptions AddPrimer<TPrimer>(
+    this EntityServiceCollectionOptions options)
+    where TPrimer : class, IEntityPrimer;
+
+// Register a global primer scoped to a specific entity interface/type.
+public static EntityServiceCollectionOptions AddPrimer<TPrimer, TKey>(
+    this EntityServiceCollectionOptions options)
+    where TPrimer : class, IEntityPrimer<TKey>;
+
+// Register the default primer set (ArchivablePrimer, HasCreatedDbPrimer,
+// HasLastModifiedDbPrimer). Called automatically by UseDefaults().
+public static EntityServiceCollectionOptions AddDefaultPrimers(
+    this EntityServiceCollectionOptions options);
+```
+
+#### Global Filter Query Builders
+
+**Namespace:** `Regira.Entities.DependencyInjection.QueryBuilders`
+
+> **Note:** There is **no global filter query builder registration** built into `UseDefaults()` beyond
+> what is listed here. `UseDefaults()` registers `FilterHasNormalizedContentQueryBuilder` automatically.
+> Do **not** register it again manually unless you have intentionally skipped `UseDefaults()`.
+
+```csharp
+// Register a global filter query builder — applies to all entities where the builder
+// can handle the entity type (determined by IGlobalFilteredQueryBuilder.CanBuild()).
+public static EntityServiceCollectionOptions AddGlobalFilterQueryBuilder<TImplementation>(
+    this EntityServiceCollectionOptions options)
+    where TImplementation : class, IGlobalFilteredQueryBuilder;
+
+// Typed variant (also registers as IGlobalFilteredQueryBuilder<TKey>).
+public static EntityServiceCollectionOptions AddGlobalFilterQueryBuilder<TImplementation, TKey>(
+    this EntityServiceCollectionOptions options)
+    where TImplementation : class, IGlobalFilteredQueryBuilder<TKey>;
+
+// Register the default set of global filters (FilterIdsQueryBuilder, FilterArchivablesQueryBuilder,
+// FilterHasCreatedQueryBuilder, FilterHasLastModifiedQueryBuilder).
+// Called automatically by UseDefaults().
+public static EntityServiceCollectionOptions AddDefaultGlobalQueryFilters(
+    this EntityServiceCollectionOptions options);
+```
+
+---
 
 ### EntityServiceCollection\<TContext\>
 

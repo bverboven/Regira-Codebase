@@ -137,7 +137,7 @@
 
 | Namespace | Types |
 |-----------|-------|
-| `Regira.Entities.Extensions` | `EntityExtensions` |
+| `Regira.Entities.Extensions` | `EntityExtensions` *(`IsNew<TKey>()` — on `IEntity<TKey>`; `SetSortOrder()` — on `IEnumerable<ISortable>`)* |
 
 ---
 

@@ -404,7 +404,14 @@ Use `IQKeywordHelper.Parse(q)` to parse `Q` into keywords with wildcard support 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > IQKeywordHelper — Q full-text search
 
 **Or use the built-in global filter** (applies to all `IHasNormalizedContent` entities):
-`options.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>()`
+
+```csharp
+options.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
+```
+
+> ⚠️ `UseDefaults()` already registers `FilterHasNormalizedContentQueryBuilder` automatically.
+> Only call this manually when you are **not** using `UseDefaults()`.
+> Calling it after `UseDefaults()` registers the filter twice, which is harmless but redundant.
 
 ### Enable Normalizer Interceptors
 
@@ -555,6 +562,7 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 - Custom code (services, background jobs, console apps) must explicitly call `await service.SaveChanges()` or `await dbContext.SaveChangesAsync()`
 - Preppers run before `SaveChanges()` - they prepare entities for persistence but don't commit them
 - Primers run during `SaveChanges()` via EF Core interceptors
+- **`Count(null)` / `List(null)` ambiguity:** On a strongly-typed `IEntityService<TEntity, TKey, TSearchObject, ...>`, passing `null` to `Count()` or `List()` causes a **compiler error** because both the typed (`TSearchObject?`) and untyped (`object?`) overloads match. Always pass an empty search object: `await service.Count(new TSearchObject())`
 
 ### Controller Design
 - Don't expose entity classes directly in API responses — prefer DTOs
@@ -643,6 +651,7 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 | Normalizer not running | `AddNormalizerInterceptors(sp)` missing or wrong overload | Use `(sp, options) =>` factory overload in `AddDbContext` |
 | Primers not running | `AddPrimerInterceptors(sp)` missing | Same as above |
 | Save not persisting | `SaveChanges()` not called | ⚠️ **EF Core Pattern**: Write operations only track changes. Must call `SaveChanges()` to persist. Base controllers do this automatically; custom code (services, jobs, direct `IEntityService` usage) must call `await service.SaveChanges()` explicitly. |
+| `Count(null)` / `List(null)` compiler error | Ambiguous overload between typed and untyped variants | Pass an empty search object: `await service.Count(new TSearchObject())` |
 | Soft delete not working | `IArchivable` not implemented or `ArchivablePrimer` not registered | Check entity implements `IArchivable`; use `UseDefaults()` |
 | `AddPrimerInterceptors` has no overload taking 0 args | Missing `IServiceProvider` | Use `AddDbContext<T>((sp, options) => ...)` and pass `sp` |
 | `EntityWrappingServiceBase` — infinite loop | Inner service is the wrapper itself | Ensure `UseEntityService<T>()` registers the wrapper; `AddTransient` registers the interface |

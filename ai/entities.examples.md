@@ -1,5 +1,12 @@
 # Webshop API — Regira Entities Example
 
+> **⚠️ Reference material — not copy-paste ready.**
+> Code snippets in this file are **abbreviated illustrative examples**. They demonstrate patterns and
+> structure but intentionally omit boilerplate, imports, and error handling for brevity.
+> Before using any configuration call (especially lambdas inside `UseEntities`), verify the exact
+> signature in [`entities.signatures.md`](./entities.signatures.md).
+> Namespace imports are listed in [`entities.namespaces.md`](./entities.namespaces.md).
+
 *Sample files are incomplete and only show relevant parts for brevity.*
 
 For the correct **namespaces**: see [`entities.namespaces.md`](./entities.namespaces.md).
@@ -64,52 +71,8 @@ Webshop.API/
 
 ## Setup
 
-```xml
-<!-- Webshop.API.csproj -->
-<Project Sdk="Microsoft.NET.Sdk.Web">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+see [`entities.setup.md`](./entities.setup.md)
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="*" />
-    <PackageReference Include="Scalar.AspNetCore" Version="*" />
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="*" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="*" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="*" />
-    <PackageReference Include="Serilog.Sinks.File" Version="*" />
-  </ItemGroup>
-</Project>
-```
-
-```csharp
-// Program.cs
-builder.Services.AddDbContext<WebshopDbContext>((sp, options) =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("Default"))
-           .AddPrimerInterceptors(sp)
-           .AddNormalizerInterceptors(sp)
-           .AddAutoTruncateInterceptors());
-builder.Services.AddEntityServices();
-
-// Extensions/ServiceCollectionExtensions.cs
-public static IServiceCollection AddEntityServices(this IServiceCollection services)
-{
-    services
-        .UseEntities<WebshopDbContext>(options =>
-        {
-            options.UseDefaults();
-            options.UseMapsterMapping();
-            options.AddPrepper<IHasAggregateKey>(x => x.AggregateKey ??= Guid.NewGuid()); // global inline prepper
-        })
-        .AddCategories()
-        .AddProducts()
-        .AddCustomers()
-        .AddOrders();
-    return services;
-}
-```
 
 ## DbContext
 
@@ -529,7 +492,8 @@ public class OrderQueryBuilder : IFilteredQueryBuilder<Order, int, OrderSearchOb
     public IQueryable<Order> Build(IQueryable<Order> query, OrderSearchObject? so)
     {
         if (so == null) return query;
-        if (!string.IsNullOrWhiteSpace(so.Code)) query = query.FilterCode(so.Code); // QueryExtensions helper
+        // FilterCode requires IHasCode — Order implements it; inline alternative: query.Where(x => x.Code == so.Code)
+        if (!string.IsNullOrWhiteSpace(so.Code)) query = query.FilterCode(so.Code);
         if (so.CustomerId?.Any() == true) query = query.Where(x => so.CustomerId.Contains(x.CustomerId));
         if (so.ProductId?.Any() == true) query = query.Where(x => x.OrderLines!.Any(ol => so.ProductId.Contains(ol.ProductId)));
         if (so.CategoryId?.Any() == true) query = query.Where(x => x.OrderLines!.Any(ol => ol.Product!.Categories!.Any(pc => so.CategoryId.Contains(pc.CategoryId))));
@@ -694,6 +658,8 @@ public class FilterByTenantQueryBuilder(ITenantContext tenantContext) : GlobalFi
 // Registration: options.AddGlobalFilterQueryBuilder<FilterByTenantQueryBuilder>();
 
 // Built-in Q search for all IHasNormalizedContent entities:
+// ⚠️ UseDefaults() already calls this automatically — only register manually if you are
+//    NOT using UseDefaults() and want to enable Q-based full-text search globally.
 options.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
 ```
 
@@ -752,20 +718,24 @@ services.UseEntities<AppDbContext>(/* ... */)
 
 ### Query extensions reference
 
+> Each `QueryExtensions` method requires the entity to implement the listed interface. If it does not,
+> use inline LINQ (e.g. `query.Where(x => x.Code == so.Code)`) as a drop-in replacement.
+> See [`entities.signatures.md`](./entities.signatures.md) — §Query Extensions for full interface constraints.
+
 ```csharp
 // From Regira.Entities.EFcore.QueryBuilders (QueryExtensions):
-query.FilterId(so.Id)
-query.FilterIds(so.Ids)
-query.FilterExclude(so.Exclude)
-query.FilterCode(so.Code)
-query.FilterTitle(keywords)
-query.FilterNormalizedTitle(keywords)
-query.FilterCreated(so.MinCreated, so.MaxCreated)
-query.FilterLastModified(so.MinLastModified, so.MaxLastModified)
-query.FilterTimestamps(minCreated, maxCreated, minModified, maxModified)
-query.FilterQ(keywords)
-query.FilterArchivable(so.IsArchived)
-query.FilterHasAttachment(so.HasAttachment)
+query.FilterId(so.Id)                   // requires IEntity<TKey>
+query.FilterIds(so.Ids)                 // requires IEntity<TKey>
+query.FilterExclude(so.Exclude)         // requires IEntity<TKey>
+query.FilterCode(so.Code)               // requires IHasCode
+query.FilterTitle(keywords)             // requires IHasTitle
+query.FilterNormalizedTitle(keywords)   // requires IHasNormalizedTitle
+query.FilterCreated(so.MinCreated, so.MaxCreated)               // requires IHasCreated
+query.FilterLastModified(so.MinLastModified, so.MaxLastModified) // requires IHasLastModified
+query.FilterTimestamps(minCreated, maxCreated, minModified, maxModified) // requires IHasTimestamps
+query.FilterQ(keywords)                 // requires IHasNormalizedContent
+query.FilterArchivable(so.IsArchived)   // requires IArchivable
+query.FilterHasAttachment(so.HasAttachment) // requires IHasAttachments
 query.SortQuery<TEntity, TKey>()
 query.PageQuery(pagingInfo)
 query.PageQuery(pageSize: 20, page: 1)
