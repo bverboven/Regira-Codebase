@@ -127,7 +127,12 @@ Base controllers call `SaveChanges()` automatically, but when using `IEntityServ
 - Production-quality code requiring testability
 - Testing complex logic in isolation is beneficial
 
-### Choosing Base Controller
+### Controller
+
+- Use base class `EntityControllerBase`
+- Don't expose entity classes directly in API responses — prefer DTOs
+- Extend `SearchObject` to add filtering rather than creating extra endpoints
+- Add custom controller actions only when base methods are insufficient
 
 ```csharp
 // Minimal (no search or sorting)
@@ -162,8 +167,6 @@ Don't copy the example code, use it as a reference and follow the steps to creat
 
 ### Step 1: Project Files
 
-> **→ See:** [`entities.setup.md`](./entities.setup.md)
-
 - Add NuGet package(s)
 - Apply template files (*.csproj, appsettings.json, Program.cs)
 
@@ -173,15 +176,16 @@ Don't copy the example code, use it as a reference and follow the steps to creat
 - **Project structure**: Per-entity folder structure
 - **Service layer**: Default `EntityRepository` (unless complex logic requires wrapping)
 
+> **→ See:** [`entities.setup.md`](./entities.setup.md)
+
 ### Step 2: Create DbContext
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — DbContext
 
 ### Step 3: Create the DI Extension Method
 
-Create `Extensions/ServiceCollectionExtensions.cs`.
-
-**Tip:** Create separate extension methods per entity for cleaner code — one `Add{EntityNameInPlural}()` method per entity.
+- Use extension methods per entity for clean, composable DI registration
+- Use inline config for simple logic; separate classes for complex logic or when DI is needed
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Setup
 
@@ -191,7 +195,9 @@ Create `Extensions/ServiceCollectionExtensions.cs`.
 
 ### Step 1: Create Entity Model
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
+- Keep entities as POCOs — data only, no business logic
+- Use data annotations (`[Required]`, `[MaxLength]`, `[Range]`) directly on entity properties
+- Use `SetDecimalPrecisionConvention` in DbContext instead of setting precision per property
 
 **Interface selection checklist:**
 
@@ -208,33 +214,61 @@ Create `Extensions/ServiceCollectionExtensions.cs`.
 | `IHasNormalizedContent` | Entity uses normalized text for search |
 | `IHasAttachments` | Entity can have file attachments |
 
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
+
 ### Step 2: Create SearchObject
+
+- Inherit from `SearchObject` and add filter properties as needed. 
+- When no custom search object is implemented, the default `SearchObject` is used as fallback.
+- Prefer using `ICollection<TKey>` for FK filters to allow multiple values.
+
+```csharp
+public class SearchObject : SearchObject<int>;
+public class SearchObject<TKey> : ISearchObject<TKey>
+{
+    public TKey? Id { get; set; }
+    public ICollection<TKey>? Ids { get; set; }
+    public ICollection<TKey>? Exclude { get; set; }
+    public string? Q { get; set; }
+
+    public DateTime? MinCreated { get; set; }
+    public DateTime? MaxCreated { get; set; }
+    public DateTime? MinLastModified { get; set; }
+    public DateTime? MaxLastModified { get; set; }
+
+    public bool? IsArchived { get; set; }
+}
+```
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
 
-> Use `ICollection<TKey>` (not a single value) for FK filter properties — enables filtering by multiple values.
-
 ### Step 3: Create SortBy Enum
 
-> `SortBy` is a plain (non-`[Flags]`) enum — values are applied one at a time, not combined.
+- `SortBy` is a plain (non-`[Flags]`) enum — values are applied one at a time, not combined.
+- The framework falls back to `EntitySortBy` if no custom sorting options implemented
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Product entity
 
 ### Step 4: Create Includes Enum
 
 > `Includes` is a `[Flags]` enum — values are combined with bitwise OR.
+> The framework falls back to `EntityIncludes` if no custom includes options implemented.
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
 
 ### Step 5: Create DTOs
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
-
-**Rules:**
 - Include `Id` in `InputDto` to support the Save (upsert) action
-- Do **not** include: `Created`, `LastModified`, `NormalizedContent`, or any computed property
-- Only include child collections in `InputDto` when configured with `e.Related(...)`
-- Use navigation properties instead of flattened fields (prefer `Category` over `CategoryTitle`)
+- Exclude normalized fields from DTOs — they are for internal use only
+- Exclude auto-generated fields (`Created`, `LastModified`, `NormalizedContent`) from `InputDto`
+- Exclude secured fields (e.g. `Password`) from DTOs
+- When using Attachments, exclude full File paths, since the FileService accepts relative paths (identifiers)
+- Try to facilitate mapping by keeping DTO structure similar to the entity (e.g. nested related entities instead of flattening)
+- Use navigation properties in DTOs instead of flattening related entity data: this preserves structure and enables richer client-side handling (e.g. avoid `CategoryTitle`, but use `Category`=>`Title`)
+- Only include child collections in `InputDto` when they are configured with `e.Related(...)`
+- Use `AfterMapper` for computed/calculated properties (e.g. URLs, display names) in DTO
+
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
 
 ### Step 6: Create Query Builders
 
@@ -251,7 +285,9 @@ Use processors to fill `[NotMapped]` properties or enrich entities **after** fet
 
 ### Step 8: Preppers (Optional)
 
-Use preppers to prepare entities **before saving** — e.g. generate codes, set FKs, recalculate totals.
+- Before saving
+- manage child entities (if not using `e.Related()` in entity configuration)
+- (re)calculate totals, generate codes, set FKs, etc.
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Prepper
 
@@ -259,25 +295,26 @@ Use preppers to prepare entities **before saving** — e.g. generate codes, set 
 
 ### Step 9: Primers (Optional)
 
-Primers are EF Core `SaveChangesInterceptors` — they run **when DbContext executes SaveChanges**. They must be registered via `AddPrimerInterceptors(sp)` in `AddDbContext`.
+- Run during `SaveChanges()` via EF Core interceptors
+- Allow checking other modified entities, ready to be persisted in the same transaction
+- Require use of `AddPrimerInterceptors(sp)` in `AddDbContext()`
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Primers
 
 ### Step 10: Mapping & AfterMappers
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > AfterMapper
-
-**Key points:**
+- Skip mapping when using Mapster and DTO structure is similar to the entity and Mapster's conventions can handle it automatically
 - Use `.After(...)` to enrich the DTO after `Entity→DTO` mapping (computed properties, URLs)
 - Use `.AfterInput(...)` to modify the entity after `InputDto→Entity` mapping
 - Use `.After<TAfterMapper>()` for a separate class when DI is needed
 - Use `options.AddAfterMapper<T>()` to register a global AfterMapper
 
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > AfterMapper
+
 ### Step 11: Configure Controller
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Controllers
-
-**Rule:** The generic type arguments on the controller must **exactly match** the type arguments used in `.For<>()`. The controller adds `TDto` and `TInputDto` on top.
+The generic type arguments on the controller must **exactly match** the type arguments used in `.For<>()`. 
+The controller can add `TDto` and `TInputDto` on top.
 
 | `.For<>()` registration | Required controller base |
 |---|---|
@@ -286,6 +323,8 @@ Primers are EF Core `SaveChangesInterceptors` — they run **when DbContext exec
 | `.For<TEntity, TKey, TSearchObject>()` | `EntityControllerBase<TEntity, TKey, TSearchObject, TDto, TInputDto>` |
 | `.For<TEntity, TSearchObject, TSortBy, TIncludes>()` | `EntityControllerBase<TEntity, TSearchObject, TSortBy, TIncludes, TDto, TInputDto>` |
 | `.For<TEntity, TKey, TSearchObject, TSortBy, TIncludes>()` | `EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TInputDto>` |
+
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Controllers
 
 ### Step 12: Update DbContext
 
@@ -303,15 +342,23 @@ Add `DbSet<YourEntity>` and configure any relationships in `OnModelCreating`.
 
 ### Using EntityWrappingServiceBase
 
-Use `EntityWrappingServiceBase` to wrap the default `EntityRepository` and add cross-cutting concerns like **caching**, **authorization**, **auditing**, or **complex validation** at the service level.
+> Extends default logic of the Repositories. 
+> The wrapper delegates all calls to an inner `IEntityService` and you override only what you need.
+> Register via `e.UseEntityService<MyCustomEntityService>()` to replace the default repository.
+⚠️ Prevent circular dependencies when injection parent EntityService!
 
-The wrapper delegates all calls to an inner `IEntityService` and you override only what you need.
-
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Order + OrderLine entities (OrderManager)
+Examples:
+- Caching: Wrap the default `EntityRepository` with `IMemoryCache`.
+  - Override `Details(id)` — check the cache first, then call `base.Details(id)` and store the result
+  - Override `Save(item)` (and `Remove(item)` if needed) — call base, then invalidate the cache entry
+- Security: e.g. modify the SearchObject using business rules to automatically filter results based on user permissions, without needing to add extra filters on every endpoint.
+- Validation
 
 **Registration:**
 - `e.AddTransient<IProductService, ProductService>()` — enables typed injection by interface
 - `e.UseEntityService<ProductService>()` — replaces the default `EntityRepository` as `IEntityService` for the entity
+
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Order + OrderLine entities (OrderManager)
 
 ### EntityWrappingServiceBase Available Overrides
 
@@ -323,8 +370,8 @@ Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncl
 Task<long> Count(TSearchObject? so)
 Task<long> Count(IList<TSearchObject?> so)
 
-// Write (do NOT auto-persist — caller must call SaveChanges())
-Task Save(TEntity item)      // calls Add() or Modify()
+// Write
+Task Save(TEntity item)
 Task Add(TEntity item)
 Task<TEntity?> Modify(TEntity item)
 Task Remove(TEntity item)
@@ -335,7 +382,9 @@ Task<int> SaveChanges(CancellationToken token = default)
 
 ## Global Services
 
-Global services apply to **all entities implementing a given interface**. They are registered on the `EntityServiceCollectionOptions` (inside `UseEntities`) and run **before** entity-specific services.
+- Global services apply to **all entities implementing a given interface**.
+- They are registered on the `EntityServiceCollectionOptions` (inside `UseEntities`)
+- Global services execute before entity-specific services — order matters
 
 ### Global Filter Query Builders
 
@@ -351,24 +400,9 @@ Global services apply to **all entities implementing a given interface**. They a
 
 ### UseDefaults() — What It Registers
 
-`options.UseDefaults()` is a convenience method that registers:
+`options.UseDefaults()` is a convenience method that registers default primers, global query filters, and normalizer services.
 
-**Primers:**
-- `ArchivablePrimer` — soft-delete (sets `IsArchived = true` instead of deleting)
-- `HasCreatedDbPrimer` — sets `Created` on new entities
-- `HasLastModifiedDbPrimer` — sets `LastModified` on update
-
-**Global Query Filters:**
-- `FilterIdsQueryBuilder` — filter by `Id`, `Ids`, `Exclude`
-- `FilterArchivablesQueryBuilder` — excludes archived items by default (null = active only)
-- `FilterHasCreatedQueryBuilder` — filter by `MinCreated`/`MaxCreated`
-- `FilterHasLastModifiedQueryBuilder` — filter by `MinLastModified`/`MaxLastModified`
-
-**Normalizer services:**
-- `DefaultNormalizer` (`INormalizer`) — removes diacritics, lowercases, normalizes whitespace
-- `ObjectNormalizer` (`IObjectNormalizer`) — processes `[Normalized]` attributes
-- `DefaultEntityNormalizer<IEntity>` (`IEntityNormalizer`) — orchestrates attribute-based normalization
-- `QKeywordHelper` (`IQKeywordHelper`) — parses Q search strings with wildcard support
+> **→ See:** [Quick Reference: Built-in Services](#quick-reference-built-in-services) for the full list of registered classes.
 
 ---
 
@@ -377,8 +411,6 @@ Global services apply to **all entities implementing a given interface**. They a
 Normalization facilitates text search by removing diacritics, special characters, and standardizing whitespace.
 
 ### Attribute-Based (Recommended)
-
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
 
 **`[Normalized]` attribute options:**
 
@@ -389,19 +421,19 @@ Normalization facilitates text search by removing diacritics, special characters
 | `Recursive` | Process nested objects (class-level, default: `true`) |
 | `Normalizer` | Custom `INormalizer` or `IObjectNormalizer` type |
 
-### Custom Normalizer
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Global normalizer
+### Custom Normalizer
 
 - Register per entity: `e.AddNormalizer<ProductNormalizer>()`
 - Register globally: `options.AddNormalizer<IHasPhone, PhoneNormalizer>()`
 - When `IsExclusive = true`, no other normalizer runs for that entity
 
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Global normalizer
+
 ### Filtering with Normalized Content and IQKeywordHelper
 
 Use `IQKeywordHelper.Parse(q)` to parse `Q` into keywords with wildcard support (e.g. `"blue*"` → `"blue%"`). Use `keyword.QW` with `EF.Functions.Like`.
-
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > IQKeywordHelper — Q full-text search
 
 **Or use the built-in global filter** (applies to all `IHasNormalizedContent` entities):
 
@@ -409,9 +441,7 @@ Use `IQKeywordHelper.Parse(q)` to parse `Q` into keywords with wildcard support 
 options.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
 ```
 
-> ⚠️ `UseDefaults()` already registers `FilterHasNormalizedContentQueryBuilder` automatically.
-> Only call this manually when you are **not** using `UseDefaults()`.
-> Calling it after `UseDefaults()` registers the filter twice, which is harmless but redundant.
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > IQKeywordHelper — Q full-text search
 
 ### Enable Normalizer Interceptors
 
@@ -477,10 +507,9 @@ These LINQ extension methods are available for use inside query builders:
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Product entity
 
-**Key Points:**
 - Use an explicit join entity and manage the collection via `e.Related()`
 - Always configure the relationship in `DbContext.OnModelCreating`
-- Use a prepper to synchronize join table changes when updating
+- Use a prepper (or `.Related()`) to synchronize join table changes when updating
 
 ### Soft Delete
 
@@ -492,7 +521,6 @@ Implement `IArchivable` on the entity. `UseDefaults()` automatically registers `
 
 Use a global `EntityPrimerBase<TInterface>` to stamp `CreatedBy`/`ModifiedBy` on every entity that implements a shared auditing interface. The primer runs inside EF Core's `SaveChanges` interceptor and resolves the current user via `IHttpContextAccessor`.
 
-**Key points:**
 - Define an audit interface (e.g. `IAuditable`) with `CreatedBy` and `ModifiedBy` properties
 - Implement `EntityPrimerBase<IAuditable>` — check `EntityState.Added` vs `Modified`
 - Register globally via `options.AddPrimer<UserTrackingPrimer>()`
@@ -500,22 +528,15 @@ Use a global `EntityPrimerBase<TInterface>` to stamp `CreatedBy`/`ModifiedBy` on
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Primers
 
-### Caching with EntityWrappingServiceBase
-
-Wrap the default `EntityRepository` with `IMemoryCache` to avoid repeated database hits for frequently read entities. Override only the methods you need — all others delegate to the inner service automatically.
-
-**Key points:**
-- Override `Details(id)` — check the cache first, then call `base.Details(id)` and store the result
-- Override `Save(item)` (and `Remove(item)` if needed) — call base, then invalidate the cache entry
-- Register via `e.UseEntityService<Cached{EntityName}Service>()` to replace the default repository
-
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Order + OrderLine entities (OrderManager)
-
 ### Hierarchical Data (Self-referencing)
 
 Add `ParentId`, `Parent`, and `Children` navigation properties. Filter on `ParentId` in the query builder; use `x.ParentId == null` to return only root items.
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
+
+### Auto truncate
+
+Use `AddAutoTruncateInterceptors()` when registering DbContext to prevent string truncation exceptions
 
 ---
 
@@ -544,44 +565,12 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 
 ## Best Practices
 
-### Entity Design
-- Keep entities as POCOs — data only, no business logic
-- Use data annotations (`[Required]`, `[MaxLength]`, `[Range]`) directly on entity properties
-- Use `SetDecimalPrecisionConvention` in DbContext instead of setting precision per property
-- Prefer `ICollection<TKey>` over a single `TKey` for FK filter properties in SearchObjects
-
-### Service Configuration
-- Global services execute before entity-specific services — order matters
-- Use extension methods per entity for clean, composable DI registration
-- Use inline config for simple logic; separate classes for complex logic or when DI is needed
-
-### Service Layer & SaveChanges Pattern
-- **Always call `SaveChanges()`** after write operations when using `IEntityService` directly - this is standard EF Core behavior
+- **Always call `SaveChanges()`** after write operations when using `IEntityService` directly (e.g. when seeding data) - this is standard EF Core behavior
 - `Add()`, `Modify()`, `Remove()`, and `Save()` only track changes - they do NOT persist to the database
 - Base controllers call `SaveChanges()` automatically after write endpoints (POST, PUT, DELETE)
 - Custom code (services, background jobs, console apps) must explicitly call `await service.SaveChanges()` or `await dbContext.SaveChangesAsync()`
 - Preppers run before `SaveChanges()` - they prepare entities for persistence but don't commit them
 - Primers run during `SaveChanges()` via EF Core interceptors
-- **`Count(null)` / `List(null)` ambiguity:** On a strongly-typed `IEntityService<TEntity, TKey, TSearchObject, ...>`, passing `null` to `Count()` or `List()` causes a **compiler error** because both the typed (`TSearchObject?`) and untyped (`object?`) overloads match. Always pass an empty search object: `await service.Count(new TSearchObject())`
-
-### Controller Design
-- Don't expose entity classes directly in API responses — prefer DTOs
-- Add custom controller actions only when base methods are insufficient
-- Extend `SearchObject` to add filtering rather than creating extra endpoints
-
-### DTO Strategy
-- Include `Id` in `InputDto` to support the Save (upsert) action
-- Exclude normalized fields from DTOs — they are for internal use only
-- Exclude auto-generated fields (`Created`, `LastModified`, `NormalizedContent`) from `InputDto`
-- Exclude secured fields (e.g. `Password`) from DTOs
-- Exclude full File paths, since the FileService accepts relative paths (identifiers)
-- Try to facilitate mapping by keeping DTO structure similar to the entity (e.g. nested related entities instead of flattening)
-- Use navigation properties in DTOs instead of flattening related entity data: this preserves structure and enables richer client-side handling (e.g. avoid `CategoryTitle`, but use `Category`=>`Title`)
-- Only include child collections in `InputDto` when they are configured with `e.Related(...)`
-- Use `AfterMapper` for computed/calculated properties (e.g. URLs, display names) in DTO
-
-### Database
-- Use `AddAutoTruncateInterceptors()` to prevent string truncation exceptions
 
 ---
 
@@ -605,7 +594,10 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 
 ## Quick Reference: Built-in Services
 
-### Global Filter Query Builders (registered via `UseDefaults()` or manually)
+These services are automatically registered when calling `options.UseDefaults()`, 
+but can also be registered manually if you want to customize the configuration.
+
+### Global Filter Query Builders
 
 | Class | Applies to | Filters on |
 |-------|-----------|-----------|
@@ -615,7 +607,7 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 | `FilterHasLastModifiedQueryBuilder` | `IHasLastModified` | `MinLastModified`, `MaxLastModified` |
 | `FilterHasNormalizedContentQueryBuilder` | `IHasNormalizedContent` | `Q` keyword search |
 
-### Primers (registered via `UseDefaults()` or manually)
+### Primers
 
 | Class | Applies to | Behaviour |
 |-------|-----------|-----------|
@@ -624,7 +616,7 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 | `ArchivablePrimer` | `IArchivable` | Soft-delete: sets `IsArchived = true` |
 | `AutoTruncatePrimer` | All entities | Truncates strings to `[MaxLength]` |
 
-### Normalizer Services (registered via `UseDefaults()` or `AddDefaultEntityNormalizer()`)
+### Normalizer Services
 
 | Interface | Implementation | Role |
 |-----------|---------------|------|
@@ -632,12 +624,6 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 | `IObjectNormalizer` | `ObjectNormalizer` | Processes `[Normalized]` attributes |
 | `IEntityNormalizer` | `DefaultEntityNormalizer<IEntity>` | Orchestrates entity normalization |
 | `IQKeywordHelper` | `QKeywordHelper` | Parses Q search strings with wildcard support |
-
----
-
-## Complete File Example
-
-> *(not yet available in `entities.examples.md`)*
 
 ---
 

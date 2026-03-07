@@ -11,7 +11,7 @@ public abstract class EntityWrappingServiceBase<TEntity>(IEntityService<TEntity,
 
 public abstract class EntityWrappingServiceBase<TEntity, TKey>(
     IEntityService<TEntity, TKey, SearchObject<TKey>> service)
-    : EntityWrappingServiceBase<TEntity, TKey, SearchObject<TKey>>(service), IEntityService<TEntity, TKey>
+    : EntityWrappingServiceBase<TEntity, TKey, SearchObject<TKey>>(service)//, IEntityService<TEntity, TKey> (already included)
     where TEntity : class, IEntity<TKey>;
 
 public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject>(

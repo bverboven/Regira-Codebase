@@ -1,11 +1,9 @@
 # Webshop API — Regira Entities Example
 
 > **⚠️ Reference material — not copy-paste ready.**
-> Code snippets in this file are **abbreviated illustrative examples**. They demonstrate patterns and
-> structure but intentionally omit boilerplate, imports, and error handling for brevity.
-> Before using any configuration call (especially lambdas inside `UseEntities`), verify the exact
-> signature in [`entities.signatures.md`](./entities.signatures.md).
-> Namespace imports are listed in [`entities.namespaces.md`](./entities.namespaces.md).
+> - Code snippets in this file are **abbreviated illustrative examples**. They demonstrate patterns and structure but intentionally omit boilerplate, imports, and error handling for brevity.
+> - Before using any configuration call (especially lambdas inside `UseEntities`), verify the exact signature in [`entities.signatures.md`](./entities.signatures.md).
+> - Namespace imports are listed in [`entities.namespaces.md`](./entities.namespaces.md).
 
 *Sample files are incomplete and only show relevant parts for brevity.*
 

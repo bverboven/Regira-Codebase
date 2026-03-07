@@ -178,18 +178,6 @@ public interface IEntityReadService<TEntity, in TKey, in TSearchObject>
 }
 ```
 
-> ⚠️ **`Count(null)` ambiguity:** On a strongly-typed `IEntityService<TEntity, TKey, TSearchObject, ...>`,
-> calling `Count(null)` causes a **compiler error** (ambiguous call between `Count(TSearchObject? so)` and
-> `Count(object? so)`). Always pass a concrete instance:
-> ```csharp
-> // ❌ Compiler error — ambiguous
-> await service.Count(null);
->
-> // ✅ Correct — pass an empty search object
-> await service.Count(new TSearchObject());
-> ```
-> The same applies to `List(null)` on the typed overload.
-
 // Full-featured (with sorting, includes)
 public interface IEntityReadService<TEntity, in TKey, TSearchObject, TSortBy, TIncludes> 
     : IEntityReadService<TEntity, TKey, TSearchObject>
@@ -1021,10 +1009,6 @@ public static EntityServiceCollectionOptions AddDefaultPrimers(
 #### Global Filter Query Builders
 
 **Namespace:** `Regira.Entities.DependencyInjection.QueryBuilders`
-
-> **Note:** There is **no global filter query builder registration** built into `UseDefaults()` beyond
-> what is listed here. `UseDefaults()` registers `FilterHasNormalizedContentQueryBuilder` automatically.
-> Do **not** register it again manually unless you have intentionally skipped `UseDefaults()`.
 
 ```csharp
 // Register a global filter query builder — applies to all entities where the builder
