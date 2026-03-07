@@ -25,6 +25,7 @@ Use this as the primary checklist.
    - Inside the DbContext configuration, add any interceptors (primers, normalizers, auto-truncate) as needed.
    - Call `UseEntities<YourDbContext>(...)` on `builder.Services`, preferably via an extension method.
    - Inside `UseEntities` config, call `.UseDefaults()` by default, then add mapping and any global services.
+   - `UseEntities()` returns a `IEntityServiceCollection` to configure the entities using `.For()`, preferably via extension methods per main Entity.
 6. Add entities using the workflow below.
 
 ### Add a New Entity to an Existing Project
@@ -167,6 +168,7 @@ Don't copy the example code, use it as a reference and follow the steps to creat
 
 ### Step 1: Project Files
 
+- Use latest .NET TargetFramework in the project file
 - Add NuGet package(s)
 - Apply template files (*.csproj, appsettings.json, Program.cs)
 
@@ -383,7 +385,7 @@ Task<int> SaveChanges(CancellationToken token = default)
 ## Global Services
 
 - Global services apply to **all entities implementing a given interface**.
-- They are registered on the `EntityServiceCollectionOptions` (inside `UseEntities`)
+- They are registered on the `EntityServiceCollectionOptions` (inside `UseEntities()`)
 - Global services execute before entity-specific services — order matters
 
 ### Global Filter Query Builders

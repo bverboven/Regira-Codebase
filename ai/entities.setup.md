@@ -68,6 +68,7 @@
 
 Sample files with [serilog](https://serilog.net) configuration and EF Core setup. Adjust as needed for your project structure and preferences.
 Basic JSON configuration is included for System.Text.Json, but you can replace with Newtonsoft.Json if preferred.
+Replace Wildcard versions (`Version="*"`) with specific versions as needed. Always check for the latest stable versions of the packages, unless requested otherwise.
 
 ### *.csproj
 ```xml
