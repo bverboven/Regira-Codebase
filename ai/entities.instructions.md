@@ -168,7 +168,7 @@ Don't copy the example code, use it as a reference and follow the steps to creat
 
 ### Step 1: Project Files
 
-- Use latest .NET TargetFramework in the project file
+- Use latest .NET TargetFramework in the project file (currently .net10)
 - Add NuGet package(s)
 - Apply template files (*.csproj, appsettings.json, Program.cs)
 
@@ -186,7 +186,8 @@ Don't copy the example code, use it as a reference and follow the steps to creat
 
 ### Step 3: Create the DI Extension Method
 
-- Use extension methods per entity for clean, composable DI registration
+- Enable Regira Entities by `UseEntities()` which returns an `IEntityServiceCollection` for configuring entities
+- Use extension methods per entity using `.For()` for clean, composable DI registration
 - Use inline config for simple logic; separate classes for complex logic or when DI is needed
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Setup
@@ -200,6 +201,7 @@ Don't copy the example code, use it as a reference and follow the steps to creat
 - Keep entities as POCOs — data only, no business logic
 - Use data annotations (`[Required]`, `[MaxLength]`, `[Range]`) directly on entity properties
 - Use `SetDecimalPrecisionConvention` in DbContext instead of setting precision per property
+- Nullable: follow interfaces when type is nullable, nullable properties can be combined with [Required] annotation
 
 **Interface selection checklist:**
 
@@ -246,7 +248,8 @@ public class SearchObject<TKey> : ISearchObject<TKey>
 
 ### Step 3: Create SortBy Enum
 
-- `SortBy` is a plain (non-`[Flags]`) enum — values are applied one at a time, not combined.
+- `SortBy` is a plain (non-`[Flags]`) enum
+- Multiple sortBy values can be passed in an array and will be applied in order
 - The framework falls back to `EntitySortBy` if no custom sorting options implemented
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Product entity
@@ -313,7 +316,14 @@ Use processors to fill `[NotMapped]` properties or enrich entities **after** fet
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > AfterMapper
 
-### Step 11: Configure Controller
+### Step 11: Configure Entities
+
+Use `.For<TEntity, ...>(...)` to register each entity and configure its services. The generic type arguments determine which features are enabled and which base controller to use.
+Child entities configured with `e.Related()` don't need their own `.For<>()` registration.
+
+> **→ See:** [`entities.examples.md`](./entities.examples.md) (All entities)
+
+### Step 12: Configure Controller
 
 The generic type arguments on the controller must **exactly match** the type arguments used in `.For<>()`. 
 The controller can add `TDto` and `TInputDto` on top.
@@ -328,15 +338,15 @@ The controller can add `TDto` and `TInputDto` on top.
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Controllers
 
-### Step 12: Update DbContext
+### Step 13: Update DbContext
 
 Add `DbSet<YourEntity>` and configure any relationships in `OnModelCreating`.
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — DbContext
 
-### Step 13: Setup and add Entity services to DI
+### Step 14: Setup and add Entity services to DI
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Setup
+> **→ See:** [`entities.setup.md`](./entities.setup.md) — Setup
 
 ---
 
@@ -507,11 +517,12 @@ These LINQ extension methods are available for use inside query builders:
 
 **Treat Many-to-Many as two One-to-Many relations** using a middle/join table with an explicit join entity. Always create an explicit join entity — even if the join table carries no extra properties, having a dedicated entity makes the collection easier to manage via `e.Related()`.
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Product entity
-
 - Use an explicit join entity and manage the collection via `e.Related()`
 - Always configure the relationship in `DbContext.OnModelCreating`
 - Use a prepper (or `.Related()`) to synchronize join table changes when updating
+- Child entities registered via e.Related() do NOT need a standalone IEntityService<T> registration
+
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Product entity
 
 ### Soft Delete
 
@@ -532,7 +543,7 @@ Use a global `EntityPrimerBase<TInterface>` to stamp `CreatedBy`/`ModifiedBy` on
 
 ### Hierarchical Data (Self-referencing)
 
-Add `ParentId`, `Parent`, and `Children` navigation properties. Filter on `ParentId` in the query builder; use `x.ParentId == null` to return only root items.
+Add Parent, and Children navigation properties. Filter on `ParentId` or `ChildId` in the query builder; use `x.ParentId == null` to return only root items.
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
 
@@ -647,3 +658,10 @@ but can also be registered manually if you want to customize the configuration.
 | Wrong method name, parameters, or return type | Signature guessed or assumed | Look up the exact signature in [`entities.signatures.md`](./entities.signatures.md) |
 | Unsure how to implement a pattern or need a working example | No reference at hand | Copy from the matching section in [`entities.examples.md`](./entities.examples.md) |
 | `dotnet restore` fails with "Detected package downgrade" | Project targets a framework that is lower than what a dependency requires | Use latest `<TargetFramework>` in the `.csproj` |
+
+
+## See Also
+
+- [Entities Examples](./entities.examples.md) - Code examples and patterns
+- [Entities Namespaces](./entities.namespaces.md) - Namespace reference
+- [Entities Signatures](./entities.signatures.md) - Exact method signatures for all interfaces and classes

@@ -17,7 +17,7 @@ This codebase provides specialized AI instruction sets for its modules. **When a
 
 | Module | Namespace | Covers | Instructions |
 |--------|-----------|--------|--------------| 
-| **Entities** | `Regira.Entities` | CRUD APIs, EF Core, controllers, mapping, normalizing, attachments | `./entities.instructions.md` |
+| **Entities** | `Regira.Entities` | CRUD Services with built-in extras | `./entities.instructions.md` |
 | **IO.Storage** | `Regira.IO.Storage` | File storage: local filesystem, Azure Blob, SFTP/SSH, GitHub, TCP, compression | *(not yet available)* |
 | **Office** | `Regira.Office` | Document processing: Excel, Word, PDF, OCR, Barcodes, CSV, vCards | *(not yet available)* |
 | **Media** | `Regira.Media` | Image & video processing: drawing, resize/crop/rotate, FFmpeg | *(not yet available)* |
@@ -47,7 +47,7 @@ A generic, extensible framework for building ASP.NET Core APIs with standardized
 - **Soft delete, audit trails, caching** — built-in and custom wrappers using `EntityWrappingServiceBase`
 - **Troubleshooting** — diagnosing runtime issues in Entities-based projects
 
-**Load this instructions when the user's request is about any of the above**, including when building a new data-driven API, adding or changing an entity in an existing project, or fixing issues in an Entities-based solution.
+**Load these instructions when the user's request is about any of the above**, including when building a new data-driven API, adding or changing an entity in an existing project, or fixing issues in an Entities-based solution.
 
 ---
 

@@ -1,6 +1,6 @@
 # Regira Entities Framework - API Signatures Reference
 
-This document provides a comprehensive reference of all interfaces, classes, and extension methods used in the Regira Entities framework.
+Exact signatures for interfaces, classes, and extension methods in the Regira Entities framework. **Do not guess — look up here first.**
 
 ---
 
@@ -24,67 +24,49 @@ This document provides a comprehensive reference of all interfaces, classes, and
 
 ### Core Entity Interfaces
 
-**Namespace:** `Regira.Entities.Models.Abstractions`
-
 ```csharp
-// Base entity marker interface
-public interface IEntity;
+using Regira.Entities.Models.Abstractions;
 
-// Entity with typed primary key
+public interface IEntity;
 public interface IEntity<TKey> : IEntity
 {
     TKey Id { get; set; }
 }
 
-// Shortcut for entities with int primary key
-public interface IEntityWithSerial : IEntity<int>
-{
-    // Inherits: int Id { get; set; }
-}
+// Shortcut for int primary key
+public interface IEntityWithSerial : IEntity<int>;
 ```
 
 ### Property Interfaces
 
-**Namespace:** `Regira.Entities.Models.Abstractions`
-
 ```csharp
-// Code property
+using Regira.Entities.Models.Abstractions;
+
 public interface IHasCode
 {
     string? Code { get; set; }
 }
-
-// Title property (read-only)
+// Title is read-only on the interface; entity classes may expose a setter
 public interface IHasTitle
 {
     string? Title { get; }
 }
-
-// Normalized title
 public interface IHasNormalizedTitle : IHasTitle
 {
     string? NormalizedTitle { get; set; }
 }
-
-// Description property
 public interface IHasDescription
 {
     string? Description { get; set; }
 }
-
-// Normalized content for search
 public interface IHasNormalizedContent
 {
     string? NormalizedContent { get; set; }
 }
-
-// Normalized content with tracking
 public interface IHasLastNormalized : IHasNormalizedContent, IHasLastModified
 {
     DateTime? LastNormalized { get; set; }
 }
-
-// Sort order for child collections
 public interface ISortable
 {
     int SortOrder { get; set; }
@@ -93,31 +75,27 @@ public interface ISortable
 
 ### Timestamp Interfaces
 
-**Namespace:** `Regira.Entities.Models.Abstractions`
-
 ```csharp
-// Creation timestamp
+using Regira.Entities.Models.Abstractions;
+
 public interface IHasCreated
 {
     DateTime Created { get; set; }
 }
-
-// Last modified timestamp
 public interface IHasLastModified
 {
     DateTime? LastModified { get; set; }
 }
 
-// Combined timestamps
+// Combined — most common choice
 public interface IHasTimestamps : IHasCreated, IHasLastModified;
 ```
 
-### Lifecycle Interfaces
-
-**Namespace:** `Regira.Entities.Models.Abstractions`
+### Lifecycle Interface
 
 ```csharp
-// Soft-delete support
+using Regira.Entities.Models.Abstractions;
+
 public interface IArchivable
 {
     bool IsArchived { get; set; }
@@ -126,22 +104,20 @@ public interface IArchivable
 
 ### Attachment Interfaces
 
-**Namespace:** `Regira.Entities.Attachments.Abstractions`
-
 ```csharp
-// Basic attachments support
+using Regira.Entities.Attachments.Abstractions;
+
 public interface IHasAttachments
 {
     ICollection<IEntityAttachment>? Attachments { get; set; }
     bool? HasAttachment { get; set; }
 }
 
-// Typed attachments (with int keys)
-public interface IHasAttachments<TEntityAttachment> 
+// Typed (int keys) — most common
+public interface IHasAttachments<TEntityAttachment>
     : IHasAttachments<TEntityAttachment, int, int, int, Attachment>
     where TEntityAttachment : IEntityAttachment<int, int, int, Attachment>;
 
-// Fully typed attachments
 public interface IHasAttachments<TEntityAttachment, TKey, TObjectKey, TAttachmentKey, TAttachment>
     where TEntityAttachment : IEntityAttachment<TKey, TObjectKey, TAttachmentKey, TAttachment>
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
@@ -149,18 +125,22 @@ public interface IHasAttachments<TEntityAttachment, TKey, TObjectKey, TAttachmen
     ICollection<TEntityAttachment>? Attachments { get; set; }
     bool? HasAttachment { get; set; }
 }
+
+public interface IHasObjectId<TKey>
+{
+    TKey ObjectId { get; set; }
+}
 ```
 
 ---
 
 ## Service Interfaces
 
-### Read Service Interfaces
-
-**Namespace:** `Regira.Entities.Services.Abstractions`
+### Read
 
 ```csharp
-// Basic read operations
+using Regira.Entities.Services.Abstractions;
+
 public interface IEntityReadService<TEntity, in TKey>
 {
     Task<TEntity?> Details(TKey id);
@@ -168,18 +148,15 @@ public interface IEntityReadService<TEntity, in TKey>
     Task<long> Count(object? so);
 }
 
-// With typed SearchObject
-public interface IEntityReadService<TEntity, in TKey, in TSearchObject> 
+public interface IEntityReadService<TEntity, in TKey, in TSearchObject>
     : IEntityReadService<TEntity, TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
 {
     Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null);
     Task<long> Count(TSearchObject? so);
 }
-```
 
-// Full-featured (with sorting, includes)
-public interface IEntityReadService<TEntity, in TKey, TSearchObject, TSortBy, TIncludes> 
+public interface IEntityReadService<TEntity, in TKey, TSearchObject, TSortBy, TIncludes>
     : IEntityReadService<TEntity, TKey, TSearchObject>
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
@@ -187,20 +164,19 @@ public interface IEntityReadService<TEntity, in TKey, TSearchObject, TSortBy, TI
     where TIncludes : struct, Enum
 {
     Task<IList<TEntity>> List(
-        IList<TSearchObject?> so, 
-        IList<TSortBy> sortBy, 
-        TIncludes? includes = null, 
+        IList<TSearchObject?> so,
+        IList<TSortBy> sortBy,
+        TIncludes? includes = null,
         PagingInfo? pagingInfo = null);
     Task<long> Count(IList<TSearchObject?> so);
 }
 ```
 
-### Write Service Interfaces
-
-**Namespace:** `Regira.Entities.Services.Abstractions`
+### Write
 
 ```csharp
-// Write operations
+using Regira.Entities.Services.Abstractions;
+
 public interface IEntityWriteService<TEntity, TKey>
     where TEntity : class, IEntity<TKey>
 {
@@ -212,40 +188,23 @@ public interface IEntityWriteService<TEntity, TKey>
 }
 ```
 
-### Combined Service Interfaces
-
-**Namespace:** `Regira.Entities.Services.Abstractions`
+### Combined (IEntityService)
 
 ```csharp
-// Basic combined service (with TKey)
-public interface IEntityService<TEntity, TKey> 
-    : IEntityReadService<TEntity, TKey>, 
-      IEntityWriteService<TEntity, TKey>
-    where TEntity : class, IEntity<TKey>;
+using Regira.Entities.Services.Abstractions;
 
-// With SearchObject
-public interface IEntityService<TEntity, TKey, in TSearchObject>
-    : IEntityReadService<TEntity, TKey, TSearchObject>, 
-      IEntityService<TEntity, TKey>
-    where TEntity : class, IEntity<TKey>
-    where TSearchObject : class, ISearchObject<TKey>, new();
-
-// Full-featured
+// Full-featured (TKey explicit)
 public interface IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
-    : IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, 
+    : IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>,
       IEntityService<TEntity, TKey, TSearchObject>
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum;
 
-// Shortcut variants (int key)
-public interface IEntityService<TEntity> 
-    : IEntityService<TEntity, int>
-    where TEntity : class, IEntity<int>;
-
+// Shortcut — int key assumed (most common for injection)
 public interface IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>
-    : IEntityService<TEntity, int, TSearchObject, TSortBy, TIncludes>, 
+    : IEntityService<TEntity, int, TSearchObject, TSortBy, TIncludes>,
       IEntityService<TEntity>
     where TEntity : class, IEntity<int>
     where TSearchObject : class, ISearchObject<int>, new()
@@ -253,115 +212,43 @@ public interface IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>
     where TIncludes : struct, Enum;
 ```
 
-### IEntityRepository Interfaces
+> **Inject** as `IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>` (int key shortcut) when registered with `.For<TEntity, TSearchObject, TSortBy, TIncludes>()`.
 
-**Namespace:** `Regira.Entities.Services.Abstractions`
+### IEntityRepository / IEntityManager
+
+Custom services with `HasRepository<>()` or `HasManager<>()`.
 
 ```csharp
-public interface IEntityRepository<TEntity> 
-    : IEntityRepository<TEntity, int>, IEntityService<TEntity>
-    where TEntity : class, IEntity<int>;
+using Regira.Entities.Services.Abstractions;
 
-public interface IEntityRepository<TEntity, TKey> 
-    : IEntityService<TEntity, TKey>
-    where TEntity : class, IEntity<TKey>;
-
-public interface IEntityRepository<TEntity, TKey, in TSearchObject>
-    : IEntityService<TEntity, TKey, TSearchObject>, IEntityRepository<TEntity, TKey>
-    where TEntity : class, IEntity<TKey>
-    where TSearchObject : class, ISearchObject<TKey>, new();
-
-// Shortcut (int key, full-featured)
+// Primary shortcut forms (int key, full-featured)
 public interface IEntityRepository<TEntity, TSearchObject, TSortBy, TIncludes>
-    : IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>,
-      IEntityRepository<TEntity, int, TSearchObject, TSortBy, TIncludes>,
-      IEntityRepository<TEntity>
-    where TEntity : class, IEntity<int>
-    where TSearchObject : class, ISearchObject<int>, new()
-    where TSortBy : struct, Enum
-    where TIncludes : struct, Enum;
+    : IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>, IEntityRepository<TEntity>;
 
-public interface IEntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
-    : IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>,
-      IEntityRepository<TEntity, TKey, TSearchObject>
-    where TEntity : class, IEntity<TKey>
-    where TSearchObject : class, ISearchObject<TKey>, new()
-    where TSortBy : struct, Enum
-    where TIncludes : struct, Enum;
-```
-
-### IEntityManager Interfaces
-
-**Namespace:** `Regira.Entities.Services.Abstractions`
-
-```csharp
-public interface IEntityManager<TEntity> 
-    : IEntityManager<TEntity, int>, IEntityService<TEntity>
-    where TEntity : class, IEntity<int>;
-
-public interface IEntityManager<TEntity, TKey> 
-    : IEntityService<TEntity, TKey>
-    where TEntity : class, IEntity<TKey>;
-
-public interface IEntityManager<TEntity, TKey, in TSearchObject>
-    : IEntityService<TEntity, TKey, TSearchObject>, IEntityManager<TEntity, TKey>
-    where TEntity : class, IEntity<TKey>
-    where TSearchObject : class, ISearchObject<TKey>, new();
-
-// Shortcut (int key, full-featured)
 public interface IEntityManager<TEntity, TSearchObject, TSortBy, TIncludes>
-    : IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>,
-      IEntityManager<TEntity, int, TSearchObject, TSortBy, TIncludes>,
-      IEntityManager<TEntity>
-    where TEntity : class, IEntity<int>
-    where TSearchObject : class, ISearchObject<int>, new()
-    where TSortBy : struct, Enum
-    where TIncludes : struct, Enum;
+    : IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>, IEntityManager<TEntity>;
 
-public interface IEntityManager<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
-    : IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>,
-      IEntityManager<TEntity, TKey, TSearchObject>
-    where TEntity : class, IEntity<TKey>
-    where TSearchObject : class, ISearchObject<TKey>, new()
-    where TSortBy : struct, Enum
-    where TIncludes : struct, Enum;
+// Additional TKey and partial variants follow the same pattern as IEntityService.
 ```
 
-### Wrapping Service Base Classes
+### EntityWrappingServiceBase
 
-**Namespace:** `Regira.Entities.Services.Abstractions`
+Inject the inner service via constructor; override only the methods you need.
 
 ```csharp
-// Basic wrapper (int key)
-public abstract class EntityWrappingServiceBase<TEntity>(IEntityService<TEntity, int, SearchObject<int>> service)
-    : EntityWrappingServiceBase<TEntity, int, SearchObject<int>>(service), 
-      IEntityService<TEntity>
-    where TEntity : class, IEntity<int>;
+using Regira.Entities.Services.Abstractions;
 
-// With TKey
-public abstract class EntityWrappingServiceBase<TEntity, TKey>(
-    IEntityService<TEntity, TKey, SearchObject<TKey>> service)
-    : EntityWrappingServiceBase<TEntity, TKey, SearchObject<TKey>>(service), 
-      IEntityService<TEntity, TKey>
-    where TEntity : class, IEntity<TKey>;
-
-// With SearchObject
+// Without sort/includes — exposes Service field
 public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject>(
-    IEntityService<TEntity, TKey, TSearchObject> service) 
-    : IEntityService<TEntity, TKey, TSearchObject>
+    IEntityService<TEntity, TKey, TSearchObject> service) : IEntityService<TEntity, TKey, TSearchObject>
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
 {
     protected readonly IEntityService<TEntity, TKey, TSearchObject> Service = service;
 
-    // Read operations
     public virtual Task<TEntity?> Details(TKey id);
     public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null);
-    public virtual Task<IList<TEntity>> List(object? so, PagingInfo? pagingInfo);
     public virtual Task<long> Count(TSearchObject? so);
-    public virtual Task<long> Count(object? so);
-
-    // Write operations
     public virtual Task Add(TEntity item);
     public virtual Task<TEntity?> Modify(TEntity item);
     public virtual Task Save(TEntity item);
@@ -369,7 +256,7 @@ public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject>(
     public virtual Task<int> SaveChanges(CancellationToken token = default);
 }
 
-// Full-featured wrapper (int key)
+// Full-featured (int key) — most common; empty body, delegates to explicit-TKey variant
 public abstract class EntityWrappingServiceBase<TEntity, TSearchObject, TSortBy, TIncludes>(
     IEntityService<TEntity, int, TSearchObject, TSortBy, TIncludes> service)
     : EntityWrappingServiceBase<TEntity, int, TSearchObject, TSortBy, TIncludes>(service)
@@ -378,7 +265,7 @@ public abstract class EntityWrappingServiceBase<TEntity, TSearchObject, TSortBy,
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum;
 
-// Full-featured wrapper (with TKey)
+// Full-featured (explicit TKey)
 public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
     IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes> service)
     : IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
@@ -387,113 +274,53 @@ public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject, TS
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
-    // Read operations
+    // All IEntityService members are virtual — override as needed:
     public virtual Task<TEntity?> Details(TKey id);
-    public virtual Task<IList<TEntity>> List(object? so = null, PagingInfo? pagingInfo = null);
-    public Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null);
-    public virtual Task<IList<TEntity>> List(
-        IList<TSearchObject?> so, 
-        IList<TSortBy> sortBy, 
-        TIncludes? includes = null, 
-        PagingInfo? pagingInfo = null);
-    public virtual Task<long> Count(object? so);
-    public Task<long> Count(TSearchObject? so);
+    public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null);
+    public virtual Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null);
+    public virtual Task<long> Count(TSearchObject? so);
     public virtual Task<long> Count(IList<TSearchObject?> so);
-
-    // Write operations
     public virtual Task Add(TEntity item);
     public virtual Task<TEntity?> Modify(TEntity item);
     public virtual Task Save(TEntity item);
     public virtual Task Remove(TEntity item);
     public virtual Task<int> SaveChanges(CancellationToken token = default);
-
-    // Utilities
     public virtual TSearchObject? Convert(object? so);
 }
 ```
+
+> Register the wrapper with `e.UseEntityService<MyService>()` (**⚠️ Beware for circular dependency!**).
+> You can register implementations for custom interface derived from `IEntityService` with `e.AddTransient<IMyService, MyService>()`.
 
 ---
 
 ## Controller Base Classes
 
-**Namespace:** `Regira.Entities.Web.Controllers.Abstractions`
+The generic type arguments on the controller must **exactly match** those used in `.For<>()`. The controller adds `TDto` and `TInputDto` on top.
 
-### Basic Controllers (No DTO)
-
-```csharp
-// Minimal (int key, no DTO)
-public abstract class EntityControllerBase<TEntity> 
-    : EntityControllerBase<TEntity, SearchObject, TEntity, TEntity>
-    where TEntity : class, IEntity<int>;
-
-// With TKey (no DTO)
-public abstract class EntityControllerBase<TEntity, TKey> 
-    : EntityControllerBase<TEntity, TKey, SearchObject<TKey>, TEntity, TEntity>
-    where TEntity : class, IEntity<TKey>;
-```
-
-### Standard Controllers (With DTO)
+| `.For<>()` registration | Required controller base |
+|---|---|
+| `.For<TEntity>()` | `EntityControllerBase<TEntity, TDto, TInputDto>` |
+| `.For<TEntity, TKey>()` | `EntityControllerBase<TEntity, TKey, SearchObject<TKey>, TDto, TInputDto>` |
+| `.For<TEntity, TKey, TSearchObject>()` | `EntityControllerBase<TEntity, TKey, TSearchObject, TDto, TInputDto>` |
+| `.For<TEntity, TSearchObject, TSortBy, TIncludes>()` | `EntityControllerBase<TEntity, TSearchObject, TSortBy, TIncludes, TDto, TInputDto>` |
+| `.For<TEntity, TKey, TSearchObject, TSortBy, TIncludes>()` | `EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TInputDto>` |
 
 ```csharp
-// Basic with DTO (int key)
-public abstract class EntityControllerBase<TEntity, TDto, TInputDto> 
-    : EntityControllerBase<TEntity, SearchObject, TDto, TInputDto>
-    where TEntity : class, IEntity<int>
-    where TDto : class
-    where TInputDto : class;
+using Regira.Entities.Web.Controllers.Abstractions;
 
-// With SearchObject and DTO (int key)
-public abstract class EntityControllerBase<TEntity, TSearchObject, TDto, TInputDto> 
-    : EntityControllerBase<TEntity, int, TSearchObject, TDto, TInputDto>
-    where TEntity : class, IEntity<int>
-    where TSearchObject : class, ISearchObject<int>
-    where TDto : class
-    where TInputDto : class;
-
-// With TKey, SearchObject, and DTO
+// Minimal — no sorting or includes
 [ApiController]
-public abstract class EntityControllerBase<TEntity, TKey, TSearchObject, TDto, TInputDto> 
+public abstract class EntityControllerBase<TEntity, TKey, TSearchObject, TDto, TInputDto>
     : ControllerBase
     where TEntity : class, IEntity<TKey>
     where TSearchObject : class, ISearchObject<TKey>
     where TDto : class
-    where TInputDto : class
-{
-    // Details
-    [HttpGet("{id}")]
-    public virtual Task<ActionResult<DetailsResult<TDto>>> Details([FromRoute] TKey id);
+    where TInputDto : class;
 
-    // List
-    [HttpGet]
-    public virtual Task<ActionResult<ListResult<TDto>>> List(
-        [FromQuery] TSearchObject so, 
-        [FromQuery] PagingInfo pagingInfo);
-
-    // Save (upsert)
-    [HttpPost("save")]
-    public virtual Task<ActionResult<SaveResult<TDto>>> Save([FromBody] TInputDto model);
-
-    // Create
-    [HttpPost]
-    public virtual Task<ActionResult<SaveResult<TDto>>> Create([FromBody] TInputDto model);
-
-    // Modify
-    [HttpPut("{id}")]
-    public virtual Task<ActionResult<SaveResult<TDto>>> Modify(
-        [FromRoute] TKey id, 
-        [FromBody] TInputDto model);
-
-    // Delete
-    [HttpDelete("{id}")]
-    public virtual Task<ActionResult<DeleteResult<TDto>>?> Delete([FromRoute] TKey id);
-}
-```
-
-### Full-Featured Controllers
-
-```csharp
-// With sorting, includes (int key)
-public abstract class EntityControllerBase<TEntity, TSo, TSortBy, TIncludes, TDto, TInputDto> 
+// Full-featured — with sorting and includes (int key shortcut)
+[ApiController]
+public abstract class EntityControllerBase<TEntity, TSo, TSortBy, TIncludes, TDto, TInputDto>
     : EntityControllerBase<TEntity, int, TSo, TSortBy, TIncludes, TDto, TInputDto>
     where TEntity : class, IEntity<int>
     where TSo : class, ISearchObject<int>, new()
@@ -502,125 +329,70 @@ public abstract class EntityControllerBase<TEntity, TSo, TSortBy, TIncludes, TDt
     where TDto : class
     where TInputDto : class;
 
-// With TKey, sorting, includes
+// Full-featured — with explicit TKey
 [ApiController]
-public abstract class EntityControllerBase<TEntity, TKey, TSo, TSortBy, TIncludes, TDto, TInputDto> 
+public abstract class EntityControllerBase<TEntity, TKey, TSo, TSortBy, TIncludes, TDto, TInputDto>
     : ControllerBase
     where TEntity : class, IEntity<TKey>
     where TSo : class, ISearchObject<TKey>, new()
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
     where TDto : class
-    where TInputDto : class
-{
-    // Details
-    [HttpGet("{id}")]
-    public virtual Task<ActionResult<DetailsResult<TDto>>> Details([FromRoute] TKey id);
-
-    // List (GET)
-    [HttpGet]
-    public virtual Task<ActionResult<ListResult<TDto>>> List(
-        [FromQuery] TSo so,
-        [FromQuery] PagingInfo pagingInfo, 
-        [FromQuery] TIncludes[] includes, 
-        [FromQuery] TSortBy[] sortBy);
-
-    // List (POST)
-    [HttpPost("list")]
-    public virtual Task<ActionResult<ListResult<TDto>>> List(
-        [FromBody] TSo[] so,
-        [FromQuery] PagingInfo pagingInfo, 
-        [FromQuery] TIncludes[] includes, 
-        [FromQuery] TSortBy[] sortBy);
-
-    // Search (GET)
-    [HttpGet("search")]
-    public virtual Task<ActionResult<SearchResult<TDto>>> Search(
-        [FromQuery] TSo so,
-        [FromQuery] PagingInfo pagingInfo, 
-        [FromQuery] TIncludes[] includes,
-        [FromQuery] TSortBy[] sortBy);
-
-    // Search (POST)
-    [HttpPost("search")]
-    public virtual Task<ActionResult<SearchResult<TDto>>> Search(
-        [FromBody] TSo[] so,
-        [FromQuery] PagingInfo pagingInfo, 
-        [FromQuery] TIncludes[] includes, 
-        [FromQuery] TSortBy[] sortBy);
-
-    // Save (upsert)
-    [HttpPost("save")]
-    public virtual Task<ActionResult<SaveResult<TDto>>> Save([FromBody] TInputDto model);
-
-    // Create
-    [HttpPost]
-    public virtual Task<ActionResult<SaveResult<TDto>>> Create([FromBody] TInputDto model);
-
-    // Modify
-    [HttpPut("{id}")]
-    public virtual Task<ActionResult<SaveResult<TDto>>> Modify(
-        [FromRoute] TKey id, 
-        [FromBody] TInputDto model);
-
-    // Delete
-    [HttpDelete("{id}")]
-    public virtual Task<ActionResult<DeleteResult<TDto>>?> Delete([FromRoute] TKey id);
-}
+    where TInputDto : class;
 ```
+
+**Endpoints exposed by all controller variants:**
+
+| Method | Route | Action |
+|--------|-------|--------|
+| `GET` | `/{id}` | Details |
+| `GET` | `/` | List |
+| `POST` | `/list` | List (body) |
+| `GET` | `/search` | Search (with count) |
+| `POST` | `/search` | Search (body) |
+| `POST` | `/save` | Save (upsert) |
+| `POST` | `/` | Create |
+| `PUT` | `/{id}` | Modify |
+| `DELETE` | `/{id}` | Delete |
 
 ---
 
 ## Search and Filter Objects
 
-### ISearchObject Interface
-
-**Namespace:** `Regira.Entities.Models.Abstractions`
-
 ```csharp
-// Base search object interface
+using Regira.Entities.Models.Abstractions;
+using Regira.Entities.Models;
+
 public interface ISearchObject
 {
     string? Q { get; set; }
-
     DateTime? MinCreated { get; set; }
     DateTime? MaxCreated { get; set; }
     DateTime? MinLastModified { get; set; }
     DateTime? MaxLastModified { get; set; }
-
     bool? IsArchived { get; set; }
 }
 
-// With typed ID
 public interface ISearchObject<TKey> : ISearchObject
 {
     TKey? Id { get; set; }
     ICollection<TKey>? Ids { get; set; }
     ICollection<TKey>? Exclude { get; set; }
 }
-```
 
-### SearchObject Implementation
-
-**Namespace:** `Regira.Entities.Models`
-
-```csharp
-// Default SearchObject (int key)
+// Default implementation (int key) — extend this for custom filters
 public class SearchObject : SearchObject<int>;
 
-// Generic SearchObject
 public class SearchObject<TKey> : ISearchObject<TKey>
 {
     public TKey? Id { get; set; }
     public ICollection<TKey>? Ids { get; set; }
     public ICollection<TKey>? Exclude { get; set; }
     public string? Q { get; set; }
-
     public DateTime? MinCreated { get; set; }
     public DateTime? MaxCreated { get; set; }
     public DateTime? MinLastModified { get; set; }
     public DateTime? MaxLastModified { get; set; }
-
     public bool? IsArchived { get; set; }
 }
 ```
@@ -629,225 +401,63 @@ public class SearchObject<TKey> : ISearchObject<TKey>
 
 ## Extension Methods
 
-### Entity Extensions
-
-**Namespace:** `Regira.Entities.Extensions`  
-**Class:** `EntityExtensions`
+### EntityExtensions
 
 ```csharp
+using Regira.Entities.Extensions;
+
 public static class EntityExtensions
 {
-    // Check if entity is new (Id is default)
     public static bool IsNew<TKey>(this IEntity<TKey> item);
-
-    // Adjust IDs for EF Core (negative IDs → 0)
     public static void AdjustIdForEfCore(this IEnumerable<IEntity<int>> items);
-
-    // Set sort order for sortable items
     public static void SetSortOrder(this IEnumerable<ISortable> items);
 }
 ```
 
-### Query Extensions
+### QueryExtensions
 
-**Namespace:** `Regira.Entities.EFcore.Extensions`  
-**Class:** `QueryExtensions`
-
-> **Interface constraints:** Every `QueryExtensions` method enforces a compile-time `where TEntity : <Interface>` constraint.
-> Your entity **must implement the listed interface** for the method to be available.
-> If the entity does not implement the interface, use inline LINQ instead — e.g.:
-> - `query.FilterCode(so.Code)` → requires `IHasCode`; alternative: `query.Where(x => x.Code == so.Code)`
-> - `query.FilterTitle(keywords)` → requires `IHasTitle`; alternative: `query.Where(x => x.Title!.Contains(term))`
-> - `query.FilterQ(keywords)` → requires `IHasNormalizedContent`; alternative: `query.Where(x => EF.Functions.Like(x.NormalizedContent, kw))`
+> Every method
 
 ```csharp
+using Regira.Entities.EFcore.Extensions;
+
 public static class QueryExtensions
 {
-    // Filter by single ID
-    public static IQueryable<TEntity> FilterId<TEntity, TKey>(
-        this IQueryable<TEntity> query, 
-        TKey? id)
+    // Requires IEntity<TKey>
+    public static IQueryable<TEntity> FilterId<TEntity, TKey>(this IQueryable<TEntity> query, TKey? id);
+    public static IQueryable<TEntity> FilterIds<TEntity, TKey>(this IQueryable<TEntity> query, ICollection<TKey>? ids);
+    public static IQueryable<TEntity> FilterExclude<TEntity, TKey>(this IQueryable<TEntity> query, ICollection<TKey>? ids);
+
+    // Requires IHasCode
+    public static IQueryable<TEntity> FilterCode<TEntity>(this IQueryable<TEntity> query, string? code);
+
+    // Requires IHasTitle
+    public static IQueryable<TEntity> FilterTitle<TEntity>(this IQueryable<TEntity> query, ParsedKeywordCollection? keywords);
+
+    // Requires IHasNormalizedTitle
+    public static IQueryable<TEntity> FilterNormalizedTitle<TEntity>(this IQueryable<TEntity> query, ParsedKeywordCollection? keywords);
+
+    // Requires IHasNormalizedContent
+    public static IQueryable<TEntity> FilterQ<TEntity>(this IQueryable<TEntity> query, ParsedKeywordCollection? keywords);
+
+    // Requires IHasCreated
+    public static IQueryable<TEntity> FilterCreated<TEntity>(this IQueryable<TEntity> query, DateTime? minDate, DateTime? maxDate);
+
+    // Requires IHasLastModified
+    public static IQueryable<TEntity> FilterLastModified<TEntity>(this IQueryable<TEntity> query, DateTime? minDate, DateTime? maxDate);
+
+    // Requires IHasTimestamps
+    public static IQueryable<TEntity> FilterTimestamps<TEntity>(this IQueryable<TEntity> query,
+        DateTime? minCreated, DateTime? maxCreated, DateTime? minModified, DateTime? maxModified);
+
+    // Requires IArchivable
+    public static IQueryable<TEntity> FilterArchivable<TEntity>(this IQueryable<TEntity> query, bool? isArchived);
+
+    // Requires IHasAttachments
+    public static IQueryable<TEntity> FilterHasAttachment<TEntity>(this IQueryable<TEntity> query, bool? hasAttachment);
+
+    public static IQueryable<TEntity> SortQuery<TEntity, TKey>(this IQueryable<TEntity> query)
         where TEntity : IEntity<TKey>;
-
-    // Filter by multiple IDs
-    public static IQueryable<TEntity> FilterIds<TEntity, TKey>(
-        this IQueryable<TEntity> query, 
-        ICollection<TKey>? ids)
-        where TEntity : IEntity<TKey>;
-
-    // Exclude specific IDs
-    public static IQueryable<TEntity> FilterExclude<TEntity, TKey>(
-        this IQueryable<TEntity> query, 
-        ICollection<TKey>? ids)
-        where TEntity : IEntity<TKey>;
-
-    // Filter by Code
-    public static IQueryable<TEntity> FilterCode<TEntity>(
-        this IQueryable<TEntity> query, 
-        string? code)
-        where TEntity : IHasCode;
-
-    // Filter by Title (with keywords)
-    public static IQueryable<TEntity> FilterTitle<TEntity>(
-        this IQueryable<TEntity> query, 
-        ParsedKeywordCollection? keywords)
-        where TEntity : IHasTitle;
-
-    // Filter by Normalized Title
-    public static IQueryable<TEntity> FilterNormalizedTitle<TEntity>(
-        this IQueryable<TEntity> query, 
-        ParsedKeywordCollection? keywords)
-        where TEntity : IHasNormalizedTitle;
-
-    // Filter by Created date range
-    public static IQueryable<TEntity> FilterCreated<TEntity>(
-        this IQueryable<TEntity> query, 
-        DateTime? minDate, 
-        DateTime? maxDate)
-        where TEntity : IHasCreated;
-
-    // Filter by LastModified date range
-    public static IQueryable<TEntity> FilterLastModified<TEntity>(
-        this IQueryable<TEntity> query, 
-        DateTime? minDate, 
-        DateTime? maxDate)
-        where TEntity : IHasLastModified;
-
-    // Filter by both timestamp ranges
-    public static IQueryable<TEntity> FilterTimestamps<TEntity>(
-        this IQueryable<TEntity> query, 
-        DateTime? minCreated, 
-        DateTime? maxCreated, 
-        DateTime? minModified, 
-        DateTime? maxModified)
-        where TEntity : IHasTimestamps;
-
-    // Filter by Q (full-text search on NormalizedContent)
-    public static IQueryable<TEntity> FilterQ<TEntity>(
-        this IQueryable<TEntity> query, 
-        ParsedKeywordCollection? keywords)
-        where TEntity : IHasNormalizedContent;
-
-    // Filter archived items
-    public static IQueryable<TEntity> FilterArchivable<TEntity>(
-        this IQueryable<TEntity> query, 
-        bool? isArchived)
-        where TEntity : IArchivable;
-
-    // Filter by attachment presence
-    public static IQueryable<TEntity> FilterHasAttachment<TEntity>(
-        this IQueryable<TEntity> query, 
-        bool? hasAttachment)
-        where TEntity : IHasAttachments;
-
-    // Apply default sorting
-    public static IQueryable<TEntity> SortQuery<TEntity, TKey>(
-        this IQueryable<TEntity> query)
-        where TEntity : IEntity<TKey>;
-}
-```
-
-### Controller Extensions
-
-**Namespace:** `Regira.Entities.Web.Controllers`  
-**Class:** `ControllerExtensions`
-
-```csharp
-public static class ControllerExtensions
-{
-    // Details helpers
-    public static OkObjectResult DetailsResult<TDto>(
-        this ControllerBase _, 
-        TDto item, 
-        long? duration = null);
-
-    public static Task<ActionResult<DetailsResult<TDto>>?> Details<TEntity, TDto>(
-        this ControllerBase ctrl, 
-        int id)
-        where TEntity : class, IEntity<int>;
-
-    public static Task<ActionResult<DetailsResult<TDto>>?> Details<TEntity, TKey, TDto>(
-        this ControllerBase ctrl, 
-        TKey id)
-        where TEntity : class, IEntity<TKey>;
-
-    // List helpers
-    public static OkObjectResult ListResult<TDto>(
-        this ControllerBase _, 
-        IList<TDto> items, 
-        long? duration = null);
-
-    // Simple list
-    public static Task<ActionResult<ListResult<TDto>>> List<TEntity, TKey, TSearchObject, TDto>(
-        this ControllerBase ctrl, 
-        TSearchObject? so = null, 
-        PagingInfo? pagingInfo = null)
-        where TEntity : class, IEntity<TKey>
-        where TSearchObject : class, ISearchObject<TKey>;
-
-    // Complex list (with sorting and includes)
-    public static Task<ActionResult<ListResult<TDto>>> List<TEntity, TKey, TSo, TSortBy, TIncludes, TDto>(
-        this ControllerBase ctrl,
-        TSo[] so, 
-        PagingInfo pagingInfo, 
-        TIncludes[] includes, 
-        TSortBy[] sortBy)
-        where TEntity : class, IEntity<TKey>
-        where TSo : class, ISearchObject<TKey>, new()
-        where TSortBy : struct, Enum
-        where TIncludes : struct, Enum;
-
-    // Search helpers
-    public static OkObjectResult SearchResult<TDto>(
-        this ControllerBase _, 
-        IList<TDto> items, 
-        long count, 
-        long? duration = null);
-
-    // Simple search
-    public static Task<ActionResult<SearchResult<TDto>>> Search<TEntity, TKey, TDto>(
-        this ControllerBase ctrl, 
-        SearchObject<TKey>? so = null, 
-        PagingInfo? pagingInfo = null)
-        where TEntity : class, IEntity<TKey>;
-
-    // Complex search (with sorting and includes)
-    public static Task<ActionResult<SearchResult<TDto>>> Search<TEntity, TKey, TSo, TSortBy, TIncludes, TDto>(
-        this ControllerBase ctrl,
-        TSo[] so, 
-        PagingInfo pagingInfo, 
-        TIncludes[] includes, 
-        TSortBy[] sortBy)
-        where TEntity : class, IEntity<TKey>
-        where TSo : class, ISearchObject<TKey>, new()
-        where TSortBy : struct, Enum
-        where TIncludes : struct, Enum;
-
-    // Save helpers
-    public static OkObjectResult SaveResult<TDto>(
-        this ControllerBase _, 
-        TDto item, 
-        int affected,
-        bool isNew, 
-        long? duration = null);
-
-    public static Task<ActionResult<SaveResult<TDto>>?> Save<TEntity, TKey, TDto, TInputDto>(
-        this ControllerBase ctrl, 
-        TInputDto model, 
-        TKey? id = default)
-        where TEntity : class, IEntity<TKey>
-        where TInputDto : class;
-
-    // Delete helpers
-    public static OkObjectResult DeleteResult<TDto>(
-        this ControllerBase _, 
-        TDto item, 
-        long? duration = null);
-
-    public static Task<ActionResult<DeleteResult<TDto>>?> Delete<TEntity, TKey, TDto>(
-        this ControllerBase ctrl, 
-        TKey id)
-        where TEntity : class, IEntity<TKey>;
 }
 ```
 
@@ -855,12 +465,11 @@ public static class ControllerExtensions
 
 ## Service Builders
 
-### Top-Level DI Entry Points
-
-**Namespace:** `Regira.Entities.DependencyInjection.ServiceBuilders.Extensions`
+### Top-Level DI Entry Point
 
 ```csharp
-// Entry point: creates an EntityServiceCollection for fluent entity registration
+using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
+
 public static EntityServiceCollection<TContext> UseEntities<TContext>(
     this IServiceCollection services,
     Action<EntityServiceCollectionOptions>? configure = null)
@@ -871,24 +480,16 @@ public static EntityServiceCollection<TContext> UseEntities<TContext>(
 
 ### EntityServiceCollectionOptions Extension Methods
 
-The `EntityServiceCollectionOptions` object is passed to the `UseEntities` configure lambda. All methods below are **extension methods** on `EntityServiceCollectionOptions` from the listed namespaces.
-
-#### Setup Helpers
-
-**Namespace:** `Regira.Entities.DependencyInjection.ServiceBuilders.Extensions`
+#### Setup
 
 ```csharp
-// Convenience method: registers default primers, normalizer services,
-// FilterHasNormalizedContentQueryBuilder, and all default global query filters.
-// Equivalent to calling AddDefaultPrimers() + AddDefaultEntityNormalizer()
-//   + AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>()
-//   + AddDefaultGlobalQueryFilters()
+using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
+
+// Registers default primers
 public static EntityServiceCollectionOptions UseDefaults(
     this EntityServiceCollectionOptions options,
     Action<EntityDefaultNormalizingOptions>? configure = null);
 
-// Registers only the default normalizer services (no primers, no query filters).
-// Use when you want fine-grained control instead of UseDefaults().
 public static EntityServiceCollectionOptions UseNormalizerDefaults(
     this EntityServiceCollectionOptions options,
     Action<EntityDefaultNormalizingOptions>? configure = null);
@@ -896,34 +497,31 @@ public static EntityServiceCollectionOptions UseNormalizerDefaults(
 
 #### Mapping
 
-**Namespace:** `Regira.Entities.Mapping.Mapster` (package: `Regira.Entities.Mapping.Mapster`)
-
 ```csharp
-// Registers Mapster as the IEntityMapper. Default mapping choice.
+// package: Regira.Entities.Mapping.Mapster
+using Regira.Entities.Mapping.Mapster;
+
 public static EntityServiceCollectionOptions UseMapsterMapping(
     this EntityServiceCollectionOptions options,
     Action<TypeAdapterConfig>? configure = null);
 ```
 
-**Namespace:** `Regira.Entities.Mapping.AutoMapper` (package: `Regira.Entities.Mapping.AutoMapper`)
-
 ```csharp
-// Registers AutoMapper as the IEntityMapper.
+// package: Regira.Entities.Mapping.AutoMapper
+using Regira.Entities.Mapping.AutoMapper;
+
 public static EntityServiceCollectionOptions UseAutoMapper(
     this EntityServiceCollectionOptions options,
     Action<IServiceProvider, IMapperConfigurationExpression>? configure = null);
 ```
 
-**Namespace:** `Regira.Entities.DependencyInjection.Mapping`
-
 ```csharp
-// Register a global after-mapper class (runs after every Entity→DTO mapping
-// where CanMap() returns true).
+using Regira.Entities.DependencyInjection.Mapping;
+
 public static EntityServiceCollectionOptions AddAfterMapper<TAfterMapper>(
     this EntityServiceCollectionOptions options)
     where TAfterMapper : class, IEntityAfterMapper;
 
-// Register a global inline after-mapper for a specific source/target pair.
 public static EntityServiceCollectionOptions AfterMap<TSource, TTarget>(
     this EntityServiceCollectionOptions options,
     Action<TSource, TTarget> afterMapAction);
@@ -933,29 +531,20 @@ public static EntityServiceCollectionOptions AfterMap<TSource, TTarget>(
     Func<IServiceProvider, Action<TSource, TTarget>> afterMapAction);
 ```
 
-#### Preppers (global, run before SaveChanges for matching entities)
-
-**Namespace:** `Regira.Entities.DependencyInjection.Preppers`
+#### Preppers (global)
 
 ```csharp
-// Register a global prepper class — runs for every entity that passes CanPrepare().
+using Regira.Entities.DependencyInjection.Preppers;
+
 public static EntityServiceCollectionOptions AddPrepper<TImplementation>(
     this EntityServiceCollectionOptions options)
     where TImplementation : class, IEntityPrepper;
 
-// Register a global prepper class scoped to a specific entity interface/type.
-public static EntityServiceCollectionOptions AddPrepper<TImplementation, TKey>(
-    this EntityServiceCollectionOptions options)
-    where TImplementation : class, IEntityPrepper<TKey>;
-
-// Register an inline prepper for entities implementing a specific interface/type.
-// TEntity can be an interface (e.g. IHasAggregateKey) — runs for all entities that implement it.
 public static EntityServiceCollectionOptions AddPrepper<TEntity>(
     this EntityServiceCollectionOptions options,
     Action<TEntity> prepareFunc)
     where TEntity : class;
 
-// Register an inline async prepper that receives the DbContext.
 public static EntityServiceCollectionOptions AddPrepper<TContext, TEntity, TKey>(
     this EntityServiceCollectionOptions options,
     Func<TEntity, TContext, Task> prepareFunc)
@@ -963,82 +552,62 @@ public static EntityServiceCollectionOptions AddPrepper<TContext, TEntity, TKey>
     where TEntity : class, IEntity<TKey>;
 ```
 
-#### Normalizers (global, run on save for matching entities)
-
-**Namespace:** `Regira.Entities.DependencyInjection.Normalizers`
+#### Primers (global)
 
 ```csharp
-// Register a global entity normalizer class.
-public static EntityServiceCollectionOptions AddNormalizer<TNormalizer>(
-    this EntityServiceCollectionOptions options)
-    where TNormalizer : class, IEntityNormalizer;
+using Regira.Entities.DependencyInjection.Primers;
 
-// Register a global entity normalizer scoped to a specific entity interface/type.
-public static EntityServiceCollectionOptions AddNormalizer<TEntity, TNormalizer>(
-    this EntityServiceCollectionOptions options)
-    where TNormalizer : class, IEntityNormalizer<TEntity>;
-
-// Register the default normalizer stack (DefaultNormalizer, ObjectNormalizer,
-// DefaultEntityNormalizer, QKeywordHelper). Called automatically by UseDefaults().
-public static EntityServiceCollectionOptions AddDefaultEntityNormalizer(
-    this EntityServiceCollectionOptions options,
-    Action<NormalizeOptions>? configure = null);
-```
-
-#### Primers (global, run inside EF Core SaveChanges interceptor)
-
-**Namespace:** `Regira.Entities.DependencyInjection.Primers`
-
-```csharp
-// Register a global primer class.
 public static EntityServiceCollectionOptions AddPrimer<TPrimer>(
     this EntityServiceCollectionOptions options)
     where TPrimer : class, IEntityPrimer;
 
-// Register a global primer scoped to a specific entity interface/type.
-public static EntityServiceCollectionOptions AddPrimer<TPrimer, TKey>(
-    this EntityServiceCollectionOptions options)
-    where TPrimer : class, IEntityPrimer<TKey>;
-
-// Register the default primer set (ArchivablePrimer, HasCreatedDbPrimer,
-// HasLastModifiedDbPrimer). Called automatically by UseDefaults().
+// Registers ArchivablePrimer + HasCreatedDbPrimer + HasLastModifiedDbPrimer
 public static EntityServiceCollectionOptions AddDefaultPrimers(
     this EntityServiceCollectionOptions options);
 ```
 
 #### Global Filter Query Builders
 
-**Namespace:** `Regira.Entities.DependencyInjection.QueryBuilders`
-
 ```csharp
-// Register a global filter query builder — applies to all entities where the builder
-// can handle the entity type (determined by IGlobalFilteredQueryBuilder.CanBuild()).
+using Regira.Entities.DependencyInjection.QueryBuilders;
+
 public static EntityServiceCollectionOptions AddGlobalFilterQueryBuilder<TImplementation>(
     this EntityServiceCollectionOptions options)
     where TImplementation : class, IGlobalFilteredQueryBuilder;
 
-// Typed variant (also registers as IGlobalFilteredQueryBuilder<TKey>).
-public static EntityServiceCollectionOptions AddGlobalFilterQueryBuilder<TImplementation, TKey>(
-    this EntityServiceCollectionOptions options)
-    where TImplementation : class, IGlobalFilteredQueryBuilder<TKey>;
-
-// Register the default set of global filters (FilterIdsQueryBuilder, FilterArchivablesQueryBuilder,
-// FilterHasCreatedQueryBuilder, FilterHasLastModifiedQueryBuilder).
-// Called automatically by UseDefaults().
+// Registers FilterIdsQueryBuilder + FilterArchivablesQueryBuilder
+//   + FilterHasCreatedQueryBuilder + FilterHasLastModifiedQueryBuilder
 public static EntityServiceCollectionOptions AddDefaultGlobalQueryFilters(
     this EntityServiceCollectionOptions options);
+```
+
+#### Normalizers (global)
+
+```csharp
+using Regira.Entities.DependencyInjection.Normalizers;
+
+public static EntityServiceCollectionOptions AddNormalizer<TNormalizer>(
+    this EntityServiceCollectionOptions options)
+    where TNormalizer : class, IEntityNormalizer;
+
+public static EntityServiceCollectionOptions AddNormalizer<TEntity, TNormalizer>(
+    this EntityServiceCollectionOptions options)
+    where TNormalizer : class, IEntityNormalizer<TEntity>;
+
+// Registers DefaultNormalizer + ObjectNormalizer + DefaultEntityNormalizer + QKeywordHelper
+public static EntityServiceCollectionOptions AddDefaultEntityNormalizer(
+    this EntityServiceCollectionOptions options,
+    Action<NormalizeOptions>? configure = null);
 ```
 
 ---
 
 ### EntityServiceCollection\<TContext\>
 
-The fluent builder returned by `UseEntities<TContext>()`. Use `.For<>()` to register each entity.
-
-**Namespace:** `Regira.Entities.DependencyInjection.ServiceBuilders`
-
 ```csharp
-public class EntityServiceCollection<TContext>(EntityServiceCollectionOptions options)
+using Regira.Entities.DependencyInjection.ServiceBuilders;
+
+public class EntityServiceCollection<TContext>
     where TContext : DbContext
 {
     // Simple entity (int key, default SearchObject)
@@ -1057,7 +626,7 @@ public class EntityServiceCollection<TContext>(EntityServiceCollectionOptions op
         where TEntity : class, IEntity<TKey>
         where TSearchObject : class, ISearchObject<TKey>, new();
 
-    // Full-featured (int key)
+    // Full-featured (int key) — most common
     EntityServiceCollection<TContext> For<TEntity, TSearchObject, TSortBy, TIncludes>(
         Action<ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>>? configure = null)
         where TEntity : class, IEntity<int>
@@ -1073,26 +642,12 @@ public class EntityServiceCollection<TContext>(EntityServiceCollectionOptions op
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum;
 
-    // Attachment support for the default Attachment entity
+    // Attachments
     EntityServiceCollection<TContext> WithAttachments(
         Func<IServiceProvider, IFileService> factory,
         Action<EntitySearchObjectServiceBuilder<TContext, Attachment, int, AttachmentSearchObject<int>>>? configure = null);
 
-    // Attachment support for a custom attachment entity
-    EntityServiceCollection<TContext> WithAttachments<TAttachment, TAttachmentKey, TAttachmentSearchObject>(
-        Func<IServiceProvider, IFileService> fileServiceFactory,
-        Action<EntitySearchObjectServiceBuilder<TContext, TAttachment, TAttachmentKey, TAttachmentSearchObject>>? configure = null)
-        where TAttachment : class, IAttachment<TAttachmentKey>, new()
-        where TAttachmentSearchObject : AttachmentSearchObject<TAttachmentKey>, new();
-
-    // Typed attachment query service
-    EntityServiceCollection<TContext> ConfigureTypedAttachmentService(
-        Func<TContext, IList<IAttachmentQuerySetDescriptor>> queryFactory);
-
-    EntityServiceCollection<TContext> ConfigureTypedAttachmentService<TService>()
-        where TService : class, ITypedAttachmentService;
-
-    // Generic service registration helpers
+    // Generic service helpers
     EntityServiceCollection<TContext> AddTransient<TService, TImplementation>()
         where TService : class
         where TImplementation : class, TService;
@@ -1103,197 +658,294 @@ public class EntityServiceCollection<TContext>(EntityServiceCollectionOptions op
 }
 ```
 
-### Entity Service Builder
+---
 
-**Namespace:** `Regira.Entities.DependencyInjection.ServiceBuilders`  
-**Class:** `EntityServiceBuilder<TContext, TEntity, TKey>`
+### EntityServiceBuilder\<TContext, TEntity, TKey\>
+
+Base builder.
 
 ```csharp
+using Regira.Entities.DependencyInjection.ServiceBuilders;
+
 public partial class EntityServiceBuilder<TContext, TEntity, TKey>
     where TContext : DbContext
     where TEntity : class, IEntity<TKey>
 {
-    // Service checks
     bool HasEntityService();
     bool HasService<TService>();
 
-    // Search object configuration
-    EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject> 
+    // Elevate to typed search object builder
+    EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject>
         WithSearchObject<TSearchObject>()
         where TSearchObject : class, ISearchObject<TKey>, new();
 
     // Mapping
-    MappedEntityServiceBuilder<TContext, TEntity, TKey, TDto, TInputDto> 
+    MappedEntityServiceBuilder<TContext, TEntity, TKey, TDto, TInputDto>
         UseMapping<TDto, TInputDto>(Action<IEntityMapConfigurator>? mapAction = null);
 
-    MappedEntityServiceBuilder<TContext, TEntity, TKey> 
-        UseMapping(Type dto, Type inputDto, Action<IEntityMapConfigurator>? mapAction = null);
+    // Register additional type pairs for nested DTOs / related collections.
+    // <A, A> same-type: registers the DTO so nested collections are mapped in output
+    //   (e.g. AddMapping<CategoryDto, CategoryDto>() — mapper knows how to project the list).
+    // <InputDto, Entity> cross-type: required when InputDto items appear inside a Related()
+    //   navigation — without this pair the mapper cannot resolve the input items to entities.
+    // e.g. e.AddMapping<ProductCategoryDto, ProductCategoryDto>() — same-type registers nested DTO
+    //      e.AddMapping<ProductCategoryInputDto, ProductCategory>() — input → entity for Related()
+    EntityServiceBuilder<TContext, TEntity, TKey> AddMapping<TSource, TTarget>();
 
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        AddMapping<TSource, TTarget>();
+    // Service registration
+    EntityServiceBuilder<TContext, TEntity, TKey> AddDefaultService();
 
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        AddMapping(Type sourceType, Type targetType);
-
-    // Entity service registration
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        AddDefaultService();
-
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        UseEntityService<TService>()
+    EntityServiceBuilder<TContext, TEntity, TKey> UseEntityService<TService>()
         where TService : class, IEntityService<TEntity, TKey>, IEntityService<TEntity, TKey, SearchObject<TKey>>;
 
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        UseEntityService<TService>(Func<IServiceProvider, TService> factory)
+    EntityServiceBuilder<TContext, TEntity, TKey> UseEntityService<TService>(
+        Func<IServiceProvider, TService> factory)
         where TService : class, IEntityService<TEntity, TKey, SearchObject<TKey>>;
 
-    // Read/Write services
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        UseReadService<TService>()
+    EntityServiceBuilder<TContext, TEntity, TKey> UseReadService<TService>()
         where TService : class, IEntityReadService<TEntity, TKey, SearchObject<TKey>>;
 
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        UseWriteService<TService>()
+    EntityServiceBuilder<TContext, TEntity, TKey> UseWriteService<TService>()
         where TService : class, IEntityWriteService<TEntity, TKey>;
 
-    // Repository
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        HasRepository<TService>()
+    EntityServiceBuilder<TContext, TEntity, TKey> HasRepository<TService>()
         where TService : class, IEntityRepository<TEntity, TKey, SearchObject<TKey>>;
 
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        HasRepository<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+    EntityServiceBuilder<TContext, TEntity, TKey> HasRepository<TImplementation>(
+        Func<IServiceProvider, TImplementation> factory)
         where TImplementation : class, IEntityRepository<TEntity, TKey>, IEntityRepository<TEntity, TKey, SearchObject<TKey>>;
 
-    // Manager
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        HasManager<TService>()
+    EntityServiceBuilder<TContext, TEntity, TKey> HasManager<TService>()
         where TService : class, IEntityManager<TEntity, TKey>, IEntityManager<TEntity, TKey, SearchObject<TKey>>;
 
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        HasManager<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+    EntityServiceBuilder<TContext, TEntity, TKey> HasManager<TImplementation>(
+        Func<IServiceProvider, TImplementation> factory)
         where TImplementation : class, IEntityManager<TEntity, TKey>, IEntityManager<TEntity, TKey, SearchObject<TKey>>;
 
     // Query builders
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        AddDefaultQueryBuilder();
+    EntityServiceBuilder<TContext, TEntity, TKey> AddDefaultQueryBuilder();
 
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        UseQueryBuilder<TImplementation>()
+    EntityServiceBuilder<TContext, TEntity, TKey> UseQueryBuilder<TImplementation>()
         where TImplementation : class, IQueryBuilder<TEntity, TKey, SearchObject<TKey>, EntitySortBy, EntityIncludes>;
 
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        UseQueryBuilder<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+    EntityServiceBuilder<TContext, TEntity, TKey> UseQueryBuilder<TImplementation>(
+        Func<IServiceProvider, TImplementation> factory)
         where TImplementation : class, IQueryBuilder<TEntity, TKey, SearchObject<TKey>, EntitySortBy, EntityIncludes>;
 
-    // Query filters
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        AddQueryFilter<TImplementation>()
+    EntityServiceBuilder<TContext, TEntity, TKey> AddQueryFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>;
 
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        AddQueryFilter<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+    EntityServiceBuilder<TContext, TEntity, TKey> AddQueryFilter<TImplementation>(
+        Func<IServiceProvider, TImplementation> factory)
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>;
 
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        Filter(Func<IQueryable<TEntity>, SearchObject<TKey>?, IQueryable<TEntity>> filterFunc);
+    EntityServiceBuilder<TContext, TEntity, TKey> Filter(
+        Func<IQueryable<TEntity>, SearchObject<TKey>?, IQueryable<TEntity>> filterFunc);
 
-    // Sorting and includes
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        SortBy(Func<IQueryable<TEntity>, IQueryable<TEntity>> sortBy);
+    // Sorting / includes (typed to EntitySortBy / EntityIncludes at this level)
+    EntityServiceBuilder<TContext, TEntity, TKey> SortBy(
+        Func<IQueryable<TEntity>, IQueryable<TEntity>> sortBy);
 
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        Includes(Func<IQueryable<TEntity>, EntityIncludes?, IQueryable<TEntity>> addIncludes);
+    EntityServiceBuilder<TContext, TEntity, TKey> Includes(
+        Func<IQueryable<TEntity>, EntityIncludes?, IQueryable<TEntity>> addIncludes);
 
     // Primers
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        AddPrimer<TPrimer>()
+    EntityServiceBuilder<TContext, TEntity, TKey> AddPrimer<TPrimer>()
         where TPrimer : class, IEntityPrimer<TEntity>;
 
     // Normalizers
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        AddNormalizer<TNormalizer>()
+    EntityServiceBuilder<TContext, TEntity, TKey> AddNormalizer<TNormalizer>()
         where TNormalizer : class, IEntityNormalizer<TEntity>;
 
     // Processors
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        Process(Func<IList<TEntity>, EntityIncludes?, Task> process);
+    EntityServiceBuilder<TContext, TEntity, TKey> Process(
+        Func<IList<TEntity>, EntityIncludes?, Task> process);
 
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        Process(Action<TEntity, EntityIncludes?> process);
+    EntityServiceBuilder<TContext, TEntity, TKey> Process(
+        Action<TEntity, EntityIncludes?> process);
 
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        Process<TProcessor>()
+    EntityServiceBuilder<TContext, TEntity, TKey> Process<TProcessor>()
         where TProcessor : class, IEntityProcessor<TEntity, EntityIncludes>;
 
-    // Preppers
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        Prepare(Action<TEntity> prepareFunc);
+    // Preppers (inline — for class-based preppers implement IEntityPrepper<TEntity>)
+    EntityServiceBuilder<TContext, TEntity, TKey> Prepare(Action<TEntity> prepareFunc);
 
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        Prepare(Func<TEntity, TContext, Task> prepareFunc);
+    EntityServiceBuilder<TContext, TEntity, TKey> Prepare(
+        Func<TEntity, TContext, Task> prepareFunc);
 
-    // Related collections — manages a child collection via RelatedCollectionPrepper
-    EntityServiceBuilder<TContext, TEntity, TKey> 
-        Related<TRelated, TRelatedKey>(
-            Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression,
-            Action<TEntity>? prepareFunc = null)
+    // Related child collections (managed by RelatedCollectionPrepper)
+    EntityServiceBuilder<TContext, TEntity, TKey> Related<TRelated, TRelatedKey>(
+        Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression,
+        Action<TEntity>? prepareFunc = null)
         where TRelated : class, IEntity<TRelatedKey>;
 
-    // Build
     void Build();
 }
 ```
+
+---
+
+### EntitySearchObjectServiceBuilder
+
+Returned by `WithSearchObject<TSearchObject>()`. Inherits all `EntityServiceBuilder` methods.
+**Only listing new / changed members:**
+
+```csharp
+public partial class EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject>
+    : EntityServiceBuilder<TContext, TEntity, TKey>
+    where TSearchObject : class, ISearchObject<TKey>, new()
+{
+    // NEW: elevate to full-featured builder
+    ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>
+        Complex<TSortBy, TIncludes>()
+        where TSortBy : struct, Enum
+        where TIncludes : struct, Enum;
+
+    // CHANGED: constraint uses TSearchObject instead of SearchObject<TKey>
+    EntitySearchObjectServiceBuilder<...> UseEntityService<TService>()
+        where TService : class, IEntityService<TEntity, TKey, TSearchObject>;
+
+    EntitySearchObjectServiceBuilder<...> AddQueryFilter<TImplementation>()
+        where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>;
+
+    EntitySearchObjectServiceBuilder<...> AddQueryFilter<TImplementation>(
+        Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>;
+
+    EntitySearchObjectServiceBuilder<...> Filter(
+        Func<IQueryable<TEntity>, TSearchObject?, IQueryable<TEntity>> filterFunc);
+
+    void Build();
+}
+```
+
+---
 
 ### Int-Key Variants
 
 ```csharp
-// Shortcut for entities with int keys
-public partial class EntityIntServiceBuilder<TContext, TEntity>(EntityServiceCollectionOptions options)
-    : EntityServiceBuilder<TContext, TEntity, int>(options),
-      IEntityServiceBuilder<TContext, TEntity>
-    where TContext : DbContext
+// For<TEntity>() → EntityIntServiceBuilder
+public partial class EntityIntServiceBuilder<TContext, TEntity>
+    : EntityServiceBuilder<TContext, TEntity, int>
     where TEntity : class, IEntity<int>
 {
-    EntityIntServiceBuilder<TContext, TEntity, TSearchObject> 
-        WithSearchObject<TSearchObject>()
+    // Advance to SearchObject variant
+    EntityIntServiceBuilder<TContext, TEntity, TSearchObject> WithSearchObject<TSearchObject>()
         where TSearchObject : class, ISearchObject<int>, new();
+
+    // Int-key shortcuts (no TRelatedKey / TContext parameter needed)
+    EntityIntServiceBuilder<TContext, TEntity> Prepare(Func<TEntity, TContext, Task> prepareFunc);
+
+    EntityIntServiceBuilder<TContext, TEntity> Related<TRelated>(
+        Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression,
+        Action<TEntity>? prepareFunc = null)
+        where TRelated : class, IEntity<int>;
+
+    void Build();
+}
+
+// For<TEntity, TSearchObject>() or WithSearchObject() → EntityIntServiceBuilder<TContext, TEntity, TSearchObject>
+public class EntityIntServiceBuilder<TContext, TEntity, TSearchObject>
+    : EntitySearchObjectServiceBuilder<TContext, TEntity, int, TSearchObject>
+    where TEntity : class, IEntity<int>
+    where TSearchObject : class, ISearchObject<int>, new()
+{
+    // Advance to full-featured
+    ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>
+        Complex<TSortBy, TIncludes>()
+        where TSortBy : struct, Enum
+        where TIncludes : struct, Enum;
 
     void Build();
 }
 ```
 
-### Complex Service Builder
+---
+
+### ComplexEntityServiceBuilder
+
+Returned by `.For<TEntity, TKey, TSearchObject, TSortBy, TIncludes>()` or `.Complex<TSortBy, TIncludes>()`.
+Inherits all `EntitySearchObjectServiceBuilder` methods.
+**Only listing new / changed members:**
 
 ```csharp
 public partial class ComplexEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject, TSortBy, TIncludes>
-    where TContext : DbContext
-    where TEntity : class, IEntity<TKey>
-    where TSearchObject : class, ISearchObject<TKey>, new()
+    : EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject>
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
-    // Inherits all methods from EntityServiceBuilder
-    // Plus specialized methods for TSortBy and TIncludes
+    // CHANGED: constraints use full TSortBy/TIncludes
+    ComplexEntityServiceBuilder<...> UseEntityService<TService>()
+        where TService : class, IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>;
+
+    ComplexEntityServiceBuilder<...> UseReadService<TService>()
+        where TService : class, IEntityReadService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>;
+
+    ComplexEntityServiceBuilder<...> HasRepository<TService>()
+        where TService : class, IEntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>, IEntityRepository<TEntity, TKey>;
+
+    ComplexEntityServiceBuilder<...> HasManager<TService>()
+        where TService : class, IEntityManager<TEntity, TKey, TSearchObject, TSortBy, TIncludes>;
+
+    ComplexEntityServiceBuilder<...> UseQueryBuilder<TImplementation>()
+        where TImplementation : class, IQueryBuilder<TEntity, TKey, TSearchObject, TSortBy, TIncludes>;
+
+    // NEW: typed sorting
+    ComplexEntityServiceBuilder<...> SortBy<TImplementation>()
+        where TImplementation : class, ISortedQueryBuilder<TEntity, TKey, TSortBy>;
+
+    ComplexEntityServiceBuilder<...> SortBy(
+        Func<IQueryable<TEntity>, TSortBy?, IQueryable<TEntity>> sortByFunc);
+
+    // NEW: typed includes
+    ComplexEntityServiceBuilder<...> Includes<TImplementation>()
+        where TImplementation : class, IIncludableQueryBuilder<TEntity, TKey, TIncludes>;
+
+    ComplexEntityServiceBuilder<...> Includes(
+        Func<IQueryable<TEntity>, TIncludes?, IQueryable<TEntity>> addIncludes);
+
+    // NEW: typed processors
+    ComplexEntityServiceBuilder<...> Process(Func<IList<TEntity>, TIncludes?, Task> process);
+    ComplexEntityServiceBuilder<...> Process(Action<TEntity, TIncludes?> process);
+    ComplexEntityServiceBuilder<...> Process<TImplementation>()
+        where TImplementation : class, IEntityProcessor<TEntity, TIncludes>;
 
     void Build();
 }
 ```
 
-### MappedEntityServiceBuilder
+---
 
-Returned by `UseMapping<TDto, TInputDto>()`. Inherits all `EntityServiceBuilder` methods.
+### ComplexEntityIntServiceBuilder
 
-**Namespace:** `Regira.Entities.DependencyInjection.Mapping`
+Returned by `.For<TEntity, TSearchObject, TSortBy, TIncludes>()`.
+Inherits all `ComplexEntityServiceBuilder` methods. Only addition vs parent:
 
 ```csharp
-// Base variant — After mappers for any source/target
-public class MappedEntityServiceBuilder<TContext, TEntity, TKey>(EntityServiceCollectionOptions options)
-    : EntityServiceBuilder<TContext, TEntity, TKey>(options)
-    where TContext : DbContext
-    where TEntity : class, IEntity<TKey>
+public partial class ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes>
+    : ComplexEntityServiceBuilder<TContext, TEntity, int, TSearchObject, TSortBy, TIncludes>
 {
-    // Register a typed after-mapper class
+    // Int-key shortcut — no TRelatedKey type parameter needed
+    ComplexEntityIntServiceBuilder<...> Related<TRelated>(
+        Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression,
+        Action<TEntity>? prepareFunc = null)
+        where TRelated : class, IEntity<int>;
+
+    void Build();
+}
+```
+
+---
+
+### MappedEntityServiceBuilder
+
+Returned by `UseMapping<TDto, TInputDto>()`. Inherits all builder methods.
+
+```csharp
+// Base variant — any source/target after-mapper
+public class MappedEntityServiceBuilder<TContext, TEntity, TKey>
+    : EntityServiceBuilder<TContext, TEntity, TKey>
+{
     MappedEntityServiceBuilder<TContext, TEntity, TKey> After<TImplementation>()
         where TImplementation : class, IEntityAfterMapper;
 
@@ -1301,7 +953,6 @@ public class MappedEntityServiceBuilder<TContext, TEntity, TKey>(EntityServiceCo
         Func<IServiceProvider, TImplementation> factory)
         where TImplementation : class, IEntityAfterMapper;
 
-    // Register an inline after-mapper (Entity -> DTO)
     MappedEntityServiceBuilder<TContext, TEntity, TKey> After<TSource, TTarget>(
         Action<TSource, TTarget> afterMapAction);
 
@@ -1309,17 +960,15 @@ public class MappedEntityServiceBuilder<TContext, TEntity, TKey>(EntityServiceCo
         Func<IServiceProvider, Action<TSource, TTarget>> afterMapActionFactory);
 }
 
-// Typed variant — DTO and InputDto are known; shortcut After/AfterInput methods
-public class MappedEntityServiceBuilder<TContext, TEntity, TKey, TDto, TInputDto>(EntityServiceCollectionOptions options)
-    : MappedEntityServiceBuilder<TContext, TEntity, TKey>(options)
-    where TContext : DbContext
-    where TEntity : class, IEntity<TKey>
+// Typed variant — TDto and TInputDto known; shortcut After/AfterInput
+public class MappedEntityServiceBuilder<TContext, TEntity, TKey, TDto, TInputDto>
+    : MappedEntityServiceBuilder<TContext, TEntity, TKey>
 {
-    // Shortcut: Entity -> TDto after-mapper
+    // Entity → TDto after-mapper
     MappedEntityServiceBuilder<TContext, TEntity, TKey, TDto, TInputDto> After(
         Action<TEntity, TDto> afterMapAction);
 
-    // Shortcut: TInputDto -> Entity after-mapper
+    // TInputDto → Entity after-mapper
     MappedEntityServiceBuilder<TContext, TEntity, TKey, TDto, TInputDto> AfterInput(
         Action<TInputDto, TEntity> afterMapAction);
 }
@@ -1329,138 +978,98 @@ public class MappedEntityServiceBuilder<TContext, TEntity, TKey, TDto, TInputDto
 
 ## Mapping and Processing
 
-### Mapping
-
-**Namespace:** `Regira.Entities.Mapping.Abstractions`
+### IEntityMapper
 
 ```csharp
+using Regira.Entities.Mapping.Abstractions;
+
 public interface IEntityMapper
 {
     TTarget Map<TTarget>(object source);
     TTarget Map<TSource, TTarget>(TSource source, TTarget target);
 }
-
-public abstract class EntityMapperBase(IEnumerable<IEntityAfterMapper>? afterMappers = null) 
-    : IEntityMapper
-{
-    public virtual TTarget Map<TTarget>(object source);
-    public virtual TTarget Map<TSource, TTarget>(TSource source, TTarget target);
-    public virtual void ApplyAfterMappings<TSource, TTarget>(TSource source, TTarget target);
-}
-```
-
-### ServiceCollectionMappingExtensions
-
-Extension methods on `EntityServiceCollectionOptions` for global mapping setup.
-
-**Namespace:** `Regira.Entities.DependencyInjection.Mapping`
-
-```csharp
-public static class ServiceCollectionMappingExtensions
-{
-    // Configure mapping library (MapConfigurator + IEntityMapper implementation)
-    public static EntityServiceCollectionOptions AddMapping(
-        this EntityServiceCollectionOptions options,
-        Action<MappingConfigurator> configure);
-
-    public static EntityServiceCollectionOptions AddMapping<TEntityMapper>(
-        this EntityServiceCollectionOptions options,
-        Func<IServiceCollection, IEntityMapConfigurator> configFactory)
-        where TEntityMapper : class, IEntityMapper;
-
-    // Register a global after-mapper class
-    public static EntityServiceCollectionOptions AddAfterMapper<TAfterMapper>(
-        this EntityServiceCollectionOptions options)
-        where TAfterMapper : class, IEntityAfterMapper;
-
-    // Register a global inline after-mapper
-    public static EntityServiceCollectionOptions AfterMap<TSource, TTarget>(
-        this EntityServiceCollectionOptions options,
-        Action<TSource, TTarget> afterMapAction);
-
-    public static EntityServiceCollectionOptions AfterMap<TSource, TTarget>(
-        this EntityServiceCollectionOptions options,
-        Func<IServiceProvider, Action<TSource, TTarget>> afterMapAction);
-}
 ```
 
 ### After Mappers
 
-**Namespace:** `Regira.Entities.Mapping.Abstractions`
-
 ```csharp
-// Non-generic interface
+using Regira.Entities.Mapping.Abstractions;
+
 public interface IEntityAfterMapper
 {
     bool CanMap(object source);
     void AfterMap(object source, object target);
 }
 
-// Typed interface
 public interface IEntityAfterMapper<in TSource, in TTarget> : IEntityAfterMapper
 {
     void AfterMap(TSource source, TTarget target);
 }
 
-// Abstract base class (inherit to create a custom after-mapper)
+// Inherit to create a custom after-mapper class
 public abstract class EntityAfterMapperBase<TSource, TTarget> : IEntityAfterMapper<TSource, TTarget>
 {
     public abstract void AfterMap(TSource source, TTarget target);
     public bool CanMap(object source);
-    void IEntityAfterMapper.AfterMap(object source, object target);
-}
-
-// Concrete helper — wraps an Action
-public class EntityAfterMapper<TSource, TTarget>(Action<TSource, TTarget> afterMapAction)
-    : EntityAfterMapperBase<TSource, TTarget>
-{
-    public override void AfterMap(TSource source, TTarget target);
 }
 ```
 
 ### Query Builders
 
-**Namespace:** `Regira.Entities.EFcore.QueryBuilders.Abstractions`
-
 ```csharp
-public interface IQueryBuilder<TEntity, in TKey, in TSearchObject, TSortBy, TIncludes>
-    where TEntity : class, IEntity<TKey>
-    where TSearchObject : class, ISearchObject<TKey>, new()
+using Regira.Entities.EFcore.QueryBuilders.Abstractions;
+
+public interface IFilteredQueryBuilder<TEntity, TKey, in TSearchObject>
+    where TSearchObject : ISearchObject<TKey>
+{
+    IQueryable<TEntity> Build(IQueryable<TEntity> query, TSearchObject? so);
+}
+
+// Preferred base class — inherit and override Build().
+public abstract class FilteredQueryBuilderBase<TEntity>
+    : FilteredQueryBuilderBase<TEntity, SearchObject<int>>
+    where TEntity : IEntity<int>;
+
+public abstract class FilteredQueryBuilderBase<TEntity, TSearchObject>
+    : FilteredQueryBuilderBase<TEntity, int, TSearchObject>
+    where TEntity : IEntity<int>
+    where TSearchObject : ISearchObject<int>;
+
+public abstract class FilteredQueryBuilderBase<TEntity, TKey, TSearchObject>
+    : IFilteredQueryBuilder<TEntity, TKey, TSearchObject>
+    where TSearchObject : ISearchObject<TKey>
+{
+    public abstract IQueryable<TEntity> Build(IQueryable<TEntity> query, TSearchObject? so);
+}
+
+// 2-param shortcut defaults TSortBy to EntitySortBy
+public interface ISortedQueryBuilder<TEntity, TKey> : ISortedQueryBuilder<TEntity, TKey, EntitySortBy>
+    where TEntity : IEntity<TKey>;
+
+public interface ISortedQueryBuilder<TEntity, TKey, TSortBy>
+    where TEntity : IEntity<TKey>
     where TSortBy : struct, Enum
+{
+    IQueryable<TEntity> SortBy(IQueryable<TEntity> query, TSortBy? sortBy = null);
+}
+
+// 2-param shortcut defaults TIncludes to EntityIncludes
+public interface IIncludableQueryBuilder<TEntity, TKey> : IIncludableQueryBuilder<TEntity, TKey, EntityIncludes>
+    where TEntity : IEntity<TKey>;
+
+public interface IIncludableQueryBuilder<TEntity, TKey, TIncludes>
+    where TEntity : IEntity<TKey>
     where TIncludes : struct, Enum
 {
-    IQueryable<TEntity> BuildQuery(
-        IQueryable<TEntity> query, 
-        IList<TSearchObject?> so, 
-        IList<TSortBy> sortBy, 
-        TIncludes? includes);
-}
-
-public interface IFilteredQueryBuilder<TEntity, in TKey, in TSearchObject>
-    where TEntity : class, IEntity<TKey>
-    where TSearchObject : class, ISearchObject<TKey>, new()
-{
-    IQueryable<TEntity> Filter(IQueryable<TEntity> query, TSearchObject? so);
-}
-
-public interface ISortedQueryBuilder<TEntity, in TKey>
-    where TEntity : class, IEntity<TKey>
-{
-    IQueryable<TEntity> Sort(IQueryable<TEntity> query);
-}
-
-public interface IIncludableQueryBuilder<TEntity, in TKey>
-    where TEntity : class, IEntity<TKey>
-{
-    IQueryable<TEntity> Include(IQueryable<TEntity> query, object? includes);
+    IQueryable<TEntity> AddIncludes(IQueryable<TEntity> query, TIncludes? includes = null);
 }
 ```
 
 ### Processors
 
-**Namespace:** `Regira.Entities.EFcore.Processing.Abstractions`
-
 ```csharp
+using Regira.Entities.EFcore.Processing.Abstractions;
+
 public interface IEntityProcessor<TEntity, in TIncludes>
     where TIncludes : struct, Enum
 {
@@ -1470,16 +1079,14 @@ public interface IEntityProcessor<TEntity, in TIncludes>
 
 ### Preppers
 
-**Namespace:** `Regira.Entities.EFcore.Preppers.Abstractions`
-
 ```csharp
-// Non-generic interface
+using Regira.Entities.EFcore.Preppers.Abstractions;
+
 public interface IEntityPrepper
 {
     Task Prepare(object modified, object? original);
 }
 
-// Typed interface
 public interface IEntityPrepper<in TEntity> : IEntityPrepper
 {
     Task Prepare(TEntity modified, TEntity? original);
@@ -1488,10 +1095,9 @@ public interface IEntityPrepper<in TEntity> : IEntityPrepper
 
 ### Primers
 
-**Namespace:** `Regira.Entities.EFcore.Primers.Abstractions`
-
 ```csharp
-// Non-generic interface (EF Core interceptor-level)
+using Regira.Entities.EFcore.Primers.Abstractions;
+
 public interface IEntityPrimer
 {
     Task PrepareManyAsync(IList<EntityEntry> entries);
@@ -1499,7 +1105,6 @@ public interface IEntityPrimer
     bool CanPrepare(object entity);
 }
 
-// Typed interface
 public interface IEntityPrimer<in T> : IEntityPrimer
 {
     Task PrepareAsync(T entity, EntityEntry entry);
@@ -1509,10 +1114,9 @@ public interface IEntityPrimer<in T> : IEntityPrimer
 
 ### Normalizers
 
-**Namespace:** `Regira.Entities.EFcore.Normalizing.Abstractions`
-
 ```csharp
-// Non-generic interface
+using Regira.Entities.EFcore.Normalizing.Abstractions;
+
 public interface IEntityNormalizer
 {
     bool IsExclusive { get; }
@@ -1520,7 +1124,6 @@ public interface IEntityNormalizer
     Task HandleNormalizeMany(IEnumerable<object> items);
 }
 
-// Typed interface
 public interface IEntityNormalizer<in T> : IEntityNormalizer
 {
     Task HandleNormalize(T item);
@@ -1532,57 +1135,23 @@ public interface IEntityNormalizer<in T> : IEntityNormalizer
 
 ## Response Types
 
-**Namespace:** `Regira.Entities.Web.Models`
-
 ```csharp
-// Details response
-public class DetailsResult<TDto>
-{
-    public TDto Item { get; set; }
-    public long? Duration { get; set; }
-}
+using Regira.Entities.Web.Models;
 
-// List response
-public class ListResult<TDto>
-{
-    public IList<TDto> Items { get; set; }
-    public long? Duration { get; set; }
-}
-
-// Search response (with total count)
-public class SearchResult<TDto>
-{
-    public IList<TDto> Items { get; set; }
-    public long Count { get; set; }
-    public long? Duration { get; set; }
-}
-
-// Save response
-public class SaveResult<TDto>
-{
-    public TDto Item { get; set; }
-    public bool IsNew { get; set; }
-    public int Affected { get; set; }
-    public long? Duration { get; set; }
-}
-
-// Delete response
-public class DeleteResult<TDto>
-{
-    public TDto Item { get; set; }
-    public long? Duration { get; set; }
-}
+public class DetailsResult<TDto>  { public TDto Item { get; set; }        public long? Duration { get; set; } }
+public class ListResult<TDto>     { public IList<TDto> Items { get; set; } public long? Duration { get; set; } }
+public class SearchResult<TDto>   { public IList<TDto> Items { get; set; } public long Count { get; set; }     public long? Duration { get; set; } }
+public class SaveResult<TDto>     { public TDto Item { get; set; }        public bool IsNew { get; set; }     public int Affected { get; set; }   public long? Duration { get; set; } }
+public class DeleteResult<TDto>   { public TDto Item { get; set; }        public long? Duration { get; set; } }
 ```
 
 ---
 
 ## Attachments
 
-**Namespace:** `Regira.Entities.Attachments.Abstractions`
-
-### Attachment Interfaces
-
 ```csharp
+using Regira.Entities.Attachments.Abstractions;
+
 public interface IAttachment<TKey>
 {
     TKey Id { get; set; }
@@ -1593,7 +1162,7 @@ public interface IAttachment<TKey>
 
 public interface IEntityAttachment;
 
-public interface IEntityAttachment<TKey, TObjectKey, TAttachmentKey, TAttachment> 
+public interface IEntityAttachment<TKey, TObjectKey, TAttachmentKey, TAttachment>
     : IEntityAttachment, IEntity<TKey>, IHasObjectId<TObjectKey>
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
 {
@@ -1604,80 +1173,34 @@ public interface IEntityAttachment<TKey, TObjectKey, TAttachmentKey, TAttachment
 
 ### Attachment Controller
 
-**Namespace:** `Regira.Entities.Web.Attachments.Abstractions`
-
 ```csharp
-// Simplest variant (uses EntityAttachmentDto / EntityAttachmentInputDto)
+using Regira.Entities.Web.Attachments.Abstractions;
+
+// Simplest variant
 public abstract class EntityAttachmentControllerBase<TEntity>
     : EntityAttachmentControllerBase<TEntity, EntityAttachmentDto, EntityAttachmentInputDto>
     where TEntity : class, IEntityAttachment<int, int, int, Attachment>, IEntity<int>;
 
-// Standard variant
+// Standard variant — route pattern: api/{entity}/{objectId}/attachments
 public abstract class EntityAttachmentControllerBase<TEntity, TDto, TInputDto>
     : ControllerBase
     where TEntity : class, IEntityAttachment<int, int, int, Attachment>, IEntity<int>
-    where TInputDto : class, IEntityAttachmentInput
-{
-    // GET attachments/{id}
-    [HttpGet("attachments/{id}")]
-    public virtual Task<ActionResult<DetailsResult<TDto>>> Details([FromRoute] int id);
-
-    // GET attachments
-    [HttpGet("attachments")]
-    public virtual Task<ActionResult<ListResult<TDto>>> List(
-        [FromQuery] EntityAttachmentSearchObject so,
-        [FromQuery] PagingInfo? pagingInfo = null);
-
-    // GET {objectId}/attachments
-    [HttpGet("{objectId}/attachments")]
-    public virtual Task<ActionResult<ListResult<TDto>>> List(
-        [FromRoute] int objectId,
-        [FromQuery] EntityAttachmentSearchObject so,
-        [FromQuery] PagingInfo? pagingInfo = null);
-
-    // PUT {objectId}/attachments/{id}
-    [HttpPut("{objectId}/attachments/{id}")]
-    public virtual Task<ActionResult<SaveResult<TDto>>?> Update(
-        [FromRoute] int objectId,
-        [FromRoute] int id,
-        [FromBody] TInputDto model);
-
-    // DELETE attachments/{id}
-    [HttpDelete("attachments/{id}")]
-    public virtual Task<ActionResult<DeleteResult<TDto>>?> Delete([FromRoute] int id);
-
-    // GET files/{id} — download by attachment ID
-    [HttpGet("files/{id}")]
-    public virtual Task<IActionResult> GetFile([FromRoute] int id, bool inline = true);
-
-    // GET {objectId}/files/{fileName} — download by object + filename
-    [HttpGet("{objectId}/files/{fileName}")]
-    public virtual Task<IActionResult> GetFile(
-        [FromRoute] int objectId,
-        [FromRoute] string fileName,
-        bool inline = true);
-
-    // POST {objectId}/files — upload
-    [HttpPost("{objectId}/files")]
-    public virtual Task<ActionResult<SaveResult<TDto>>> Add(
-        [FromRoute] int objectId,
-        IFormFile file,
-        [FromForm] TInputDto model);
-}
+    where TInputDto : class, IEntityAttachmentInput;
 ```
 
 ---
 
 ## Exceptions
 
-**Namespace:** `Regira.Entities.Models`
-
 ```csharp
+using Regira.Entities.Models;
+
+// Throw to return HTTP 400 from a controller action
 public class EntityInputException<T>(string message, Exception? innerException = null)
     : Exception(message, innerException)
 {
     public T? Item { get; set; }
-    public IDictionary<string, string> InputErrors { get; set; } = new Dictionary<string, string>();
+    public IDictionary<string, string> InputErrors { get; set; }
 }
 ```
 
@@ -1685,9 +1208,9 @@ public class EntityInputException<T>(string message, Exception? innerException =
 
 ## Supporting Types
 
-**Namespace:** `Regira.DAL.Paging`
-
 ```csharp
+using Regira.DAL.Paging;
+
 public class PagingInfo
 {
     public int PageSize { get; set; }
@@ -1695,47 +1218,24 @@ public class PagingInfo
 }
 ```
 
-**Namespace:** `Regira.Entities.DependencyInjection.ServiceBuilders.Models`
-
 ```csharp
+using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
+
 public class EntityServiceCollectionOptions(IServiceCollection services)
 {
     public IServiceCollection Services { get; }
-    public Func<IServiceCollection, IEntityMapConfigurator>? EntityMapConfiguratorFactory { get; set; }
 }
 ```
 
 ---
 
-## Notes
-
-### Generic Type Parameter Conventions
-
-- `TEntity` - The entity class
-- `TKey` - Primary key type (default: `int`)
-- `TSearchObject` - Filter/search criteria class
-- `TSortBy` - Enum for sorting options
-- `TIncludes` - Enum (flags) for navigation properties
-- `TDto` - Data Transfer Object for reading
-- `TInputDto` - Data Transfer Object for writing
-- `TContext` - EF Core DbContext type
-
-### Common Patterns
-
-1. **Service registration**: Use `.For<TEntity>()` to start entity configuration
-2. **Pipeline order**: Global services → Entity-specific services
-3. **SaveChanges**: Must be called explicitly when using `IEntityService` directly
-4. **Soft delete**: `IsArchived = null` filters to active-only by default
-5. **Navigation loading**: Use `Includes` enum with `[Flags]` attribute
-
-### Version Information
-
-This reference is current as of the latest framework version. Check the official documentation for updates.
-
----
-
 ## See Also
 
-- [Entities Instructions](./entities.instructions.md) - Complete framework guide
-- [Entities Examples](./entities.examples.md) - Code examples and patterns
-- [Entities Namespaces](./entities.namespaces.md) - Namespace reference
+- [Entities Instructions](./entities.instructions.md) — Complete framework guide and decision rules
+- [Entities Examples](./entities.examples.md) — Working code patterns
+- [Entities Namespaces](./entities.namespaces.md) — Full namespace listing
+
+> **⚠️ Null ambiguity — `List` / `Count`:** Passing a bare `null` is ambiguous when both the
+> `object?` and `TSearchObject?` overloads are in scope. Always cast explicitly:
+> `service.List((MySearchObject?)null)` or `service.Count((MySearchObject?)null)`.
+> Alternatively, omit the argument entirely when `PagingInfo` is not needed — the default covers it.
