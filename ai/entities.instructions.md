@@ -258,6 +258,8 @@ public class SearchObject<TKey> : ISearchObject<TKey>
 
 > `Includes` is a `[Flags]` enum — values are combined with bitwise OR.
 > The framework falls back to `EntityIncludes` if no custom includes options implemented.
+> List function should not return navigation properties by default — they must be explicitly requested via the `includes` parameter to prevent over-fetching and performance issues.
+> Details function can return all navigation properties by default since it's for a single item and the consumer is likely to want the related data.
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
 

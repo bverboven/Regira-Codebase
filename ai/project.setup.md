@@ -1,7 +1,9 @@
 # Copilot Instructions — Project Templates
 
-This solution contains four reusable starter templates. When asked to scaffold a new project,
-identify the user's use case and apply the matching template below as the starting point.
+> **NuGet package versions:** Always resolve to the **latest stable version** of every package unless the user explicitly requests a specific version. The version numbers shown throughout this document are illustrative only.
+
+This solution contains some reusable starter templates.
+Identify the user's use case and apply the matching template below as the starting point.
 
 ---
 
@@ -88,18 +90,18 @@ All templates use Serilog with console + rolling file sinks configured from `app
 **Packages**
 
 ```xml
-<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.0" />
-<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
-<PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
-<PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
-<PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
-<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="*" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="*" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="*" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="*" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="*" />
+    <PackageReference Include="Serilog.Sinks.File" Version="*" />
 ```
 
 **Packages — Web APIs **
 
 ```xml
-<PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+<PackageReference Include="Serilog.AspNetCore" Version="*" />
 ```
 
 **Bootstrap pattern (web APIs)**
@@ -173,8 +175,8 @@ All API templates expose:
 
 **Nuget packages — Web API**
 ```xml
-<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
-<PackageReference Include="Scalar.AspNetCore" Version="2.11.0" />
+<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="*" />
+<PackageReference Include="Scalar.AspNetCore" Version="*" />
 ```
 
 ### Launch API
@@ -214,7 +216,7 @@ Enrich console apps with appsettings, user secrets and environment variables.
 **.csproj file — Console App**
 ```xml
   <!-- NuGet package -->
-  <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.0" />
+  <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="*" />
 
   <!-- include appsettings.json in output for console apps -->
   <ItemGroup>
@@ -260,8 +262,8 @@ public static IHostBuilder AddConfiguration(this IHostBuilder builder)
 
 **Nuget packages**
 ```xml
-<PackageReference Include="Regira.Security.Authentication" Version="5.0.1" />
-<PackageReference Include="Regira.Security.Authentication.Web" Version="5.0.1" />
+<PackageReference Include="Regira.Security.Authentication" Version="*" />
+<PackageReference Include="Regira.Security.Authentication.Web" Version="*" />
 ```
 
 **appsettings.json — Authentication block**
@@ -292,7 +294,7 @@ Provided by `Regira.Security.Authentication`:
 
 **Nuget packages**
 ```xml
-<PackageReference Include="Regira.System.Hosting" Version="5.0.1" />
+<PackageReference Include="Regira.System.Hosting" Version="*" />
 ```
 
 **appsettings.json — Kestrel block**

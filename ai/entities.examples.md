@@ -358,6 +358,7 @@ public static IEntityServiceCollection<WebshopDbContext> AddProducts(this IEntit
             };
         });
         e.Related(x => x.Categories);
+        // Always include categories with products; no need for ProductIncludes enum
         e.Includes((query, includes) => query.Include(x => x.Categories!).ThenInclude(pc => pc.Category));
         e.UseMapping<ProductDto, ProductInputDto>();
         e.AddMapping<ProductCategoryDto, ProductCategoryDto>();
