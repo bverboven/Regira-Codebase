@@ -1,6 +1,7 @@
 # Regira Entities — Project Setup
 
 > **AI Agent Rule**: Follow this guide to scaffold a new Regira Entities API project from scratch.
+> Start from the **`BasicApi`** template in [`project.setup.md`](./project.setup.md) and apply the Entities-specific additions below.
 > Always combine with [`entities.namespaces.md`](./entities.namespaces.md) for exact `using` directives
 > and [`entities.examples.md`](./entities.examples.md) for complete working code.
 
@@ -19,8 +20,8 @@
 
 ## Checklist
 
-1. Create an ASP.NET Core Web API project targeting the latest .NET version (or the solution's target).
-2. Add `NuGet.Config` with the Regira feed.
+1. Create an ASP.NET Core Web API project — use the **`BasicApi`** template in [`project.setup.md`](./project.setup.md) as the starting point.
+2. Add `NuGet.Config` with the Regira feed — see [`project.setup.md`](./project.setup.md) — **Shared Conventions → NuGet feed**.
 3. Add required packages to `.csproj`.
 4. Create `YourDbContext` deriving from `DbContext`.
 5. Configure `Program.cs`.
@@ -31,22 +32,7 @@
 
 ## NuGet Feed
 
-**Package source URL:**
-```xml
-<add key="Regira" value="https://packages.regira.com/v3/index.json" />
-```
-
-**NuGet.Config** (add to project root):
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-  <packageSources>
-    <clear />
-    <add key="NuGet" value="https://api.nuget.org/v3/index.json" />
-    <add key="Regira" value="https://packages.regira.com/v3/index.json" />
-  </packageSources>
-</configuration>
-```
+> **→ See:** [`project.setup.md`](./project.setup.md) — **Shared Conventions → NuGet feed** for the feed URL and `NuGet.Config` template.
 
 ---
 
@@ -66,137 +52,7 @@
 
 ## Step 1: Project Files
 
-Sample files with [serilog](https://serilog.net) configuration and EF Core setup. Adjust as needed for your project structure and preferences.
-Basic JSON configuration is included for System.Text.Json, but you can replace with Newtonsoft.Json if preferred.
-Replace Wildcard versions (`Version="*"`) with specific versions as needed. Always check for the latest stable versions of the packages, unless requested otherwise.
-
-### *.csproj
-```xml
-<Project Sdk="Microsoft.NET.Sdk.Web">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="*" />
-    <PackageReference Include="Scalar.AspNetCore" Version="*" />
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="*" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="*" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="*" />
-    <PackageReference Include="Serilog.Sinks.File" Version="*" />
-  </ItemGroup>
-</Project>
-```
-
-### Properties/launchSettings.json
-
-> This template is intended for ASP.NET Core **API projects**. Replace `xxx` with the actual port numbers.
-
-```json
-{
-  "profiles": {
-    "https": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "launchUrl": "scalar",
-      "applicationUrl": "https://localhost:xxx;http://localhost:xxx",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    }
-  }
-}
-```
-
-### appsettings.json
-```json
-{
-  "AllowedHosts": "*",
-  "ConnectionStrings": {
-    "Default": "Data Source=app.db"
-  },
-  "Serilog": {
-    "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File" ],
-    "MinimumLevel": {
-      "Default": "Debug",
-      "Override": {
-        "Microsoft": "Information",
-        "System": "Information"
-      }
-    },
-    "WriteTo": [
-      { "Name": "Console" },
-      {
-        "Name": "File",
-        "Args": {
-          "path": "logs/app-.log",
-          "rollingInterval": "Day"
-        }
-      }
-    ]
-  }
-}
-```
-
-### Program.cs
-```csharp
-using Microsoft.EntityFrameworkCore;
-using Regira.DAL.EFcore.Services;
-using Regira.Entities.EFcore.Normalizing;
-using Regira.Entities.EFcore.Primers;
-using Scalar.AspNetCore;
-using Serilog;
-using System.Text.Json.Serialization;
-
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .CreateLogger();
-
-try
-{
-    var builder = WebApplication.CreateBuilder(args);
-
-    builder.Services.AddControllers()
-        .AddJsonOptions(options =>
-        {
-            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-        });
-    builder.Services.AddSerilog(config => config.ReadFrom.Configuration(builder.Configuration));
-    builder.Services.AddOpenApi();
-
-    builder.Services.AddDbContext<AppDbContext>((sp, options) =>
-        options.UseSqlite(builder.Configuration.GetConnectionString("Default"))
-               .AddPrimerInterceptors(sp)
-               .AddNormalizerInterceptors(sp)
-               .AddAutoTruncateInterceptors());
-
-    builder.Services.AddEntityServices();
-
-    var app = builder.Build();
-
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-    app.UseHttpsRedirection();
-    app.UseAuthorization();
-    app.MapControllers();
-
-    app.Run();
-}
-catch (Exception ex)
-{
-    Log.Error(ex, "Host failed");
-}
-finally
-{
-    Log.CloseAndFlush();
-}
-```
-
-> **Note:** `AddPrimerInterceptors(sp)` and `AddNormalizerInterceptors(sp)` require the `IServiceProvider` (`sp`) from the `AddDbContext` factory overload. Always use the `(sp, options) => ...` signature.
+> Start from the **`BasicApi`** template in [`project.setup.md`](./project.setup.md) and apply the Entities-specific additions below.
 
 ---
 
@@ -211,7 +67,44 @@ finally
 
 ---
 
-## Step 3: Create the DI Extension Method
+## Step 3: Program.cs
+
+**Changes to BasicApi**
+```csharp
+// ... usings from BasicApi
+using Microsoft.EntityFrameworkCore;
+using Regira.DAL.EFcore.Services;
+using Regira.Entities.EFcore.Normalizing;
+using Regira.Entities.EFcore.Primers;
+
+// add JSON options to handle cycles and ignore nulls globally for all controllers
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
+
+// add DbContext with interceptors for primers, normalizers, and auto-truncate
+builder.Services.AddDbContext<AppDbContext>((sp, options) =>
+    // use DB provider at wish
+    options.UseSqlite(builder.Configuration.GetConnectionString("Default"))
+            .AddPrimerInterceptors(sp)
+            .AddNormalizerInterceptors(sp)
+            .AddAutoTruncateInterceptors());
+
+// add entity services (repositories) and configurations
+builder.Services.AddEntityServices();
+
+// ...
+// build app and configure as in BasicApi
+```
+
+> **Note:** `AddPrimerInterceptors(sp)` and `AddNormalizerInterceptors(sp)` require the `IServiceProvider` (`sp`) from the `AddDbContext` factory overload. Always use the `(sp, options) => ...` signature.
+
+---
+
+## Step 4: Create the DI Extension Method
 
 Create `Extensions/ServiceCollectionExtensions.cs`.
 

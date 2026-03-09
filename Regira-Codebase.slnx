@@ -6,6 +6,7 @@
     <File Path="ai/entities.namespaces.md" />
     <File Path="ai/entities.setup.md" />
     <File Path="ai/entities.signatures.md" />
+    <File Path="ai/project.setup.md" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />

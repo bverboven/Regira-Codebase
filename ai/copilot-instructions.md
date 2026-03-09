@@ -17,6 +17,7 @@ This codebase provides specialized AI instruction sets for its modules. **When a
 
 | Module | Namespace | Covers | Instructions |
 |--------|-----------|--------|--------------| 
+| **Project Templates** | *(scaffolding)* | Scaffolding new projects from reusable starter templates | `./project.setup.md` |
 | **Entities** | `Regira.Entities` | CRUD Services with built-in extras | `./entities.instructions.md` |
 | **IO.Storage** | `Regira.IO.Storage` | File storage: local filesystem, Azure Blob, SFTP/SSH, GitHub, TCP, compression | *(not yet available)* |
 | **Office** | `Regira.Office` | Document processing: Excel, Word, PDF, OCR, Barcodes, CSV, vCards | *(not yet available)* |
@@ -31,13 +32,28 @@ When a module's instruction file is not yet available, apply general .NET best p
 
 ---
 
+### Project Templates
+
+**Instructions:** `./project.setup.md`
+
+Reusable starter templates for bootstrapping new .NET projects. Covers four templates:
+
+- **`ConsoleWithLogging`** — standalone console app with Serilog, DI, and configuration
+- **`BasicApi`** — standard ASP.NET Core API (IIS / Azure / Docker) with controllers and Minimal API endpoints, Serilog, and Scalar UI
+- **`SelfHostingMinimalApi`** — self-hosted Kestrel API with Minimal API endpoints, Swagger + Scalar, and optional Windows Service support
+- **`SelfHostingApiWithAuth`** — self-hosted API with API key and JWT Bearer authentication, OpenAPI security transformers, and Swagger + Scalar
+
+**Load these instructions when the user asks to** scaffold a new project, create a new console app or API, set up a Windows Service, or choose between hosting and authentication options.
+
+---
+
 ### Regira Entities
 
 **Instructions:** `./entities.instructions.md`
 
 A generic, extensible framework for building ASP.NET Core APIs with standardized CRUD operations on top of EF Core. It covers the full stack from database to HTTP endpoint:
 
-- **Project setup** — scaffolding a new ASP.NET Core Web API with EF Core, NuGet config, `DbContext`, `Program.cs`, and DI wiring
+- **Entity Project setup** — scaffolding a new ASP.NET Core Web API with EF Core, NuGet config, `DbContext`, `Program.cs`, and DI wiring
 - **Entity modeling** — POCO entity classes, marker interfaces (`IHasTimestamps`, `IArchivable`, `ISortable`, …), `SearchObject` for filtering, `SortBy` enum, `Includes` flags enum, and DTOs
 - **CRUD service layer** — `IEntityService` / `EntityRepository` backed by EF Core; custom query filters, sorting, navigation-property includes, processors (post-fetch enrichment), preppers (pre-save preparation), and primers (EF Core `SaveChanges` interceptors)
 - **DTO mapping** — Mapster or AutoMapper integration with inline or class-based `AfterMapper` for computed properties
@@ -102,23 +118,3 @@ Always apply SOLID as a default design guide:
 - Solve the current problem; do not add flexibility or abstractions for imagined future requirements
 - Use `null!` only when the value is guaranteed by DI/framework (e.g. `DbSet<T>` properties)
 - Apply `[Required]`, `[MaxLength]`, `[Range]` on entity/DTO properties — these drive both validation and EF schema
-
-### Launching
-
-When creating an API project, add the Scalar/Swagger UI as a launch profile for easy testing and documentation. Use the following `launchSettings.json` configuration:
-```json
-{
-  "profiles": {
-    "https": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "launchUrl": "scalar",
-      "applicationUrl": "https://localhost:xxxx;http://localhost:xxxx",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    }
-  }
-}
-```
