@@ -50,7 +50,7 @@ public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject>(
 
 public abstract class EntityWrappingServiceBase<TEntity, TSearchObject, TSortBy, TIncludes>(
     IEntityService<TEntity, int, TSearchObject, TSortBy, TIncludes> service)
-    : EntityWrappingServiceBase<TEntity, int, TSearchObject, TSortBy, TIncludes>(service)
+    : EntityWrappingServiceBase<TEntity, int, TSearchObject, TSortBy, TIncludes>(service), IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>
     where TEntity : class, IEntity<int>
     where TSearchObject : class, ISearchObject<int>, new()
     where TSortBy : struct, Enum

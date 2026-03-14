@@ -77,6 +77,11 @@ public class EntityWriteService<TContext, TEntity, TKey>(
         }
     }
 
+    /// <summary>
+    /// Saves changes to DB, and detaches all entries in ChangeTracker to prevent issues with stale entries in future operations
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
     public virtual Task<int> SaveChanges(CancellationToken token = default)
     {
 #if DEBUG
@@ -84,6 +89,15 @@ public class EntityWriteService<TContext, TEntity, TKey>(
         Logger?.LogDebug(DbContext.ChangeTracker.DebugView.ShortView);
 #endif
 #endif
-        return DbContext.SaveChangesAsync(token);
+        var count = DbContext.SaveChangesAsync(token);
+#if NET6_0_OR_GREATER
+        DbContext.ChangeTracker.Clear();
+#else
+        foreach (var entry in DbContext.ChangeTracker.Entries().ToList())
+        {
+            entry.State = EntityState.Detached;
+        }
+#endif
+        return count;
     }
 }

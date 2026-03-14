@@ -1,11 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Regira.Utilities;
+using System.ComponentModel.DataAnnotations;
 
 namespace Regira.DAL.EFcore.Extensions;
 
-#if NETCOREAPP3_1_OR_GREATER
-#endif
 public static class EntryExtensions
 {
     /// <summary> 

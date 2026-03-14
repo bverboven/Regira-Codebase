@@ -119,26 +119,6 @@ public class WebshopDbContext(DbContextOptions<WebshopDbContext> options) : DbCo
 }
 ```
 
-## Controllers
-
-```csharp
-// Controllers/CategoryController.cs
-[ApiController, Route("categories")]
-public class CategoryController : EntityControllerBase<Category, CategorySearchObject, EntitySortBy, CategoryIncludes, CategoryDto, CategoryInputDto>;
-
-// Controllers/ProductController.cs
-[ApiController, Route("products")]
-public class ProductController : EntityControllerBase<Product, ProductSearchObject, ProductSortBy, EntityIncludes, ProductDto, ProductInputDto>;
-
-// Controllers/CustomerController.cs — Guid key: uses TKey overload with SearchObject<Guid>
-[ApiController, Route("customers")]
-public class CustomerController : EntityControllerBase<Customer, Guid, SearchObject<Guid>, CustomerDto, CustomerInputDto>;
-
-// Controllers/OrderController.cs
-[ApiController, Route("orders")]
-public class OrderController : EntityControllerBase<Order, OrderSearchObject, EntitySortBy, OrderIncludes, OrderDto, OrderInputDto>;
-```
-
 ## Category entity
 
 ```csharp
@@ -238,8 +218,10 @@ public static IEntityServiceCollection<WebshopDbContext> AddCategories(this IEnt
     {
         e.Filter((query, so) =>
         {
-            if (so?.ParentId?.Any() == true) query = query.Where(x => x.ParentEntities!.Any(pe => so.ParentId.Contains(pe.ParentId)));
-            if (so?.ChildId?.Any() == true) query = query.Where(x => x.ChildEntities!.Any(ce => so.ChildId.Contains(ce.ChildId)));
+            if (so?.ParentId?.Any() == true)
+              query = query.Where(x => x.ParentEntities!.Any(pe => so.ParentId.Contains(pe.ParentId)));
+            if (so?.ChildId?.Any() == true)
+              query = query.Where(x => x.ChildEntities!.Any(ce => so.ChildId.Contains(ce.ChildId)));
             if (so?.IsRoot != null)
                 query = so.IsRoot.Value ? query.Where(x => !x.ParentEntities!.Any()) : query.Where(x => x.ParentEntities!.Any());
             return query;
@@ -256,9 +238,6 @@ public static IEntityServiceCollection<WebshopDbContext> AddCategories(this IEnt
         e.Process<CategoryProcessor>();
         e.Related(x => x.ParentEntities);
         e.Related(x => x.ChildEntities);
-        e.UseMapping<CategoryDto, CategoryInputDto>();
-        e.AddMapping<CategoryCoreDto, CategoryCoreDto>();
-        e.AddMapping<RelatedCategoryInputDto, RelatedCategory>();
     });
     return services;
 }
@@ -358,11 +337,11 @@ public static IEntityServiceCollection<WebshopDbContext> AddProducts(this IEntit
             };
         });
         e.Related(x => x.Categories);
-        // Always include categories with products; no need for ProductIncludes enum
-        e.Includes((query, includes) => query.Include(x => x.Categories!).ThenInclude(pc => pc.Category));
-        e.UseMapping<ProductDto, ProductInputDto>();
-        e.AddMapping<ProductCategoryDto, ProductCategoryDto>();
-        e.AddMapping<ProductCategoryInputDto, ProductCategory>();
+        e.Includes((query, includes) => {
+            if (includes?.HasFlag(EntityIncludes.Categories) == true)
+                query = query.Include(x => x.Categories!).ThenInclude(pc => pc.Category);
+            return query;
+        });
     });
     return services;
 }
@@ -403,7 +382,6 @@ public static IEntityServiceCollection<WebshopDbContext> AddCustomers(this IEnti
     {
         e.SortBy(query => query.OrderBy(x => x.Name));
         e.Prepare(item => item.Id = item.Id == Guid.Empty ? Guid.NewGuid() : item.Id); // inline prepper
-        e.UseMapping<CustomerDto, CustomerInputDto>();
     });
     return services;
 }
@@ -540,12 +518,30 @@ public static IEntityServiceCollection<WebshopDbContext> AddOrders(this IEntityS
         e.AddNormalizer<OrderNormalizer>();
         e.AddTransient<IOrderService, OrderManager>();  // enables typed IOrderService injection
         e.UseEntityService<OrderManager>();             // replaces default EntityRepository
-        e.UseMapping<OrderDto, OrderInputDto>();
-        e.AddMapping<OrderLine, OrderLineDto>();
-        e.AddMapping<OrderLineInputDto, OrderLine>();
     });
     return services;
 }
+```
+
+## Controllers
+
+```csharp
+// Controllers/CategoryController.cs ~ For<Category, CategorySearchObject, EntitySortBy, CategoryIncludes>()
+[ApiController, Route("categories")]
+public class CategoryController : EntityControllerBase<Category, CategorySearchObject, EntitySortBy, CategoryIncludes, CategoryDto, CategoryInputDto>;
+
+// Controllers/ProductController.cs ~ For<Product, ProductSearchObject, ProductSortBy, EntityIncludes>()
+[ApiController, Route("products")]
+public class ProductController : EntityControllerBase<Product, ProductSearchObject, ProductSortBy, EntityIncludes, ProductDto, ProductInputDto>;
+
+// Controllers/CustomerController.cs ~ For<Customer, Guid, SearchObject<Guid>>()
+// Guid key: uses TKey overload with SearchObject<Guid>
+[ApiController, Route("customers")]
+public class CustomerController : EntityControllerBase<Customer, Guid, SearchObject<Guid>, CustomerDto, CustomerInputDto>;
+
+// Controllers/OrderController.cs ~ For<Order, OrderSearchObject, EntitySortBy, OrderIncludes>()
+[ApiController, Route("orders")]
+public class OrderController : EntityControllerBase<Order, OrderSearchObject, EntitySortBy, OrderIncludes, OrderDto, OrderInputDto>;
 ```
 
 ---
