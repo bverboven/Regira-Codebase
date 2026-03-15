@@ -302,6 +302,9 @@ public class EntityServiceCollection<TContext>(EntityServiceCollectionOptions op
 
 
     // helpers
+    public EntityServiceCollection<TContext> AddTransient<TService>()
+        where TService : class
+        => AddTransient<TService, TService>();
     public EntityServiceCollection<TContext> AddTransient<TService, TImplementation>()
         where TService : class
         where TImplementation : class, TService

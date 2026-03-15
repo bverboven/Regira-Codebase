@@ -117,6 +117,10 @@ public static class QueryExtensions
             .FilterCreated(minCreated, maxCreated)
             .FilterLastModified(minModified, maxModified);
 
+    public static IQueryable<TEntity> FilterIsActiveOn<TEntity>(this IQueryable<TEntity> query, DateTime? date)
+        where TEntity : IHasStartEndDate
+        => query.Where(x => (x.StartDate == null || x.StartDate <= date) && (x.EndDate == null || x.EndDate >= date));
+
     public static IQueryable<TEntity> FilterQ<TEntity>(this IQueryable<TEntity> query, ParsedKeywordCollection? keywords)
         where TEntity : IHasNormalizedContent
     {

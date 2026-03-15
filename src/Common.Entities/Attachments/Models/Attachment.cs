@@ -25,7 +25,7 @@ public class Attachment<TKey> : IAttachment<TKey>
     public string? Path { get; set; }
 
 
-    public DateTime Created { get; set; } = DateTime.Now;
+    public DateTime Created { get; set; }
     public DateTime? LastModified { get; set; }
 
 

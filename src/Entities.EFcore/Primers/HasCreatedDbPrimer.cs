@@ -4,6 +4,9 @@ using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.EFcore.Primers;
 
+/// <summary>
+/// Sets <see cref="IHasCreated.Created"/> to current UTC time when entity is added, or keeps original value when entity is modified<br />
+/// </summary>
 public class HasCreatedDbPrimer : EntityPrimerBase<IHasCreated>
 {
     public override Task PrepareAsync(IHasCreated entity, EntityEntry entry)
@@ -12,7 +15,7 @@ public class HasCreatedDbPrimer : EntityPrimerBase<IHasCreated>
 
         if (entity.Created == DateTime.MinValue)
         {
-            entity.Created = DateTime.Now;
+            entity.Created = DateTime.UtcNow;
         }
 
         return Task.CompletedTask;
