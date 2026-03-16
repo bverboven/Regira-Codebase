@@ -11,10 +11,10 @@
     <AssemblyName>Regira.DAL.MySQL</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.0.1</Version>
+    <Version>5.0.2</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="Dapper" Version="2.1.72" />
     <PackageReference Include="MySqlConnector" Version="2.5.0" />
   </ItemGroup>
   <ItemGroup>

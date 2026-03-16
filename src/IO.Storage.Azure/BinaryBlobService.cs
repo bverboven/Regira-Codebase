@@ -116,7 +116,7 @@ public class BinaryBlobService(AzureCommunicator communicator) : IFileService
     protected async IAsyncEnumerable<BlobItem> ListBlobs(FileSearchObject so)
     {
         var relativeFolderUri = FileNameUtility.GetRelativeUri(so.FolderUri, Root);
-        var blobPages = Container.GetBlobsAsync(BlobTraits.None, BlobStates.None, relativeFolderUri);
+        var blobPages = Container.GetBlobsAsync(BlobTraits.None, BlobStates.None, relativeFolderUri, CancellationToken.None);
         await foreach (var blob in blobPages)
         {
             yield return blob;

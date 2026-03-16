@@ -1,4 +1,5 @@
-﻿using MsgReader.Outlook;
+﻿using System.Text;
+using MsgReader.Outlook;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Office.Mail.Abstractions;
@@ -8,6 +9,11 @@ namespace Regira.Office.Mail.MSGReader;
 
 public class MsgParser : IMessageParser
 {
+    static MsgParser()
+    {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+    }
+
     public IMessageObject Parse(IMemoryFile msgFile)
     {
         using var msgStream = msgFile.GetStream();

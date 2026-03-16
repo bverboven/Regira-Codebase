@@ -158,7 +158,9 @@ public class CreationTests
         folder ??= AppContext.BaseDirectory;
         do
         {
-            var solutionFiles = Directory.GetFiles(folder, "*.sln", SearchOption.TopDirectoryOnly);
+            var solutionFiles = Directory.GetFiles(folder, "*.sln", SearchOption.TopDirectoryOnly)
+                .Concat(Directory.GetFiles(folder, "*.slnx", SearchOption.TopDirectoryOnly))
+                .ToArray();
             if (solutionFiles.Any())
             {
                 return Path.GetDirectoryName(solutionFiles.First());
