@@ -11,8 +11,7 @@ public class RazorTemplateParser(RazorTemplateParser.Options? options = null) : 
     }
 
     private readonly RazorLightEngine _engine = new RazorLightEngineBuilder()
-        .UseEmbeddedResourcesProject(typeof(RazorTemplateParser))
-        .UseMemoryCachingProvider()
+        .UseNoProject()
         .Build();
 
     public async Task<string> Parse<T>(string html, T model)
