@@ -229,7 +229,7 @@ services
     .For<Category, Guid>(e =>
     {
         // Query Filter
-        e.AddQueryFilter<CategoryQueryFilter>();
+        e.AddFilter<CategoryQueryFilter>();
         
         // Sorting
         e.SortBy((query, sortBy) =>
@@ -243,7 +243,7 @@ services
         });
 
         // Processor
-        e.Process<CategoryProcessor>();
+        e.AddProcessor<CategoryProcessor>();
     })
     
     // Product
@@ -311,7 +311,7 @@ services
     // Order
     .For<Order, int, OrderSearchObject, OrderSortBy, OrderIncludes>(e =>
     {
-        e.AddQueryFilter<OrderQueryFilter>();
+        e.AddFilter<OrderQueryFilter>();
         
         e.SortBy((query, sortBy) =>
         {
@@ -336,7 +336,7 @@ services
         
         e.Includes<OrderIncludableQueryBuilder>();
         
-        e.Process<OrderProcessor>();
+        e.AddProcessor<OrderProcessor>();
         
         // Complex prepper with DbContext
         e.Prepare(async (item, dbContext) =>

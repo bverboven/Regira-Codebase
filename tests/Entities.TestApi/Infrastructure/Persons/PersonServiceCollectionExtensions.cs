@@ -16,8 +16,8 @@ public static class PersonServiceCollectionExtensions
                 e.Related(x => x.Departments);
                 //e.Related(x => x.Subordinates);
                 e.HasAttachments(x => x.Attachments);
-                e.AddQueryFilter<PersonQueryFilter>();
-                e.Includes<PersonIncludableQueryBuilder>();
+                e.AddFilter<PersonQueryFilter>();
+                e.AddIncludes<PersonIncludableQueryBuilder>();
                 //e.SortBy<PersonSortQueryBuilder>();
                 e.SortBy((query, sortBy) =>
                 {

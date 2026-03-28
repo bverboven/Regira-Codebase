@@ -70,11 +70,4 @@ public static class ServiceCollectionPrimerExtensions
         options.Services.AddTransient<IEntityPrimer, TPrimer>();
         return options;
     }
-    public static EntityServiceCollectionOptions AddPrimer<TPrimer, TKey>(this EntityServiceCollectionOptions options)
-        where TPrimer : class, IEntityPrimer<TKey>
-    {
-        options.AddPrimer<TPrimer>();
-        options.Services.AddTransient<IEntityPrimer<TKey>, TPrimer>();
-        return options;
-    }
 }

@@ -255,8 +255,8 @@ public class EntityServiceCollection<TContext>(EntityServiceCollectionOptions op
 
         builder.For<TAttachment, TAttachmentKey, TAttachmentSearchObject>(e =>
         {
-            e.AddQueryFilter<AttachmentFilteredQueryBuilder<TAttachment, TAttachmentKey, TAttachmentSearchObject>>();
-            e.Process<AttachmentProcessor<TAttachment, TAttachmentKey>>();
+            e.AddFilter<AttachmentFilteredQueryBuilder<TAttachment, TAttachmentKey, TAttachmentSearchObject>>();
+            e.AddProcessor<AttachmentProcessor<TAttachment, TAttachmentKey>>();
             e.AddPrimer<AttachmentPrimer>();
             e.AddTransient<IFileIdentifierGenerator, DefaultFileIdentifierGenerator<TAttachmentKey, TAttachment>>();
             e.AddTransient<IAttachmentFileService<TAttachment, TAttachmentKey>>(p => new AttachmentFileService<TAttachment, TAttachmentKey>(fileServiceFactory(p)));

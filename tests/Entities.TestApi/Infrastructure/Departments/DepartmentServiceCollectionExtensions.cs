@@ -13,7 +13,7 @@ public static class DepartmentServiceCollectionExtensions
             .For<Department>(e =>
             {
                 e.UseMapping<DepartmentDto, DepartmentInputDto>();
-                e.AddQueryFilter<DepartmentMax10YearsOldQueryFilter>();
+                e.AddFilter<DepartmentMax10YearsOldQueryFilter>();
             });
 
         return services;

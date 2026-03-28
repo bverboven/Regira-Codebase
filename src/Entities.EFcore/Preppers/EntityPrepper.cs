@@ -1,18 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Regira.Entities.EFcore.Preppers.Abstractions;
-using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.EFcore.Preppers;
 
-public class EntityPrepper<TEntity>(Func<TEntity, Task> prepareFunc) : EntityPrepperBase<TEntity>
+public class EntityPrepper<TEntity>(Action<TEntity> prepareFunc) : EntityPrepperBase<TEntity>
     where TEntity : class
 {
-    public override Task Prepare(TEntity modified, TEntity? original) => prepareFunc(modified);
+    public override Task Prepare(TEntity modified, TEntity? original)
+    {
+        prepareFunc(modified);
+        return Task.CompletedTask;
+    }
 }
 
-public class EntityPrepper<TContext, TEntity, TKey>(TContext dbContext, Func<TEntity, TContext, Task> prepareFunc) : EntityPrepperBase<TEntity>
+public class EntityPrepper<TContext, TEntity>(TContext dbContext, Func<TEntity, TContext, Task> prepareFunc) : EntityPrepperBase<TEntity>
     where TContext : DbContext
-    where TEntity : class, IEntity<TKey>
+    where TEntity : class
 {
-    public override Task Prepare(TEntity modified, TEntity? original) => prepareFunc(modified, dbContext);
+    public override Task Prepare(TEntity modified, TEntity? original) 
+        => prepareFunc(modified, dbContext);
 }

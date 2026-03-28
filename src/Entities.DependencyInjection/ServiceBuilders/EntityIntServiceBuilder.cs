@@ -1,6 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
 using Regira.Entities.EFcore.Preppers;
 using Regira.Entities.EFcore.Preppers.Abstractions;
@@ -14,10 +17,47 @@ using System.Linq.Expressions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 
-public partial class EntityIntServiceBuilder<TContext, TEntity>
+public class EntityIntServiceBuilder<TContext, TEntity>(EntityServiceCollectionOptions options)
+    : EntityServiceBuilder<TContext, TEntity, int>(options),
+        IEntityServiceBuilder<TContext, TEntity>
+    where TContext : DbContext
+    where TEntity : class, IEntity<int>
 {
     public new bool HasEntityService() => HasService<IEntityService<TEntity>>();
-    
+
+    // Build
+    public override void Build()
+    {
+        base.Build();
+
+        // Query Builder
+        if (!HasService<IQueryBuilder<TEntity, int, SearchObject<int>, EntitySortBy, EntityIncludes>>())
+        {
+            AddDefaultQueryBuilder();
+        }
+        // Read Service
+        if (!HasService<IEntityReadService<TEntity, int, SearchObject<int>>>())
+        {
+            UseReadService<EntityReadService<TContext, TEntity, int, SearchObject<int>>>();
+        }
+        // Write Service
+        if (!HasService<IEntityWriteService<TEntity, int>>())
+        {
+            UseWriteService<EntityWriteService<TContext, TEntity>>();
+        }
+        // Entity Repository
+        if (!HasService<IEntityRepository<TEntity>>())
+        {
+            HasRepositoryInner<EntityRepository<TEntity>>();
+        }
+        // Entity Service
+        if (!HasService<IEntityService<TEntity>>())
+        {
+            UseEntityService<EntityRepository<TEntity>>();
+        }
+    }
+
+
     // Entity service
     public new EntityIntServiceBuilder<TContext, TEntity> AddDefaultService()
         => UseEntityService<EntityRepository<TEntity>>();
@@ -129,7 +169,7 @@ public partial class EntityIntServiceBuilder<TContext, TEntity>
     // Preppers
     public new EntityIntServiceBuilder<TContext, TEntity> Prepare(Func<TEntity, TContext, Task> prepareFunc)
     {
-        Services.AddTransient<IEntityPrepper>(p => new EntityPrepper<TContext, TEntity, int>(p.GetRequiredService<TContext>(), prepareFunc));
+        Services.AddTransient<IEntityPrepper>(p => new EntityPrepper<TContext, TEntity>(p.GetRequiredService<TContext>(), prepareFunc));
 
         return this;
     }

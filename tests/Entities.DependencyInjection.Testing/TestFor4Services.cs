@@ -270,7 +270,7 @@ public class TestFor4Services
             .UseEntities<ContosoContext>()
             .For<Course, CourseSearchObject, CourseSortBy, CourseIncludes>(e =>
             {
-                e.Includes<CourseIncludingQueryBuilder>();
+                e.AddIncludes<CourseIncludingQueryBuilder>();
             })
             .BuildServiceProvider();
 
@@ -394,7 +394,7 @@ public class TestFor4Services
             .UseEntities<ContosoContext>()
             .For<Course, CourseSearchObject, CourseSortBy, CourseIncludes>(e =>
             {
-                e.AddQueryFilter<CourseQueryFilter1>();
+                e.AddFilter<CourseQueryFilter1>();
             })
             .BuildServiceProvider();
 
@@ -889,7 +889,7 @@ public class TestFor4Services
             {
                 e.SortBy(query => query.OrderBy(x => x.Title));
                 e.Includes((query, _) => query.Include(x => x.Instructors));
-                e.AddQueryFilter<CourseQueryFilter1>();
+                e.AddFilter<CourseQueryFilter1>();
                 e.AddPrimer<CoursePrimer>();
                 e.HasRepository<CourseRepository4>();
                 e.HasManager<CourseManager4>();
