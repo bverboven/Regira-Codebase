@@ -261,7 +261,7 @@ public class TestFor3Services
             .UseEntities<ContosoContext>()
             .For<Course, int, CourseSearchObject>(e =>
             {
-                e.AddQueryFilter<CourseQueryFilter1>();
+                e.AddFilter<CourseQueryFilter1>();
             })
             .BuildServiceProvider();
 
@@ -638,7 +638,7 @@ public class TestFor3Services
             {
                 e.SortBy(query => query.OrderBy(x => x.Title));
                 e.Includes((query, _) => query.Include(x => x.Instructors));
-                e.AddQueryFilter<CourseQueryFilter1>();
+                e.AddFilter<CourseQueryFilter1>();
                 e.AddPrimer<CoursePrimer>();
                 e.HasRepository<CourseRepository3B>();
                 e.HasManager<CourseManager3B>();

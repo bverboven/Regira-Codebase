@@ -1,16 +1,59 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection.QueryBuilders;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 using Regira.Entities.EFcore.QueryBuilders;
 using Regira.Entities.EFcore.QueryBuilders.Abstractions;
 using Regira.Entities.EFcore.Services;
 using Regira.Entities.Models;
+using Regira.Entities.Models.Abstractions;
 using Regira.Entities.Services.Abstractions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 
-public partial class EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject>
+public class EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject>(EntityServiceCollectionOptions options)
+    : EntityServiceBuilder<TContext, TEntity, TKey>(options),
+        IEntityServiceBuilder<TContext, TEntity, TKey, TSearchObject>
+    where TContext : DbContext
+    where TEntity : class, IEntity<TKey>
+    where TSearchObject : class, ISearchObject<TKey>, new()
 {
     public new bool HasEntityService() => HasService<IEntityService<TEntity, TKey, TSearchObject>>();
+
+    // Build
+    public override void Build()
+    {
+        base.Build();
+
+        // Query Builder
+        if (!HasService<IQueryBuilder<TEntity, TKey, TSearchObject, EntitySortBy, EntityIncludes>>())
+        {
+            AddDefaultQueryBuilder();
+        }
+        // Read Service
+        if (!HasService<IEntityReadService<TEntity, TKey, TSearchObject>>())
+        {
+            UseReadService<EntityReadService<TContext, TEntity, TKey, TSearchObject>>();
+        }
+        // Write Service
+        if (!HasService<IEntityWriteService<TEntity, TKey>>())
+        {
+            UseWriteService<EntityWriteService<TContext, TEntity, TKey>>();
+        }
+        // Entity Repository
+        if (!HasService<IEntityRepository<TEntity, TKey, TSearchObject>>())
+        {
+            HasRepositoryInner<EntityRepository<TEntity, TKey, TSearchObject>>();
+        }
+        // Entity Service
+        if (!HasService<IEntityService<TEntity, TKey, TSearchObject>>())
+        {
+            UseEntityService<EntityRepository<TEntity, TKey, TSearchObject>>();
+        }
+    }
+
+
 
     // Entity services
     public new EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddDefaultService()
@@ -169,21 +212,21 @@ public partial class EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, T
     }
 
     // Query Filters
-    public new EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddQueryFilter<TImplementation>()
+    public new EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>
     {
-        Services.AddQueryFilter<TEntity, TKey, TSearchObject, TImplementation>();
+        Services.AddFilter<TEntity, TKey, TSearchObject, TImplementation>();
         return this;
     }
-    public new EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddQueryFilter<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+    public new EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject> AddFilter<TImplementation>(Func<IServiceProvider, TImplementation> factory)
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, TSearchObject>
     {
-        Services.AddQueryFilter<TEntity, TKey, TSearchObject, TImplementation>(factory);
+        Services.AddFilter<TEntity, TKey, TSearchObject, TImplementation>(factory);
         return this;
     }
     public EntitySearchObjectServiceBuilder<TContext, TEntity, TKey, TSearchObject> Filter(Func<IQueryable<TEntity>, TSearchObject?, IQueryable<TEntity>> filterFunc)
     {
-        AddQueryFilter(_ => new EntityQueryFilter<TEntity, TKey, TSearchObject>(filterFunc));
+        AddFilter(_ => new EntityQueryFilter<TEntity, TKey, TSearchObject>(filterFunc));
         return this;
     }
 }

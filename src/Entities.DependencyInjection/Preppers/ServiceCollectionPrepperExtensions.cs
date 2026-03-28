@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 using Regira.Entities.EFcore.Preppers;
 using Regira.Entities.EFcore.Preppers.Abstractions;
-using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.DependencyInjection.Preppers;
 
@@ -34,16 +33,12 @@ public static class ServiceCollectionPrepperExtensions
 
     public static IServiceCollection AddPrepper<TEntity>(this IServiceCollection services, Action<TEntity> prepareFunc)
         where TEntity : class
-        => services.AddTransient<IEntityPrepper>(_ => new EntityPrepper<TEntity>(item =>
-        {
-            prepareFunc(item);
-            return Task.CompletedTask;
-        }));
+        => services.AddTransient<IEntityPrepper>(_ => new EntityPrepper<TEntity>(prepareFunc));
 
-    public static IServiceCollection AddPrepper<TContext, TEntity, TKey>(this IServiceCollection services, Func<TEntity, TContext, Task> prepareFunc)
+    public static IServiceCollection AddPrepper<TContext, TEntity>(this IServiceCollection services, Func<TEntity, TContext, Task> prepareFunc)
         where TContext : DbContext
-        where TEntity : class, IEntity<TKey>
-        => services.AddTransient<IEntityPrepper>(p => new EntityPrepper<TContext, TEntity, TKey>(p.GetRequiredService<TContext>(), prepareFunc));
+        where TEntity : class
+        => services.AddTransient<IEntityPrepper>(p => new EntityPrepper<TContext, TEntity>(p.GetRequiredService<TContext>(), prepareFunc));
 
 
     public static EntityServiceCollectionOptions AddPrepper<TImplementation>(this EntityServiceCollectionOptions options)
@@ -59,11 +54,11 @@ public static class ServiceCollectionPrepperExtensions
         options.Services.AddTransient<IEntityPrepper<TKey>, TImplementation>();
         return options;
     }
-    public static EntityServiceCollectionOptions AddPrepper<TContext, TEntity, TKey>(this EntityServiceCollectionOptions options, Func<TEntity, TContext, Task> prepareFunc)
+    public static EntityServiceCollectionOptions AddPrepper<TContext, TEntity>(this EntityServiceCollectionOptions options, Func<TEntity, TContext, Task> prepareFunc)
         where TContext : DbContext
-        where TEntity : class, IEntity<TKey>
+        where TEntity : class
     {
-        options.Services.AddPrepper<TContext, TEntity, TKey>(prepareFunc);
+        options.Services.AddPrepper(prepareFunc);
         return options;
     }
     public static EntityServiceCollectionOptions AddPrepper<TEntity>(this EntityServiceCollectionOptions options, Action<TEntity> prepareFunc)

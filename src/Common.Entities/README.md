@@ -52,9 +52,9 @@ services
     {
         e.Related(x => x.Departments);
         e.HasAttachments(x => x.Attachments);
-        e.AddQueryFilter<PersonQueryFilter>();
+        e.AddFilter<PersonQueryFilter>();
         e.Includes<PersonIncludableQueryBuilder>();
-        e.SortBy<PersonSortQueryBuilder>();
+        e.AddSortBy<PersonSortQueryBuilder>();
         e.AddNormalizer<PersonNormalizer>();
         e.HasManager<PersonManager>();
         e.AddMapping<PersonDto, PersonInputDto>();

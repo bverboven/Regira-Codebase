@@ -1,11 +1,18 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.DependencyInjection;
 using Regira.Entities.DependencyInjection.Mapping;
 using Regira.Entities.DependencyInjection.Normalizers;
 using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.Primers;
+using Regira.Entities.DependencyInjection.Processors;
 using Regira.Entities.DependencyInjection.QueryBuilders;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
+using Regira.Entities.DependencyInjection.ServiceBuilders.Models;
 using Regira.Entities.EFcore.Normalizing.Abstractions;
 using Regira.Entities.EFcore.Preppers;
+using Regira.Entities.EFcore.Preppers.Abstractions;
+using Regira.Entities.EFcore.Primers;
 using Regira.Entities.EFcore.Primers.Abstractions;
 using Regira.Entities.EFcore.Processing;
 using Regira.Entities.EFcore.Processing.Abstractions;
@@ -20,10 +27,45 @@ using System.Linq.Expressions;
 
 namespace Regira.Entities.DependencyInjection.ServiceBuilders;
 
-public partial class EntityServiceBuilder<TContext, TEntity, TKey>
+public class EntityServiceBuilder<TContext, TEntity, TKey>(EntityServiceCollectionOptions options)
+    : EntityServiceCollection<TContext>(options),
+        IEntityServiceBuilder<TContext, TEntity, TKey>
+    where TContext : DbContext
+    where TEntity : class, IEntity<TKey>
 {
     public bool HasEntityService() => HasService<IEntityService<TEntity, TKey>>();
     public bool HasService<TService>() => Services.Any(s => s.ServiceType == typeof(TService));
+
+    // Build
+    public virtual void Build()
+    {
+        // Query Builder
+        if (!HasService<IQueryBuilder<TEntity, TKey, SearchObject<TKey>, EntitySortBy, EntityIncludes>>())
+        {
+            AddDefaultQueryBuilder();
+        }
+        // Read Service
+        if (!HasService<IEntityReadService<TEntity, TKey, SearchObject<TKey>>>())
+        {
+            UseReadService<EntityReadService<TContext, TEntity, TKey, SearchObject<TKey>>>();
+        }
+        // Write Service
+        if (!HasService<IEntityWriteService<TEntity, TKey>>())
+        {
+            UseWriteService<EntityWriteService<TContext, TEntity, TKey>>();
+        }
+        // Entity Repository
+        if (!HasService<IEntityRepository<TEntity, TKey>>())
+        {
+            HasRepositoryInner<EntityRepository<TEntity, TKey>>();
+        }
+        // Entity Service
+        if (!HasService<IEntityService<TEntity, TKey>>())
+        {
+            UseEntityService<EntityRepository<TEntity, TKey>>();
+        }
+    }
+
 
     // Entity mapping
     public MappedEntityServiceBuilder<TContext, TEntity, TKey, TDto, TInputDto> UseMapping<TDto, TInputDto>(Action<IEntityMapConfigurator>? mapAction = null)
@@ -224,6 +266,8 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
         return this;
     }
 
+    /* Reading */
+
     // Query Builders
     public EntityServiceBuilder<TContext, TEntity, TKey> AddDefaultQueryBuilder()
     {
@@ -245,24 +289,23 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
     }
 
     // Query Filters
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddQueryFilter<TImplementation>()
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddFilter<TImplementation>()
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>
     {
-        Services.AddQueryFilter<TEntity, TKey, SearchObject<TKey>, TImplementation>();
+        Services.AddFilter<TEntity, TKey, SearchObject<TKey>, TImplementation>();
         return this;
     }
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddQueryFilter<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddFilter<TImplementation>(Func<IServiceProvider, TImplementation> factory)
         where TImplementation : class, IFilteredQueryBuilder<TEntity, TKey, SearchObject<TKey>>
     {
-        Services.AddQueryFilter<TEntity, TKey, SearchObject<TKey>, TImplementation>(factory);
+        Services.AddFilter<TEntity, TKey, SearchObject<TKey>, TImplementation>(factory);
         return this;
     }
     public EntityServiceBuilder<TContext, TEntity, TKey> Filter(Func<IQueryable<TEntity>, SearchObject<TKey>?, IQueryable<TEntity>> filterFunc)
     {
-        AddQueryFilter(_ => new EntityQueryFilter<TEntity, TKey, SearchObject<TKey>>(filterFunc));
+        AddFilter(_ => new EntityQueryFilter<TEntity, TKey, SearchObject<TKey>>(filterFunc));
         return this;
     }
-
 
     // Default SortBy
     public EntityServiceBuilder<TContext, TEntity, TKey> SortBy(Func<IQueryable<TEntity>, IQueryable<TEntity>> sortBy)
@@ -270,18 +313,11 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
         Services.AddTransient<ISortedQueryBuilder<TEntity, TKey>>(_ => new SortedQueryBuilder<TEntity, TKey>(sortBy));
         return this;
     }
+
     // Default Includes
     public EntityServiceBuilder<TContext, TEntity, TKey> Includes(Func<IQueryable<TEntity>, EntityIncludes?, IQueryable<TEntity>> addIncludes)
     {
         Services.AddTransient<IIncludableQueryBuilder<TEntity, TKey>>(_ => new IncludableQueryBuilder<TEntity, TKey>(addIncludes));
-        return this;
-    }
-
-    // Primers
-    public EntityServiceBuilder<TContext, TEntity, TKey> AddPrimer<TPrimer>()
-        where TPrimer : class, IEntityPrimer<TEntity>
-    {
-        Services.AddPrimer<TEntity, TPrimer>();
         return this;
     }
 
@@ -294,14 +330,25 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
     }
 
     // Entity Processor
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddProcessor<TImplementation>()
+        where TImplementation : class, IEntityProcessor<TEntity, EntityIncludes>
+    {
+        Services.AddProcessor<TEntity, EntityIncludes, TImplementation>();
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddProcessor<TImplementation>(Func<IServiceProvider, TImplementation> factory)
+        where TImplementation : class, IEntityProcessor<TEntity, EntityIncludes>
+    {
+        Services.AddProcessor<TEntity, EntityIncludes, TImplementation>(factory);
+        return this;
+    }
     public EntityServiceBuilder<TContext, TEntity, TKey> Process(Func<IList<TEntity>, EntityIncludes?, Task> process)
     {
-        Services.AddTransient<IEntityProcessor<TEntity, EntityIncludes>>(_ => new EntityProcessor<TEntity, EntityIncludes>(process));
-        return this;
+        return AddProcessor(_ => new EntityProcessor<TEntity, EntityIncludes>(process));
     }
     public EntityServiceBuilder<TContext, TEntity, TKey> Process(Action<TEntity, EntityIncludes?> process)
     {
-        Services.AddTransient<IEntityProcessor<TEntity, EntityIncludes>>(_ => new EntityProcessor<TEntity, EntityIncludes>((items, includes) =>
+        return AddProcessor(_ => new EntityProcessor<TEntity, EntityIncludes>((items, includes) =>
         {
             foreach (var item in items)
             {
@@ -309,17 +356,45 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
             }
             return Task.CompletedTask;
         }));
+    }
 
+    /* Writing */
+
+    // Primers
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddPrimer<TPrimer>()
+        where TPrimer : class, IEntityPrimer<TEntity>
+    {
+        Services.AddPrimer<TEntity, TPrimer>();
         return this;
     }
-    public EntityServiceBuilder<TContext, TEntity, TKey> Process<TImplementation>()
-        where TImplementation : class, IEntityProcessor<TEntity, EntityIncludes>
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddPrimer(Func<IServiceProvider, IEntityPrimer> factory)
     {
-        Services.AddTransient<IEntityProcessor<TEntity, EntityIncludes>, TImplementation>();
+        Services.AddPrimer(factory);
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey> Prime(Action<TEntity> primeFunc)
+    {
+        Services.AddPrimer(_ => new EntityPrimer<TEntity>((item, _) =>
+        {
+            primeFunc(item);
+            return Task.CompletedTask;
+        }));
+        return this;
+    }
+    public EntityServiceBuilder<TContext, TEntity, TKey> Prime(Func<TEntity, EntityEntry, TContext, Task> primeFunc)
+    {
+        Services.AddPrimer(p => new EntityPrimer<TEntity>((item, entry)
+            => primeFunc(item, entry, p.GetRequiredService<TContext>())));
         return this;
     }
 
     // Preppers
+    public EntityServiceBuilder<TContext, TEntity, TKey> AddPrepper<TPrepper>()
+        where TPrepper : class, IEntityPrepper<TEntity>
+    {
+        Services.AddPrepper<TEntity, TPrepper>();
+        return this;
+    }
     public EntityServiceBuilder<TContext, TEntity, TKey> Prepare(Action<TEntity> prepareFunc)
     {
         Services.AddPrepper(prepareFunc);
@@ -327,9 +402,10 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
     }
     public EntityServiceBuilder<TContext, TEntity, TKey> Prepare(Func<TEntity, TContext, Task> prepareFunc)
     {
-        Services.AddPrepper<TContext, TEntity, TKey>(prepareFunc);
+        Services.AddPrepper(prepareFunc);
         return this;
     }
+
     // Related
     public EntityServiceBuilder<TContext, TEntity, TKey> Related<TRelated, TRelatedKey>(
         Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression, Action<TEntity>? prepareFunc = null)
