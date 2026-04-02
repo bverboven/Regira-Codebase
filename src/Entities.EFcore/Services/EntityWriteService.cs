@@ -82,14 +82,14 @@ public class EntityWriteService<TContext, TEntity, TKey>(
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
-    public virtual Task<int> SaveChanges(CancellationToken token = default)
+    public virtual async Task<int> SaveChanges(CancellationToken token = default)
     {
 #if DEBUG
 #if NET6_0_OR_GREATER
         Logger?.LogDebug(DbContext.ChangeTracker.DebugView.ShortView);
 #endif
 #endif
-        var count = DbContext.SaveChangesAsync(token);
+        var count = await DbContext.SaveChangesAsync(token);
 #if NET6_0_OR_GREATER
         DbContext.ChangeTracker.Clear();
 #else
