@@ -11,10 +11,10 @@
     <AssemblyName>Regira.Security.Authentication</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.0.2</Version>
+    <Version>5.0.3</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Duende.IdentityModel" Version="8.0.1" />
+    <PackageReference Include="Duende.IdentityModel" Version="8.1.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Security\Common.Security.csproj" />

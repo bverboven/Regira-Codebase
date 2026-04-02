@@ -11,10 +11,10 @@
     <AssemblyName>Regira.DAL.MySQL.MySqlBackup</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.0.2</Version>
+    <Version>5.0.3</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MySqlBackup.NET.MySqlConnector" Version="2.6.5" />
+    <PackageReference Include="MySqlBackup.NET.MySqlConnector" Version="2.7.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DAL.MySQL\DAL.MySQL.csproj" />
