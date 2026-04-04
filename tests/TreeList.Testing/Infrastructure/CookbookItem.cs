@@ -21,5 +21,6 @@ public class Ingredient : ICookbookItem
     public int Id { get; set; }
     public string Name { get; set; } = null!;
 
+    public IList<Ingredient> Ingredients { get; set; } = [];
     public override string ToString() => Name;
 }
