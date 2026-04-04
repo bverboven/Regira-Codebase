@@ -32,13 +32,13 @@ public class VCardManager : IVCardService
     {
         var vCard = Convert(item);
         var stream = new MemoryStream();
-        vCard.SerializeVcf(stream, GetVersion(version), null, Opts.Default, true);
+        vCard.SerializeVcf(stream, GetVersion(version), null, VcfOpts.Default, true);
         return FileUtility.GetString(stream)!;
     }
     public string Write(IEnumerable<VCard> items, VCardVersion version = VCardVersion.V3_0)
     {
         var stream = new MemoryStream();
-        items.Select(Convert).ToList().SerializeVcf(stream, GetVersion(version), null, Opts.Default, true);
+        items.Select(Convert).ToList().SerializeVcf(stream, GetVersion(version), null, VcfOpts.Default, true);
         return FileUtility.GetString(stream)!;
     }
 

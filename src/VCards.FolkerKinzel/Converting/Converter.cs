@@ -1,5 +1,8 @@
 ﻿using FolkerKinzel.VCards.Enums;
 using FolkerKinzel.VCards.Models;
+using FolkerKinzel.VCards.Models.Properties;
+using AddressBuilder = FolkerKinzel.VCards.AddressBuilder;
+using NameBuilder = FolkerKinzel.VCards.NameBuilder;
 using Regira.Office.VCards.Abstractions;
 using Regira.Office.VCards.Models;
 using Regira.Office.VCards.Utilities;
@@ -14,8 +17,8 @@ internal static class Converter
         var fkName = item.NameViews?.FirstOrDefault()?.Value;
         var name = new VCardName
         {
-            GivenName = fkName?.GivenNames.FirstOrDefault(),
-            SurName = fkName?.FamilyNames.FirstOrDefault(),
+            GivenName = fkName?.Given.FirstOrDefault(),
+            SurName = fkName?.Surnames.FirstOrDefault(),
             Prefix = fkName?.Prefixes.FirstOrDefault(),
             Suffix = fkName?.Suffixes.FirstOrDefault()
         };
@@ -104,7 +107,7 @@ internal static class Converter
         var organization = item.Organizations
             ?.Select(o => new VCardOrganization
             {
-                Name = o?.Value.OrganizationName,
+                Name = o?.Value.Name,
             })
             .FirstOrDefault();
         return new VCard
@@ -120,17 +123,16 @@ internal static class Converter
 
     public static FKvCard Convert(VCard item)
     {
-        var name = new NameProperty(
-            item.Name?.SurName,
-            item.Name?.GivenName,
-            null,
-            item.Name?.Prefix,
-            item.Name?.Suffix
-        );
+        var nameBuilder = NameBuilder.Create();
+        if (item.Name?.SurName != null) nameBuilder.AddSurname(item.Name.SurName);
+        if (item.Name?.GivenName != null) nameBuilder.AddGiven(item.Name.GivenName);
+        if (item.Name?.Prefix != null) nameBuilder.AddPrefix(item.Name.Prefix);
+        if (item.Name?.Suffix != null) nameBuilder.AddSuffix(item.Name.Suffix);
+        var name = new NameProperty(nameBuilder.Build(), null);
         var phoneNumbers = item.Tels
             ?.Select(tel =>
             {
-                var phone = new TextProperty(tel);
+                var phone = new TextProperty(tel?.Uri ?? string.Empty, null);
                 if (tel.Type.HasValue)
                 {
                     var telTypes = ConvertUtility
@@ -155,7 +157,7 @@ internal static class Converter
         var emailAddresses = item.Emails
             ?.Select(email =>
             {
-                var emailAddress = new TextProperty(email);
+                var emailAddress = new TextProperty(email?.Text ?? string.Empty, null);
                 if (email.Type.HasValue)
                 {
                     var types = ConvertUtility
@@ -172,13 +174,12 @@ internal static class Converter
         var addresses = item.Addresses
             ?.Select(x =>
                 {
-                    var address = new AddressProperty(
-                        x.StreetAndNumber,
-                        x.Locality,
-                        null,
-                        x.PostalCode,
-                        x.Country
-                    )
+                    var addrBuilder = AddressBuilder.Create();
+                    if (x.StreetAndNumber != null) addrBuilder.AddStreet(x.StreetAndNumber);
+                    if (x.Locality != null) addrBuilder.AddLocality(x.Locality);
+                    if (x.PostalCode != null) addrBuilder.AddPostalCode(x.PostalCode);
+                    if (x.Country != null) addrBuilder.AddCountry(x.Country);
+                    var address = new AddressProperty(addrBuilder.Build(), null)
                     {
                         Parameters =
                         {
@@ -204,12 +205,12 @@ internal static class Converter
                     return address;
                 }
             );
-        var orgs = item.Organization != null ? new[] { new OrgProperty(item.Organization?.Name) } : null;
+        var orgs = item.Organization != null ? new[] { new OrgProperty(new Organization(item.Organization.Name ?? string.Empty, null), null) } : null;
         return new FKvCard
         {
             DisplayNames = new List<TextProperty>
             {
-                new (item.FormattedName)
+                new (item.FormattedName ?? string.Empty, null)
             },
             NameViews = name,
             Phones = phoneNumbers,
