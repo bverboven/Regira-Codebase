@@ -41,16 +41,24 @@ public class FamilyTreeTests
     private static FamilyTreeData CreateData()
     {
         var grandpa = new FamilyMember { Id = 1, Name = "Grandpa" };
-        var father = new FamilyMember { Id = 2, Name = "Father", Parent = grandpa };
-        var uncle = new FamilyMember { Id = 3, Name = "Uncle", Parent = grandpa };
-        var child1 = new FamilyMember { Id = 4, Name = "Child1", Parent = father };
-        var child2 = new FamilyMember { Id = 5, Name = "Child2", Parent = father };
-        var cousin = new FamilyMember { Id = 6, Name = "Cousin", Parent = uncle };
-        var grandChild1 = new FamilyMember { Id = 7, Name = "GrandChild1", Parent = child1 };
-        var grandChild2 = new FamilyMember { Id = 8, Name = "GrandChild2", Parent = cousin };
+        var father = new FamilyMember { Id = 2, Name = "Father" };
+        var uncle = new FamilyMember { Id = 3, Name = "Uncle" };
+        var child1 = new FamilyMember { Id = 4, Name = "Child1" };
+        var child2 = new FamilyMember { Id = 5, Name = "Child2" };
+        var cousin = new FamilyMember { Id = 6, Name = "Cousin" };
+        var grandChild1 = new FamilyMember { Id = 7, Name = "GrandChild1" };
+        var grandChild2 = new FamilyMember { Id = 8, Name = "GrandChild2" };
+
+        grandpa.Children = new List<FamilyMember> { father, uncle };
+        father.Children = new List<FamilyMember> { child1, child2 };
+        uncle.Children = new List<FamilyMember> { cousin };
+        child1.Children = new List<FamilyMember> { grandChild1 };
+        cousin.Children = new List<FamilyMember> { grandChild2 };
 
         var allMembers = new[] { grandpa, father, uncle, child1, child2, cousin, grandChild1, grandChild2 };
-        var tree = allMembers.ToTreeList(m => m.Parent!);
+        var roots = new[] { grandpa };
+        var tree = new TreeList<FamilyMember>();
+        tree.Fill(roots, node => node.Value.Children);
 
         return new FamilyTreeData
         {
@@ -70,7 +78,7 @@ public class FamilyTreeTests
     // ─── ToTreeList overloads ──────────────────────────────────────────────────
 
     [Test]
-    public void ToTreeList_WithParentSelector_BuildsCorrectTree()
+    public void Fill_WithChildrenSelector_BuildsCorrectTree()
     {
         var data = CreateData();
         var tree = data.Tree;
@@ -89,7 +97,7 @@ public class FamilyTreeTests
 
         var tree = allMembers.ToTreeList(
             roots,
-            (ITreeNode<FamilyMember> node) => allMembers.Where(m => m.Parent == node.Value));
+            (ITreeNode<FamilyMember> node) => node.Value.Children);
 
         Assert.That(tree.Count, Is.EqualTo(allMembers.Length));
         Assert.That(tree.Roots.Select(n => n.Value), Is.EquivalentTo(roots));
@@ -100,9 +108,10 @@ public class FamilyTreeTests
     {
         var data = CreateData();
 
-        // Using fkSelector overload (each member's parent as a collection)
-        var tree = data.AllMembers.ToTreeList(
-            m => data.AllMembers.Where(candidate => candidate == m.Parent));
+        // Using fkSelector overload: for each member, find the members that have it as a child
+        var allMembers = data.AllMembers;
+        var tree = allMembers.ToTreeList(
+            m => allMembers.Where(candidate => candidate.Children.Contains(m)));
 
         Assert.That(tree.Count, Is.EqualTo(data.AllMembers.Length));
         Assert.That(tree.Roots.Select(n => n.Value), Is.EquivalentTo(new[] { data.Grandpa }));
