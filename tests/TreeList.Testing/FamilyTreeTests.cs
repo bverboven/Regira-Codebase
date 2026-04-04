@@ -49,16 +49,17 @@ public class FamilyTreeTests
         var grandChild1 = new FamilyMember { Id = 7, Name = "GrandChild1" };
         var grandChild2 = new FamilyMember { Id = 8, Name = "GrandChild2" };
 
-        grandpa.Children = new List<FamilyMember> { father, uncle };
-        father.Children = new List<FamilyMember> { child1, child2 };
-        uncle.Children = new List<FamilyMember> { cousin };
-        child1.Children = new List<FamilyMember> { grandChild1 };
-        cousin.Children = new List<FamilyMember> { grandChild2 };
+        father.Parents = [grandpa];
+        uncle.Parents = [grandpa];
+        child1.Parents = [father];
+        child2.Parents = [father];
+        cousin.Parents = [uncle];
+        grandChild1.Parents = [child1];
+        grandChild2.Parents = [cousin];
 
         var allMembers = new[] { grandpa, father, uncle, child1, child2, cousin, grandChild1, grandChild2 };
-        var roots = new[] { grandpa };
         var tree = new TreeList<FamilyMember>();
-        tree.Fill(roots, node => node.Value.Children);
+        tree.Fill(allMembers, m => m.Parents ?? []);
 
         return new FamilyTreeData
         {
@@ -78,7 +79,7 @@ public class FamilyTreeTests
     // ─── ToTreeList overloads ──────────────────────────────────────────────────
 
     [Test]
-    public void Fill_WithChildrenSelector_BuildsCorrectTree()
+    public void Fill_WithGetParents_BuildsCorrectTree()
     {
         var data = CreateData();
         var tree = data.Tree;
@@ -97,7 +98,7 @@ public class FamilyTreeTests
 
         var tree = allMembers.ToTreeList(
             roots,
-            (ITreeNode<FamilyMember> node) => node.Value.Children);
+            (ITreeNode<FamilyMember> node) => allMembers.Where(m => m.Parents?.Contains(node.Value) == true));
 
         Assert.That(tree.Count, Is.EqualTo(allMembers.Length));
         Assert.That(tree.Roots.Select(n => n.Value), Is.EquivalentTo(roots));
@@ -111,7 +112,7 @@ public class FamilyTreeTests
         // Using fkSelector overload: for each member, find the members that have it as a child
         var allMembers = data.AllMembers;
         var tree = allMembers.ToTreeList(
-            m => allMembers.Where(candidate => candidate.Children.Contains(m)));
+            m => m.Parents ?? []);
 
         Assert.That(tree.Count, Is.EqualTo(data.AllMembers.Length));
         Assert.That(tree.Roots.Select(n => n.Value), Is.EquivalentTo(new[] { data.Grandpa }));
