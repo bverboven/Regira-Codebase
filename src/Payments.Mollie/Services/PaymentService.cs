@@ -79,7 +79,7 @@ public class PaymentService(MollieConfig config)
     }
     public async Task Delete(IPayment item)
     {
-        await _paymentClient.DeletePaymentAsync(item.Id);
+        //await _paymentClient.DeletePaymentAsync(item.Id);
     }
 
     public async Task WebHook(string id, Func<IPayment?, Task> handleWebHook)
