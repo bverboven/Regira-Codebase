@@ -8,8 +8,9 @@ namespace TreeList.Testing;
 /// Unit tests for <see cref="TreeListExtensions"/> using a cookbook scenario (many-to-many relationships).
 /// <para>
 /// An ingredient can be used in multiple recipes, and a recipe has many ingredients.
-/// The <see cref="CookbookItem.UsedInRecipes"/> collection models the many-to-many link:
-/// an ingredient's parents in the tree are all the recipes it belongs to.
+/// <see cref="Recipe.Ingredients"/> models the one-to-many link from recipe to ingredients;
+/// the many-to-many relationship emerges because the same <see cref="Ingredient"/> object
+/// is referenced by multiple recipes, producing multiple tree nodes for the same value.
 /// </para>
 /// <para>
 /// Cookbook used across all tests:
@@ -32,36 +33,45 @@ public class CookbookTests
 {
     private class CookbookData
     {
-        public TreeList<CookbookItem> Tree { get; init; } = null!;
-        public CookbookItem Pasta { get; init; } = null!;
-        public CookbookItem Pizza { get; init; } = null!;
-        public CookbookItem Salad { get; init; } = null!;
-        public CookbookItem Tomato { get; init; } = null!;
-        public CookbookItem OliveOil { get; init; } = null!;
-        public CookbookItem Flour { get; init; } = null!;
-        public CookbookItem Mozzarella { get; init; } = null!;
-        public CookbookItem Lettuce { get; init; } = null!;
-        public CookbookItem[] AllItems { get; init; } = null!;
-        public CookbookItem[] Recipes { get; init; } = null!;
-        public CookbookItem[] Ingredients { get; init; } = null!;
+        public TreeList<ICookbookItem> Tree { get; init; } = null!;
+        public Recipe Pasta { get; init; } = null!;
+        public Recipe Pizza { get; init; } = null!;
+        public Recipe Salad { get; init; } = null!;
+        public Ingredient Tomato { get; init; } = null!;
+        public Ingredient OliveOil { get; init; } = null!;
+        public Ingredient Flour { get; init; } = null!;
+        public Ingredient Mozzarella { get; init; } = null!;
+        public Ingredient Lettuce { get; init; } = null!;
+        public ICookbookItem[] AllItems { get; init; } = null!;
+        public Recipe[] Recipes { get; init; } = null!;
+        public Ingredient[] Ingredients { get; init; } = null!;
     }
 
     private static CookbookData CreateData()
     {
-        var pasta = new CookbookItem { Id = 1, Name = "Pasta" };
-        var pizza = new CookbookItem { Id = 2, Name = "Pizza" };
-        var salad = new CookbookItem { Id = 3, Name = "Salad" };
+        var pasta = new Recipe { Id = 1, Name = "Pasta" };
+        var pizza = new Recipe { Id = 2, Name = "Pizza" };
+        var salad = new Recipe { Id = 3, Name = "Salad" };
 
-        var tomato = new CookbookItem { Id = 4, Name = "Tomato", UsedInRecipes = [pasta, pizza, salad] };
-        var oliveOil = new CookbookItem { Id = 5, Name = "OliveOil", UsedInRecipes = [pasta, pizza, salad] };
-        var flour = new CookbookItem { Id = 6, Name = "Flour", UsedInRecipes = [pasta, pizza] };
-        var mozzarella = new CookbookItem { Id = 7, Name = "Mozzarella", UsedInRecipes = [pizza] };
-        var lettuce = new CookbookItem { Id = 8, Name = "Lettuce", UsedInRecipes = [salad] };
+        var tomato = new Ingredient { Id = 4, Name = "Tomato" };
+        var oliveOil = new Ingredient { Id = 5, Name = "OliveOil" };
+        var flour = new Ingredient { Id = 6, Name = "Flour" };
+        var mozzarella = new Ingredient { Id = 7, Name = "Mozzarella" };
+        var lettuce = new Ingredient { Id = 8, Name = "Lettuce" };
 
-        var allItems = new[] { pasta, pizza, salad, tomato, oliveOil, flour, mozzarella, lettuce };
+        pasta.Ingredients = [tomato, oliveOil, flour];
+        pizza.Ingredients = [tomato, oliveOil, flour, mozzarella];
+        salad.Ingredients = [tomato, oliveOil, lettuce];
 
-        // Build tree: an item's parents are the recipes it is used in
-        var tree = allItems.ToTreeList(item => (IEnumerable<CookbookItem>)item.UsedInRecipes);
+        ICookbookItem[] allItems = [pasta, pizza, salad, tomato, oliveOil, flour, mozzarella, lettuce];
+        Recipe[] recipes = [pasta, pizza, salad];
+        Ingredient[] ingredients = [tomato, oliveOil, flour, mozzarella, lettuce];
+
+        // Build tree: each recipe is a root; its ingredients are children (many-to-many)
+        var tree = new TreeList<ICookbookItem>();
+        tree.Fill(recipes, node => node.Value is Recipe r
+            ? r.Ingredients.Cast<ICookbookItem>()
+            : Enumerable.Empty<ICookbookItem>());
 
         return new CookbookData
         {
@@ -75,8 +85,8 @@ public class CookbookTests
             Mozzarella = mozzarella,
             Lettuce = lettuce,
             AllItems = allItems,
-            Recipes = [pasta, pizza, salad],
-            Ingredients = [tomato, oliveOil, flour, mozzarella, lettuce]
+            Recipes = recipes,
+            Ingredients = ingredients
         };
     }
 
@@ -109,7 +119,9 @@ public class CookbookTests
 
         var tree = allItems.ToTreeList(
             recipes,
-            (ITreeNode<CookbookItem> node) => allItems.Where(item => item.UsedInRecipes.Contains(node.Value)));
+            (ITreeNode<ICookbookItem> node) => node.Value is Recipe r
+                ? r.Ingredients.Cast<ICookbookItem>()
+                : Enumerable.Empty<ICookbookItem>());
 
         Assert.That(tree.Count, Is.EqualTo(data.Tree.Count));
         Assert.That(tree.Roots.Select(n => n.Value), Is.EquivalentTo(recipes));
@@ -155,7 +167,7 @@ public class CookbookTests
         var data = CreateData();
 
         // Mozzarella (1 node) + Lettuce (1 node)
-        var nodes = data.Tree.GetSelf(new[] { data.Mozzarella, data.Lettuce }).ToArray();
+        var nodes = data.Tree.GetSelf(new ICookbookItem[] { data.Mozzarella, data.Lettuce }).ToArray();
 
         Assert.That(nodes, Has.Length.EqualTo(2));
         Assert.That(nodes.Select(n => n.Value), Is.EquivalentTo(new[] { data.Mozzarella, data.Lettuce }));
@@ -301,7 +313,7 @@ public class CookbookTests
 
         var withOffspringValues = pastaNodes.WithOffspring().Select(n => n.Value).ToArray();
 
-        Assert.That(withOffspringValues, Is.EquivalentTo(new[] { data.Pasta, data.Tomato, data.OliveOil, data.Flour }));
+        Assert.That(withOffspringValues, Is.EquivalentTo(new ICookbookItem[] { data.Pasta, data.Tomato, data.OliveOil, data.Flour }));
     }
 
     // ─── GetBrothers ──────────────────────────────────────────────────────────
