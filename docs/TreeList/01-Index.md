@@ -32,7 +32,7 @@ extension methods, and includes built-in protection against circular references.
 ## Installation
 
 ```xml
-<PackageReference Include="Regira.TreeList" Version="4.2.0" />
+<PackageReference Include="Regira.TreeList" Version="*" />
 ```
 
 ## Building a Tree
@@ -81,13 +81,13 @@ Once the tree is built every node exposes navigation extension methods:
 var node = tree.First(n => n.Value.Name == "Bob");
 
 // Single-node navigation
-var root      = node.GetRoot();        // Alice
-var ancestors = node.GetAncestors();   // [Alice]
-var children  = node.GetChildren();    // direct children of Bob
-var offspring = node.GetOffspring();   // all descendants of Bob (recursive)
-var siblings  = node.GetBrothers();    // Carol (same parent, excluding self)
-var uncles    = node.GetUncles();      // children of Alice's siblings
-var nephews   = node.GetNephews();     // children of uncles
+var root      = node.GetRoot();         // Alice
+var ancestors = node.GetAncestors();    // [Alice]
+var children  = node.GetChildren();     // direct children of Bob
+var offspring = node.GetOffspring();    // all descendants of Bob (recursive)
+var siblings  = node.GetBrothers();     // Carol (same parent, excluding self)
+var uncles    = node.GetUncles();       // children of Alice's siblings
+var nephews   = node.GetNephews();      // children of uncles
 ```
 
 Extension methods also work on **collections of nodes**:
@@ -95,11 +95,11 @@ Extension methods also work on **collections of nodes**:
 ```csharp
 IEnumerable<TreeNode<Person>> subset = tree.Where(n => n.Level == 1);
 
+var roots     = subset.GetRoots();      // root nodes reachable from subset
+var ancestors = subset.GetAncestors();  // all ancestors (distinct)
 var parents   = subset.GetParents();    // distinct parent nodes
-var ancestors = subset.GetAncestors(); // all ancestors (distinct)
-var roots     = subset.GetRoots();     // root nodes reachable from subset
-var leaves    = tree.GetBottom();      // nodes with no children
-var offspring = subset.GetOffspring(); // all descendants
+var leaves    = tree.GetBottom();       // nodes with no children
+var offspring = subset.GetOffspring();  // all descendants
 var withSelf  = subset.WithOffspring(); // self + all descendants
 ```
 

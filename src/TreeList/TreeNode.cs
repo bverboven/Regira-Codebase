@@ -25,7 +25,7 @@ public class TreeNode<T> : TreeNodeBase<T>
         Tree = parent.Tree;
         Value = value;
         Parent = parent;
-        Root = parent.Root;
+        Root = parent.Root ?? parent;
         Level = parent.Level + 1;
     }
 

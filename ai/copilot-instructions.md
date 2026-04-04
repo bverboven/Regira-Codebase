@@ -19,6 +19,7 @@ This codebase provides specialized AI instruction sets for its modules. **When a
 |--------|-----------|--------|--------------| 
 | **Project Templates** | *(scaffolding)* | Scaffolding new projects from reusable starter templates | `./project.setup.md` |
 | **Entities** | `Regira.Entities` | CRUD Services with built-in extras | `./entities.instructions.md` |
+| **TreeList** | `Regira.TreeList` | Hierarchical tree structures: build, navigate, and query nodes | `./treelist.instructions.md` |
 | **IO.Storage** | `Regira.IO.Storage` | File storage: local filesystem, Azure Blob, SFTP/SSH, GitHub, TCP, compression | *(not yet available)* |
 | **Office** | `Regira.Office` | Document processing: Excel, Word, PDF, OCR, Barcodes, CSV, vCards | *(not yet available)* |
 | **Media** | `Regira.Media` | Image & video processing: drawing, resize/crop/rotate, FFmpeg | *(not yet available)* |
@@ -64,6 +65,28 @@ A generic, extensible framework for building ASP.NET Core APIs with standardized
 - **Troubleshooting** — diagnosing runtime issues in Entities-based projects
 
 **Load these instructions when the user's request is about any of the above**, including when building a new data-driven API, adding or changing an entity in an existing project, or fixing issues in an Entities-based solution.
+
+---
+
+### Regira TreeList
+
+**Instructions:** `./treelist.instructions.md`
+
+A generic, lightweight library for building and querying **hierarchical tree structures** over any type `T`.
+The main container is `TreeList<T>` (inherits `List<TreeNode<T>>`), which keeps all nodes in a flat list while maintaining full parent/child links.
+
+Key capabilities:
+
+- **Building trees** — four strategies: children-selector (`Fill` / `ToTreeList` with roots + child func), single-parent selector, multi-parent selector for many-to-many, and manual node-by-node construction (`AddValue` / `AddChild`)
+- **Node navigation** — extension methods on a single `TreeNode<T>`: `GetRoot`, `GetAncestors`, `GetChildren`, `GetOffspring`, `GetBrothers`, `GetUncles`, `GetNephews`
+- **Collection navigation** — extension methods on `IEnumerable<TreeNode<T>>`: `GetSelf`, `GetParents`, `GetAncestors`, `GetRoots`, `GetBottom`, `GetOffspring`, `WithOffspring`, `GetBrothers`, `GetUncles`
+- **Ordering** — `OrderByHierarchy()` for depth-first traversal with optional sibling sort key
+- **TreeView** — `ToTreeView()` produces a `ReadOnlyCollection<T>` of raw values in hierarchical order
+- **ReverseTree** — inverts the hierarchy (leaves become roots)
+- **Many-to-many** — the same value object can appear as multiple `TreeNode<T>` instances at different positions
+- **Circular reference detection** — configurable via `TreeOptions` (`EnableAutoCheck`, `ThrowOnError`)
+
+**Load these instructions when the user asks to** build or traverse a tree, use `TreeList<T>`, work with hierarchical data structures, or add tree navigation to a .NET project.
 
 ---
 

@@ -346,7 +346,7 @@ public static class TreeListExtensions
     /// from the specified collection.
     /// </returns>
     public static IEnumerable<TreeNode<T>> GetBottom<T>(this IEnumerable<TreeNode<T>> collection) 
-        => collection.GetOffspring().Where(n => !n.Children.Any());
+        => collection.WithOffspring().Where(n => !n.Children.Any());
     /// <summary>
     /// Retrieves the direct children of each <see cref="TreeNode{T}"/> in the specified collection.
     /// </summary>

@@ -19,7 +19,6 @@
   </Folder>
   <Folder Name="/src/Core/">
     <Project Path="src/Common/Common.csproj" />
-    <Project Path="src/TreeList/TreeList.csproj" />
   </Folder>
   <Folder Name="/src/DAL/">
     <Project Path="src/DAL.EFcore/DAL.EFcore.csproj" />
@@ -133,6 +132,13 @@
     <Project Path="src/Common.System/Common.System.csproj" />
     <Project Path="src/System.Hosting/System.Hosting.csproj" />
     <Project Path="src/System.Projects/System.Projects.csproj" />
+  </Folder>
+  <Folder Name="/src/TreeList/">
+    <Project Path="src/TreeList/TreeList.csproj" />
+  </Folder>
+  <Folder Name="/src/TreeList/docs/">
+    <File Path="docs/TreeList/01-Index.md" />
+    <File Path="docs/TreeList/02-Examples.md" />
   </Folder>
   <Folder Name="/src/Web/">
     <Project Path="src/Common.Web/Common.Web.csproj" />

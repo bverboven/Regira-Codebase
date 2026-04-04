@@ -31,15 +31,15 @@ public class TreeList<T> : List<TreeNode<T>>
     public TreeList(int capacity, TreeOptions? options = null)
         : base(capacity)
     {
-        options ??= new TreeOptions();
-        EnableAutoCheck = options.EnableAutoCheck;
-        ThrowOnError = options.ThrowOnError;
+        Options = options ?? new TreeOptions();
+        EnableAutoCheck = Options.EnableAutoCheck;
+        ThrowOnError = Options.ThrowOnError;
     }
     public TreeList(IEnumerable<T> collection, TreeOptions? options = null)
     {
-        options ??= new TreeOptions();
-        EnableAutoCheck = options.EnableAutoCheck;
-        ThrowOnError = options.ThrowOnError;
+        Options = options ?? new TreeOptions();
+        EnableAutoCheck = Options.EnableAutoCheck;
+        ThrowOnError = Options.ThrowOnError;
 
         AddValues(collection);
     }
@@ -118,7 +118,7 @@ public class TreeList<T> : List<TreeNode<T>>
 
     public new void RemoveAt(int index)
     {
-        if (index > Count || index < 0)
+        if (index >= Count || index < 0)
         {
             throw new Exception("Invalid index");
         }
@@ -127,7 +127,14 @@ public class TreeList<T> : List<TreeNode<T>>
 
         base.RemoveAt(index);
 
-        item.Parent?.RemoveChild(item);
+        if (item.Parent == null)
+        {
+            Roots = Roots.Where(r => !ReferenceEquals(r, item)).ToArray();
+        }
+        else
+        {
+            item.Parent.RemoveChild(item);
+        }
 
         foreach (var child in item.Children)
         {
@@ -155,7 +162,7 @@ public class TreeList<T> : List<TreeNode<T>>
     }
     public int RemoveAll(Func<TreeNode<T>, bool> predicate)
     {
-        var items = this.Where(predicate);
+        var items = this.Where(predicate).ToList();
         return items.Count(Remove);
     }
 
