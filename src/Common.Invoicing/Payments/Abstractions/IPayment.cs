@@ -4,7 +4,7 @@ namespace Regira.Invoicing.Payments.Abstractions;
 
 public interface IPayment
 {
-    string? Id { get; set; }
+    string Id { get; set; }
     decimal Amount { get; set; }
     string? Currency { get; set; }
     string? Description { get; set; }

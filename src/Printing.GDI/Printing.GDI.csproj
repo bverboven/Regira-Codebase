@@ -1,23 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-	<TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
-	<ImplicitUsings>enable</ImplicitUsings>
-	<Nullable>enable</Nullable>
-	<LangVersion>latest</LangVersion>
-	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<Authors>B.Verboven</Authors>
-	<RootNamespace>Regira.Printing.GDI</RootNamespace>
-	<PackageId>Regira.Printing.GDI</PackageId>
-	<AssemblyName>Regira.Printing.GDI</AssemblyName>
-	<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	<NoWarn>1701;1702;1591</NoWarn>
-	<Version>5.0.0</Version>
+    <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.Printing.GDI</RootNamespace>
+    <PackageId>Regira.Printing.GDI</PackageId>
+    <AssemblyName>Regira.Printing.GDI</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>5.0.0</Version>
   </PropertyGroup>
-
   <ItemGroup>
-	<ProjectReference Include="..\Common.Office\Common.Office.csproj" />
-	<ProjectReference Include="..\Drawing.GDI\Drawing.GDI.csproj" />
+    <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
+    <ProjectReference Include="..\Drawing.GDI\Drawing.GDI.csproj" />
   </ItemGroup>
-
 </Project>

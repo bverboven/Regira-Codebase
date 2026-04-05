@@ -1,4 +1,3 @@
-using System.Globalization;
 using Mollie.Api.Client;
 using Mollie.Api.Models;
 using Mollie.Api.Models.Payment.Request;
@@ -8,6 +7,7 @@ using Regira.Invoicing.Payments.Enums;
 using Regira.Invoicing.Payments.Models;
 using Regira.Payments.Mollie.Config;
 using Regira.Utilities;
+using System.Globalization;
 
 namespace Regira.Payments.Mollie.Services;
 
@@ -29,7 +29,7 @@ public class PaymentService(MollieConfig config)
 
         var response = await _paymentClient.GetPaymentAsync(id.ToString());
 
-        if (response == null)
+        if (response == null!)
         {
             return null;
         }
@@ -79,7 +79,9 @@ public class PaymentService(MollieConfig config)
     }
     public async Task Delete(IPayment item)
     {
+        // Not supported by Mollie anymore
         //await _paymentClient.DeletePaymentAsync(item.Id);
+        await _paymentClient.CancelPaymentAsync(item.Id);
     }
 
     public async Task WebHook(string id, Func<IPayment?, Task> handleWebHook)
@@ -136,12 +138,15 @@ public class PaymentService(MollieConfig config)
         var request = new PaymentRequest
         {
             Amount = new Amount(payment.Currency ?? "EUR", payment.Amount),
-            Description = payment.Description,
+            Description = payment.Description ?? string.Empty,
             RedirectUrl = _redirectFactory?.Invoke(payment),
             WebhookUrl = _webhookFactory?.Invoke(payment)
         };
         var metadata = payment.Metadata;
-        request.SetMetadata(metadata);
+        if (metadata?.Any() == true)
+        {
+            request.SetMetadata(metadata);
+        }
         return request;
     }
 }
