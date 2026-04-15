@@ -63,7 +63,7 @@ public class SelectPdfTests
         {
             title = "Test Title",
             date = date.ToString("dd/MM/yyyy"),
-            lijnen = Enumerable.Repeat((object?)null, 25).Select((_, i) => new { title = $"Item {char.ConvertFromUtf32(i + 65)}" }).ToList(),
+            lijn = Enumerable.Repeat((object?)null, 25).Select((_, i) => new { title = $"Item {char.ConvertFromUtf32(i + 65)}" }).ToList(),
             logo = logoBase64
         };
 

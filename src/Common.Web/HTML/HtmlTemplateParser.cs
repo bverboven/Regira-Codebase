@@ -46,7 +46,7 @@ public class HtmlTemplateParser : IHtmlParser
             var blockName = lines[0].Substring("<!--{{".Length, lines[0].IndexOf("}}-->", StringComparison.Ordinal) - "<!--{{".Length);
             var blockContent = string.Join(Environment.NewLine, lines.Skip(1).Take(lines.Length - 2)).Trim()
                 .Replace(Environment.NewLine + Environment.NewLine, Environment.NewLine);
-            var groupedBlockParameters = parameters.FindAll(p => p.Key.StartsWith(blockName))
+            var groupedBlockParameters = parameters.FindAll(p => p.Key.StartsWith(blockName + "."))
                 .Select(p => new { Key = string.Join(".", p.Key.Split('.').Skip(1)), p.Value })
                 .GroupBy(p => p.Key.Split('.').First());
             var blockParameters = groupedBlockParameters
@@ -63,7 +63,7 @@ public class HtmlTemplateParser : IHtmlParser
                 result += parameterContent;
             }
             htmlContent = htmlContent.Replace(blockMatch.ToString()!, result);
-            parameters.RemoveAll(x => x.Key.StartsWith(blockName));
+            parameters.RemoveAll(x => x.Key.StartsWith(blockName + "."));
         }
         var paramsDic = parameters.ToDictionary(k => k.Key, v => ValueConverter(v.Key, v.Value));
 

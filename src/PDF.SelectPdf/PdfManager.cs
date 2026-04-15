@@ -8,16 +8,8 @@ using SelectPdf;
 
 namespace Regira.Office.PDF.SelectPdf;
 
-public class PdfManager(PdfManager.Options? options = null) : IHtmlToPdfService
+public class PdfManager : IHtmlToPdfService
 {
-    public class Options
-    {
-        public Action<HtmlInput, string?>? OnPrint { get; set; }
-    }
-
-    public event Action<HtmlInput, string?>? OnPrint = options?.OnPrint;
-
-
     public Task<IMemoryFile> Create(HtmlInput template)
     {
         var doc = GetPdfDocument(template);
@@ -39,29 +31,13 @@ public class PdfManager(PdfManager.Options? options = null) : IHtmlToPdfService
         {
             Options =
             {
-                //converter.Options.CssMediaType = HtmlToPdfCssMediaType.Print;
                 PdfPageSize = pageSize,
                 PdfPageOrientation = pdfOrientation,
-                //}
-                //    }
-                //        converter.Options.WebPageHeight = (int)(DimensionsUtility.MmToPt(PageSizes.Mm.A4.Width) - (margins.Top + margins.Bottom));
-                //        converter.Options.WebPageWidth = (int)(DimensionsUtility.MmToPt(PageSizes.Mm.A4.Height) - (margins.Right + margins.Left));
-                //    {
-                //    else
-                //    }
-                //        converter.Options.WebPageHeight = (int)(DimensionsUtility.MmToPt(PageSizes.Mm.A4.Height) - (margins.Top + margins.Bottom));
-                //        converter.Options.WebPageWidth = (int)(DimensionsUtility.MmToPt(PageSizes.Mm.A4.Width) - (margins.Right + margins.Left));
-                //    {
-                //    if (template.Orientation == PageOrientation.Portrait)
-                //{
-                //if (pageSize == PdfPageSize.A4)
-                //converter.Options.WebPageFixedSize = true;
                 MarginTop = (int)margins.Top,
                 MarginRight = (int)margins.Right,
                 MarginBottom = (int)margins.Bottom,
                 MarginLeft = (int)margins.Left
             }
-            //converter.Options.EmbedFonts = true;
         };
 
         // header
@@ -87,11 +63,7 @@ public class PdfManager(PdfManager.Options? options = null) : IHtmlToPdfService
             }
         }
 
-        OnPrint?.Invoke(template, htmlString);
-
         var doc = converter.ConvertHtmlString(htmlString);
-        //var font = doc.AddFont(PdfStandardFont.TimesRoman);
-        //font.Size = 14;
         return doc;
     }
 
