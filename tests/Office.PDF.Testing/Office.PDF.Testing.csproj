@@ -25,11 +25,10 @@
     <ProjectReference Include="..\..\src\Common.Web\Common.Web.csproj" />
     <ProjectReference Include="..\..\src\Drawing.SkiaSharp\Drawing.SkiaSharp.csproj" />
     <ProjectReference Include="..\..\src\PDF.DocNET\PDF.DocNET.csproj" />
+    <ProjectReference Include="..\..\src\PDF.Playwright\PDF.Playwright.csproj" />
+    <ProjectReference Include="..\..\src\PDF.Puppeteer\PDF.Puppeteer.csproj" />
     <ProjectReference Include="..\..\src\PDF.SelectPdf\PDF.SelectPdf.csproj" />
     <ProjectReference Include="..\..\src\PDF.Spire\PDF.Spire.csproj" />
     <ProjectReference Include="..\..\src\Serializing.Newtonsoft\Serializing.Newtonsoft.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Assets\Output\SelectPdf\" />
   </ItemGroup>
 </Project>

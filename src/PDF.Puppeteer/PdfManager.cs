@@ -8,9 +8,20 @@ namespace Regira.Office.PDF.Puppeteer;
 
 public class PdfManager : IHtmlToPdfService
 {
+    private static readonly SemaphoreSlim DownloadLock = new(1, 1);
+
     public async Task<IMemoryFile> Create(HtmlInput template)
     {
-        await new BrowserFetcher().DownloadAsync();
+        await DownloadLock.WaitAsync();
+        try
+        {
+            await new BrowserFetcher().DownloadAsync();
+        }
+        finally
+        {
+            DownloadLock.Release();
+        }
+
         var browser = await PuppeteerSharp.Puppeteer.LaunchAsync(new LaunchOptions
         {
             Headless = true

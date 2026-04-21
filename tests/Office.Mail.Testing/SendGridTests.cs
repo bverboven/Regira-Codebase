@@ -22,11 +22,13 @@ public class SendGridTests : MailerTestsBase
     [Test]
     public override Task Send_Without_Attachment()
     {
+        Assert.Ignore("License expired");
         return base.Send_Without_Attachment();
     }
     [Test]
     public override Task Send_With_Attachment()
     {
+        Assert.Ignore("License expired");
         return base.Send_With_Attachment();
     }
 }

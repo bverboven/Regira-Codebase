@@ -32,7 +32,15 @@ public static class DbContextExtensions
     public static void UpdateRelatedCollection<TEntity, TRelated>(this DbContext dbContext, TEntity modified, TEntity original, Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
         where TEntity : class, IEntity<int>
         where TRelated : class, IEntity<int>
-    => dbContext.UpdateRelatedCollection<TEntity, TRelated, int, int>(modified, original, navigationExpression);
+    {
+        foreach (var item in navigationExpression.Compile()(modified) ?? Array.Empty<TRelated>())
+        {
+            // No negative ids for EF!
+            item.Id = Math.Max(0, item.Id);
+        }
+        dbContext.UpdateRelatedCollection<TEntity, TRelated, int, int>(modified, original, navigationExpression);
+    }
+
     public static void UpdateRelatedCollection<TEntity, TRelated, TEntityKey, TRelatedKey>(this DbContext dbContext, TEntity modified, TEntity original, Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression)
         where TEntity : class, IEntity<TEntityKey>
         where TRelated : class, IEntity<TRelatedKey>
@@ -51,7 +59,7 @@ public static class DbContextExtensions
         {
             return;
         }
-        
+
         var relatedItemsToAdd = modifiedItems.Where(m => m.Id == null || m.Id.Equals(default(TRelatedKey)) || originalItems.All(o => m.Id.Equals(o.Id) != true)).ToArray();
         var relatedItemsToDelete = originalItems.Where(o => modifiedItems.All(m => m.Id != null && m.Id.Equals(o.Id) != true)).ToArray();
         foreach (var entity in relatedItemsToAdd)
