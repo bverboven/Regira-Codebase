@@ -20,6 +20,9 @@
   <Folder Name="/src/Core/">
     <Project Path="src/Common/Common.csproj" />
   </Folder>
+  <Folder Name="/src/Core/docs/">
+    <File Path="docs/Common/01-index.md" />
+  </Folder>
   <Folder Name="/src/DAL/">
     <Project Path="src/DAL.EFcore/DAL.EFcore.csproj" />
     <Project Path="src/DAL.MongoDB/DAL.MongoDB.csproj" />
@@ -70,11 +73,19 @@
     <Project Path="src/IO.Storage.SimpleTCP/IO.Storage.SimpleTCP.csproj" />
     <Project Path="src/IO.Storage.SSH/IO.Storage.SSH.csproj" />
   </Folder>
+  <Folder Name="/src/IO/docs/">
+    <File Path="docs/IO.Storage/01-index.md" />
+    <File Path="docs/IO.Storage/02-examples.md" />
+  </Folder>
   <Folder Name="/src/Media/">
     <Project Path="src/Common.Media/Common.Media.csproj" />
     <Project Path="src/Drawing.GDI/Drawing.GDI.csproj" />
     <Project Path="src/Drawing.SkiaSharp/Drawing.SkiaSharp.csproj" />
     <Project Path="src/Media.FFMpeg/Media.FFMpeg.csproj" />
+  </Folder>
+  <Folder Name="/src/Media/docs/">
+    <File Path="docs/Drawing/01-index.md" />
+    <File Path="docs/Drawing/02-examples.md" />
   </Folder>
   <Folder Name="/src/Office/">
     <Project Path="src/Common.Office/Common.Office.csproj" />
@@ -99,6 +110,10 @@
     <Project Path="src/Mail.MSGReader/Mail.MSGReader.csproj" />
     <Project Path="src/Mail.SendGrid/Mail.SendGrid.csproj" />
     <Project Path="src/Mail.Web/Mail.Web.csproj" />
+  </Folder>
+  <Folder Name="/src/Office/Mail/docs/">
+    <File Path="docs/Office.Mail/01-index.md" />
+    <File Path="docs/Office.Mail/02-examples.md" />
   </Folder>
   <Folder Name="/src/Office/OCR/">
     <Project Path="src/OCR.PaddleOCR/OCR.PaddleOCR.csproj" />
