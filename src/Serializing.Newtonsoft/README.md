@@ -1,6 +1,6 @@
 # Regira Serializing
 
-Regira Serializing provides JSON serialisation via the `ISerializer` contract defined in [Common](../Common/README.md#serializing).
+Regira Serializing provides JSON serialisation via the `ISerializer` contract defined in [Common](../Common#serializing).
 
 ## Projects
 

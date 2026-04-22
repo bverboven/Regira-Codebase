@@ -208,7 +208,7 @@ var pos = new Position2D { Top = 10, Left = 20 };
 public enum LengthUnit { Points, Inches, Millimeters, Percent }
 ```
 
-Used by Drawing DTOs and PDF layout engines when specifying measurements. See [Drawing → DTOs & API Integration](../Common.Media/README.md#dtos--api-integration).
+Used by Drawing DTOs and PDF layout engines when specifying measurements. See [Drawing → DTOs & API Integration](../Common.Media#dtos--api-integration).
 
 ---
 
@@ -366,9 +366,9 @@ public interface IDbRestoreService
 ```
 
 See the individual DAL project docs for implementations:
-- [MongoDB](../DAL.MongoDB/README.md)
-- [MySQL](../DAL.MySQL/README.md)
-- [PostgreSQL](../DAL.PostgreSQL/README.md)
+- [MongoDB](../DAL.MongoDB)
+- [MySQL](../DAL.MySQL)
+- [PostgreSQL](../DAL.PostgreSQL)
 
 ---
 
@@ -391,8 +391,8 @@ images.Add(imageService.Parse(bytes2)!);
 
 | Library | Doc |
 |---------|-----|
-| Entities & EF Core | [Common.Entities](../Common.Entities/README.md) |
-| Drawing (images) | [Common.Media](../Common.Media/README.md) — uses `IMemoryFile`, `BinaryFileItem`, `Size2D`, `LengthUnit` |
-| IO.Storage | [Common.IO.Storage](../Common.IO.Storage/README.md) — uses `INamedFile`, `BinaryFileItem`, `ContentTypeUtility` |
-| Office.Mail | [Mail docs](../Common.Office/docs/mail/README.md) — uses `INamedFile` for attachments |
-| TreeList | [TreeList](../TreeList/README.md) |
+| Entities & EF Core | [Common.Entities](../Common.Entities) |
+| Drawing (images) | [Common.Media](../Common.Media) — uses `IMemoryFile`, `BinaryFileItem`, `Size2D`, `LengthUnit` |
+| IO.Storage | [Common.IO.Storage](../Common.IO.Storage) — uses `INamedFile`, `BinaryFileItem`, `ContentTypeUtility` |
+| Office.Mail | [Mail docs](../Common.Office/docs/mail) — uses `INamedFile` for attachments |
+| TreeList | [TreeList](../TreeList) |

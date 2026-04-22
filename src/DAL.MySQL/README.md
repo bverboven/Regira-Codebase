@@ -69,7 +69,7 @@ await new MySqlRestoreService(options).Restore(backup);
 
 ## Backup/Restore contracts
 
-Both services implement the shared contracts from [Common](../Common/README.md#dal-abstractions):
+Both services implement the shared contracts from [Common](../Common#dal-abstractions):
 
 ```csharp
 public interface IDbBackupService  { Task<IMemoryFile> Backup(); }

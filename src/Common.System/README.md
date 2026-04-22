@@ -9,7 +9,7 @@ Regira System provides application hosting utilities, background task management
 | `System.Hosting` | `Regira.System.Hosting` | Host config, background queues, Windows Service |
 | `System.Projects` | `Regira.System.Projects` | Parse and manage .csproj files |
 
-See [Web](../Common.Web/README.md#systemhosting) for the full `System.Hosting` API reference and examples.
+See [Web](../Common.Web#systemhosting) for the full `System.Hosting` API reference and examples.
 
 ## Installation
 
@@ -112,4 +112,4 @@ var roots = tree.Roots;                              // projects with no depende
 var leaves = tree.GetBottom().Select(n => n.Value.Id);  // projects nobody depends on
 ```
 
-`ProjectTree` extends `TreeList<Project>` — see [TreeList docs](../TreeList/README.md) for the full navigation API.
+`ProjectTree` extends `TreeList<Project>` — see [TreeList docs](../TreeList) for the full navigation API.
