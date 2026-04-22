@@ -72,6 +72,58 @@ string  GetIdentifier(string uri)            // absolute → relative
 string? GetRelativeFolder(string identifier) // extract parent folder
 ```
 
+## File Identification
+
+Files are addressed uniformly across all backends using three coordinated concepts.
+
+### `IFileService.Root`
+
+Every `IFileService` implementation exposes a `Root` — the backend-specific base address for that storage scope:
+
+| Implementation | `Root` example |
+|----------------|----------------|
+| `BinaryFileService` | `/var/app/storage` (local path) |
+| `BinaryBlobService` | `https://account.blob.core.windows.net/my-container` |
+| `SftpService` | `/home/deploy/files` (remote base directory) |
+| `GitHubService` | `https://api.github.com/repos/owner/repo/contents/` |
+
+All `IFileService` methods (`GetBytes`, `Save`, `List`, …) accept and return **identifiers** — paths relative to this root — keeping consuming code independent of the backend.
+
+### `IBinaryFile.Identifier` and `IBinaryFile.Prefix`
+
+`BinaryFileItem` (and anything implementing `IBinaryFile` / `IStorageFile`) carries two address parts:
+
+| Property | Description | Example |
+|----------|-------------|---------|
+| `Prefix` | Sub-folder path below the root, excluding the filename | `"invoices/2024/"` |
+| `Identifier` | `Prefix + FileName` — the relative key used in all `IFileService` calls | `"invoices/2024/inv-001.pdf"` |
+| `Path` | Full absolute address — `Root + Identifier` | `/var/app/storage/invoices/2024/inv-001.pdf` |
+
+```
+Root        →  /var/app/storage/
+Prefix      →                   invoices/2024/
+FileName    →                                 inv-001.pdf
+Identifier  →                   invoices/2024/inv-001.pdf
+Path        →  /var/app/storage/invoices/2024/inv-001.pdf
+```
+
+### Converting between identifier and absolute URI
+
+`IFileService` provides helpers to move between the two representations:
+
+```csharp
+string absolute = service.GetAbsoluteUri("invoices/2024/inv-001.pdf");
+// → /var/app/storage/invoices/2024/inv-001.pdf  (or the equivalent Azure/SFTP URL)
+
+string identifier = service.GetIdentifier("/var/app/storage/invoices/2024/inv-001.pdf");
+// → invoices/2024/inv-001.pdf
+
+string? folder = service.GetRelativeFolder("invoices/2024/inv-001.pdf");
+// → invoices/2024
+```
+
+Use `Identifier` as the portable key that survives a backend swap; only resolve to `Path` when you need the actual physical/network address.
+
 ## FileSearchObject
 
 Filter parameter for `List()`.

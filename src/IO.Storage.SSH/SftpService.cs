@@ -7,7 +7,6 @@ namespace Regira.IO.Storage.SSH;
 public class SftpService(SftpCommunicator communicator) : IFileService
 {
     public string Root => communicator.ContainerName;
-    public string RootFolder => Root;
 
 
     public async Task<bool> Exists(string identifier)

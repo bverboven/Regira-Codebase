@@ -22,7 +22,6 @@ public class BinaryBlobService(AzureCommunicator communicator) : IFileService
         }
     }
     public string Root => Container.Uri.ToString();
-    public string RootFolder => Root;
 
 
     public async Task<bool> Exists(string identifier)

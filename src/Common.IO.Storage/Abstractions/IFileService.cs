@@ -3,8 +3,6 @@
 public interface IFileService
 {
     string Root { get; }
-    [Obsolete("Please use more generic Root", false)]
-    string RootFolder { get; }
 
     Task<bool> Exists(string identifier);
     Task<byte[]?> GetBytes(string identifier);

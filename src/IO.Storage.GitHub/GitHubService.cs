@@ -1,8 +1,8 @@
-﻿using System.Net.Http.Headers;
-using System.Reflection;
-using Regira.IO.Storage.Abstractions;
+﻿using Regira.IO.Storage.Abstractions;
 using Regira.IO.Utilities;
 using Regira.Serializing.Abstractions;
+using System.Net.Http.Headers;
+using System.Reflection;
 
 namespace Regira.IO.Storage.GitHub;
 
@@ -12,7 +12,6 @@ namespace Regira.IO.Storage.GitHub;
 public class GitHubService(GitHubOptions options, ISerializer serializer) : IFileService
 {
     public string Root { get; } = options.Uri.TrimEnd('/') + "/contents/"; // Remove trailing slash when using api trees (https://docs.github.com/en/rest/git/trees)
-    public string RootFolder => Root;
 
     public async Task<bool> Exists(string identifier)
     {

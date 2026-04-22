@@ -7,7 +7,6 @@ public class BinaryFileService(FileSystemOptions options) : IFileService
     public class FileServiceOptions : FileSystemOptions;
 
     public string Root => options.RootFolder;
-    public string RootFolder => Root;
 
 
     public Task<bool> Exists(string identifier)

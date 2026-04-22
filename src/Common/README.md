@@ -20,35 +20,34 @@ Most Regira packages pull this in as a transitive dependency, so you rarely need
 
 ## IO Abstractions
 
-The IO abstraction hierarchy is the most widely referenced part of this library. It is used as the common file contract throughout IO.Storage, Drawing, and Office.Mail.
+The IO abstraction hierarchy is the most widely referenced part of this library. It is used as the common file contract throughout IO.Storage, Drawing, and Office projects.
 
 ### Interface hierarchy
 
 ```
-IMemoryBytesFile          IMemoryStreamFile
-  Bytes: byte[]?            Stream: Stream?
-  ContentType: string?      ContentType: string?
-  Length: long              Length: long
-
-                      ↓ both
-                IMemoryFile
-
-                      ↓
-                INamedFile
-                  FileName: string?
-
-                      ↓
-                IStorageFile
-                  Identifier: string?
-                  Prefix: string?
-                  Path: string?
-
-                      ↓
-                IBinaryFile
-
-                      ↓
-                ITextFile
-                  Contents: string?
+┌───────────────────┐    ┌───────────────────┐
+│ IMemoryBytesFile  │    │ IMemoryStreamFile │
+└─────────┬─────────┘    └─────────┬─────────┘
+          └────────────┬───────────┘
+                Input Interfaces
+                       │
+                ▼──────────────▼
+                  IMemoryFile
+                ┌──────────────┐
+                │ INamedFile   │──▶ FileName
+                └──────────────┘
+                       │
+                ┌──────────────┐
+                │ IStorageFile │──▶ Identifier, Path, Prefix
+                └──────────────┘
+                       │
+                ┌──────────────┐
+                │ IBinaryFile  │
+                └──────────────┘
+                       │
+                ┌──────────────┐
+                │  ITextFile   │──▶ Contents
+                └──────────────┘
 ```
 
 ### BinaryFileItem
@@ -80,7 +79,6 @@ byte[]? bytes  = file.GetBytes();
 Stream? stream = file.GetStream();
 long    length = file.GetLength();
 bool    hasIt  = file.HasContent();
-await   file.SaveAs("/tmp/output.pdf");
 ```
 
 **`BinaryFileExtensions`** — factory helpers:
