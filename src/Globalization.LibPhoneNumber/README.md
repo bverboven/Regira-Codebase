@@ -1,6 +1,6 @@
 # Regira Globalization
 
-Regira Globalization extends the phone number formatting and country utilities built into [Common](../Common/README.md).
+Regira Globalization extends the phone number formatting and country utilities built into [Common](../Common).
 
 ## Projects
 
