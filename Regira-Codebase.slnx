@@ -20,9 +20,6 @@
   <Folder Name="/src/Core/">
     <Project Path="src/Common/Common.csproj" />
   </Folder>
-  <Folder Name="/src/Core/docs/">
-    <File Path="docs/Common/01-index.md" />
-  </Folder>
   <Folder Name="/src/DAL/">
     <Project Path="src/DAL.EFcore/DAL.EFcore.csproj" />
     <Project Path="src/DAL.MongoDB/DAL.MongoDB.csproj" />
@@ -37,18 +34,6 @@
     <Project Path="src/Entities.Mapping.AutoMapper/Entities.Mapping.AutoMapper.csproj" />
     <Project Path="src/Entities.Mapping.Mapster/Entities.Mapping.Mapster.csproj" />
     <Project Path="src/Entities.Web/Entities.Web.csproj" />
-  </Folder>
-  <Folder Name="/src/Entities/docs/">
-    <File Path="docs/Entities/01-Index.md" />
-    <File Path="docs/Entities/02-Models.md" />
-    <File Path="docs/Entities/03-Services.md" />
-    <File Path="docs/Entities/04-Mapping.md" />
-    <File Path="docs/Entities/05-Controllers.md" />
-    <File Path="docs/Entities/06-Normalizing.md" />
-    <File Path="docs/Entities/07-Attachments.md" />
-    <File Path="docs/Entities/08-Built-in-Features.md" />
-    <File Path="docs/Entities/09-Checklist.md" />
-    <File Path="docs/Entities/10-Examples.md" />
   </Folder>
   <Folder Name="/src/Globalization/">
     <Project Path="src/Globalization.LibPhoneNumber/Globalization.LibPhoneNumber.csproj" />
@@ -73,19 +58,11 @@
     <Project Path="src/IO.Storage.SimpleTCP/IO.Storage.SimpleTCP.csproj" />
     <Project Path="src/IO.Storage.SSH/IO.Storage.SSH.csproj" />
   </Folder>
-  <Folder Name="/src/IO/docs/">
-    <File Path="docs/IO.Storage/01-index.md" />
-    <File Path="docs/IO.Storage/02-examples.md" />
-  </Folder>
   <Folder Name="/src/Media/">
     <Project Path="src/Common.Media/Common.Media.csproj" />
     <Project Path="src/Drawing.GDI/Drawing.GDI.csproj" />
     <Project Path="src/Drawing.SkiaSharp/Drawing.SkiaSharp.csproj" />
     <Project Path="src/Media.FFMpeg/Media.FFMpeg.csproj" />
-  </Folder>
-  <Folder Name="/src/Media/docs/">
-    <File Path="docs/Drawing/01-index.md" />
-    <File Path="docs/Drawing/02-examples.md" />
   </Folder>
   <Folder Name="/src/Office/">
     <Project Path="src/Common.Office/Common.Office.csproj" />
@@ -154,10 +131,6 @@
   </Folder>
   <Folder Name="/src/TreeList/">
     <Project Path="src/TreeList/TreeList.csproj" />
-  </Folder>
-  <Folder Name="/src/TreeList/docs/">
-    <File Path="docs/TreeList/01-Index.md" />
-    <File Path="docs/TreeList/02-Examples.md" />
   </Folder>
   <Folder Name="/src/Web/">
     <Project Path="src/Common.Web/Common.Web.csproj" />
