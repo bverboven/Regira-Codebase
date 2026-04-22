@@ -11,7 +11,7 @@
     <AssemblyName>Regira.Office.Csv.CsvHelper</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.0.3</Version>
+    <Version>5.0.4</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
@@ -20,6 +20,6 @@
     <PackageReference Include="CsvHelper" Version="33.1.0" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) != 'net10.0'">
-    <PackageReference Include="System.Interactive.Async" Version="7.0.0" />
+    <PackageReference Include="System.Interactive.Async" Version="7.0.1" />
   </ItemGroup>
 </Project>

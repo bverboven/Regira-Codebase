@@ -11,14 +11,14 @@
     <AssemblyName>Regira.Entities.Mapping.Mapster</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.0.11</Version>
+    <Version>5.0.12</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Include="$(OutputPath)$(AssemblyName).xml" Pack="true" PackagePath="lib\$(TargetFramework)\" Visible="false" Condition="Exists('$(OutputPath)$(AssemblyName).xml')" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Mapster" Version="10.0.6" />
-    <PackageReference Include="Mapster.DependencyInjection" Version="10.0.6" />
+    <PackageReference Include="Mapster" Version="10.0.7" />
+    <PackageReference Include="Mapster.DependencyInjection" Version="10.0.7" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Entities.DependencyInjection\Entities.DependencyInjection.csproj" />

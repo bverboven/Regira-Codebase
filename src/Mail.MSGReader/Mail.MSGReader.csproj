@@ -11,10 +11,10 @@
     <AssemblyName>Regira.Office.Mail.MSGReader</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.0.3</Version>
+    <Version>5.0.4</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MsgReader" Version="6.0.9" />
+    <PackageReference Include="MsgReader" Version="6.0.10" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Office\Common.Office.csproj" />

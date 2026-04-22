@@ -9,11 +9,19 @@ Regira is a collection of .NET libraries providing unified abstractions for comm
 | Module | Description |
 |--------|-------------|
 | [Common](src/Common) | Shared foundation — IO abstractions, utilities, normalizing, caching, serializing, DAL contracts |
-| [Common.Entities](src/Common.Entities) | Generic entity framework for CRUD, filtering, sorting, and EF Core integration |
-| [DAL.MongoDB](src/DAL.MongoDB) | MongoDB connectivity and backup/restore |
-| [DAL.MySQL](src/DAL.MySQL) | MySQL/MariaDB connectivity and backup/restore |
-| [DAL.PostgreSQL](src/DAL.PostgreSQL) | PostgreSQL connectivity and backup/restore |
+| [Entities](src/Common.Entities) | Generic entity framework for CRUD, filtering, sorting, and EF Core integration |
 | [IO.Storage](src/Common.IO.Storage) | Unified file storage — local, Azure Blob, SFTP, GitHub, ZIP |
+
+---
+
+## DAL
+
+| Module | Description |
+|--------|-------------|
+| [EF Core](src/DAL.EFCore) | Entity Framework Core extensions and utilities |
+| [MongoDB](src/DAL.MongoDB) | MongoDB connectivity and backup/restore |
+| [MySQL](src/DAL.MySQL) | MySQL/MariaDB connectivity and backup/restore |
+| [PostgreSQL](src/DAL.PostgreSQL) | PostgreSQL connectivity and backup/restore |
 
 ---
 
@@ -21,7 +29,7 @@ Regira is a collection of .NET libraries providing unified abstractions for comm
 
 | Module | Description |
 |--------|-------------|
-| [Drawing / Images](src/Common.Media) | Image processing, format conversion, and layer composition |
+| [Drawing](src/Common.Media) | Image processing, format conversion, and layer composition |
 | [Video](src/Common.Media/docs/video.md) | Video compression and snapshot extraction via FFMpeg |
 
 ---

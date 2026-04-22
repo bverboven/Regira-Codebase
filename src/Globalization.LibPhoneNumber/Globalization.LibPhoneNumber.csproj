@@ -11,10 +11,10 @@
     <AssemblyName>Regira.Globalization.LibPhoneNumber</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.0.3</Version>
+    <Version>5.0.4</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="libphonenumber-csharp" Version="9.0.27" />
+    <PackageReference Include="libphonenumber-csharp" Version="9.0.28" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />

@@ -11,7 +11,7 @@
     <AssemblyName>Regira.Web</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.0.4</Version>
+    <Version>5.0.5</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
@@ -26,6 +26,6 @@
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
     <!-- Upgraded for vulnerabilities -->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="10.0.5" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="10.0.7" />
   </ItemGroup>
 </Project>

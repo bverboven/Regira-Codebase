@@ -7,6 +7,8 @@ When you have to guess and the instruction files don't give you the required inf
 - Stop and describe the problem!
 - ASK feedback from the user!
 
+After every significant task, analyze what went well and what failed. Update ./learnings.md with a 'Lessons Learned' section. Before starting any new task, read learnings.md to avoid repeating past mistakes.
+
 ---
 
 ## Module Instructions
