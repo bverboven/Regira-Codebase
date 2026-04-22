@@ -4,7 +4,7 @@
 
 - Implement `IEntity<TKey>` (if entity has a serial int ID, use `IEntityWithSerial`))
 - Have a primary key property named `Id`
-- Implement relevant marker interfaces based on properties (see [Built-in Features: Entity Interfaces](built-in-features.md))
+- Implement relevant marker interfaces based on properties (see [Built-in Features: Entity Interfaces](built-in-features.md#entity-interfaces))
 - Be a POCO (Plain Old CLR Object) - data only, minimal behavior
 - Use data annotations (MaxLength, Required, ...) directly on entity properties.
 
@@ -47,7 +47,7 @@ public class SearchObject<TKey> : ISearchObject<TKey>
 - Typically used when entity implements `IHasTitle` or `IHasDescription`
 - Developers can add custom filtering logic in query filters
 - Use `QKeywordHelper` for wildcard support (*) in search queries
-- See TODO: *Normalizing Entities* for more info
+- See: [*Normalizing Entities*](normalizing.md) for more info
 
 ## SortBy Enum
 

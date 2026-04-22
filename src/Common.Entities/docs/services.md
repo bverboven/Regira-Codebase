@@ -59,7 +59,7 @@ Query builders are used to filter, sort entities and include navigation properti
 #### Filter Query Builders
 
 - Uses the configured `TSearchObject`
-- Inline shortcut is available
+- Inline shortcut is available `.Filter((query, so) => ...)`
 - If no SearchObject is configured, a basic `SearchObject<TKey>` is provided
 
 ```csharp
@@ -109,7 +109,7 @@ public abstract class GlobalFilteredQueryBuilderBase<TEntity, TKey> : FilteredQu
 - Uses the configured `TSortyBy`
 - Inline shortcut is available
 - If no SortBy enum is configured, a basic `EntitySortBy` is provided
-- No base class provided
+- Implement interface, no base class provided
 
 ```csharp
 // interface
@@ -126,7 +126,7 @@ public interface ISortedQueryBuilder<TEntity, TKey, TSortBy>
 - Uses the configured `TIncludes`
 - Inline shortcut is available
 - If no Includes enum is configured, a basic `EntityIncludes` is provided
-- No base class provided
+- Implement interface, no base class provided
 
 ```csharp
 // interface
@@ -142,7 +142,7 @@ public interface IIncludableQueryBuilder<TEntity, TKey, TIncludes>
 
 - Processors modify/decorate entities after fetching from database
 - Inline shortcut is available
-- No base class provided
+- Implement interface, no base class provided
 
 *Fill `[NotMapped]` properties here.*
 
@@ -179,8 +179,9 @@ public abstract class EntityPrepperBase<TEntity> : IEntityPrepper<TEntity>
 
 ### Entity Primers
 
-- Executed as EF Core `SaveChangesInterceptors` by DbContext (via extension method `DbContextOptionsBuilder.AddPrimerInterceptors`)
-- Can be registered **globally** (apply to an interface/base type) or **per entity**
+- Executed as EF Core `SaveChangesInterceptors` by DbContext 
+- Requires calling `DbContextOptionsBuilder.AddPrimerInterceptors` when configuring DbContext
+- Can be registered **globally** (apply to an interface or base type) or **per entity**
 
 ```csharp
 // interface

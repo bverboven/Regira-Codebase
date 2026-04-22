@@ -93,7 +93,9 @@ Registers a set of commonly used features for typical applications, including:
 
 ### Preppers
 
-**RelatedCollectionPrepper**: *Prepares related collections for saving by adding, updating, or removing items as necessary.*
+| Prepper | Description |
+|---------|-------------|
+| **RelatedCollectionPrepper** | *Prepares related collections for saving by adding, updating, or removing items as necessary.* |
 
 ```csharp
 // use shortcut when configuring Entity (creates RelatedCollectionPrepper in background)
@@ -108,22 +110,21 @@ Registers a set of commonly used features for typical applications, including:
 *Sets IsArchived to true instead of deleting entities implementing `IArchivable`.
 To be combined with `FilterArchivablesQueryBuilder`.*
 
-**HasCreatedDbPrimer**: *Sets Created timestamp on new entities implementing `IHasCreated`.*
-
-**HasLastModifiedDbPrimer**: *Sets LastModified timestamp when updating entities implementing `IHasLastModified`.*
+| Primer                      | Description |
+|-----------------------------|-------------|
+| **HasCreatedDbPrimer**      | *Sets Created timestamp on new entities implementing `IHasCreated`.* |
+| **HasLastModifiedDbPrimer** | *Sets LastModified timestamp when updating entities implementing `IHasLastModified`.* |
 
 
 ### Query Builders
 
-**FilterIdsQueryBuilder**: *Filters entities based on a collection of IDs.*
-
-**FilterArchivablesQueryBuilder**: *Filters entities based on `IsArchived` property. Can be used to globally exclude archived items by default.*
-
-**FilterHasCreatedQueryBuilder**: *Filters entities based on Created timestamp range.*
-
-**FilterHasLastModifiedQueryBuilder**: *Filters entities based on LastModified timestamp range.*
-
-**FilterHasNormalizedContentQueryBuilder**: *Filters entities based on normalized content keywords (input: `ISearchObject.Q`).*
+| Query Builder                              | Description |
+|--------------------------------------------|-------------|
+| **FilterIdsQueryBuilder**                  | *Filters entities based on a collection of IDs.* |
+| **FilterArchivablesQueryBuilder**          | *Filters entities based on `IsArchived` property. Can be used to globally exclude archived items by default.* |
+| **FilterHasCreatedQueryBuilder**           | *Filters entities based on Created timestamp range.* |
+| **FilterHasLastModifiedQueryBuilder**      | *Filters entities based on LastModified timestamp range.* |
+| **FilterHasNormalizedContentQueryBuilder** | *Filters entities based on normalized content keywords (input: `ISearchObject.Q`).* |
 
 
 ### Query Extensions
