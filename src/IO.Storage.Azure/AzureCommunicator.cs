@@ -10,6 +10,7 @@ public class AzureCommunicator(AzureOptions config)
 
     private readonly string _containerName = config.ContainerName ?? throw new ArgumentNullException(nameof(config.ContainerName));
     private readonly string _connectionString = config.ConnectionString ?? throw new ArgumentNullException(nameof(config.ConnectionString));
+    private readonly SemaphoreSlim _openLock = new(1, 1);
 
 
     public async Task Open()
@@ -19,12 +20,25 @@ public class AzureCommunicator(AzureOptions config)
             return;
         }
 
-        Container = new BlobContainerClient(_connectionString, _containerName);
-        if (!await Container.ExistsAsync())
+        await _openLock.WaitAsync();
+        try
         {
-            await Container.CreateAsync();
-        }
+            if (IsOpened)
+            {
+                return;
+            }
 
-        IsOpened = true;
+            Container = new BlobContainerClient(_connectionString, _containerName);
+            if (!await Container.ExistsAsync())
+            {
+                await Container.CreateAsync();
+            }
+
+            IsOpened = true;
+        }
+        finally
+        {
+            _openLock.Release();
+        }
     }
 }

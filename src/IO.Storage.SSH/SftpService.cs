@@ -36,8 +36,10 @@ public class SftpService(SftpCommunicator communicator) : IFileService
         var client = await communicator.Open();
         var sftpFiles = List(client, folderUri, so.Recursive);
         var files = sftpFiles
-            .Where(f => so.Type == FileEntryTypes.Files && f.IsRegularFile
-                        || so.Type == FileEntryTypes.Directories && f.IsDirectory)
+            .Where(f => so.Type == FileEntryTypes.All 
+                || (so.Type == FileEntryTypes.Files && f.IsRegularFile)
+                || (so.Type == FileEntryTypes.Directories && f.IsDirectory)
+            )
             .Where(f => !(so.Extensions?.Any() ?? false) || so.Extensions.Any(e => e.TrimStart('*') == Path.GetExtension(f.Name)));
         return files.Select(f => FileNameUtility.GetRelativeUri(f.FullName, Root));
     }

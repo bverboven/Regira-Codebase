@@ -86,8 +86,7 @@ public class GitHubService(GitHubOptions options, ISerializer serializer) : IFil
                 {
                     if (so == null || (so.Extensions?.Any() ?? false) == false || so.Extensions?.Any(e => item.Name.EndsWith(e, StringComparison.InvariantCultureIgnoreCase)) == true)
                     {
-                        var uri = item.ToTokenUri();
-                        var identifier = GetIdentifier(uri);
+                        var identifier = GetIdentifier(item.Url);
                         files.Add(identifier);
                     }
                 }
