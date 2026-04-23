@@ -1,49 +1,47 @@
-﻿using Regira.IO.Storage.Abstractions;
-using Regira.IO.Utilities;
+using Regira.IO.Storage.Abstractions;
 using Regira.Serializing.Abstractions;
-using System.Net.Http.Headers;
-using System.Reflection;
+using Regira.Web.Utilities;
+using System.Text;
 
 namespace Regira.IO.Storage.GitHub;
 
 /// <summary>
 /// Based on https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28
 /// </summary>
-public class GitHubService(GitHubOptions options, ISerializer serializer) : IFileService
+public class GitHubService(GitHubCommunicator communicator, ISerializer serializer) : IFileService
 {
-    public string Root { get; } = options.Uri.TrimEnd('/') + "/contents/"; // Remove trailing slash when using api trees (https://docs.github.com/en/rest/git/trees)
+    public string Root => communicator.Root;
 
     public async Task<bool> Exists(string identifier)
     {
-        using var httpClient = GetClient();
         var uri = GetIdentifier(identifier);
-        var response = await httpClient.GetAsync(uri);
+        var response = await communicator.Client.GetAsync(uri);
         return response.IsSuccessStatusCode;
     }
     public async Task<byte[]?> GetBytes(string identifier)
     {
-#if NETSTANDARD2_0
-        using var ms = await GetStream(identifier);
-#else
-        await using var ms = await GetStream(identifier);
-#endif
-        return FileUtility.GetBytes(ms);
+        var uri = GetAbsoluteUri(identifier);
+        var response = await communicator.Client.GetAsync(uri);
+        if (!response.IsSuccessStatusCode)
+            return null;
+        var json = await response.Content.ReadAsStringAsync();
+        var item = serializer.Deserialize<GitHubItem>(json);
+        if (item?.Content == null)
+            return null;
+        return Convert.FromBase64String(item.Content.Replace("\n", ""));
     }
     public async Task<Stream?> GetStream(string identifier)
     {
-        using var httpClient = GetClient();
-        var gitUri = GetAbsoluteUri(identifier);
-        var folder = GetRelativeFolder(identifier);
-        var downloadUri = gitUri.ToDownloadUri(folder);
-        var response = await httpClient.GetAsync(downloadUri);
-        return await response.Content.ReadAsStreamAsync();
+        var bytes = await GetBytes(identifier);
+        return bytes != null ? new MemoryStream(bytes) : null;
     }
     public async Task<IEnumerable<string>> List(FileSearchObject? so = null)
     {
-        using var httpClient = GetClient();
-
-        var listUri = $"{so?.FolderUri?.TrimStart(@"\/".ToCharArray())}";
-        var response = await httpClient.GetAsync(listUri);
+        var folderPath = so?.FolderUri?.TrimStart(@"\/".ToCharArray());
+        var listUri = string.IsNullOrEmpty(folderPath) ? Root.TrimEnd('/') : folderPath;
+        var response = await communicator.Client.GetAsync(listUri);
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            return [];
         response.EnsureSuccessStatusCode();
         var content = await response.Content.ReadAsStringAsync();
         var items = serializer.Deserialize<GitHubItem[]>(content)!;
@@ -57,12 +55,7 @@ public class GitHubService(GitHubOptions options, ISerializer serializer) : IFil
                 {
                     if (so?.Extensions == null)
                     {
-                        var folder = string.Join(
-                            "/",
-                            new[] { Root, so?.FolderUri, item.Path }
-                                .Where(x => x != null)
-                                .Select(x => x!.TrimEnd(@"\/".ToCharArray()))
-                        ) + '/';
+                        var folder = item.Url.Split('?').First().TrimEnd('/') + "/";
                         files.Add(folder);
                     }
                 }
@@ -84,7 +77,7 @@ public class GitHubService(GitHubOptions options, ISerializer serializer) : IFil
             {
                 if (so == null || so.Type == FileEntryTypes.All || so.Type == FileEntryTypes.Files)
                 {
-                    if (so == null || (so.Extensions?.Any() ?? false) == false || so.Extensions?.Any(e => item.Name.EndsWith(e, StringComparison.InvariantCultureIgnoreCase)) == true)
+                    if (so == null || (so.Extensions?.Count ?? 0) == 0 || so.Extensions?.Any(e => item.Name.EndsWith(e, StringComparison.InvariantCultureIgnoreCase)) == true)
                     {
                         var identifier = GetIdentifier(item.Url);
                         files.Add(identifier);
@@ -109,40 +102,82 @@ public class GitHubService(GitHubOptions options, ISerializer serializer) : IFil
         return FileNameUtility.GetRelativeFolder(identifier, Root);
     }
 
-
-    protected HttpClient GetClient()
+    public async Task Move(string sourceIdentifier, string targetIdentifier)
     {
-        var httpClient = new HttpClient
+        var bytes = await GetBytes(sourceIdentifier) ?? throw new FileNotFoundException($"Source not found: {sourceIdentifier}");
+        await Save(targetIdentifier, bytes);
+        await Delete(sourceIdentifier);
+    }
+    public async Task<string> Save(string identifier, byte[] bytes, string? contentType = null)
+    {
+        var (path, branch) = GetPathAndBranch(identifier);
+        var sha = await GetFileSha(identifier);
+
+        var body = new Dictionary<string, object?>
         {
-            BaseAddress = new Uri(Root)
+            ["message"] = communicator.CommitMessage ?? $"update {path}",
+            ["content"] = Convert.ToBase64String(bytes),
+            ["branch"] = branch
+        };
+        if (sha != null)
+            body["sha"] = sha;
+
+        var json = serializer.Serialize(body);
+        var response = await communicator.Client.PutAsync(path, new StringContent(json, Encoding.UTF8, "application/json"));
+        response.EnsureSuccessStatusCode();
+
+        return identifier;
+    }
+    public async Task<string> Save(string identifier, Stream stream, string? contentType = null)
+    {
+        using var ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
+        return await Save(identifier, ms.ToArray(), contentType);
+    }
+    public async Task Delete(string identifier)
+    {
+        var sha = await GetFileSha(identifier);
+        if (sha == null)
+            return;
+
+        var (path, branch) = GetPathAndBranch(identifier);
+
+        var body = new Dictionary<string, string>
+        {
+            ["message"] = communicator.CommitMessage ?? $"delete {path}",
+            ["sha"] = sha,
+            ["branch"] = branch
         };
 
-        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(options.UserAgent ?? Assembly.GetExecutingAssembly().GetName().Name);
-        if (!string.IsNullOrEmpty(options.Key))
+        var json = serializer.Serialize(body);
+        var request = new HttpRequestMessage(HttpMethod.Delete, path)
         {
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.Key);
+            Content = new StringContent(json, Encoding.UTF8, "application/json")
+        };
+        var response = await communicator.Client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+    }
+
+    private async Task<string?> GetFileSha(string identifier)
+    {
+        var uri = GetAbsoluteUri(identifier);
+        var response = await communicator.Client.GetAsync(uri);
+        if (!response.IsSuccessStatusCode)
+            return null;
+        var content = await response.Content.ReadAsStringAsync();
+        return serializer.Deserialize<GitHubItem>(content)?.Sha;
+    }
+    private (string path, string branch) GetPathAndBranch(string identifier)
+    {
+        var parts = identifier.Replace('\\', '/').Split('?');
+        var branch = communicator.Branch;
+        if (parts.Length > 1)
+        {
+            var query = UriUtility.ToQueryDictionary(parts[1]);
+            var refBranch = query.Contains("ref") ? query["ref"].FirstOrDefault() : null;
+            if (!string.IsNullOrEmpty(refBranch))
+                branch = refBranch;
         }
-
-        return httpClient;
+        return (parts[0], branch);
     }
-
-
-    #region NotSupported
-    public Task Move(string sourceIdentifier, string targetIdentifier)
-    {
-        throw new NotImplementedException();
-    }
-    public Task<string> Save(string identifier, byte[] bytes, string? contentType = null)
-    {
-        throw new NotImplementedException();
-    }
-    public Task<string> Save(string identifier, Stream stream, string? contentType = null)
-    {
-        throw new NotImplementedException();
-    }
-    public Task Delete(string identifier)
-    {
-        throw new NotImplementedException();
-    }
-    #endregion
 }

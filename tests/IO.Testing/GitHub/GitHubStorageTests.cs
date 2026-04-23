@@ -1,124 +1,77 @@
-﻿using System.Reflection;
+using IO.Testing.Helpers;
 using Microsoft.Extensions.Configuration;
-using NUnit.Framework.Legacy;
-using Regira.IO.Storage;
-using Regira.IO.Storage.Abstractions;
+using Regira.IO.Extensions;
 using Regira.IO.Storage.GitHub;
 using Regira.Serializing.Newtonsoft.Json;
-using Regira.Utilities;
-
+using System.Net;
 namespace IO.Testing.GitHub;
 
 [TestFixture]
 public class GitHubStorageTests
 {
-    [Test]
-    public virtual async Task List()
-    {
-        var fileService = GetFileService();
-        var files = (await fileService.List()).AsList();
-        Assert.That(files, Is.Not.Empty);
-    }
-    [Test]
-    public virtual async Task Filter_By_Folder()
-    {
-        var so = new FileSearchObject
-        {
-            FolderUri = "img"
-        };
-        var fileService = GetFileService();
-        var files = (await fileService.List(so)).AsList();
-        Assert.That(files, Is.Not.Empty);
-    }
-    [Test]
-    public virtual async Task Filter_Recursive()
-    {
-        var so = new FileSearchObject
-        {
-            Recursive = true,
-        };
-        var fileService = GetFileService();
-        var files = (await fileService.List(so)).AsList();
-        Assert.That(files, Is.Not.Empty);
-    }
-    [Test]
-    public virtual async Task Filter_By_EntryType()
-    {
-        // files
-        var so = new FileSearchObject
-        {
-            Recursive = true,
-            Type = FileEntryTypes.Files
-        };
-        var fileService = GetFileService();
-        var files = (await fileService.List(so)).AsList();
-        Assert.That(files, Is.Not.Empty);
-        // folders
-        so = new FileSearchObject
-        {
-            Recursive = true,
-            Type = FileEntryTypes.Directories
-        };
-        var folders = (await fileService.List(so)).AsList();
-        Assert.That(folders, Is.Not.Empty);
-        // both
-        so = new FileSearchObject
-        {
-            Recursive = true,
-            Type = FileEntryTypes.All
-        };
-        var both = (await fileService.List(so)).AsList();
-        Assert.That(both, Is.Not.Empty);
-        Assert.That(both, Is.EquivalentTo(folders.Concat(files)));
-    }
-    [Test]
-    public virtual async Task Filter_By_Extension()
-    {
-        var so = new FileSearchObject
-        {
-            Recursive = true,
-            Extensions = [".png", ".txt", ".sql"]
-        };
-        var fileService = GetFileService();
-        var files = (await fileService.List(so)).AsList();
-        Assert.That(files, Is.Not.Empty);
-        foreach (var file in files)
-        {
-            var pathWithoutQuery = file.Split('?').First();
-            Assert.That(so.Extensions.Any(e => pathWithoutQuery.EndsWith(e, StringComparison.CurrentCultureIgnoreCase)), Is.True);
-        }
-    }
-    [Test]
-    public virtual async Task GetBytes()
-    {
-        var fileService = GetFileService();
-        var fso = new FileSearchObject
-        {
-            Type = FileEntryTypes.Files,
-            FolderUri = "img",
-            Recursive = true
-        };
-        var files = (await fileService.List(fso)).AsList();
-        Assert.That(files, Is.Not.Empty);
-        // Getting file contents is sometimes very slow (penalty for testing too much?)
-        foreach (var file in files.Take(1))
-        {
-            var bytes = await fileService.GetBytes(file);
-            ClassicAssert.IsNotNull(bytes);
-            Assert.That(bytes!.Length > 0, Is.True);
-        }
-    }
+    public StorageTestHelper.StorageTestContext<GitHubService> StorageTestContext { get; set; } = null!;
+    private GitHubCommunicator _communicator = null!;
 
-
-    IFileService GetFileService()
+    [SetUp]
+    public async Task Setup()
     {
         var config = new ConfigurationBuilder()
-            .AddUserSecrets(Assembly.GetExecutingAssembly())
+            .AddUserSecrets(typeof(GitHubStorageTests).Assembly, true)
             .Build();
-        return new GitHubService(new GitHubOptions
+
+        _communicator = new GitHubCommunicator(new GitHubOptions
         {
             Uri = config["Storage:GitHub:Uri"]!,
-            Key = config["Storage:GitHub:Key"]
-        }, new JsonSerializer());
+            Key = config["Storage:GitHub:Key"],
+            Branch = config["Storage:GitHub:Branch"] ?? "main",
+            ContentPath = $"test-write/{Guid.NewGuid():D}"
+        });
+
+        StorageTestContext = StorageTestHelper.CreateDecoratedFileService((_, _) =>
+            new GitHubService(_communicator, new JsonSerializer()));
+
+        foreach (var file in StorageTestContext.SourceFiles)
+        {
+            await StorageTestContext.FileService.Save(file.Identifier!, file.GetBytes()!, file.ContentType);
+        }
     }
+
+    [TearDown]
+    public async Task TearDown()
+    {
+        try
+        {
+            await StorageTestContext.DisposeAsync();
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.TooManyRequests or HttpStatusCode.NotFound)
+        {
+            // GitHub secondary rate limit hit during remote cleanup.
+            // Local folder and file handles were already released before the remote call threw.
+            // The unique GUID test folder is orphaned in the repo but is harmless.
+        }
+        finally
+        {
+            _communicator.Dispose();
+        }
+    }
+
+    [Test]
+    public async Task List() => await StorageTestContext.Test_List();
+    [Test]
+    public async Task GetBytes() => await StorageTestContext.Test_GetBytes();
+    [Test]
+    public async Task Filter_By_Folder() => await StorageTestContext.Test_Filter_By_Folder();
+    [Test]
+    public async Task Filter_By_Extension() => await StorageTestContext.Test_Filter_By_Extension();
+    [Test]
+    public async Task Filter_Recursive() => await StorageTestContext.Test_Filter_Recursive();
+    [Test]
+    public async Task Filter_By_EntryType() => await StorageTestContext.Test_Filter_By_EntryType();
+
+    [Test]
+    public async Task Add_File() => await StorageTestContext.Test_Add_File();
+    [Test]
+    public async Task Update_File() => await StorageTestContext.Test_Update_File();
+    [Test]
+    public async Task Remove_File() => await StorageTestContext.Test_Remove_File();
 }

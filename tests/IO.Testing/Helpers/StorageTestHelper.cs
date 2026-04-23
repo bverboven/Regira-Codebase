@@ -11,7 +11,6 @@ public static class StorageTestHelper
 {
     public interface IStorageTestContext : IAsyncDisposable
     {
-        string SourceFolder { get; }
         IList<BinaryFileItem> SourceFiles { get; }
         IFileService FileService { get; }
     }
@@ -71,7 +70,7 @@ public static class StorageTestHelper
             var bytes = await ctx.FileService.GetBytes(file);
             Assert.That(bytes, Is.Not.Null);
             Assert.That(bytes!.Length > 0, Is.True);
-            var sourceFileName = Path.GetFileName(file);
+            var sourceFileName = Path.GetFileName(file.Split('?').First());
             var sourceFile = ctx.SourceFiles.Single(x => sourceFileName.Equals(x.FileName, StringComparison.InvariantCultureIgnoreCase));
             Assert.That(bytes.Length, Is.EqualTo(sourceFile.Length));
         }
