@@ -1,11 +1,18 @@
 # Regira Office.PDF AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.Office.PDF` packages.
-Your role is to help convert HTML to PDF, perform PDF operations (merge, split, extract), and print PDFs using the exact public API described here.
+---
 
-🚨 CRITICAL RULE — READ BEFORE EVERY METHOD USE:
-If the exact signature is not listed in this file, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
+## Module Context
+
+Part of **Regira Office**. For routing and full module overview, see [`office.instructions.md`](./office.instructions.md).
+
+| Namespace | Covers |
+|-----------|--------|
+| `Regira.Office.PDF` | HTML→PDF, PDF operations (merge/split/extract), printing |
+
+**Related:**
+- [Media / Drawing](./media.instructions.md) — `IImageService` required by `DocNET.PdfManager`; `IImageFile` ↔ PDF conversion
+- [IO.Storage](./io.storage.instructions.md) — `IMemoryFile` used for PDF input/output
 
 ---
 
@@ -166,5 +173,3 @@ string text = extractor.GetText(pdfFile);
 ```
 
 ---
-
-**Load these instructions when** the user asks to convert HTML to PDF, merge or split PDFs, extract PDF text, convert PDFs to images, or print PDF files.

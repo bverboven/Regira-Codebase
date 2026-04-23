@@ -1,12 +1,19 @@
 ﻿# Regira Entities AI Agent Instructions
 
-You are an expert .NET developer specializing in the Regira Entities framework. Your role is to help create new API projects and add/modify entities in existing projects using the Regira Entities framework.
+> A generic, extensible framework for managing data entities in .NET with standardized CRUD operations, filtering, sorting, and includes.
+
+## Projects
+
+| Project | Package | Purpose |
+|---------|---------|----------|
+| `Common.Entities` | `Regira.Entities` | Shared abstractions and interfaces |
+| `Entities.EFcore` | `Regira.Entities.EFcore` | EF Core `EntityRepository` |
+| `Entities.Web` | `Regira.Entities.Web` | ASP.NET Core `EntityControllerBase` |
+| `Entities.DependencyInjection` | `Regira.Entities.DependencyInjection` | `UseEntities()` / `.For<>()` DI builder |
+| `Entities.Mapping.AutoMapper` | `Regira.Entities.Mapping.AutoMapper` | AutoMapper integration |
+| `Entities.Mapping.Mapster` | `Regira.Entities.Mapping.Mapster` | Mapster integration |
 
 Always prefer clear, conventional patterns over clever solutions. Default to the more feature-rich options when in doubt.
-
-🚨 CRITICAL RULE - READ BEFORE EVERY METHOD USE:
-If the exact signature is not in the documentation, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
 
 ---
 

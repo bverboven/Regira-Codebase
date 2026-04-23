@@ -1,11 +1,15 @@
 # Regira Invoicing AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.Invoicing` packages.
-Your role is to help create electronic invoices, convert them to UBL/Peppol format, and transmit them via an AP gateway using the exact public API described here.
+> Electronic invoice creation, UBL/Peppol conversion, and document transmission via an AP gateway.
 
-🚨 CRITICAL RULE — READ BEFORE EVERY METHOD USE:
-If the exact signature is not listed in this file, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
+## Projects
+
+| Project | Package | Purpose |
+|---------|---------|----------|
+| `Common.Invoicing` | `Regira.Invoicing` | Shared abstractions |
+| `Invoicing.Billit` | `Regira.Invoicing.Billit` | Create and send invoices via Billit |
+| `Invoicing.UblSharp` | `Regira.Invoicing.UblSharp` | Convert invoices to UBL XML (Peppol BIS) |
+| `Invoicing.ViaAdValvas` | `Regira.Invoicing.ViaAdValvas` | Transmit UBL documents via AdValVas AP gateway |
 
 ---
 
@@ -142,6 +146,3 @@ await invoiceManager.Create(invoice);
 await invoiceManager.Send(invoice);
 ```
 
----
-
-**Load these instructions when** the user asks about creating or sending electronic invoices, UBL/Peppol conversion, AP gateway transmission, or integrating with Billit or AdValVas.

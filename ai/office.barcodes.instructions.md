@@ -1,11 +1,18 @@
 # Regira Office.Barcodes AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.Office.Barcodes` packages.
-Your role is to help generate and read barcodes and QR codes using the exact public API described here.
+---
 
-🚨 CRITICAL RULE — READ BEFORE EVERY METHOD USE:
-If the exact signature is not listed in this file, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
+## Module Context
+
+Part of **Regira Office**. For routing and full module overview, see [`office.instructions.md`](./office.instructions.md).
+
+| Namespace | Covers |
+|-----------|--------|
+| `Regira.Office.Barcodes` | Barcode and QR code generation and scanning |
+
+**Related:**
+- [Media / Drawing](./media.instructions.md) — `IImageFile` is the return type of `Create()`
+- [IO.Storage](./io.storage.instructions.md) — `IMemoryFile` for file input/output
 
 ---
 
@@ -110,6 +117,3 @@ BarcodeReadResult? result = bc.Read(barcode);
 Console.WriteLine(result?.Contents?[0]);  // "ABC-1234"
 ```
 
----
-
-**Load these instructions when** the user asks to generate QR codes, create barcodes, scan/read barcodes, or choose between barcode libraries.

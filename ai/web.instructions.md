@@ -1,11 +1,16 @@
 # Regira Web AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.Web` packages.
-Your role is to help implement HTML template rendering, web middleware, Swagger configuration, and background task hosting using the exact public API described here.
+> Razor-based HTML template rendering plus common web utilities, middleware, and Swagger configuration.
 
-🚨 CRITICAL RULE — READ BEFORE EVERY METHOD USE:
-If the exact signature is not listed in this file, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
+## Projects
+
+| Project | Package | Purpose |
+|---------|---------|----------|
+| `Common.Web` | `Regira.Web` | Core web utilities, middleware, exception handling |
+| `Web.HTML.RazorEngineCore` | `Regira.Web.HTML.RazorEngineCore` | Razor templates via RazorEngineCore |
+| `Web.HTML.RazorLight` | `Regira.Web.HTML.RazorLight` | Razor templates via RazorLight |
+| `Web.Swagger` | `Regira.Web.Swagger` | Swagger/OpenAPI JWT & API Key support |
+| `System.Hosting` | `Regira.System.Hosting` | Host config, background tasks, Windows Service |
 
 ---
 
@@ -221,5 +226,3 @@ var task = taskManager.Execute<string>(async (sp, t) =>
 ```
 
 ---
-
-**Load these instructions when** the user asks about Razor HTML templates, web middleware (exception handling, culture, route prefix), Swagger configuration, background task queues, or hosting options.

@@ -1,11 +1,14 @@
 # Regira Office.VCards AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.Office.VCards` packages.
-Your role is to help read and write vCard contact files using the exact public API described here.
+---
 
-🚨 CRITICAL RULE — READ BEFORE EVERY METHOD USE:
-If the exact signature is not listed in this file, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
+## Module Context
+
+Part of **Regira Office**. For routing and full module overview, see [`office.instructions.md`](./office.instructions.md).
+
+| Namespace | Covers |
+|-----------|--------|
+| `Regira.Office.VCards` | vCard contact file reading and writing (.vcf) |
 
 ---
 
@@ -75,5 +78,3 @@ Version 3.0 is the most widely compatible.
 - A single `.vcf` file may contain multiple VCARD blocks — use `ReadMany` in that case.
 
 ---
-
-**Load these instructions when** the user asks to read or write vCard files, parse `.vcf` contacts, or export contact data to vCard format.

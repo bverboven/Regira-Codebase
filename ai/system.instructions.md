@@ -1,11 +1,13 @@
 # Regira System AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.System` packages.
-Your role is to help configure application hosting, manage background tasks, set up Windows Services, and parse `.csproj` project files using the exact public API described here.
+> Application hosting utilities, background task management, Windows Service support, and `.csproj` project parsing.
 
-🚨 CRITICAL RULE — READ BEFORE EVERY METHOD USE:
-If the exact signature is not listed in this file, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
+## Projects
+
+| Project | Package | Purpose |
+|---------|---------|----------|
+| `System.Hosting` | `Regira.System.Hosting` | Host config, background queues, Windows Service |
+| `System.Projects` | `Regira.System.Projects` | Parse and manage `.csproj` files |
 
 ---
 
@@ -157,5 +159,3 @@ var leaves = tree.GetBottom().Select(n => n.Value.Id);
 `ProjectTree` extends `TreeList<Project>` — see [treelist.instructions.md](./treelist.instructions.md) for the full navigation API.
 
 ---
-
-**Load these instructions when** the user asks about host configuration, background task queues, Windows Service installation, or parsing / manipulating `.csproj` project files.

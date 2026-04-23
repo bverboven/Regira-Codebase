@@ -1,11 +1,17 @@
 # Regira Office.CSV AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.Office.Csv` packages.
-Your role is to help read and write CSV files using the exact public API described here.
+---
 
-🚨 CRITICAL RULE — READ BEFORE EVERY METHOD USE:
-If the exact signature is not listed in this file, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
+## Module Context
+
+Part of **Regira Office**. For routing and full module overview, see [`office.instructions.md`](./office.instructions.md).
+
+| Namespace | Covers |
+|-----------|--------|
+| `Regira.Office.Csv` | CSV reading and writing (typed + dictionary) |
+
+**Related:**
+- [IO.Storage](./io.storage.instructions.md) — `IBinaryFile` / `IMemoryFile` used as input/output
 
 ---
 
@@ -91,5 +97,3 @@ string csv = await new CsvManager().Write(rows);
 ```
 
 ---
-
-**Load these instructions when** the user asks to read or write CSV files, parse CSV data, or export data to CSV format.

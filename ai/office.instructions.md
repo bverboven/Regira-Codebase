@@ -1,7 +1,6 @@
 # Regira Office AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.Office` packages.
-Your role is to help work with documents, spreadsheets, PDFs, barcodes, email, and other office-related functionality.
+> Regira Office is a collection of document and communication libraries for .NET. All modules share a common set of abstractions from `Common.Office` and are designed to be interchangeable.
 
 **When a user's request targets a specific Office sub-module, load its dedicated instruction file for the exact API.**
 

@@ -1,11 +1,17 @@
 # Regira Office.Excel AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.Office.Excel` packages.
-Your role is to help read and write Excel workbooks using the exact public API described here.
+---
 
-🚨 CRITICAL RULE — READ BEFORE EVERY METHOD USE:
-If the exact signature is not listed in this file, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
+## Module Context
+
+Part of **Regira Office**. For routing and full module overview, see [`office.instructions.md`](./office.instructions.md).
+
+| Namespace | Covers |
+|-----------|--------|
+| `Regira.Office.Excel` | Excel workbook reading and writing |
+
+**Related:**
+- [IO.Storage](./io.storage.instructions.md) — `IBinaryFile` / `IMemoryFile` used as input/output
 
 ---
 
@@ -106,5 +112,3 @@ IMemoryFile output = excel.Create(sheets);
 ```
 
 ---
-
-**Load these instructions when** the user asks to read or write Excel files, import spreadsheet data, or export data to `.xlsx` format.

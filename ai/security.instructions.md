@@ -1,11 +1,15 @@
 # Regira Security AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.Security` packages.
-Your role is to help implement encryption, password hashing, JWT authentication, and API key authentication using the exact public API described here.
+> Encryption, password hashing, JWT authentication, and API Key authentication for .NET applications.
 
-🚨 CRITICAL RULE — READ BEFORE EVERY METHOD USE:
-If the exact signature is not listed in this file, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
+## Projects
+
+| Project | Package | Purpose |
+|---------|---------|----------|
+| `Common.Security` | `Regira.Security` | Symmetric encryption and PBKDF2 hashing |
+| `Security.Hashing.BCryptNet` | `Regira.Security.Hashing.BCryptNet` | BCrypt password hashing |
+| `Security.Authentication` | `Regira.Security.Authentication` | JWT tokens and API Key auth |
+| `Security.Authentication.Web` | `Regira.Security.Authentication.Web` | Pre-built auth controllers |
 
 ---
 
@@ -239,5 +243,3 @@ Each base controller requires `[ApiController]` and a `[Route]` attribute on the
 | `auth/password/reset` | POST | Reset password with token |
 
 ---
-
-**Load these instructions when** the user asks about encrypting/decrypting data, hashing passwords, setting up JWT authentication, implementing API key auth, or adding authentication controllers.

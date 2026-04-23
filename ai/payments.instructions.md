@@ -1,11 +1,14 @@
 # Regira Payments AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.Payments` packages.
-Your role is to help integrate payment providers (Mollie and POM) using the exact public API described here.
+> Unified payment processing abstraction over Mollie and POM payment gateways. Both services implement `IPaymentService` and are stateless singletons.
 
-🚨 CRITICAL RULE — READ BEFORE EVERY METHOD USE:
-If the exact signature is not listed in this file, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
+## Projects
+
+| Project | Package | Backend |
+|---------|---------|----------|
+| `Common.Payments` | `Regira.Payments` | Shared abstractions |
+| `Payments.Mollie` | `Regira.Payments.Mollie` | Mollie API |
+| `Payments.Pom` | `Regira.Payments.Pom` | POM payment gateway |
 
 ---
 
@@ -122,5 +125,3 @@ await svc.Save(pom);
 | Client library | Official `Mollie.Api` NuGet | `RestSharp` + HTTP Basic Auth |
 
 ---
-
-**Load these instructions when** the user asks about payment processing, Mollie integration, POM payment links, or handling payment webhooks.

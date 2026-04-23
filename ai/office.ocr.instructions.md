@@ -1,11 +1,18 @@
 # Regira Office.OCR AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.Office.OCR` packages.
-Your role is to help extract text from images using optical character recognition, using the exact public API described here.
+---
 
-🚨 CRITICAL RULE — READ BEFORE EVERY METHOD USE:
-If the exact signature is not listed in this file, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
+## Module Context
+
+Part of **Regira Office**. For routing and full module overview, see [`office.instructions.md`](./office.instructions.md).
+
+| Namespace | Covers |
+|-----------|--------|
+| `Regira.Office.OCR` | Optical character recognition via Tesseract and PaddleOCR |
+
+**Related:**
+- [IO.Storage](./io.storage.instructions.md) — `IMemoryFile` used as image input
+- [Media / Drawing](./media.instructions.md) — image preprocessing before OCR
 
 ---
 
@@ -86,5 +93,3 @@ string? zh   = await ocr.Read(imageFile, lang: "zh");
 - Tesseract is the cross-platform choice; PaddleOCR is Windows-only but bundles models automatically.
 
 ---
-
-**Load these instructions when** the user asks to extract text from images, scan documents with OCR, or choose between Tesseract and PaddleOCR.

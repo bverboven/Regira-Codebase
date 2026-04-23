@@ -1,11 +1,86 @@
 # Regira IO.Storage AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.IO.Storage` packages.
-Your role is to help read, write, and manage files across multiple storage backends using the exact public API described here.
+---
 
-🚨 CRITICAL RULE — READ BEFORE EVERY METHOD USE:
-If the exact signature is not listed in this file, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
+## IO Abstractions (from `Regira.Common`)
+
+The IO abstraction hierarchy provides the common file contract used throughout IO.Storage, Drawing, and Office.
+
+### Interface hierarchy
+
+```
+┌───────────────────┐    ┌───────────────────┐
+│ IMemoryBytesFile  │    │ IMemoryStreamFile │
+└─────────┬─────────┘    └─────────┬─────────┘
+          └────────────┬───────────┘
+                       │
+                  IMemoryFile
+                ┌──────────────┐
+                │ INamedFile   │──▶ FileName
+                └──────────────┘
+                       │
+                ┌──────────────┐
+                │ IStorageFile │──▶ Identifier, Path, Prefix
+                └──────────────┘
+                       │
+                ┌──────────────┐
+                │ IBinaryFile  │
+                └──────────────┘
+                       │
+                ┌──────────────┐
+                │  ITextFile   │──▶ Contents
+                └──────────────┘
+```
+
+### `BinaryFileItem`
+
+The standard concrete implementation of `IBinaryFile`.
+
+```csharp
+var file = new BinaryFileItem
+{
+    FileName    = "invoice.pdf",
+    Bytes       = pdfBytes,
+    ContentType = "application/pdf"
+};
+```
+
+Implicit conversions from `byte[]` and `Stream`:
+
+```csharp
+BinaryFileItem f1 = pdfBytes;
+BinaryFileItem f2 = someStream;
+```
+
+### Extension methods — `BinaryFileExtensions`
+
+```csharp
+byte[]? bytes  = file.GetBytes();
+Stream? stream = file.GetStream();
+long    length = file.GetLength();
+bool    hasIt  = file.HasContent();
+
+IBinaryFile f = bytes.ToBinaryFile("invoice.pdf");
+IBinaryFile f = stream.ToBinaryFile("data.csv");
+IBinaryFile f = memoryFile.ToBinaryFile("copy.pdf");
+```
+
+### `ContentTypeUtility`
+
+```csharp
+string mime = ContentTypeUtility.GetContentType("report.pdf");  // "application/pdf"
+string ext  = ContentTypeUtility.GetExtension("image/webp");    // ".webp"
+```
+
+### `FileUtility`
+
+```csharp
+byte[]  bytes  = FileUtility.GetBytes(stream);
+Stream  stream = FileUtility.GetStream(bytes);
+string  text   = FileUtility.GetString(bytes, Encoding.UTF8);
+string  b64    = FileUtility.GetBase64String(bytes);
+byte[]  back   = FileUtility.GetBytesFromString(b64);  // Base64 → bytes
+```
 
 ---
 
@@ -43,6 +118,8 @@ FileName    →                                 inv-001.pdf
 Identifier  →                   invoices/2024/inv-001.pdf   ← use this in all API calls
 Path        →  /var/app/storage/invoices/2024/inv-001.pdf
 ```
+
+*The Path is intended for internal use only. When working with `IFileService`, always use the Identifier — it abstracts away backend differences and ensures portability.*
 
 | Concept | Description |
 |---------|-------------|
@@ -319,5 +396,3 @@ services.AddSingleton<IFileService>(sp =>
 | `SftpService` | `Regira.IO.Storage.SSH` | ✓ | ✓ | Remote SSH/SFTP |
 | `GitHubService` | `Regira.IO.Storage.GitHub` | — | ✓ | Read-only GitHub |
 | `ZipFileService` | `Regira.IO.Storage` | ✓ | ✓ | In-memory ZIP archive |
-
-**Load these instructions when** the user asks to store, retrieve, list, or manage files; work with Azure Blob, SFTP, GitHub, or ZIP storage; swap storage backends; or use `IFileService`.

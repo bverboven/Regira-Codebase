@@ -1,11 +1,6 @@
 # Regira TreeList AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.TreeList` package.
-Your role is to help build, navigate, and query hierarchical tree structures using the exact public API described here.
-
-🚨 CRITICAL RULE — READ BEFORE EVERY METHOD USE:
-If the exact signature is not listed in this file, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
+> A generic .NET library for building and navigating hierarchical tree structures. Supports one-to-many and many-to-many parent-child relationships, rich navigation extension methods, and built-in circular reference protection.
 
 ---
 

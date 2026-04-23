@@ -1,11 +1,14 @@
 # Regira Media (Drawing) AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.Drawing` packages.
-Your role is to help process images, compose layers, and transform image files using the exact public API described here.
+> A cross-platform image processing library with a single `IImageService` interface backed by SkiaSharp (recommended) or GDI+ (Windows-only).
 
-🚨 CRITICAL RULE — READ BEFORE EVERY METHOD USE:
-If the exact signature is not listed in this file, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
+## Projects
+
+| Project | Package | Purpose |
+|---------|---------|----------|
+| `Common.Media` | *(transitive)* | Shared abstractions, models, DTOs, and `ImageBuilder` |
+| `Drawing.SkiaSharp` | `Regira.Drawing.SkiaSharp` | **Preferred** — cross-platform (SkiaSharp) |
+| `Drawing.GDI` | `Regira.Drawing.GDI` | Windows-only alternative (GDI+) |
 
 ---
 
@@ -289,5 +292,3 @@ using var resized = imageService.Resize(image, new ImageSize(200, 200));
 using var webp    = imageService.ChangeFormat(resized, ImageFormat.Webp);
 return webp.Bytes!;
 ```
-
-**Load these instructions when** the user asks to resize, crop, rotate, convert, or compose images; use `IImageService`; build multi-layer image canvases; or work with `ImageBuilder`.

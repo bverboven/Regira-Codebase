@@ -1,11 +1,18 @@
 # Regira Office.Word AI Agent Instructions
 
-You are an expert .NET developer working with the `Regira.Office.Word` packages.
-Your role is to help create Word documents from templates, convert, merge, and extract content using the exact public API described here.
+---
 
-🚨 CRITICAL RULE — READ BEFORE EVERY METHOD USE:
-If the exact signature is not listed in this file, STOP.
-DO NOT invent. DO NOT combine patterns. ASK the user.
+## Module Context
+
+Part of **Regira Office**. For routing and full module overview, see [`office.instructions.md`](./office.instructions.md).
+
+| Namespace | Covers |
+|-----------|--------|
+| `Regira.Office.Word` | Word document creation, conversion, merge, and extraction |
+
+**Related:**
+- [Media / Drawing](./media.instructions.md) — `IImageFile` returned by `ToImages()`
+- [IO.Storage](./io.storage.instructions.md) — `IMemoryFile` used for document input/output
 
 ---
 
@@ -173,5 +180,3 @@ GlobalParameters = new Dictionary<string, object>
 ```
 
 ---
-
-**Load these instructions when** the user asks to create Word documents from templates, convert Word files to PDF or other formats, merge Word documents, or extract text/images from Word files.
