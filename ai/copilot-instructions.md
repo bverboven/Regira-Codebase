@@ -22,16 +22,16 @@ This codebase provides specialized AI instruction sets for its modules. **When a
 | **Project Templates** | *(scaffolding)* | Scaffolding new projects from reusable starter templates | `./project.setup.md` |
 | **Entities** | `Regira.Entities` | CRUD Services with built-in extras | `./entities.instructions.md` |
 | **TreeList** | `Regira.TreeList` | Hierarchical tree structures: build, navigate, and query nodes | `./treelist.instructions.md` |
-| **IO.Storage** | `Regira.IO.Storage` | File storage: local filesystem, Azure Blob, SFTP/SSH, GitHub, TCP, compression | *(not yet available)* |
-| **Office** | `Regira.Office` | Document processing: Excel, Word, PDF, OCR, Barcodes, CSV, vCards | *(not yet available)* |
-| **Media** | `Regira.Media` | Image & video processing: drawing, resize/crop/rotate, FFmpeg | *(not yet available)* |
-| **Invoicing** | `Regira.Invoicing` | Invoice creation and integrations (Billit, UBL, ViaAdValvas) | *(not yet available)* |
-| **Payments** | `Regira.Payments` | Payment provider integrations (Mollie, Pom) | *(not yet available)* |
-| **Security** | `Regira.Security` | Authentication, hashing (BCrypt), cryptography | *(not yet available)* |
-| **Web** | `Regira.Web` | Web utilities: HTML generation (RazorLight), Swagger, mail providers | *(not yet available)* |
-| **System** | `Regira.System` | Hosting utilities, project/solution file tooling | *(not yet available)* |
+| **IO.Storage** | `Regira.IO.Storage` | File storage: local filesystem, Azure Blob, SFTP/SSH, GitHub, TCP, compression | `./io.storage.instructions.md` |
+| **Office** | `Regira.Office` | Document processing: Excel, Word, PDF, OCR, Barcodes, CSV, vCards | `./office.instructions.md` |
+| **Media** | `Regira.Media` | Image & video processing: drawing, resize/crop/rotate, FFmpeg | `./media.instructions.md` |
+| **Invoicing** | `Regira.Invoicing` | Invoice creation and integrations (Billit, UBL, ViaAdValvas) | `./invoicing.instructions.md` |
+| **Payments** | `Regira.Payments` | Payment provider integrations (Mollie, Pom) | `./payments.instructions.md` |
+| **Security** | `Regira.Security` | Authentication, hashing (BCrypt), cryptography | `./security.instructions.md` |
+| **Web** | `Regira.Web` | Web utilities: HTML generation (RazorLight), Swagger, mail providers | `./web.instructions.md` |
+| **System** | `Regira.System` | Hosting utilities, project/solution file tooling | `./system.instructions.md` |
 
-When a module's instruction file is not yet available, apply general .NET best practices and the conventions in this file.
+When a module's instruction file is not yet available (or the topic isn't covered), apply general .NET best practices and the conventions in this file.
 
 ---
 
@@ -89,6 +89,130 @@ Key capabilities:
 - **Circular reference detection** — configurable via `TreeOptions` (`EnableAutoCheck`, `ThrowOnError`)
 
 **Load these instructions when the user asks to** build or traverse a tree, use `TreeList<T>`, work with hierarchical data structures, or add tree navigation to a .NET project.
+
+---
+
+### Regira IO.Storage
+
+**Instructions:** `./io.storage.instructions.md`
+
+A unified abstraction for reading and writing files across interchangeable storage backends. All backends implement the same `IFileService` interface, so consuming code is backend-independent.
+
+- **Backends** — `BinaryFileService` (local disk), `BinaryBlobService` (Azure Blob), `SftpService` (SSH/SFTP), `GitHubService` (read-only GitHub), `ZipFileService` (in-memory archives)
+- **File addressing** — Identifier (relative, portable), Path (absolute), URI helpers
+- **Search** — `FileSearchObject` for folder-scoped, extension-filtered, recursive listing
+- **ZIP utilities** — `ZipBuilder`, `ZipUtility` for creating and extracting archives
+- **Helpers** — `FileProcessor` (recursive batch processing), `FileNameHelper` (unique filenames), `ExportHelper` (copy between backends)
+
+**Load these instructions when the user asks to** store, retrieve, list, or manage files; work with Azure Blob, SFTP, GitHub, or ZIP storage; swap storage backends; or use `IFileService`.
+
+---
+
+### Regira Office
+
+**Instructions:** `./office.instructions.md` — routes to individual sub-module instruction files
+
+A collection of document and communication libraries, all sharing the same abstractions from `Common.Office`. **When a request targets a specific Office sub-module, load that sub-module's instruction file directly.**
+
+| Sub-Module | File |
+|-----------|------|
+| Barcodes — QR code and barcode generation/scanning | `./office.barcodes.instructions.md` |
+| CSV — read/write CSV files (typed + dictionary) | `./office.csv.instructions.md` |
+| Excel — read/write Excel workbooks | `./office.excel.instructions.md` |
+| Mail — send email via SendGrid or Mailgun | `./office.mail.instructions.md` |
+| OCR — extract text from images | `./office.ocr.instructions.md` |
+| PDF — HTML→PDF, merge/split/extract, print | `./office.pdf.instructions.md` |
+| VCards — read/write `.vcf` contact files | `./office.vcards.instructions.md` |
+| Word — create/convert/merge Word documents | `./office.word.instructions.md` |
+
+**Load these instructions when the user's request involves any of the above Office sub-modules.** Start with `office.instructions.md` if the sub-module is unclear, then load the specific sub-module file.
+
+---
+
+### Regira Media (Drawing)
+
+**Instructions:** `./media.instructions.md`
+
+A cross-platform image processing library with a single `IImageService` interface backed by SkiaSharp (recommended) or GDI+ (Windows-only). Covers the full image pipeline from parsing to composition.
+
+- **Operations** — parse, resize, crop, rotate, flip, format conversion, pixel color access, transparency
+- **Composition** — `ImageBuilder` fluent API for multi-layer canvas: image layers, colored canvas layers, text label layers
+- **Models** — `IImageFile`, `ImageSize`, `Color` (hex), `ImageFormat`, `ImagePosition` (flags), `ImageLayerOptions`
+- **Extensibility** — `IImageCreator<T>` for custom layer sources (e.g. QR codes, charts)
+- **Backends** — `Drawing.SkiaSharp` (cross-platform, recommended), `Drawing.GDI` (Windows-only, EXIF auto-rotate)
+
+**Load these instructions when the user asks to** resize, crop, rotate, convert, or compose images; use `IImageService`; build multi-layer canvases; or create watermarks, thumbnails, or text overlays.
+
+---
+
+### Regira Invoicing
+
+**Instructions:** `./invoicing.instructions.md`
+
+Electronic invoice creation, UBL/Peppol format conversion, and document transmission via an AP gateway. Three packages cover the full invoicing pipeline.
+
+- **Billit** — create and send invoices via the Billit platform; registers `IInvoiceManager`, `IPartyManager`, `IPeppolManager`
+- **UblSharp** — convert domain invoice models to UBL 2.1 XML (Peppol BIS Billing 3.0) via `IUblConverter`
+- **ViaAdValvas** — transmit UBL documents via the AdValVas Peppol AP gateway using HMAC-signed requests
+
+**Load these instructions when the user asks to** create or send electronic invoices, convert to UBL/Peppol format, transmit via an AP gateway, or integrate with Billit or AdValVas.
+
+---
+
+### Regira Payments
+
+**Instructions:** `./payments.instructions.md`
+
+A unified payment processing abstraction over Mollie and POM payment gateways. Both services implement a shared `IPaymentService` interface and are stateless singletons.
+
+- **Mollie** — full CRUD, checkout URL generation on `Save`, and webhook handling via `WebHook()`
+- **POM** — payment link creation (`CreatePaylinkApi`), status polling, HMAC webhook verification
+
+**Load these instructions when the user asks to** process payments, integrate Mollie or POM, create payment links, or handle payment webhooks.
+
+---
+
+### Regira Security
+
+**Instructions:** `./security.instructions.md`
+
+Encryption, password hashing, JWT authentication, API key authentication, and pre-built auth controllers for ASP.NET Core.
+
+- **Encryption** — `SymmetricEncrypter` (static key, fast) and `AesEncrypter` (random salt, recommended for stored secrets) via `IEncrypter`
+- **Hashing** — `BCryptNet.Hasher` (recommended for passwords), `Hasher` (PBKDF2), `SimpleHasher` (non-password) via `IHasher`
+- **JWT** — `ITokenHelper`, `AddJwtAuthentication()` DI extension, `ClaimsPrincipal` extension methods
+- **API Key** — `IApiKeyOwnerService`, in-memory + config-based registration via `AddApiKeyAuthentication()`
+- **Controllers** — `AccountControllerBase<T>`, `UserControllerBase<T>`, `PasswordControllerBase<T>` (pre-built auth endpoints)
+
+**Load these instructions when the user asks to** encrypt or decrypt data, hash passwords, set up JWT authentication, implement API key auth, or add pre-built authentication controllers.
+
+---
+
+### Regira Web
+
+**Instructions:** `./web.instructions.md`
+
+Web utilities for ASP.NET Core: Razor-based HTML template rendering, middleware, Swagger configuration, and background task hosting.
+
+- **HTML templates** — `IHtmlParser` with three engines: `HtmlTemplateParser` (`{{token}}` placeholders), `RazorEngineCore` (full Razor), `RazorLight` (Razor with caching)
+- **Middleware** — global exception handling, request culture, central route prefix, `TextPlainInputFormatter`, controller file helpers
+- **Swagger** — `AddJwtAuthentication()` and `AddApiKeyAuthentication()` extensions for Swagger UI; enum-as-string display
+- **Hosting** — `WebHostOptions` (appsettings `"Hosting"` section), background task queues, Windows Service installer
+
+**Load these instructions when the user asks to** render Razor or token-based HTML templates, configure Swagger security, add web middleware (exception handling, culture, route prefix), or set up background task queues.
+
+---
+
+### Regira System
+
+**Instructions:** `./system.instructions.md`
+
+Application hosting utilities and `.csproj` file tooling.
+
+- **Hosting** — `WebHostOptions` (port, Swagger, CORS, HTTPS, route prefix via appsettings), background task queues, Windows Service installer scripts
+- **Projects** — `ProjectParser` (parse/update `.csproj` XML), `ProjectService` (CRUD on disk), `ProjectManager` + `ProjectTree` (dependency tree built on `TreeList<Project>`)
+
+**Load these instructions when the user asks to** configure host options, set up background task queues, install as a Windows Service, or parse and manipulate `.csproj` project files.
 
 ---
 
