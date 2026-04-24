@@ -372,17 +372,14 @@ FileNameUtility.SanitizeFilename("con.txt")              // avoids Windows reser
 services.AddSingleton<IFileService>(_ =>
     new BinaryFileService(new FileSystemOptions { RootFolder = "/var/app/uploads" }));
 
-// Azure Blob
-services.AddSingleton<IFileService>(sp =>
+// Azure Blob — register options and communicator separately; the service calls Open() lazily
+services.AddSingleton(new AzureOptions
 {
-    var communicator = new AzureCommunicator(new AzureOptions
-    {
-        ConnectionString = configuration["Azure:Storage"],
-        ContainerName    = "uploads"
-    });
-    communicator.Open().GetAwaiter().GetResult();
-    return new BinaryBlobService(communicator);
+    ConnectionString = configuration["Azure:Storage"],
+    ContainerName    = "uploads"
 });
+services.AddSingleton<AzureCommunicator>();
+services.AddSingleton<IFileService, BinaryBlobService>();
 ```
 
 ---
