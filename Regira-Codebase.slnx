@@ -1,12 +1,30 @@
 <Solution>
   <Folder Name="/ai/">
     <File Path="ai/copilot-instructions.md" />
+    <File Path="ai/entities.advanced.example.md" />
     <File Path="ai/entities.examples.md" />
     <File Path="ai/entities.instructions.md" />
     <File Path="ai/entities.namespaces.md" />
     <File Path="ai/entities.setup.md" />
     <File Path="ai/entities.signatures.md" />
+    <File Path="ai/invoicing.instructions.md" />
+    <File Path="ai/io.storage.instructions.md" />
+    <File Path="ai/media.instructions.md" />
+    <File Path="ai/office.barcodes.instructions.md" />
+    <File Path="ai/office.csv.instructions.md" />
+    <File Path="ai/office.excel.instructions.md" />
+    <File Path="ai/office.instructions.md" />
+    <File Path="ai/office.mail.instructions.md" />
+    <File Path="ai/office.ocr.instructions.md" />
+    <File Path="ai/office.pdf.instructions.md" />
+    <File Path="ai/office.vcards.instructions.md" />
+    <File Path="ai/office.word.instructions.md" />
+    <File Path="ai/payments.instructions.md" />
     <File Path="ai/project.setup.md" />
+    <File Path="ai/security.instructions.md" />
+    <File Path="ai/system.instructions.md" />
+    <File Path="ai/treelist.instructions.md" />
+    <File Path="ai/web.instructions.md" />
     <File Path="learnings.md" />
   </Folder>
   <Folder Name="/Solution Items/">

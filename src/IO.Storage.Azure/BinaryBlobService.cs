@@ -180,31 +180,19 @@ public class BinaryBlobService(AzureCommunicator communicator) : IFileService
 
     public string GetAbsoluteUri(string identifier)
     {
-        if (!communicator.IsOpened)
-        {
-            throw new Exception("Communicator is not opened yet!");
-        }
-        //communicator.Open().Wait();
+        communicator.Open().GetAwaiter().GetResult();
         return FileNameUtility.GetUri(identifier, Root);
     }
 
     public string GetIdentifier(string uri)
     {
-        if (!communicator.IsOpened)
-        {
-            throw new Exception("Communicator is not opened yet!");
-        }
-        //communicator.Open().Wait();
+        communicator.Open().GetAwaiter().GetResult();
         return FileNameUtility.GetRelativeUri(uri, Root);
     }
 
     public string? GetRelativeFolder(string identifier)
     {
-        if (!communicator.IsOpened)
-        {
-            throw new Exception("Communicator is not opened yet!");
-        }
-        //communicator.Open().Wait();
+        communicator.Open().GetAwaiter().GetResult();
         return FileNameUtility.GetRelativeFolder(identifier, Root);
     }
 

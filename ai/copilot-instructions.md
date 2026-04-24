@@ -25,11 +25,11 @@ This codebase provides specialized AI instruction sets for its modules. **When a
 | **IO.Storage** | `Regira.IO.Storage` | File storage: local filesystem, Azure Blob, SFTP/SSH, GitHub, TCP, compression | `./io.storage.instructions.md` |
 | **Office** | `Regira.Office` | Document processing: Excel, Word, PDF, OCR, Barcodes, CSV, vCards | `./office.instructions.md` |
 | **Media** | `Regira.Media` | Image & video processing: drawing, resize/crop/rotate, FFmpeg | `./media.instructions.md` |
+| **Web** | `Regira.Web` | Web utilities: HTML generation (RazorLight), Swagger, mail providers | `./web.instructions.md` |
+| **Security** | `Regira.Security` | Authentication, hashing (BCrypt), cryptography | `./security.instructions.md` |
+| **System** | `Regira.System` | Hosting utilities, project/solution file tooling | `./system.instructions.md` |
 | **Invoicing** | `Regira.Invoicing` | Invoice creation and integrations (Billit, UBL, ViaAdValvas) | `./invoicing.instructions.md` |
 | **Payments** | `Regira.Payments` | Payment provider integrations (Mollie, Pom) | `./payments.instructions.md` |
-| **Security** | `Regira.Security` | Authentication, hashing (BCrypt), cryptography | `./security.instructions.md` |
-| **Web** | `Regira.Web` | Web utilities: HTML generation (RazorLight), Swagger, mail providers | `./web.instructions.md` |
-| **System** | `Regira.System` | Hosting utilities, project/solution file tooling | `./system.instructions.md` |
 
 When a module's instruction file is not yet available (or the topic isn't covered), apply general .NET best practices and the conventions in this file.
 
