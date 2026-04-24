@@ -10,17 +10,14 @@
 services.AddSingleton<IFileService>(_ =>
     new BinaryFileService(new FileSystemOptions { RootFolder = "/var/app/uploads" }));
 
-// Azure Blob for backups
-services.AddSingleton<IFileService>("backup", sp =>
+// Azure Blob for backups — let IoC construct both the communicator and the service
+services.AddSingleton(new AzureOptions
 {
-    var comm = new AzureCommunicator(new AzureOptions
-    {
-        ConnectionString = configuration["Azure:Storage"],
-        ContainerName    = "product-images"
-    });
-    comm.Open().GetAwaiter().GetResult();
-    return new BinaryBlobService(comm);
+    ConnectionString = configuration["Azure:Storage"],
+    ContainerName    = "product-images"
 });
+services.AddSingleton<AzureCommunicator>();
+services.AddSingleton<IFileService, BinaryBlobService>();
 ```
 
 ## Upload an image
