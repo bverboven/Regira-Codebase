@@ -2,6 +2,7 @@ using System.IO.Compression;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
+using Regira.IO.Storage.FileSystem;
 using Regira.IO.Storage.Helpers;
 
 namespace Regira.IO.Storage.Compression;
@@ -116,7 +117,7 @@ public static class ZipUtility
         foreach (var entry in entries)
         {
             using var zipStream = entry.Open();
-            var fullPath = Path.Combine(targetDirectory, entry.FullName.TrimEnd('/'));
+            var fullPath = FileNameUtility.EnsureContained(Path.Combine(targetDirectory, entry.FullName.TrimEnd('/')), targetDirectory);
             if (IsDirectory(entry))
             {
                 Directory.CreateDirectory(fullPath);

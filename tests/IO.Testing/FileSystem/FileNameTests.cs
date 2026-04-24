@@ -49,6 +49,37 @@ public class FileNameTests
         Assert.That(identifier, Is.EqualTo(file3));
     }
     [Test]
+    public void EnsureContained_Safe_Path_Returns_Normalized()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "test-root");
+        var path = Path.Combine(root, "subfolder", "file.txt");
+        Assert.That(FileNameUtility.EnsureContained(path, root), Is.EqualTo(Path.GetFullPath(path)));
+    }
+
+    [Test]
+    public void EnsureContained_Root_Itself_Returns_Normalized()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "test-root");
+        Assert.That(FileNameUtility.EnsureContained(root, root), Is.EqualTo(Path.GetFullPath(root)));
+    }
+
+    [Test]
+    public void EnsureContained_Traversal_Throws()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "test-root");
+        Assert.Throws<UnauthorizedAccessException>(
+            () => FileNameUtility.EnsureContained(Path.Combine(root, "..", "outside"), root));
+    }
+
+    [Test]
+    public void EnsureContained_External_Path_Throws()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "test-root");
+        var other = Path.Combine(Path.GetTempPath(), "other-root", "file.txt");
+        Assert.Throws<UnauthorizedAccessException>(() => FileNameUtility.EnsureContained(other, root));
+    }
+
+    [Test]
     public async Task Next_Available_FileName_With_Custom_NumberPattern()
     {
         var file1 = "folder/file.jpg";

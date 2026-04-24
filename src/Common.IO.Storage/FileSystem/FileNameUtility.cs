@@ -45,6 +45,17 @@ public static class FileNameUtility
         var validSegments = segments.Where(s => !string.IsNullOrEmpty(s)).ToArray();
         return Path.Combine(validSegments!);
     }
+    public static string EnsureContained(string absolutePath, string root)
+    {
+        var normalized = Path.GetFullPath(absolutePath);
+        var normalizedRoot = Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        if (!normalized.StartsWith(normalizedRoot, StringComparison.OrdinalIgnoreCase)
+            && !string.Equals(normalized.TrimEnd(Path.DirectorySeparatorChar), normalizedRoot.TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase))
+        {
+            throw new UnauthorizedAccessException($"Path '{absolutePath}' escapes the root context.");
+        }
+        return normalized;
+    }
 
     public static bool IsFile(string uri, string root)
     {

@@ -27,6 +27,9 @@
     <File Path="ai/web.instructions.md" />
     <File Path="learnings.md" />
   </Folder>
+  <Folder Name="/evaluations/">
+    <File Path="evaluations/IO.Storage-evaluation.md" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />
     <File Path="LICENSE" />

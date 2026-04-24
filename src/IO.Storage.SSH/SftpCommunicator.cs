@@ -7,6 +7,7 @@ public class SftpCommunicator : IDisposable
     private readonly SftpConfig _config;
     private readonly SftpClient _client;
     internal string ContainerName => $"/{_config.ContainerName?.TrimStart('/')}";
+    internal bool Contained => _config.Contained;
     public SftpCommunicator(SftpConfig config)
     {
         _config = config;

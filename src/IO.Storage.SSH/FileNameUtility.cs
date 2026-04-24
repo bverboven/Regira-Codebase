@@ -65,4 +65,26 @@ public static class FileNameUtility
             )
             .TrimStart('/');
     }
+    public static string NormalizePath(string path)
+    {
+        var leadingSlash = path.StartsWith("/");
+        var result = new List<string>();
+        foreach (var part in path.Split('/'))
+        {
+            if (part == "..") { if (result.Count > 0) result.RemoveAt(result.Count - 1); }
+            else if (part is not "" and not ".") result.Add(part);
+        }
+        var joined = string.Join("/", result);
+        return leadingSlash ? "/" + joined : joined;
+    }
+    public static string EnsureContained(string absolutePath, string root)
+    {
+        var normalized = NormalizePath(absolutePath);
+        var normalizedRoot = root.TrimEnd('/');
+        if (!normalized.StartsWith(normalizedRoot + "/", StringComparison.Ordinal) && normalized != normalizedRoot)
+        {
+            throw new UnauthorizedAccessException($"Path '{absolutePath}' escapes the root context.");
+        }
+        return normalized;
+    }
 }

@@ -12,27 +12,27 @@ public class SftpService(SftpCommunicator communicator) : IFileService
     public async Task<bool> Exists(string identifier)
     {
         var client = await communicator.Open();
-        var fileUri = FileNameUtility.GetUri(identifier, Root);
+        var fileUri = ResolveUri(identifier);
         return await client.ExistsAsync(fileUri);
     }
     public async Task<byte[]?> GetBytes(string identifier)
     {
         var client = await communicator.Open();
-        var fileUri = FileNameUtility.GetUri(identifier, Root);
+        var fileUri = ResolveUri(identifier);
 
         return client.ReadAllBytes(fileUri);
     }
     public async Task<Stream?> GetStream(string identifier)
     {
         var client = await communicator.Open();
-        var fileUri = FileNameUtility.GetUri(identifier, Root);
+        var fileUri = ResolveUri(identifier);
 
         return client.OpenRead(fileUri);
     }
     public async Task<IEnumerable<string>> List(FileSearchObject? so = null)
     {
         so ??= new FileSearchObject();
-        var folderUri = !string.IsNullOrWhiteSpace(so.FolderUri) ? FileNameUtility.GetUri(so.FolderUri!, Root) : Root;
+        var folderUri = !string.IsNullOrWhiteSpace(so.FolderUri) ? ResolveUri(so.FolderUri!) : Root;
         var client = await communicator.Open();
         var sftpFiles = List(client, folderUri, so.Recursive);
         var files = sftpFiles
@@ -64,8 +64,8 @@ public class SftpService(SftpCommunicator communicator) : IFileService
     public async Task Move(string sourceIdentifier, string targetIdentifier)
     {
         var client = await communicator.Open();
-        var sourceUri = FileNameUtility.GetUri(sourceIdentifier, Root);
-        var targetUri = FileNameUtility.GetUri(targetIdentifier, Root);
+        var sourceUri = ResolveUri(sourceIdentifier);
+        var targetUri = ResolveUri(targetIdentifier);
 #if NETSTANDARD2_0
         using (var srcStream = client.OpenRead(sourceUri))
         {
@@ -84,17 +84,17 @@ public class SftpService(SftpCommunicator communicator) : IFileService
     public async Task<string> Save(string identifier, byte[] bytes, string? contentType = null)
     {
         var client = await communicator.Open();
-        var fileUri = FileNameUtility.GetUri(identifier, Root);
+        var fileUri = ResolveUri(identifier);
 
         await CreateDirectory(identifier);
 
         client.WriteAllBytes(fileUri, bytes);
-        return FileNameUtility.GetUri(fileUri, Root);
+        return fileUri;
     }
     public async Task<string> Save(string identifier, Stream stream, string? contentType = null)
     {
         var client = await communicator.Open();
-        var fileUri = FileNameUtility.GetUri(identifier, Root);
+        var fileUri = ResolveUri(identifier);
 
         await CreateDirectory(identifier);
 
@@ -104,7 +104,7 @@ public class SftpService(SftpCommunicator communicator) : IFileService
         await using var targetStream = client.Create(fileUri);
 #endif
         await stream.CopyToAsync(targetStream);
-        return FileNameUtility.GetUri(fileUri, Root);
+        return fileUri;
     }
 
     protected async Task CreateDirectory(string identifier)
@@ -122,7 +122,7 @@ public class SftpService(SftpCommunicator communicator) : IFileService
     public async Task Delete(string identifier)
     {
         var client = await communicator.Open();
-        var fileUri = FileNameUtility.GetUri(identifier, Root);
+        var fileUri = ResolveUri(identifier);
 
         if (!await client.ExistsAsync(fileUri))
         {
@@ -142,9 +142,16 @@ public class SftpService(SftpCommunicator communicator) : IFileService
     }
 
     public string GetAbsoluteUri(string identifier)
-        => FileNameUtility.GetUri(identifier, Root);
+        => ResolveUri(identifier);
     public string GetIdentifier(string uri)
         => FileNameUtility.GetRelativeUri(uri, Root);
     public string? GetRelativeFolder(string identifier)
         => FileNameUtility.GetRelativeFolder(identifier, Root);
+    private string ResolveUri(string identifier)
+    {
+        var uri = FileNameUtility.GetUri(identifier, Root);
+        return communicator.Contained
+            ? FileNameUtility.EnsureContained(uri, Root)
+            : uri;
+    }
 }
