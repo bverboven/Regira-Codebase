@@ -11,7 +11,7 @@ public static class DtoExtensions
             Content = dto.Content,
             Format = dto.Format ?? BarcodeDefaults.Format,
             Size = new ImageSize(dto.Width ?? BarcodeDefaults.Size.Width, dto.Height ?? BarcodeDefaults.Size.Height),
-            Color = dto.Color,
-            BackgroundColor = dto.BackgroundColor
+            Color = dto.Color ?? BarcodeDefaults.Color,
+            BackgroundColor = dto.BackgroundColor ?? BarcodeDefaults.BackgroundColor
         };
 }

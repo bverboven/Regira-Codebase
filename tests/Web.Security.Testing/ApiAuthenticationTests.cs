@@ -27,6 +27,7 @@ public class ApiAuthenticationTests : IClassFixture<TestingWebApplicationFactory
         var response = await httpClient.GetAsync("");
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
+
     [Fact]
     public async Task Test_Protected_Without_ApiKey_Returns_Unauthorized()
     {
@@ -35,15 +36,17 @@ public class ApiAuthenticationTests : IClassFixture<TestingWebApplicationFactory
         var response = await httpClient.GetAsync("protected");
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
+
     [Fact]
     public async Task Test_Protected_With_Valid_ApiKey_Returns_Ok()
     {
         var httpClient = _factory.CreateClient();
-        httpClient.DefaultRequestHeaders.Add(ApiKeyDefaults.HeaderName, ApiKeyOwners.Value.First().Key);
+        httpClient.DefaultRequestHeaders.Add(ApiKeyDefaults.HeaderName, ApiKeyOwners.Default.Key);
 
         var response = await httpClient.GetAsync("protected");
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
+
     [Fact]
     public async Task Test_Protected_With_Empty_ApiKey_Returns_Unauthorized()
     {
@@ -53,6 +56,7 @@ public class ApiAuthenticationTests : IClassFixture<TestingWebApplicationFactory
         var response = await httpClient.GetAsync("protected");
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
+
     [Fact]
     public async Task Test_Protected_With_Invalid_ApiKey_Returns_Unauthorized()
     {
@@ -61,5 +65,57 @@ public class ApiAuthenticationTests : IClassFixture<TestingWebApplicationFactory
 
         var response = await httpClient.GetAsync("protected");
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Test_Protected_Me_Returns_OwnerId()
+    {
+        var httpClient = _factory.CreateClient();
+        httpClient.DefaultRequestHeaders.Add(ApiKeyDefaults.HeaderName, ApiKeyOwners.Default.Key);
+
+        var response = await httpClient.GetAsync("protected/me");
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var body = await response.Content.ReadAsStringAsync();
+        body.ShouldContain(ApiKeyOwners.Default.OwnerId);
+    }
+
+    [Fact]
+    public async Task Test_AdminOnly_Without_ApiKey_Returns_Unauthorized()
+    {
+        var httpClient = _factory.CreateClient();
+
+        var response = await httpClient.GetAsync("protected/admin");
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Test_AdminOnly_With_NonAdmin_ApiKey_Returns_Forbidden()
+    {
+        var httpClient = _factory.CreateClient();
+        httpClient.DefaultRequestHeaders.Add(ApiKeyDefaults.HeaderName, ApiKeyOwners.Default.Key);
+
+        var response = await httpClient.GetAsync("protected/admin");
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task Test_AdminOnly_With_Admin_ApiKey_Returns_Ok()
+    {
+        var httpClient = _factory.CreateClient();
+        httpClient.DefaultRequestHeaders.Add(ApiKeyDefaults.HeaderName, ApiKeyOwners.WithAdminRole.Key);
+
+        var response = await httpClient.GetAsync("protected/admin");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task Test_AdminOnly_With_MultiRole_ApiKey_Returns_Ok()
+    {
+        var httpClient = _factory.CreateClient();
+        httpClient.DefaultRequestHeaders.Add(ApiKeyDefaults.HeaderName, ApiKeyOwners.WithRolesAndClaims.Key);
+
+        var response = await httpClient.GetAsync("protected/admin");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 }

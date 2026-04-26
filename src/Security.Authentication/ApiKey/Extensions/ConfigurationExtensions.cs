@@ -16,8 +16,10 @@ public static class ConfigurationExtensions
     {
         return new ApiKeyOwner
         {
-            Key = apiKeySection["Key"],
-            OwnerId = apiKeySection["OwnerId"]
+            Key = apiKeySection["Key"] ?? throw new InvalidOperationException("API key is missing"),
+            OwnerId = apiKeySection["OwnerId"] ?? throw new InvalidOperationException("OwnerId is missing"),
+            Roles = apiKeySection.GetSection("Roles").Get<List<string>>() ?? [],
+            Claims = apiKeySection.GetSection("Claims").Get<List<ApiKeyOwner.Claim>>() ?? []
         };
     }
 }

@@ -79,7 +79,7 @@ public class BarcodeService : IBarcodeService
                 Height = input.Size.Height,
                 Margin = 0,
                 PureBarcode = true,
-                GS1Format = true,
+                GS1Format = input.Format == BarcodeFormat.DataMatrix,
                 NoPadding = true
             },
             Renderer = new SKBitmapRenderer

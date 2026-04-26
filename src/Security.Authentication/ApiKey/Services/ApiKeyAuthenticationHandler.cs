@@ -14,23 +14,18 @@ public class ApiKeyAuthenticationHandler(IOptionsMonitor<ApiKeyAuthenticationOpt
     // https://josef.codes/asp-net-core-protect-your-api-with-api-keys/
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        //var endpoint = Request.HttpContext.Features.Get<IEndpointFeature>()?.Endpoint;
-        //var allowAnonymous = endpoint?.Metadata.Any(x => x.GetType() == typeof(AllowAnonymousAttribute) || x.GetType() == typeof(AllowNoApiKeyAttribute)) ?? false;
-
         if (!Request.Headers.TryGetValue(Options.ApiKeyHeaderName, out var apiKeyHeaderValues))
         {
             return AuthenticateResult.NoResult();
         }
 
         var providedApiKey = apiKeyHeaderValues.FirstOrDefault();
-
         if (apiKeyHeaderValues.Count == 0 || string.IsNullOrWhiteSpace(providedApiKey))
         {
             return AuthenticateResult.NoResult();
         }
 
         var existingApiKey = await apiKeyOwnerService.FindByKey(providedApiKey);
-
         if (existingApiKey != null)
         {
             var claims = new List<Claim>
@@ -39,6 +34,7 @@ public class ApiKeyAuthenticationHandler(IOptionsMonitor<ApiKeyAuthenticationOpt
             };
 
             claims.AddRange(existingApiKey.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            claims.AddRange(existingApiKey.Claims.Select(c => new Claim(c.Type, c.Value)));
 
             var identity = new ClaimsIdentity(claims, Options.AuthenticationType);
             var identities = new List<ClaimsIdentity> { identity };

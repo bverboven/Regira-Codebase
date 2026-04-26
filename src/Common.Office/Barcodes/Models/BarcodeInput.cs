@@ -8,6 +8,8 @@ public class BarcodeInput : BarcodeInputBase
     public BarcodeInput()
     {
         Format = BarcodeDefaults.Format;
+        Color = BarcodeDefaults.Color;
+        BackgroundColor = BarcodeDefaults.BackgroundColor;
     }
 
     public static implicit operator BarcodeInput(string content) => new() { Content = content };

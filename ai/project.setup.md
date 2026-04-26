@@ -554,17 +554,20 @@ finally
 ## Template 4 — `SelfHostingApiWithAuth`
 
 ### Use when
-Self-hosted HTTP API with controller-based routing and access control via API key and/or JWT Bearer tokens.
+Self-hosted HTTP API with controller-based routing and access control via API key and/or JWT Bearer tokens. 
+Deployable as a Windows Service.
 
 ### `Program.cs`
 
 ```csharp
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Hosting.WindowsServices;
 using Regira.Security.Authentication.ApiKey.Extensions;
 using Regira.Security.Authentication.ApiKey.Models;
 using Regira.Security.Authentication.Jwt.Extensions;
 using Regira.Security.Authentication.Web.OpenApi.Transformers;
+using Regira.System.Hosting.WindowsService;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -574,6 +577,9 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseSerilog((ctx, cfg) => cfg.ReadFrom.Configuration(ctx.Configuration));
+
+    if (WindowsServiceHelpers.IsWindowsService())
+        builder.Host.UseWindowsService();
 
     builder.WebHost.ConfigureKestrel((context, options) =>
         options.Configure(context.Configuration.GetSection("Kestrel")));
@@ -647,6 +653,9 @@ try
             endpoints.MapControllers()
               .RequireAuthorization();
         });
+
+    var host = app.Services.GetRequiredService<IHost>();
+    host.AddWindowsServiceInstaller(new WindowsServiceOptions { ServiceName = "MyProject" }); // Replace with actual service name
 
     app.Run();
 }

@@ -27,4 +27,7 @@
     <ProjectReference Include="..\..\src\Barcodes.ZXing\Barcodes.ZXing.csproj" />
     <ProjectReference Include="..\..\src\Common.Office\Common.Office.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets\Output\" />
+  </ItemGroup>
 </Project>

@@ -1,6 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-var srcDir = args.Any() && !string.IsNullOrWhiteSpace(args[0]) ? args[0] : Directory.GetCurrentDirectory();
+﻿var srcDir = args.Any() && !string.IsNullOrWhiteSpace(args[0]) ? args[0] : Directory.GetCurrentDirectory();
 
 var slnFiles = Directory.GetFiles(srcDir, "*.sln", SearchOption.AllDirectories);
 
