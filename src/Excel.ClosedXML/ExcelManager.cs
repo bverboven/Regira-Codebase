@@ -23,10 +23,10 @@ public class ExcelManager : IExcelManager
 
     public Task<IEnumerable<ExcelSheet>> Read(IBinaryFile input, string[]? headers = null, CancellationToken cancellationToken = default)
     {
-        var sheets = ReadInternal(input, headers).ToList();
+        var sheets = ReadCore(input, headers).ToList();
         return Task.FromResult<IEnumerable<ExcelSheet>>(sheets);
     }
-    private IEnumerable<ExcelSheet> ReadInternal(IBinaryFile input, string[]? headers = null)
+    private IEnumerable<ExcelSheet> ReadCore(IBinaryFile input, string[]? headers = null)
     {
         using var ms = input.GetStream();
         using var wb = new XLWorkbook(ms);

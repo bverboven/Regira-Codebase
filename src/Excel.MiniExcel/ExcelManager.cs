@@ -19,10 +19,10 @@ public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
 
     public Task<IEnumerable<ExcelSheet>> Read(IBinaryFile input, string[]? headers = null, CancellationToken cancellationToken = default)
     {
-        var sheets = ReadInternal(input, headers).ToList();
+        var sheets = ReadCore(input, headers).ToList();
         return Task.FromResult<IEnumerable<ExcelSheet>>(sheets);
     }
-    private IEnumerable<ExcelSheet> ReadInternal(IBinaryFile input, string[]? headers = null)
+    private IEnumerable<ExcelSheet> ReadCore(IBinaryFile input, string[]? headers = null)
     {
         using var ms = input.GetStream();
         var sheetNames = ms.GetSheetNames();
@@ -108,10 +108,10 @@ public class ExcelManager<T> : IExcelManager<T>
 {
     public Task<IEnumerable<ExcelSheet<T>>> Read(IBinaryFile input, string[]? headers = null, CancellationToken cancellationToken = default)
     {
-        var sheets = ReadInternal(input, headers).ToList();
+        var sheets = ReadCore(input, headers).ToList();
         return Task.FromResult<IEnumerable<ExcelSheet<T>>>(sheets);
     }
-    private IEnumerable<ExcelSheet<T>> ReadInternal(IBinaryFile input, string[]? headers = null)
+    private IEnumerable<ExcelSheet<T>> ReadCore(IBinaryFile input, string[]? headers = null)
     {
         using var ms = input.GetStream();
         var sheetNames = ms.GetSheetNames();

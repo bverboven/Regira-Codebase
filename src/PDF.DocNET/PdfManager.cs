@@ -24,17 +24,17 @@ public class PdfManager(IImageService imageService) : IPdfService
     }
 
 
-    public Task<IEnumerable<IMemoryFile>> Split(IMemoryFile pdf, IEnumerable<PdfSplitRange> ranges, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<IMemoryFile>> Split(IMemoryFile pdf, IEnumerable<PdfSplitRange> ranges, CancellationToken cancellationToken = default)
     {
         var result = new List<IMemoryFile>();
         foreach (var range in ranges)
         {
-            var pageCount = GetPageCount(pdf).GetAwaiter().GetResult();
+            var pageCount = await GetPageCount(pdf, cancellationToken);
             var splitBytes = DocLib.Instance.Split(pdf.GetBytes(), range.Start - 1, (range.End ?? pageCount) - 1);
             var file = splitBytes.ToMemoryFile(ContentTypes.PDF);
             result.Add(file);
         }
-        return Task.FromResult<IEnumerable<IMemoryFile>>(result);
+        return result;
     }
     public IMemoryFile Merge(IEnumerable<string> pdfPaths)
     {
@@ -114,11 +114,11 @@ public class PdfManager(IImageService imageService) : IPdfService
     }
 
 
-    public Task<string> GetText(IMemoryFile pdf, CancellationToken cancellationToken = default)
+    public async Task<string> GetText(IMemoryFile pdf, CancellationToken cancellationToken = default)
     {
-        var texts = GetTextPerPage(pdf).GetAwaiter().GetResult()
+        var texts = (await GetTextPerPage(pdf, cancellationToken))
             .Select(line => line.Trim());
-        return Task.FromResult(string.Join(Environment.NewLine, texts));
+        return string.Join(Environment.NewLine, texts);
     }
     public Task<IList<string>> GetTextPerPage(IMemoryFile pdf, CancellationToken cancellationToken = default)
     {
