@@ -5,5 +5,5 @@ namespace Regira.Office.Word.Abstractions;
 
 public interface IWordCreator
 {
-    Task<IMemoryFile> Create(WordTemplateInput input);
+    Task<IMemoryFile> Create(WordTemplateInput input, CancellationToken cancellationToken = default);
 }

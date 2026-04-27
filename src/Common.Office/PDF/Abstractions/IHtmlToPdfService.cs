@@ -5,5 +5,5 @@ namespace Regira.Office.PDF.Abstractions;
 
 public interface IHtmlToPdfService
 {
-    Task<IMemoryFile> Create(HtmlInput template);
+    Task<IMemoryFile> Create(HtmlInput template, CancellationToken cancellationToken = default);
 }

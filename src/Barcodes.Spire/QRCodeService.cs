@@ -8,6 +8,6 @@ public class QRCodeService : IQRCodeService
 {
     private readonly BarcodeService _service = new();
 
-    public IImageFile Create(QRCodeInput input) => _service.Create(input);
-    public BarcodeReadResult Read(IImageFile qrCode) => _service.Read(qrCode);
+    public Task<IImageFile> Create(QRCodeInput input, CancellationToken cancellationToken = default) => _service.Create(input, cancellationToken);
+    public Task<BarcodeReadResult?> Read(IImageFile qrCode, CancellationToken cancellationToken = default) => _service.Read(qrCode, cancellationToken: cancellationToken);
 }

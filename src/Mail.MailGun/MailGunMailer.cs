@@ -15,7 +15,7 @@ public class MailGunMailer(MailgunConfig config) : MailerBase
     private readonly string _domain = config.Domain;
 
 
-    protected override async Task<IMailResponse> OnSend(IMessageObject message)
+    protected override async Task<IMailResponse> OnSend(IMessageObject message, CancellationToken cancellationToken = default)
     {
         var client = new RestClient(_mailgunApi, c => c.Authenticator = new HttpBasicAuthenticator("api", _mailgunKey));
 
@@ -57,7 +57,7 @@ public class MailGunMailer(MailgunConfig config) : MailerBase
         }
 
         // response
-        var mailerResponse = await client.ExecuteAsync(request);
+        var mailerResponse = await client.ExecuteAsync(request, cancellationToken);
 
         // errors?
         if (mailerResponse.StatusCode == HttpStatusCode.Unauthorized)

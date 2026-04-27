@@ -43,22 +43,22 @@ public class WordManager : IWordManager
     private int _insertDocumentCounter;
     private static readonly Regex ParamRegex = new("{{ *[a-zA-Z0-9._]+ *}}");
 
-    public Task<IMemoryFile> Create(WordTemplateInput input)
+    public Task<IMemoryFile> Create(WordTemplateInput input, CancellationToken cancellationToken = default)
     {
         using var doc = CreateDocument(input);
         var file = ToMemoryFile(doc);
         return Task.FromResult(file);
     }
-    public async Task<IMemoryFile> Merge(params WordTemplateInput[] inputs)
+    public async Task<IMemoryFile> Merge(IEnumerable<WordTemplateInput> inputs, CancellationToken cancellationToken = default)
     {
         using var doc = await MergeDocuments(inputs);
         return ToMemoryFile(doc);
     }
-    public Task<IMemoryFile> Convert(WordTemplateInput input, RegiraFileFormat format)
+    public Task<IMemoryFile> Convert(WordTemplateInput input, RegiraFileFormat format, CancellationToken cancellationToken = default)
     {
-        return Convert(input, new ConversionOptions { OutputFormat = format });
+        return Convert(input, new ConversionOptions { OutputFormat = format }, cancellationToken);
     }
-    public Task<IMemoryFile> Convert(WordTemplateInput input, ConversionOptions options)
+    public Task<IMemoryFile> Convert(WordTemplateInput input, ConversionOptions options, CancellationToken cancellationToken = default)
     {
         using var doc = CreateDocument(input);
         var convertedStream = ConvertDocument(doc, options);
@@ -66,43 +66,43 @@ public class WordManager : IWordManager
         return Task.FromResult(file);
     }
 
-    public Task<string> GetText(WordTemplateInput input)
+    public Task<string> GetText(WordTemplateInput input, CancellationToken cancellationToken = default)
     {
         using var doc = CreateDocument(input);
         var contents = doc.GetText();
         return Task.FromResult(contents);
     }
-    public IEnumerable<WordImage> GetImages(WordTemplateInput input)
+    public Task<IEnumerable<WordImage>> GetImages(WordTemplateInput input, CancellationToken cancellationToken = default)
     {
         using var doc = CreateDocument(input);
         var tree = doc.ToTreeList();
         var pictures = tree.FindAllPictures();
-        foreach (var pic in pictures)
+        var images = pictures.Select(pic => new WordImage
         {
-            yield return new WordImage
-            {
-                Name = pic.Title,
-                Size = new ImageSize((int)pic.Width, (int)pic.Height),
-                File = pic.ImageBytes.ToBinaryFile()
-            };
-        }
+            Name = pic.Title,
+            Size = new ImageSize((int)pic.Width, (int)pic.Height),
+            File = pic.ImageBytes.ToBinaryFile()
+        }).ToList();
+        return Task.FromResult<IEnumerable<WordImage>>(images);
     }
-    public IEnumerable<IImageFile> ToImages(WordTemplateInput input)
+    public Task<IEnumerable<IImageFile>> ToImages(WordTemplateInput input, CancellationToken cancellationToken = default)
     {
         //throw new NotSupportedException("https://www.e-iceblue.com/forum/missingmethodexception-when-converting-document-to-images-t9466.html");
         using var doc = CreateDocument(input);
+        var images = new List<IImageFile>();
         for (var i = 0; i < doc.PageCount; i++)
         {
 #if NETSTANDARD2_0
             var skImg = doc.SaveToImages(i, ImageType.Bitmap);
-            yield return skImg.ToImageFile(SKEncodedImageFormat.Jpeg);
+            images.Add(skImg.ToImageFile(SKEncodedImageFormat.Jpeg));
 #else
             var img = doc.SaveToImages(i, ImageType.Bitmap);
 #pragma warning disable CA1416
-            yield return img.ToImageFile(ImageFormat.Jpeg);
+            images.Add(img.ToImageFile(ImageFormat.Jpeg));
 #pragma warning restore CA1416
 #endif
         }
+        return Task.FromResult<IEnumerable<IImageFile>>(images);
     }
 
 

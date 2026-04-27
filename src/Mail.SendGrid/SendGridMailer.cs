@@ -11,10 +11,10 @@ public class SendGridMailer(SendGridConfig config) : MailerBase
 {
     private readonly SendGridClient _client = new(config.Key);
 
-    protected override async Task<IMailResponse> OnSend(IMessageObject message)
+    protected override async Task<IMailResponse> OnSend(IMessageObject message, CancellationToken cancellationToken = default)
     {
         var mail = message.ToMailMessage();
-        var mailerResponse = await _client.SendEmailAsync(mail);
+        var mailerResponse = await _client.SendEmailAsync(mail, cancellationToken);
 
         if (mailerResponse.StatusCode == HttpStatusCode.Unauthorized)
         {

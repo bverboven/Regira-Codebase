@@ -14,7 +14,7 @@ namespace Regira.Office.Barcodes.UziGranot;
 
 public class QRCodeService : IQRCodeService
 {
-    public IImageFile Create(QRCodeInput input)
+    public Task<IImageFile> Create(QRCodeInput input, CancellationToken cancellationToken = default)
     {
         var moduleSize = 4;
 
@@ -43,10 +43,10 @@ public class QRCodeService : IQRCodeService
 
         // resize image
         using var img = GdiUtility.ResizeFixed(Image.FromStream(ms), input.Size.ToGdiSize());
-        return img.ToImageFile(ImageFormat.Jpeg);
+        return Task.FromResult<IImageFile>(img.ToImageFile(ImageFormat.Jpeg));
     }
 
-    public BarcodeReadResult Read(IImageFile qrCode)
+    public Task<BarcodeReadResult?> Read(IImageFile qrCode, CancellationToken cancellationToken = default)
     {
         var decoder = new QRDecoder();
         using var img = qrCode.ToBitmap();
@@ -54,11 +54,11 @@ public class QRCodeService : IQRCodeService
         var data = decoder.ImageDecoder(bitmap);
         var contents = QRCodeResult(data);
 
-        return new BarcodeReadResult
+        return Task.FromResult<BarcodeReadResult?>(new BarcodeReadResult
         {
             Contents = contents,
             Format = BarcodeFormat.QRCode
-        };
+        });
     }
 
 

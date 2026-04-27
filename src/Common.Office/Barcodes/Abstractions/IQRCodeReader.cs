@@ -5,5 +5,5 @@ namespace Regira.Office.Barcodes.Abstractions;
 
 public interface IQRCodeReader
 {
-    BarcodeReadResult? Read(IImageFile qrCode);
+    Task<BarcodeReadResult?> Read(IImageFile qrCode, CancellationToken cancellationToken = default);
 }

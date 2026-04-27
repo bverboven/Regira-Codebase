@@ -7,5 +7,5 @@ namespace Regira.Office.Barcodes.Drawing;
 public class BarcodeImageCreator(IBarcodeWriter barcodeWriter) : ImageCreatorBase<BarcodeInput>
 {
     public override IImageFile Create(BarcodeInput input)
-        => barcodeWriter.Create(input);
+        => barcodeWriter.Create(input).GetAwaiter().GetResult();
 }

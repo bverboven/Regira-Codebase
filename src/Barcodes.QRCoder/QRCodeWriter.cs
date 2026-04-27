@@ -14,7 +14,7 @@ namespace Regira.Office.Barcodes.QRCoder;
 
 public class QRCodeWriter : IQRCodeWriter
 {
-    public IImageFile Create(QRCodeInput input)
+    public Task<IImageFile> Create(QRCodeInput input, CancellationToken cancellationToken = default)
     {
         var generator = new QRCodeGenerator();
         QRCodeData qrData;
@@ -32,6 +32,6 @@ public class QRCodeWriter : IQRCodeWriter
         var width = input.Size.Width;
         var height = input.Size.Height;
         using var resizedImg = GdiUtility.Resize(img.ToBitmap(), new Size(width, height));
-        return resizedImg.ToImageFile(ImageFormat.Jpeg);
+        return Task.FromResult<IImageFile>(resizedImg.ToImageFile(ImageFormat.Jpeg));
     }
 }

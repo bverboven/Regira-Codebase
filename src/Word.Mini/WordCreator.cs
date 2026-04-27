@@ -8,7 +8,7 @@ namespace Regira.Office.Word.Mini;
 
 public class WordCreator : IWordCreator
 {
-    public async Task<IMemoryFile> Create(WordTemplateInput input)
+    public async Task<IMemoryFile> Create(WordTemplateInput input, CancellationToken cancellationToken = default)
     {
         var ms = new MemoryStream();
         var templateBytes = input.Template.GetBytes()!;

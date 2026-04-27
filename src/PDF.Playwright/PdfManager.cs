@@ -11,9 +11,9 @@ public class PdfManager : IHtmlToPdfService
     private static readonly SemaphoreSlim InstallLock = new(1, 1);
     private static bool _browserInstalled;
 
-    public async Task<IMemoryFile> Create(HtmlInput template)
+    public async Task<IMemoryFile> Create(HtmlInput template, CancellationToken cancellationToken = default)
     {
-        await InstallLock.WaitAsync();
+        await InstallLock.WaitAsync(cancellationToken);
         try
         {
             if (!_browserInstalled)

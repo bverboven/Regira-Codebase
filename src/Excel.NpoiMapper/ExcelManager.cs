@@ -18,7 +18,12 @@ public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
     }
 
 
-    public IEnumerable<ExcelSheet> Read(IBinaryFile input, string[]? headers = null)
+    public Task<IEnumerable<ExcelSheet>> Read(IBinaryFile input, string[]? headers = null, CancellationToken cancellationToken = default)
+    {
+        var sheets = ReadInternal(input, headers).ToList();
+        return Task.FromResult<IEnumerable<ExcelSheet>>(sheets);
+    }
+    private IEnumerable<ExcelSheet> ReadInternal(IBinaryFile input, string[]? headers = null)
     {
         using var ms = input.GetStream();
         var mapper = new Mapper(ms);
@@ -33,7 +38,7 @@ public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
             };
         }
     }
-    public IMemoryFile Create(IEnumerable<ExcelSheet> sheets)
+    public Task<IMemoryFile> Create(IEnumerable<ExcelSheet> sheets, CancellationToken cancellationToken = default)
     {
         var workbook = new XSSFWorkbook();
         var mapper = new Mapper(workbook);
@@ -55,7 +60,7 @@ public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
 
         var ms = new MemoryStream();
         workbook.Write(ms, true);
-        return ms.ToMemoryFile(ContentTypes.XLSX);
+        return Task.FromResult<IMemoryFile>(ms.ToMemoryFile(ContentTypes.XLSX));
     }
 
     protected void FillSheet(ISheet sheet, IList<IDictionary<string, object?>> data)
@@ -128,7 +133,12 @@ public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
 public class ExcelManager<T> : IExcelManager<T>
     where T : class, new()
 {
-    public IEnumerable<ExcelSheet<T>> Read(IBinaryFile input, string[]? headers = null)
+    public Task<IEnumerable<ExcelSheet<T>>> Read(IBinaryFile input, string[]? headers = null, CancellationToken cancellationToken = default)
+    {
+        var sheets = ReadInternal(input, headers).ToList();
+        return Task.FromResult<IEnumerable<ExcelSheet<T>>>(sheets);
+    }
+    private IEnumerable<ExcelSheet<T>> ReadInternal(IBinaryFile input, string[]? headers = null)
     {
         using var ms = input.GetStream();
         var mapper = new Mapper(ms);
@@ -143,7 +153,7 @@ public class ExcelManager<T> : IExcelManager<T>
             };
         }
     }
-    public IMemoryFile Create(IEnumerable<ExcelSheet<T>> sheets)
+    public Task<IMemoryFile> Create(IEnumerable<ExcelSheet<T>> sheets, CancellationToken cancellationToken = default)
     {
         var ms = new MemoryStream();
         var mapper = new Mapper();
@@ -158,6 +168,6 @@ public class ExcelManager<T> : IExcelManager<T>
 #else
         mapper.Save(ms);
 #endif
-        return ms.ToMemoryFile(ContentTypes.XLSX);
+        return Task.FromResult<IMemoryFile>(ms.ToMemoryFile(ContentTypes.XLSX));
     }
 }

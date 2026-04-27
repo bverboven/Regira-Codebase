@@ -5,5 +5,5 @@ namespace Regira.Office.Barcodes.Abstractions;
 
 public interface IQRCodeWriter
 {
-    IImageFile Create(QRCodeInput input);
+    Task<IImageFile> Create(QRCodeInput input, CancellationToken cancellationToken = default);
 }

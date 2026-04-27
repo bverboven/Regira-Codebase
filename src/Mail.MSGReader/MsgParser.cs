@@ -14,12 +14,12 @@ public class MsgParser : IMessageParser
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
 
-    public IMessageObject Parse(IMemoryFile msgFile)
+    public Task<IMessageObject> Parse(IMemoryFile msgFile, CancellationToken cancellationToken = default)
     {
         using var msgStream = msgFile.GetStream();
         using var msg = new Storage.Message(msgStream);
 
-        return new MessageObject
+        return Task.FromResult<IMessageObject>(new MessageObject
         {
             From = new MailAddress { DisplayName = msg.Sender.DisplayName, Email = msg.Sender.Email },
             To = msg.Recipients
@@ -32,6 +32,6 @@ public class MsgParser : IMessageParser
                 .Cast<Storage.Attachment?>()
                 .ToAttachments()
                 .ToList()
-        };
+        });
     }
 }

@@ -5,5 +5,5 @@ namespace Regira.Office.Word.Abstractions;
 
 public interface IWordMerger
 {
-    Task<IMemoryFile> Merge(params WordTemplateInput[] inputs);
+    Task<IMemoryFile> Merge(IEnumerable<WordTemplateInput> inputs, CancellationToken cancellationToken = default);
 }

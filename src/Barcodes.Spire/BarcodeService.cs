@@ -12,29 +12,29 @@ namespace Regira.Office.Barcodes.Spire;
 
 public class BarcodeService : IBarcodeReader, IBarcodeWriter
 {
-    public BarcodeReadResult Read(IImageFile imageBytes, BarcodeFormat? format = null)
+    public Task<BarcodeReadResult?> Read(IImageFile imageBytes, BarcodeFormat? format = null, CancellationToken cancellationToken = default)
     {
         using var imgStream = imageBytes.GetStream();
         if (!format.HasValue)
         {
             var contents = BarcodeScanner.Scan(imgStream, false);
-            return new BarcodeReadResult
+            return Task.FromResult<BarcodeReadResult?>(new BarcodeReadResult
             {
                 Contents = contents
-            };
+            });
         }
 
         {
             var spireFormat = Convert(format.Value);
             var contents = BarcodeScanner.Scan(imgStream, spireFormat, false);
-            return new BarcodeReadResult
+            return Task.FromResult<BarcodeReadResult?>(new BarcodeReadResult
             {
                 Contents = contents
-            };
+            });
         }
     }
 
-    public IImageFile Create(BarcodeInput input)
+    public Task<IImageFile> Create(BarcodeInput input, CancellationToken cancellationToken = default)
     {
         var settings = new BarcodeSettings
         {
@@ -54,7 +54,7 @@ public class BarcodeService : IBarcodeReader, IBarcodeWriter
         var height = input.Size.Height;
         using var resizedImg = GdiUtility.ResizeFixed(image, new Size(width, height));
 #pragma warning disable CA1416
-        return resizedImg.ToImageFile(ImageFormat.Jpeg);
+        return Task.FromResult<IImageFile>(resizedImg.ToImageFile(ImageFormat.Jpeg));
 #pragma warning restore CA1416
     }
 

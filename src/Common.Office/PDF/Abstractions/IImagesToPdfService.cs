@@ -5,5 +5,5 @@ namespace Regira.Office.PDF.Abstractions;
 
 public interface IImagesToPdfService
 {
-    IMemoryFile? ImagesToPdf(ImagesInput input);
+    Task<IMemoryFile?> ImagesToPdf(ImagesInput input, CancellationToken cancellationToken = default);
 }

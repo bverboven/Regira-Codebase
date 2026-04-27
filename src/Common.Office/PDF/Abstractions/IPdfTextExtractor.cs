@@ -4,5 +4,5 @@ namespace Regira.Office.PDF.Abstractions;
 
 public interface IPdfTextExtractor
 {
-    string GetText(IMemoryFile pdf);
+    Task<string> GetText(IMemoryFile pdf, CancellationToken cancellationToken = default);
 }

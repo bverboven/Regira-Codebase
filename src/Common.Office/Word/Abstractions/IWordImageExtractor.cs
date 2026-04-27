@@ -4,5 +4,5 @@ namespace Regira.Office.Word.Abstractions;
 
 public interface IWordImageExtractor
 {
-    IEnumerable<WordImage> GetImages(WordTemplateInput input);
+    Task<IEnumerable<WordImage>> GetImages(WordTemplateInput input, CancellationToken cancellationToken = default);
 }
