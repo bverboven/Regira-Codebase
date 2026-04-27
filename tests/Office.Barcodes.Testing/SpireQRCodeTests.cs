@@ -26,10 +26,10 @@ public class SpireQRCodeTests() : QRCodeTestsBase(new QRCodeService(), "Spire")
     }
 
     [Test]
-    public override void TooLong_Expect_InputException()
+    public override async Task TooLong_Expect_InputException()
     {
         Assert.Ignore("Not supported");
-        //base.TooLong_Expect_InputException();
+        //await base.TooLong_Expect_InputException();
     }
 
     [TestCase("britannica.jpg", "http://itunes.apple.com/us/app/encyclopaedia-britannica/id447919187?mt=8")]
@@ -37,17 +37,17 @@ public class SpireQRCodeTests() : QRCodeTestsBase(new QRCodeService(), "Spire")
     [TestCase("wikipedia.png", "http://en.m.wikipedia.org")]
     [TestCase("wikipedia-picture.jpg", "http://en.m.wikipedia.org")]
     [TestCase("collection-picture.jpg", "http://itunes.apple.com/us/app/encyclopaedia-britannica/id447919187?mt=8\r\nhttp://en.m.wikipedia.org\r\nhttps://www.cyberciti.biz/")]
-    public override void Read_QRCode(string inputImg, string expectedContent)
+    public override async Task Read_QRCode(string inputImg, string expectedContent)
     {
         Assert.Ignore("Not supported in free version");
-        base.Read_QRCode(inputImg, expectedContent);
+        await base.Read_QRCode(inputImg, expectedContent);
     }
 
     [Test]
     public override Task Create_And_Read_QRCode()
     {
         Assert.Ignore("Not supported in free version");
-        //base.Create_And_Read_QRCode();
+        //return base.Create_And_Read_QRCode();
         return Task.CompletedTask;
     }
 }

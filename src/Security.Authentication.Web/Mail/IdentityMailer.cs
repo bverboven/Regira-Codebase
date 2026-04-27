@@ -15,6 +15,6 @@ public class IdentityMailer(IMailer mailer, IdentityMailerOptions options) : IEm
             Subject = subject,
             Body = htmlMessage
         };
-        return mailer.Send(msg);
+        return mailer.Send(msg, CancellationToken.None);
     }
 }

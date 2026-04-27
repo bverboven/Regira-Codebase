@@ -6,6 +6,6 @@ namespace Regira.Office.Word.Abstractions;
 
 public interface IWordConverter
 {
-    Task<IMemoryFile> Convert(WordTemplateInput input, FileFormat format);
-    Task<IMemoryFile> Convert(WordTemplateInput input, ConversionOptions options);
+    Task<IMemoryFile> Convert(WordTemplateInput input, FileFormat format, CancellationToken cancellationToken = default);
+    Task<IMemoryFile> Convert(WordTemplateInput input, ConversionOptions options, CancellationToken cancellationToken = default);
 }

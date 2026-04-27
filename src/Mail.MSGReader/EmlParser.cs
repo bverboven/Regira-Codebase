@@ -8,7 +8,7 @@ namespace Regira.Office.Mail.MSGReader;
 
 public class EmlParser : IMessageParser
 {
-    public IMessageObject Parse(IMemoryFile emlFile)
+    public Task<IMessageObject> Parse(IMemoryFile emlFile, CancellationToken cancellationToken = default)
     {
         using var emlStream = emlFile.GetStream();
         var eml = new MsgReader.Mime.Message(emlStream);
@@ -16,7 +16,7 @@ public class EmlParser : IMessageParser
         var bodyEncoding = eml.HtmlBody?.BodyEncoding ?? eml.TextBody?.BodyEncoding ?? Encoding.UTF8;
         var bodyBytes = eml.HtmlBody?.Body ?? eml.TextBody?.Body;
 
-        return new MessageObject
+        return Task.FromResult<IMessageObject>(new MessageObject
         {
             From = eml.Headers.From.ToRecipient(),
             To = eml.Headers.To.ToRecipients()
@@ -28,6 +28,6 @@ public class EmlParser : IMessageParser
             Body = bodyBytes != null ? bodyEncoding.GetString(bodyBytes) : null,
             IsHtml = eml.HtmlBody?.Body?.Any() ?? false,
             Attachments = eml.Attachments.ToFiles().ToList()
-        };
+        });
     }
 }

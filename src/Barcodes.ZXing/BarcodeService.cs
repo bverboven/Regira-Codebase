@@ -16,7 +16,7 @@ namespace Regira.Office.Barcodes.ZXing;
 
 public class BarcodeService : IBarcodeService
 {
-    public BarcodeReadResult? Read(IImageFile barcode, BarcodeFormat? format = null)
+    public Task<BarcodeReadResult?> Read(IImageFile barcode, BarcodeFormat? format = null, CancellationToken cancellationToken = default)
     {
         var possibleFormats = format.HasValue ? new[] { Convert(format.Value) } : null;
         var reader = new BarcodeReader()
@@ -36,11 +36,11 @@ public class BarcodeService : IBarcodeService
 
         if (result?.Text != null)
         {
-            return new BarcodeReadResult
+            return Task.FromResult<BarcodeReadResult?>(new BarcodeReadResult
             {
                 Format = Convert(result.BarcodeFormat),
                 Contents = [content!]
-            };
+            });
         }
 
         // try again (with a performance penalty)
@@ -59,16 +59,16 @@ public class BarcodeService : IBarcodeService
         if (result != null)
         {
             content = result.Text;
-            return new BarcodeReadResult
+            return Task.FromResult<BarcodeReadResult?>(new BarcodeReadResult
             {
                 Format = Convert(result.BarcodeFormat),
                 Contents = [content]
-            };
+            });
         }
 
-        return null;
+        return Task.FromResult<BarcodeReadResult?>(null);
     }
-    public IImageFile Create(BarcodeInput input)
+    public Task<IImageFile> Create(BarcodeInput input, CancellationToken cancellationToken = default)
     {
         var writer = new BarcodeWriter<SKBitmap>
         {
@@ -96,7 +96,7 @@ public class BarcodeService : IBarcodeService
                 ? SkiaUtility.ResizeFixed(img, input.Size.ToSkiaSize())
                 : img;
 
-            return resizedImg.ToImageFile(SKEncodedImageFormat.Jpeg);
+            return Task.FromResult<IImageFile>(resizedImg.ToImageFile(SKEncodedImageFormat.Jpeg));
         }
         catch (Exception ex)
         {

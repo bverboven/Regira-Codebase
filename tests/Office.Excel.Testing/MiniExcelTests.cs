@@ -18,13 +18,13 @@ public class MiniExcelTests
     public Task Compare_DictionaryCollection_Input_With_Output() => CreateExcelManager()
         .Run_Compare_DictionaryCollection_Input_With_Output();
     [Test]
-    public void Compare_UnTyped_Input_With_Output() => CreateExcelManager()
+    public Task Compare_UnTyped_Input_With_Output() => CreateExcelManager()
         .Run_Compare_UnTyped_Input_With_Output();
     [Test]
-    public void Compare_Typed_Input_With_Output() => CreateExcelManager()
+    public Task Compare_Typed_Input_With_Output() => CreateExcelManager()
         .Run_Compare_Typed_Input_With_Output();
     [Test]
-    public void Read_With_Duplicate_Headers() => CreateExcelManager()
+    public Task Read_With_Duplicate_Headers() => CreateExcelManager()
         .Run_Read_With_Duplicate_Headers();
     [Test]
     public Task Export_Countries_As_Dictionary() => CreateExcelManager()

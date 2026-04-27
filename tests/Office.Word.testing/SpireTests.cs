@@ -467,7 +467,7 @@ public class SpireTests
             Template = inputFile
         };
         var mgr = new WordManager();
-        var images = mgr.ToImages(input).ToArray();
+        var images = (await mgr.ToImages(input)).ToArray();
 
         for (var i = 0; i < images.Length; i++)
         {

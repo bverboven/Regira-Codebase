@@ -8,7 +8,7 @@ namespace Regira.Office.Mail.Services;
 /// </summary>
 public class DummyMailer : MailerBase
 {
-    protected override Task<IMailResponse> OnSend(IMessageObject message)
+    protected override Task<IMailResponse> OnSend(IMessageObject message, CancellationToken cancellationToken = default)
     {
         return Task.FromResult((IMailResponse)new MailResponse());
     }

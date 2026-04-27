@@ -22,12 +22,12 @@ public class MsgReaderTests
 
 
     [Test]
-    public void Parse_MSG()
+    public async Task Parse_MSG()
     {
         var msgPath = Path.Combine(_assets, "sample.msg");
         using var msgFile = new BinaryFileItem(msgPath);
         var parser = new MsgParser();
-        var msgObj = parser.Parse(msgFile.GetBytes()!.ToMemoryFile());
+        var msgObj = await parser.Parse(msgFile.GetBytes()!.ToMemoryFile());
 
         Assert.That(msgObj.From!.Email, Is.EqualTo(_sampleMessageObject.From!.Email));
         Assert.That(string.IsNullOrWhiteSpace(msgObj.From!.DisplayName), Is.True);
@@ -42,12 +42,12 @@ public class MsgReaderTests
         }
     }
     [Test]
-    public void Parse_EML()
+    public async Task Parse_EML()
     {
         var emlPath = Path.Combine(_assets, "sample.eml");
         using var emlFile = new BinaryFileItem(emlPath);
         var parser = new EmlParser();
-        var msgObj = parser.Parse(emlFile.GetBytes()!.ToMemoryFile());
+        var msgObj = await parser.Parse(emlFile.GetBytes()!.ToMemoryFile());
 
         Assert.That(msgObj.From!.Email, Is.EqualTo(_sampleMessageObject.From!.Email));
         //Assert.That(string.IsNullOrWhiteSpace(msgObj.From!.DisplayName), Is.True);

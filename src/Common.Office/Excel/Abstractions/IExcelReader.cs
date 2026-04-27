@@ -4,10 +4,10 @@ namespace Regira.Office.Excel.Abstractions;
 
 public interface IExcelReader
 {
-    IEnumerable<ExcelSheet> Read(IBinaryFile input, string[]? headers = null);
+    Task<IEnumerable<ExcelSheet>> Read(IBinaryFile input, string[]? headers = null, CancellationToken cancellationToken = default);
 }
 public interface IExcelReader<T>
     where T : class
 {
-    IEnumerable<ExcelSheet<T>> Read(IBinaryFile input, string[]? headers = null);
+    Task<IEnumerable<ExcelSheet<T>>> Read(IBinaryFile input, string[]? headers = null, CancellationToken cancellationToken = default);
 }

@@ -10,9 +10,10 @@ public class PdfImageCreator(IPdfToImageService service, IPdfSplitter splitter) 
     public override IImageFile? Create(PdfToImageLayerOptions input)
     {
         var page = input.Page ?? 1;
-        var singlePagePdf= splitter.GetPageCount(input.File)>1
-            ? splitter.Split(input.File, [new PdfSplitRange { Start = page, End = page }]).Single()
+        var pageCount = splitter.GetPageCount(input.File).GetAwaiter().GetResult();
+        var singlePagePdf = pageCount > 1
+            ? splitter.Split(input.File, [new PdfSplitRange { Start = page, End = page }]).GetAwaiter().GetResult().Single()
             : input.File;
-        return service.ToImages(singlePagePdf, input.ToPdfToImageOptions()).SingleOrDefault();
+        return service.ToImages(singlePagePdf, input.ToPdfToImageOptions()).GetAwaiter().GetResult().SingleOrDefault();
     }
 }

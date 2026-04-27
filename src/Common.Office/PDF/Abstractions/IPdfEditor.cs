@@ -4,5 +4,5 @@ namespace Regira.Office.PDF.Abstractions;
 
 public interface IPdfEditor : IPdfMerger, IPdfSplitter
 {
-    IMemoryFile? RemovePages(IMemoryFile pdf, IEnumerable<int> pages);
+    Task<IMemoryFile?> RemovePages(IMemoryFile pdf, IEnumerable<int> pages, CancellationToken cancellationToken = default);
 }

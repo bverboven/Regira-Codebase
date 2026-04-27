@@ -16,14 +16,15 @@ namespace Regira.Office.PDF.Spire;
 
 public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfTextExtractor
 {
-    public int GetPageCount(IMemoryFile pdfStream)
+    public Task<int> GetPageCount(IMemoryFile pdfStream, CancellationToken cancellationToken = default)
     {
         using var doc = new PdfDocument(pdfStream.GetStream());
-        return doc.Pages.Count;
+        return Task.FromResult(doc.Pages.Count);
     }
 
-    public IEnumerable<IMemoryFile> Split(IMemoryFile pdf, IEnumerable<PdfSplitRange> ranges)
+    public Task<IEnumerable<IMemoryFile>> Split(IMemoryFile pdf, IEnumerable<PdfSplitRange> ranges, CancellationToken cancellationToken = default)
     {
+        var result = new List<IMemoryFile>();
         using var doc = new PdfDocument(pdf.GetStream());
         foreach (var range in ranges)
         {
@@ -34,8 +35,9 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
                 doc.Pages[i].CreateTemplate().Draw(page, new PointF(0, 0));
             }
 
-            yield return ToMemoryFile(split);
+            result.Add(ToMemoryFile(split));
         }
+        return Task.FromResult<IEnumerable<IMemoryFile>>(result);
     }
 
     public IMemoryFile Merge(IEnumerable<string> pdfPaths)
@@ -45,7 +47,7 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
         merged.Save(ms);
         return ms.ToMemoryFile(ContentTypes.PDF);
     }
-    public IMemoryFile Merge(IEnumerable<IMemoryFile> items)
+    public Task<IMemoryFile?> Merge(IEnumerable<IMemoryFile> items, CancellationToken cancellationToken = default)
     {
         var merged = new PdfDocument();
         foreach (var pdfStream in items)
@@ -57,10 +59,10 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
             }
         }
 
-        return ToMemoryFile(merged);
+        return Task.FromResult<IMemoryFile?>(ToMemoryFile(merged));
     }
 
-    public string GetText(IMemoryFile pdf)
+    public Task<string> GetText(IMemoryFile pdf, CancellationToken cancellationToken = default)
     {
         var doc = new PdfDocument(pdf.GetStream());
         var text = new StringBuilder(doc.Pages.Count);
@@ -71,10 +73,11 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
             text.Append(content);
         }
 
-        return text.ToString();
+        return Task.FromResult(text.ToString());
     }
-    public IEnumerable<IImageFile> ToImages(IMemoryFile pdf, PdfToImagesOptions? options = null)
+    public Task<IEnumerable<IImageFile>> ToImages(IMemoryFile pdf, PdfToImagesOptions? options = null, CancellationToken cancellationToken = default)
     {
+        var images = new List<IImageFile>();
         using var doc = new PdfDocument(pdf.GetStream());
         var pageCount = doc.Pages.Count;
         for (var i = 0; i < pageCount; i++)
@@ -84,14 +87,15 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
             if (options?.Size.HasValue == true)
             {
                 using var resized = GdiUtility.Resize(image, options.Size.Value.ToGdiSize());
-                yield return resized.ToImageFile(ImageFormat.Jpeg);
+                images.Add(resized.ToImageFile(ImageFormat.Jpeg));
             }
             else
             {
-                yield return image.ToImageFile(ImageFormat.Jpeg);
+                images.Add(image.ToImageFile(ImageFormat.Jpeg));
             }
 #pragma warning restore CA1416
         }
+        return Task.FromResult<IEnumerable<IImageFile>>(images);
     }
     
     public IMemoryFile ToMemoryFile(PdfDocument doc)

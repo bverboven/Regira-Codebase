@@ -17,7 +17,12 @@ public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
     }
 
 
-    public IEnumerable<ExcelSheet> Read(IBinaryFile input, string[]? headers = null)
+    public Task<IEnumerable<ExcelSheet>> Read(IBinaryFile input, string[]? headers = null, CancellationToken cancellationToken = default)
+    {
+        var sheets = ReadCore(input, headers).ToList();
+        return Task.FromResult<IEnumerable<ExcelSheet>>(sheets);
+    }
+    private IEnumerable<ExcelSheet> ReadCore(IBinaryFile input, string[]? headers = null)
     {
         using var ms = input.GetStream();
         var sheetNames = ms.GetSheetNames();
@@ -58,7 +63,7 @@ public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
         }
     }
 
-    public IMemoryFile Create(IEnumerable<ExcelSheet> sheets)
+    public Task<IMemoryFile> Create(IEnumerable<ExcelSheet> sheets, CancellationToken cancellationToken = default)
     {
         var ms = new MemoryStream();
         var sheetIndex = 0;
@@ -94,14 +99,19 @@ public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
         };
         ms.SaveAs(miniSheets, configuration: config);
 
-        return ms.ToMemoryFile(ContentTypes.XLSX);
+        return Task.FromResult<IMemoryFile>(ms.ToMemoryFile(ContentTypes.XLSX));
     }
 }
 
 public class ExcelManager<T> : IExcelManager<T>
     where T : class, new()
 {
-    public IEnumerable<ExcelSheet<T>> Read(IBinaryFile input, string[]? headers = null)
+    public Task<IEnumerable<ExcelSheet<T>>> Read(IBinaryFile input, string[]? headers = null, CancellationToken cancellationToken = default)
+    {
+        var sheets = ReadCore(input, headers).ToList();
+        return Task.FromResult<IEnumerable<ExcelSheet<T>>>(sheets);
+    }
+    private IEnumerable<ExcelSheet<T>> ReadCore(IBinaryFile input, string[]? headers = null)
     {
         using var ms = input.GetStream();
         var sheetNames = ms.GetSheetNames();
@@ -116,7 +126,7 @@ public class ExcelManager<T> : IExcelManager<T>
             };
         }
     }
-    public IMemoryFile Create(IEnumerable<ExcelSheet<T>> sheets)
+    public Task<IMemoryFile> Create(IEnumerable<ExcelSheet<T>> sheets, CancellationToken cancellationToken = default)
     {
         var ms = new MemoryStream();
         var sheetIndex = 0;
@@ -129,6 +139,6 @@ public class ExcelManager<T> : IExcelManager<T>
 
         ms.SaveAs(miniSheets);
 
-        return ms.ToMemoryFile(ContentTypes.XLSX);
+        return Task.FromResult<IMemoryFile>(ms.ToMemoryFile(ContentTypes.XLSX));
     }
 }

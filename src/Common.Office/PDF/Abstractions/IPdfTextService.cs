@@ -4,6 +4,6 @@ namespace Regira.Office.PDF.Abstractions;
 
 public interface IPdfTextService : IPdfTextExtractor
 {
-    IList<string> GetTextPerPage(IMemoryFile pdf);
-    IMemoryFile? RemoveEmptyPages(IMemoryFile pdf);
+    Task<IList<string>> GetTextPerPage(IMemoryFile pdf, CancellationToken cancellationToken = default);
+    Task<IMemoryFile?> RemoveEmptyPages(IMemoryFile pdf, CancellationToken cancellationToken = default);
 }

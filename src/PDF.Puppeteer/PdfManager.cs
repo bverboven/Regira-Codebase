@@ -10,9 +10,9 @@ public class PdfManager : IHtmlToPdfService
 {
     private static readonly SemaphoreSlim DownloadLock = new(1, 1);
 
-    public async Task<IMemoryFile> Create(HtmlInput template)
+    public async Task<IMemoryFile> Create(HtmlInput template, CancellationToken cancellationToken = default)
     {
-        await DownloadLock.WaitAsync();
+        await DownloadLock.WaitAsync(cancellationToken);
         try
         {
             await new BrowserFetcher().DownloadAsync();

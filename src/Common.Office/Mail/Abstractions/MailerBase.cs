@@ -8,7 +8,7 @@ namespace Regira.Office.Mail.Abstractions;
 
 public abstract class MailerBase : IMailer
 {
-    public virtual Task<IMailResponse> Send(IMailAddress sender, IEnumerable<IMailRecipient> recipients, string? subject, string? message, bool isHtml = true, IEnumerable<INamedFile>? attachments = null)
+    public virtual Task<IMailResponse> Send(IMailAddress sender, IEnumerable<IMailRecipient> recipients, string? subject, string? message, bool isHtml = true, IEnumerable<INamedFile>? attachments = null, CancellationToken cancellationToken = default)
     {
         return Send(new MessageObject
         {
@@ -18,9 +18,9 @@ public abstract class MailerBase : IMailer
             Body = message,
             IsHtml = isHtml,
             Attachments = attachments?.ToFiles().ToList()
-        });
+        }, cancellationToken);
     }
-    public virtual Task<IMailResponse> Send(IMessageObject message)
+    public virtual Task<IMailResponse> Send(IMessageObject message, CancellationToken cancellationToken = default)
     {
         // Make sure attachments have bytes or a stream 
         if (message.Attachments is { Count: > 0 })
@@ -37,8 +37,8 @@ public abstract class MailerBase : IMailer
             }
         }
 
-        return OnSend(message);
+        return OnSend(message, cancellationToken);
     }
 
-    protected abstract Task<IMailResponse> OnSend(IMessageObject message);
+    protected abstract Task<IMailResponse> OnSend(IMessageObject message, CancellationToken cancellationToken = default);
 }

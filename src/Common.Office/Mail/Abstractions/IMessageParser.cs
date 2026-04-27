@@ -4,5 +4,5 @@ namespace Regira.Office.Mail.Abstractions;
 
 public interface IMessageParser
 {
-    public IMessageObject Parse(IMemoryFile file);
+    public Task<IMessageObject> Parse(IMemoryFile file, CancellationToken cancellationToken = default);
 }

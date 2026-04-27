@@ -8,5 +8,5 @@ namespace Regira.Office.Word.Abstractions;
 /// </summary>
 public interface IWordToImagesService
 {
-    IEnumerable<IImageFile> ToImages(WordTemplateInput input);
+    Task<IEnumerable<IImageFile>> ToImages(WordTemplateInput input, CancellationToken cancellationToken = default);
 }

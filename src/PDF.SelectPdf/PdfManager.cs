@@ -10,7 +10,7 @@ namespace Regira.Office.PDF.SelectPdf;
 
 public class PdfManager : IHtmlToPdfService
 {
-    public Task<IMemoryFile> Create(HtmlInput template)
+    public Task<IMemoryFile> Create(HtmlInput template, CancellationToken cancellationToken = default)
     {
         var doc = GetPdfDocument(template);
         var ms = new MemoryStream();

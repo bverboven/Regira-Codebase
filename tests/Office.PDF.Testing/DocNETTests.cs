@@ -49,7 +49,7 @@ Simple PDF File 2
  paint dry. And more text. And more text. And more text. And more text. 
  Boring. More, a little more text. The end, and just as well.";
         await using var pdfStream = File.OpenRead(Path.Combine(_inputDir, "sample.pdf"));
-        var pdfText = _pdfService.GetText(pdfStream.ToBinaryFile());
+        var pdfText = await _pdfService.GetText(pdfStream.ToBinaryFile());
         Assert.That(pdfText, Is.EqualTo(expectedText));
     }
 
@@ -62,8 +62,9 @@ Simple PDF File 2
 
         using var merged = _pdfService.Merge(inputDocs);
 
-        var inputPageCount = inputDocs.Select(doc => _pdfService.GetPageCount(File.ReadAllBytes(doc).ToBinaryFile())).Sum();
-        var mergedPageCount = _pdfService.GetPageCount(merged.ToBinaryFile());
+        var inputPageCounts = await Task.WhenAll(inputDocs.Select(doc => _pdfService.GetPageCount(File.ReadAllBytes(doc).ToBinaryFile())));
+        var inputPageCount = inputPageCounts.Sum();
+        var mergedPageCount = await _pdfService.GetPageCount(merged.ToBinaryFile());
 
         Assert.That(mergedPageCount, Is.EqualTo(inputPageCount));
 
@@ -77,10 +78,11 @@ Simple PDF File 2
             .Select(i => File.OpenRead(Path.Combine(_inputDir, $"lorem-ipsum{i}.pdf")).ToBinaryFile())
             .ToArray();
 
-        using var merged = _pdfService.Merge(inputStreams)!;
+        using var merged = (await _pdfService.Merge(inputStreams))!;
 
-        var inputPageCount = inputStreams.Select(doc => _pdfService.GetPageCount(doc)).Sum();
-        var mergedPageCount = _pdfService.GetPageCount(merged.ToBinaryFile());
+        var inputPageCounts = await Task.WhenAll(inputStreams.Select(doc => _pdfService.GetPageCount(doc)));
+        var inputPageCount = inputPageCounts.Sum();
+        var mergedPageCount = await _pdfService.GetPageCount(merged.ToBinaryFile());
 
         Assert.That(mergedPageCount, Is.EqualTo(inputPageCount));
 
@@ -103,9 +105,9 @@ Simple PDF File 2
     public async Task Remove_Empty_Pages()
     {
         var bf = (await FileSystemUtility.Parse(Path.Combine(_inputDir, "has-empty-pages.pdf")))!;
-        var textsWithEmptyPages = _pdfService.GetTextPerPage(bf);
-        using var resultPdf = _pdfService.RemoveEmptyPages(bf);
-        var texts = _pdfService.GetTextPerPage(resultPdf!.ToBinaryFile());
+        var textsWithEmptyPages = await _pdfService.GetTextPerPage(bf);
+        using var resultPdf = await _pdfService.RemoveEmptyPages(bf);
+        var texts = await _pdfService.GetTextPerPage(resultPdf!.ToBinaryFile());
         Assert.That(texts, Is.Not.Empty);
         Assert.That(textsWithEmptyPages.Where(string.IsNullOrWhiteSpace), Is.Not.Empty);
         ClassicAssert.IsEmpty(texts.Where(string.IsNullOrWhiteSpace));
@@ -125,7 +127,7 @@ Simple PDF File 2
         );
 
         var input = new ImagesInput { Images = images };
-        using var pdf = _pdfService.ImagesToPdf(input);
+        using var pdf = await _pdfService.ImagesToPdf(input);
 
         var outputPath = Path.Combine(_outputDir, "jpg-images.pdf");
         await FileSystemUtility.SaveStream(outputPath, pdf.GetStream()!);
@@ -139,7 +141,7 @@ Simple PDF File 2
         );
 
         var input = new ImagesInput { Images = images };
-        using var pdf = _pdfService.ImagesToPdf(input);
+        using var pdf = await _pdfService.ImagesToPdf(input);
 
         var outputPath = Path.Combine(_outputDir, "png-images.pdf");
         await FileSystemUtility.SaveStream(outputPath, pdf.GetStream()!);

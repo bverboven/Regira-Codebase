@@ -31,9 +31,9 @@ public class ZXingBarcodeTests() : BarcodeTestsBase(new BarcodeService(), new Ba
     }
 
     [Test]
-    public override void TooLong_Expect_InputException()
+    public override async Task TooLong_Expect_InputException()
     {
-        base.TooLong_Expect_InputException();
+        await base.TooLong_Expect_InputException();
     }
 
     [TestCase("Code39.png", "123456")]
@@ -41,15 +41,14 @@ public class ZXingBarcodeTests() : BarcodeTestsBase(new BarcodeService(), new Ba
     [TestCase("Code93.jpg", "CODE93")]
     [TestCase("Code128.png", "1234567890")]
     [TestCase("Datamatrix.png", "This is a DataMatrix test")]
-    public override void Read_Barcode(string inputImg, string expectedContent)
+    public override async Task Read_Barcode(string inputImg, string expectedContent)
     {
-        base.Read_Barcode(inputImg, expectedContent);
+        await base.Read_Barcode(inputImg, expectedContent);
     }
 
     [Test]
     public override Task Create_And_Read_Barcode()
     {
-        base.Create_And_Read_Barcode();
-        return Task.CompletedTask;
+        return base.Create_And_Read_Barcode();
     }
 }

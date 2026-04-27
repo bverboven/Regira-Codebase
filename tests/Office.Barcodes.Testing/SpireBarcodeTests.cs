@@ -42,15 +42,14 @@ public class SpireBarcodeTests() : BarcodeTestsBase(new BarcodeService(), new Ba
     [TestCase("Code128.png", "1234567890")]
     //Not supported in free version:
     //[TestCase("Datamatrix.png", "This is a DataMatrix test")]
-    public override void Read_Barcode(string inputImg, string expectedContent)
+    public override async Task Read_Barcode(string inputImg, string expectedContent)
     {
-        base.Read_Barcode(inputImg, expectedContent);
+        await base.Read_Barcode(inputImg, expectedContent);
     }
 
     [Test]
     public override Task Create_And_Read_Barcode()
     {
-        base.Create_And_Read_Barcode();
-        return Task.CompletedTask;
+        return base.Create_And_Read_Barcode();
     }
 }

@@ -4,10 +4,10 @@ namespace Regira.Office.Excel.Abstractions;
 
 public interface IExcelWriter
 {
-    IMemoryFile Create(IEnumerable<ExcelSheet> sheets);
+    Task<IMemoryFile> Create(IEnumerable<ExcelSheet> sheets, CancellationToken cancellationToken = default);
 }
 public interface IExcelWriter<T>
     where T : class
 {
-    IMemoryFile Create(IEnumerable<ExcelSheet<T>> sheets);
+    Task<IMemoryFile> Create(IEnumerable<ExcelSheet<T>> sheets, CancellationToken cancellationToken = default);
 }

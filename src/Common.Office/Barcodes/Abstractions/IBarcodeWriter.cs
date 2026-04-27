@@ -5,5 +5,5 @@ namespace Regira.Office.Barcodes.Abstractions;
 
 public interface IBarcodeWriter
 {
-    IImageFile Create(BarcodeInput input);
+    Task<IImageFile> Create(BarcodeInput input, CancellationToken cancellationToken = default);
 }

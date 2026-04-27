@@ -30,7 +30,12 @@ public class ExcelManager : IExcelManager
     }
 
 
-    public IEnumerable<ExcelSheet> Read(IBinaryFile input, string[]? headers = null)
+    public Task<IEnumerable<ExcelSheet>> Read(IBinaryFile input, string[]? headers = null, CancellationToken cancellationToken = default)
+    {
+        var sheets = ReadCore(input, headers).ToList();
+        return Task.FromResult<IEnumerable<ExcelSheet>>(sheets);
+    }
+    private IEnumerable<ExcelSheet> ReadCore(IBinaryFile input, string[]? headers = null)
     {
         var headersOnFirstRow = headers == null;
         using var stream = input.GetStream();
@@ -64,7 +69,7 @@ public class ExcelManager : IExcelManager
 
     public IMemoryFile Create(ExcelSheet sheet)
     {
-        return Create([sheet]);
+        return Create([sheet], CancellationToken.None).GetAwaiter().GetResult();
     }
     public IMemoryFile Create(DataSet dataSet)
     {
@@ -97,7 +102,7 @@ public class ExcelManager : IExcelManager
         ms.Position = 0;
         return ms.ToMemoryFile(ContentTypes.XLSX);
     }
-    public IMemoryFile Create(IEnumerable<ExcelSheet> sheets)
+    public Task<IMemoryFile> Create(IEnumerable<ExcelSheet> sheets, CancellationToken cancellationToken = default)
     {
         using var package = new ExcelPackage();
         var i = 1;
@@ -120,7 +125,7 @@ public class ExcelManager : IExcelManager
         package.Stream.Position = 0;
         package.Stream.CopyTo(ms);
         ms.Position = 0;
-        return ms.ToMemoryFile(ContentTypes.XLSX);
+        return Task.FromResult<IMemoryFile>(ms.ToMemoryFile(ContentTypes.XLSX));
     }
 
     protected void FillSheet(ExcelWorksheet sheet, IList<IDictionary<string, object?>> data)

@@ -8,7 +8,7 @@ public class WordImageCreator(IWordToImagesService service) : ImageCreatorBase<W
 {
     public override IImageFile? Create(WordToImageLayerOptions input)
     {
-        return service.ToImages(input.ToWordTemplateInput())
+        return service.ToImages(input.ToWordTemplateInput()).GetAwaiter().GetResult()
             .Skip((input.Page ?? 1) - 1)
             .FirstOrDefault();
     }

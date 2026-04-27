@@ -69,12 +69,12 @@ public class CsvManager(CsvHelperOptions? options = null) : CsvManager<IDictiona
 }
 public class CsvManager<T>(CsvHelperOptions? defaultOptions = null) : ICsvManager<T>
 {
-    public async Task<List<T>> Read(string input, CsvOptions? options = null)
+    public async Task<List<T>> Read(string input, CsvOptions? options = null, CancellationToken cancellationToken = default)
     {
         using var sr = new StringReader(input);
         return await Read(sr, options);
     }
-    public async Task<List<T>> Read(IBinaryFile input, CsvOptions? options = null)
+    public async Task<List<T>> Read(IBinaryFile input, CsvOptions? options = null, CancellationToken cancellationToken = default)
     {
         using var ms = input.GetStream() ?? throw new Exception("Could not get contents of file");
         using var sr = new StreamReader(ms);
@@ -89,7 +89,7 @@ public class CsvManager<T>(CsvHelperOptions? defaultOptions = null) : ICsvManage
     }
 
 
-    public async Task<string> Write(IEnumerable<T> items, CsvOptions? options = null)
+    public async Task<string> Write(IEnumerable<T> items, CsvOptions? options = null, CancellationToken cancellationToken = default)
     {
 #if NETSTANDARD2_0
         using var sw = new StringWriter();
@@ -99,7 +99,7 @@ public class CsvManager<T>(CsvHelperOptions? defaultOptions = null) : ICsvManage
         await Write(sw, items, options);
         return sw.ToString();
     }
-    public async Task<IMemoryFile> WriteFile(IEnumerable<T> items, CsvOptions? options = null)
+    public async Task<IMemoryFile> WriteFile(IEnumerable<T> items, CsvOptions? options = null, CancellationToken cancellationToken = default)
     {
         // create a MemoryStream to avoid error "Cannot access a closed Stream"
         var ms = new MemoryStream();

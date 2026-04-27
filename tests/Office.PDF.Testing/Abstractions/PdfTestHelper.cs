@@ -25,18 +25,18 @@ public static class PdfTestHelper
 
         var pdfPath = Path.Combine(InputDir, inputFileName);
         await using var pdfStream = File.OpenRead(pdfPath);
-        var pageCount = pdfSplitter.GetPageCount(pdfStream.ToBinaryFile());
+        var pageCount = await pdfSplitter.GetPageCount(pdfStream.ToBinaryFile());
         var ranges = new PdfSplitRange[]
         {
             new() { Start = 1, End = (int)Math.Floor(pageCount / 2d) },
             new() { Start = (int)Math.Ceiling(pageCount / 2d) + 1, End = pageCount - 1 }
         };
-        var splidPdfs = pdfSplitter.Split(pdfStream.ToBinaryFile(), ranges).ToArray();
+        var splidPdfs = (await pdfSplitter.Split(pdfStream.ToBinaryFile(), ranges)).ToArray();
         Assert.That(splidPdfs.Length, Is.EqualTo(ranges.Length));
         for (var i = 0; i < splidPdfs.Length; i++)
         {
             var splitPdf = splidPdfs[i];
-            var splitPageCount = pdfSplitter.GetPageCount(splitPdf.ToBinaryFile());
+            var splitPageCount = await pdfSplitter.GetPageCount(splitPdf.ToBinaryFile());
             Assert.That(splitPageCount, Is.EqualTo(ranges[i].End - ranges[i].Start + 1));
             await FileSystemUtility.SaveStream(Path.Combine(outputDir, $"split-{i + 1}.pdf"), splitPdf.GetStream()!);
         }
@@ -54,7 +54,7 @@ public static class PdfTestHelper
 
         var pdfPath = Path.Combine(inputDir, inputFileName);
         await using var pdfStream = File.OpenRead(pdfPath);
-        var pageCount = pdfSplitter.GetPageCount(pdfStream.ToBinaryFile());
+        var pageCount = await pdfSplitter.GetPageCount(pdfStream.ToBinaryFile());
         var ranges = new PdfSplitRange[]
             {
                 new() { Start = 2, End = 4 },
@@ -66,13 +66,13 @@ public static class PdfTestHelper
             }
             .Where(r => r.Start < pageCount && (r.End ?? 0) <= pageCount)
             .ToArray();
-        var splidPdfs = pdfSplitter.Split(pdfStream.ToBinaryFile(), ranges)
+        var splidPdfs = (await pdfSplitter.Split(pdfStream.ToBinaryFile(), ranges))
             .Select(x => x.ToBinaryFile())
             .ToArray();
 
-        using var merged = pdfMerger.Merge(splidPdfs)!;
+        using var merged = await pdfMerger.Merge(splidPdfs);
         var expectedPageCount = ranges.Sum(r => (r.End ?? pageCount) - r.Start + 1);
-        var mergedPageCount = pdfSplitter.GetPageCount(merged.ToBinaryFile());
+        var mergedPageCount = await pdfSplitter.GetPageCount(merged.ToBinaryFile());
 
         await FileSystemUtility.SaveStream(Path.Combine(outputDir, "split-merged.pdf"), merged.GetStream()!);
         Assert.That(mergedPageCount, Is.EqualTo(expectedPageCount));
@@ -89,7 +89,7 @@ public static class PdfTestHelper
         var pdfPath = Path.Combine(inputDir, inputFileName);
         await using var pdfStream = File.OpenRead(pdfPath);
         ImageSize size = new[] { 480, 600 };
-        var images = service.ToImages(pdfStream.ToBinaryFile(), new PdfToImagesOptions { Size = size });
+        var images = await service.ToImages(pdfStream.ToBinaryFile(), new PdfToImagesOptions { Size = size });
 
         var count = 0;
         foreach (var image in images)

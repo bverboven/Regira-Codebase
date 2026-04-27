@@ -17,21 +17,24 @@ namespace Regira.Office.PDF.DocNET;
 
 public class PdfManager(IImageService imageService) : IPdfService
 {
-    public int GetPageCount(IMemoryFile pdf)
+    public Task<int> GetPageCount(IMemoryFile pdf, CancellationToken cancellationToken = default)
     {
         using var docReader = DocLib.Instance.GetDocReader(pdf.GetBytes(), new PageDimensions());
-        return docReader.GetPageCount();
+        return Task.FromResult(docReader.GetPageCount());
     }
 
 
-    public IEnumerable<IMemoryFile> Split(IMemoryFile pdf, IEnumerable<PdfSplitRange> ranges)
+    public async Task<IEnumerable<IMemoryFile>> Split(IMemoryFile pdf, IEnumerable<PdfSplitRange> ranges, CancellationToken cancellationToken = default)
     {
+        var result = new List<IMemoryFile>();
         foreach (var range in ranges)
         {
-            var splitBytes = DocLib.Instance.Split(pdf.GetBytes(), range.Start - 1, (range.End ?? GetPageCount(pdf)) - 1);
+            var pageCount = await GetPageCount(pdf, cancellationToken);
+            var splitBytes = DocLib.Instance.Split(pdf.GetBytes(), range.Start - 1, (range.End ?? pageCount) - 1);
             var file = splitBytes.ToMemoryFile(ContentTypes.PDF);
-            yield return file;
+            result.Add(file);
         }
+        return result;
     }
     public IMemoryFile Merge(IEnumerable<string> pdfPaths)
     {
@@ -53,7 +56,7 @@ public class PdfManager(IImageService imageService) : IPdfService
         var mergedBytes = DocLib.Instance.Merge(partlyMergedPdfs.ToArray());
         return mergedBytes.ToMemoryFile(ContentTypes.PDF);
     }
-    public IMemoryFile? Merge(IEnumerable<IMemoryFile> items)
+    public Task<IMemoryFile?> Merge(IEnumerable<IMemoryFile> items, CancellationToken cancellationToken = default)
     {
         byte[]? resultBytes = null;
         foreach (var pdf in items)
@@ -65,13 +68,13 @@ public class PdfManager(IImageService imageService) : IPdfService
         var ms = resultBytes != null
             ? new MemoryStream(resultBytes)
             : null;
-        return ms?.ToMemoryFile(ContentTypes.PDF);
+        return Task.FromResult<IMemoryFile?>(ms?.ToMemoryFile(ContentTypes.PDF));
     }
-    public IMemoryFile? RemovePages(IMemoryFile pdf, IEnumerable<int> pages)
+    public async Task<IMemoryFile?> RemovePages(IMemoryFile pdf, IEnumerable<int> pages, CancellationToken cancellationToken = default)
     {
         var pagesToRemove = pages.ToArray();
 
-        var pageCount = GetPageCount(pdf);
+        var pageCount = await GetPageCount(pdf, cancellationToken);
 
         var ranges = new List<PdfSplitRange>();
         var firstPage = pagesToRemove.First();
@@ -102,22 +105,22 @@ public class PdfManager(IImageService imageService) : IPdfService
             }
         }
 
-        var splitPdfs = Split(pdf, ranges)
+        var splitPdfs = (await Split(pdf, ranges, cancellationToken))
             .Select(f => f.ToBinaryFile())
             .ToArray();
-        var merged = Merge(splitPdfs);
+        var merged = await Merge(splitPdfs, cancellationToken);
         splitPdfs.Dispose();
         return merged;
     }
 
 
-    public string GetText(IMemoryFile pdf)
+    public async Task<string> GetText(IMemoryFile pdf, CancellationToken cancellationToken = default)
     {
-        var texts = GetTextPerPage(pdf)
+        var texts = (await GetTextPerPage(pdf, cancellationToken))
             .Select(line => line.Trim());
         return string.Join(Environment.NewLine, texts);
     }
-    public IList<string> GetTextPerPage(IMemoryFile pdf)
+    public Task<IList<string>> GetTextPerPage(IMemoryFile pdf, CancellationToken cancellationToken = default)
     {
         var pageDim = new PageDimensions();
         using var docReader = DocLib.Instance.GetDocReader(pdf.GetBytes(), pageDim);
@@ -131,11 +134,11 @@ public class PdfManager(IImageService imageService) : IPdfService
             pageTexts.Add(pageText);
         }
 
-        return pageTexts;
+        return Task.FromResult<IList<string>>(pageTexts);
     }
-    public IMemoryFile? RemoveEmptyPages(IMemoryFile pdf)
+    public async Task<IMemoryFile?> RemoveEmptyPages(IMemoryFile pdf, CancellationToken cancellationToken = default)
     {
-        var texts = GetTextPerPage(pdf);
+        var texts = await GetTextPerPage(pdf, cancellationToken);
         var emptyPages = texts
             .Select((x, i) => new { page = i + 1, isEmpty = string.IsNullOrWhiteSpace(x) })
             .Where(x => x.isEmpty)
@@ -143,12 +146,12 @@ public class PdfManager(IImageService imageService) : IPdfService
             .ToArray();
 
         return emptyPages.Any()
-            ? RemovePages(pdf, emptyPages)
+            ? await RemovePages(pdf, emptyPages, cancellationToken)
             : pdf;
     }
 
 
-    public IMemoryFile ImagesToPdf(ImagesInput input)
+    public Task<IMemoryFile?> ImagesToPdf(ImagesInput input, CancellationToken cancellationToken = default)
     {
         if (imageService == null)
         {
@@ -177,9 +180,9 @@ public class PdfManager(IImageService imageService) : IPdfService
             .ToArray();
 
         var pdfBytes = DocLib.Instance.JpegToPdf(jpegImages);
-        return pdfBytes.ToMemoryFile(ContentTypes.PDF);
+        return Task.FromResult<IMemoryFile?>(pdfBytes.ToMemoryFile(ContentTypes.PDF));
     }
-    public IEnumerable<IImageFile> ToImages(IMemoryFile pdf, PdfToImagesOptions? options = null)
+    public Task<IEnumerable<IImageFile>> ToImages(IMemoryFile pdf, PdfToImagesOptions? options = null, CancellationToken cancellationToken = default)
     {
         var pageDimensions = new PageDimensions(
             options?.Size?.Width ?? PdfDefaults.ImageSize.Width,
@@ -188,6 +191,7 @@ public class PdfManager(IImageService imageService) : IPdfService
 
         using var docReader = DocLib.Instance.GetDocReader(pdf.GetBytes(), pageDimensions);
         var pageCount = docReader.GetPageCount();
+        var images = new List<IImageFile>(pageCount);
         for (var pageIndex = 0; pageIndex < pageCount; pageIndex++)
         {
             using var pr = docReader.GetPageReader(pageIndex);
@@ -196,7 +200,8 @@ public class PdfManager(IImageService imageService) : IPdfService
             var width = pr.GetPageWidth();
             var height = pr.GetPageHeight();
 
-            yield return imageService.Parse(imgBytes, new ImageSize(width, height), options?.Format)!;
+            images.Add(imageService.Parse(imgBytes, new ImageSize(width, height), options?.Format)!);
         }
+        return Task.FromResult<IEnumerable<IImageFile>>(images);
     }
 }

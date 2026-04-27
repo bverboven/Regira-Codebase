@@ -5,5 +5,5 @@ namespace Regira.Office.Barcodes.Abstractions;
 
 public interface IBarcodeReader
 {
-    BarcodeReadResult? Read(IImageFile img, BarcodeFormat? format = null);
+    Task<BarcodeReadResult?> Read(IImageFile img, BarcodeFormat? format = null, CancellationToken cancellationToken = default);
 }
