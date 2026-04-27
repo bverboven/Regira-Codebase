@@ -39,7 +39,7 @@ public class UziGranotTests
         => _qrService.Check_Dimensions(content, size, OutputDir);
 
     [Test]
-    public void TooLong_Expect_InputException()
+    public Task TooLong_Expect_InputException()
         => _qrService.TooLong_Expect_InputException();
 
     [TestCase("britannica.jpg", "http://itunes.apple.com/us/app/encyclopaedia-britannica/id447919187?mt=8")]
@@ -47,7 +47,7 @@ public class UziGranotTests
     //[TestCase("wikipedia.png", "http://en.m.wikipedia.org")]// bad image ??? -> does work with a screenshot from this image (see below) ...
     [TestCase("wikipedia-picture.jpg", "http://en.m.wikipedia.org")]
     [TestCase("collection-picture.jpg", "http://itunes.apple.com/us/app/encyclopaedia-britannica/id447919187?mt=8\r\nhttp://en.m.wikipedia.org\r\nhttps://www.cyberciti.biz/")]
-    public void Read_QRCode(string inputImg, string expectedContent)
+    public Task Read_QRCode(string inputImg, string expectedContent)
         => _qrService.Read_QRCode(Path.Combine(InputDir, inputImg), expectedContent);
 
     [Test]
