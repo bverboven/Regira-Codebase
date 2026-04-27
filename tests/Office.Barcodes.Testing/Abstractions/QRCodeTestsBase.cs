@@ -43,7 +43,7 @@ public abstract class QRCodeTestsBase
             return;
         }
 
-        using var barCodeImg = QRWriter.Create(input);
+        using var barCodeImg = await QRWriter.Create(input);
         await barCodeImg.SaveAs(Path.Combine(OutputDir, $"{outputName}.jpg"));
         ClassicAssert.IsNotNull(barCodeImg.GetBytes());
         Assert.That(barCodeImg.GetLength() > 0, Is.True);
@@ -61,13 +61,13 @@ public abstract class QRCodeTestsBase
             Content = content,
             Size = size
         };
-        using var barCodeImg = QRWriter.Create(input);
+        using var barCodeImg = await QRWriter.Create(input);
         await barCodeImg.SaveAs(Path.Combine(OutputDir, $"qrcode-{input.Size.Width}x{input.Size.Height}.jpg"));
         ClassicAssert.IsNotNull(barCodeImg.GetBytes());
         Assert.That(barCodeImg.GetLength() > 0, Is.True);
         Assert.That(barCodeImg.Size?.Width, Is.EqualTo(input.Size.Width));
     }
-    public virtual void TooLong_Expect_InputException()
+    public virtual async Task TooLong_Expect_InputException()
     {
         if (QRWriter == null)
         {
@@ -76,13 +76,13 @@ public abstract class QRCodeTestsBase
         }
 
         var input = Convert.ToBase64String(Enumerable.Range(0, 2500).Select((_, i) => (byte)(i % 8)).ToArray());
-        Assert.Throws<InputException>(() =>
+        Assert.ThrowsAsync<InputException>(async () =>
         {
-            QRWriter.Create(input);
+            await QRWriter.Create(input);
         });
     }
 
-    public virtual void Read_QRCode(string filename, string expectedContent)
+    public virtual async Task Read_QRCode(string filename, string expectedContent)
     {
         if (QRReader == null)
         {
@@ -92,24 +92,24 @@ public abstract class QRCodeTestsBase
 
         var inputImg = new BinaryFileItem(Path.Combine(InputDir, filename)).ToImageFile();
 
-        var result = QRReader.Read(inputImg);
+        var result = await QRReader.Read(inputImg);
         var content = string.Join(Environment.NewLine, result?.Contents!);
         Assert.That(content, Is.EqualTo(expectedContent));
     }
 
-    public virtual Task Create_And_Read_QRCode()
+    public virtual async Task Create_And_Read_QRCode()
     {
         if (QRReader == null)
         {
             Assert.Ignore("Reading not supported");
-            return Task.CompletedTask;
+            return;
         }
 
         var input = "This is a test";
-        var qrImage = QRWriter?.Create(input);
-        qrImage!.SaveAs(Path.Combine(OutputDir, $"qrcode-{input.Length}.jpg")).Wait();
-        var content = QRReader.Read(qrImage!)?.Contents?.FirstOrDefault();
+        var qrImage = QRWriter != null ? await QRWriter.Create(input) : null;
+        await qrImage!.SaveAs(Path.Combine(OutputDir, $"qrcode-{input.Length}.jpg"));
+        var result = await QRReader.Read(qrImage!);
+        var content = result?.Contents?.FirstOrDefault();
         Assert.That(content, Is.EqualTo(input));
-        return Task.CompletedTask;
     }
 }

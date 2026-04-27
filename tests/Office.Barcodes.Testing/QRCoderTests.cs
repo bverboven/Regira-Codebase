@@ -28,8 +28,8 @@ public class QRCoderTests() : QRCodeTestsBase(new QRCodeWriter(), null, "QR-Code
     }
 
     [Test]
-    public override void TooLong_Expect_InputException()
+    public override async Task TooLong_Expect_InputException()
     {
-        base.TooLong_Expect_InputException();
+        await base.TooLong_Expect_InputException();
     }
 }

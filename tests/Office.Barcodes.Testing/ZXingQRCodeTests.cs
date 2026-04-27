@@ -22,21 +22,20 @@ public class ZXingQRCodeTests() : QRCodeTestsBase(new QRCodeService(), "ZXing")
         => base.Check_Dimensions(content, size);
 
     [Test]
-    public override void TooLong_Expect_InputException()
-        => base.TooLong_Expect_InputException();
+    public override async Task TooLong_Expect_InputException()
+        => await base.TooLong_Expect_InputException();
 
     [TestCase("britannica.jpg", "http://itunes.apple.com/us/app/encyclopaedia-britannica/id447919187?mt=8")]
     [TestCase("cyberciti.png", "https://www.cyberciti.biz/")]
     //[TestCase("wikipedia.png", "http://en.m.wikipedia.org")]// bad image ???
     //[TestCase("wikipedia-picture.jpg", "http://en.m.wikipedia.org")]
     //[TestCase("collection-picture.jpg", "http://itunes.apple.com/us/app/encyclopaedia-britannica/id447919187?mt=8\r\nhttp://en.m.wikipedia.org\r\nhttps://www.cyberciti.biz/")]
-    public override void Read_QRCode(string inputImg, string expectedContent)
-        => base.Read_QRCode(inputImg, expectedContent);
+    public override async Task Read_QRCode(string inputImg, string expectedContent)
+        => await base.Read_QRCode(inputImg, expectedContent);
 
     [Test]
     public override Task Create_And_Read_QRCode()
     {
-        base.Create_And_Read_QRCode();
-        return Task.CompletedTask;
+        return base.Create_And_Read_QRCode();
     }
 }

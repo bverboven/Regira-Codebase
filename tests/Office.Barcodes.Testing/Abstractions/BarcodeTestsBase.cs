@@ -49,7 +49,7 @@ public class BarcodeTestsBase
             Format = format,
         };
 
-        using var barCodeImg = Writer.Create(input);
+        using var barCodeImg = await Writer.Create(input);
         await barCodeImg.SaveAs(Path.Combine(OutputDir, $"{outputName}-{input.Format.ToString().ToLowerInvariant()}.jpg"));
         ClassicAssert.IsNotNull(barCodeImg.GetBytes());
         Assert.That(barCodeImg.GetLength() > 0, Is.True);
@@ -68,14 +68,14 @@ public class BarcodeTestsBase
             Format = format,
             Size = size
         };
-        using var barCodeImg = Writer.Create(input);
+        using var barCodeImg = await Writer.Create(input);
         await barCodeImg.SaveAs(Path.Combine(OutputDir, $"barcode-{input.Format}-{input.Size.Width}x{input.Size.Height}.jpg"));
         ClassicAssert.IsNotNull(barCodeImg.GetBytes());
         Assert.That(barCodeImg.GetLength() > 0, Is.True);
         Assert.That(barCodeImg.Size?.Width, Is.EqualTo(input.Size.Width));
         Assert.That(barCodeImg.Size?.Height, Is.EqualTo(input.Size.Height));
     }
-    public virtual void TooLong_Expect_InputException()
+    public virtual async Task TooLong_Expect_InputException()
     {
         if (Writer == null)
         {
@@ -84,13 +84,13 @@ public class BarcodeTestsBase
         }
 
         var input = Convert.ToBase64String(Enumerable.Range(0, 50000).Select((_, i) => (byte)(i % 8)).ToArray());
-        Assert.Throws<InputException>(() =>
+        Assert.ThrowsAsync<InputException>(async () =>
         {
-            Writer.Create(input);
+            await Writer.Create(input);
         });
     }
 
-    public virtual void Read_Barcode(string inputImg, string expectedContent)
+    public virtual async Task Read_Barcode(string inputImg, string expectedContent)
     {
         if (Reader == null)
         {
@@ -100,16 +100,16 @@ public class BarcodeTestsBase
 
         var input = new BinaryFileItem(Path.Combine(InputDir, inputImg)).ToImageFile();
 
-        var content = string.Join(Environment.NewLine, Reader.Read(input)?.Contents!);
+        var content = string.Join(Environment.NewLine, (await Reader.Read(input))?.Contents!);
         Assert.That(content, Is.EqualTo(expectedContent));
     }
 
-    public virtual Task Create_And_Read_Barcode()
+    public virtual async Task Create_And_Read_Barcode()
     {
         if (Reader == null)
         {
             Assert.Ignore("Reading not supported");
-            return Task.CompletedTask;
+            return;
         }
 
         var input = new BarcodeInput
@@ -117,9 +117,8 @@ public class BarcodeTestsBase
             Content = "This is a test",
             Format = BarcodeFormat.Code128
         };
-        var inputBytes = Writer?.Create(input)!;
-        var result = Reader.Read(inputBytes);
+        var inputBytes = Writer != null ? await Writer.Create(input) : null;
+        var result = await Reader.Read(inputBytes!);
         Assert.That(result?.Contents?.FirstOrDefault(), Is.EqualTo(input.Content));
-        return Task.CompletedTask;
     }
 }
