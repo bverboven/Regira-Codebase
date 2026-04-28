@@ -10,5 +10,6 @@ public class EntityProcessor<TEntity, TIncludes>(Func<IList<TEntity>, TIncludes?
     //    => Process(items.OfType<TEntity>().ToList(), includes);
 
     public virtual Task Process(IList<TEntity> items, TIncludes? includes, CancellationToken token = default)
+        // Note: inline process delegates do not receive the token; use a class-based IEntityProcessor for cancellation support
         => process?.Invoke(items, includes) ?? Task.CompletedTask;
 }

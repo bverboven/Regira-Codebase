@@ -21,7 +21,7 @@ public static class DbContextNormalizingExtensions
             .Where(x => entityType == null || x.Entity.GetType() == entityType || TypeUtility.GetBaseTypes(x.Entity.GetType()).Contains(entityType))
             .Select(x => x.Entity), token);
     /// <summary>
-    /// <inheritdoc cref="ApplyNormalizers(DbContext, Type?, CancellationToken)"/>
+    /// Normalizes all properties with a <see cref="NormalizedAttribute"/> for <see cref="EntityEntry">Entries</see> of type <typeparamref name="T"/> that have pending changes
     /// </summary>
     /// <typeparam name="T">Entity type</typeparam>
     /// <param name="dbContext"></param>

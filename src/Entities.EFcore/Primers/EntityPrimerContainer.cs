@@ -56,7 +56,7 @@ public class EntityPrimerContainer
     /// 
     /// </summary>
     /// <typeparam name="T">Type of entity</typeparam>
-    /// <param name="token"></param>
+    /// <param name="token">A token to monitor for cancellation requests.</param>
     /// <returns></returns>
     public Task ApplyPrimers<T>(CancellationToken token = default)
         => ApplyPrimers(typeof(T), token);
