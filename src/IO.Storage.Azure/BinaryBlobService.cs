@@ -113,16 +113,16 @@ public class BinaryBlobService(AzureCommunicator communicator) : IFileService
         {
             var blobIdentifier = FileNameUtility.GetRelativeUri(blob.Name, Root);
             var blobFolder = FileNameUtility.GetRelativeFolder(blobIdentifier, Root) ?? string.Empty;
-
-            if (!recursive && blobFolder != relativeFolderUri)
-                continue;
-
             var matchesExtension = so.Extensions == null || so.Extensions.Any(e => e.TrimStart('*') == Path.GetExtension(blobIdentifier));
+            var inScope = recursive || blobFolder == relativeFolderUri;
 
-            if (so.Type != FileEntryTypes.Directories && matchesExtension)
+            if (so.Type != FileEntryTypes.Directories && inScope && matchesExtension)
                 yield return blobIdentifier;
 
-            if (so.Type != FileEntryTypes.Files && (so.Extensions == null || matchesExtension))
+            // Mirror sync List: derive folders from all blobs when no extension filter,
+            // or from in-scope matching blobs when an extension filter is set.
+            var usedForFolderDerivation = so.Extensions == null || (inScope && matchesExtension);
+            if (so.Type != FileEntryTypes.Files && usedForFolderDerivation)
             {
                 foreach (var folder in GetFolders(blobIdentifier))
                 {

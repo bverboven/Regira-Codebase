@@ -49,6 +49,23 @@ public async Task<IEnumerable<string>> GetProductImages(int productId)
     });
 ```
 
+## Stream images for a product (NET10+)
+
+```csharp
+public async IAsyncEnumerable<string> StreamProductImages(int productId)
+{
+    var so = new FileSearchObject
+    {
+        FolderUri  = $"products/{productId}/",
+        Extensions = [".jpg", ".webp", ".png"],
+        Recursive  = false,
+        Type       = FileEntryTypes.Files
+    };
+    await foreach (var identifier in _fileService.ListAsync(so))
+        yield return identifier;
+}
+```
+
 ## Nightly backup via ExportHelper
 
 ```csharp

@@ -25,6 +25,13 @@ public class FileProcessor(IFileService fileService) : IFileProcessor
             Recursive = recursive,
             Type = FileEntryTypes.Files
         };
+#if NET10_0_OR_GREATER
+        await foreach (var uri in fileService.ListAsync(filesSo))
+        {
+            var absoluteUri = fileService.GetAbsoluteUri(uri);
+            await handleFile(absoluteUri, fileService);
+        }
+#else
         var fileUris = await fileService.List(filesSo);
         // handle file
         var handleFilesFuncs = fileUris
@@ -35,6 +42,7 @@ public class FileProcessor(IFileService fileService) : IFileProcessor
             })
             .ToArray();
         Task.WaitAll(handleFilesFuncs);
+#endif
 
         // recursive
         if (processRecursively ?? so.Recursive)
@@ -46,11 +54,19 @@ public class FileProcessor(IFileService fileService) : IFileProcessor
                 Type = FileEntryTypes.Directories,
                 Recursive = recursive
             };
+#if NET10_0_OR_GREATER
+            await foreach (var uri in fileService.ListAsync(dirSo))
+            {
+                var absoluteUri = fileService.GetAbsoluteUri(uri);
+                await ProcessFiles(new FileSearchObject { FolderUri = absoluteUri, Extensions = so.Extensions, Recursive = recursive }, handleFile, processRecursively);
+            }
+#else
             var directoryUris = await fileService.List(dirSo);
             var dirTasks = directoryUris
                 .Select(dirUri => ProcessFiles(new FileSearchObject { FolderUri = dirUri, Extensions = so.Extensions, Recursive = so.Recursive }, handleFile, processRecursively))
                 .ToArray();
             Task.WaitAll(dirTasks);
+#endif
         }
     }
 }

@@ -68,6 +68,19 @@ public class GitHubStorageTests
     [Test]
     public async Task Filter_By_EntryType() => await StorageTestContext.Test_Filter_By_EntryType();
 
+#if NET10_0_OR_GREATER
+    [Test]
+    public async Task ListAsync() => await StorageTestContext.Test_ListAsync();
+    [Test]
+    public async Task Filter_By_Folder_Async() => await StorageTestContext.Test_Filter_By_Folder_Async();
+    [Test]
+    public async Task Filter_By_Extension_Async() => await StorageTestContext.Test_Filter_By_Extension_Async();
+    [Test]
+    public async Task Filter_Recursive_Async() => await StorageTestContext.Test_Filter_Recursive_Async();
+    [Test]
+    public async Task Filter_By_EntryType_Async() => await StorageTestContext.Test_Filter_By_EntryType_Async();
+#endif
+
     [Test]
     public async Task Add_File() => await StorageTestContext.Test_Add_File();
     [Test]

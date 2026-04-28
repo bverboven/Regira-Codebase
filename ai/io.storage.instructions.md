@@ -140,6 +140,7 @@ Task<bool>                Exists(string identifier)
 Task<byte[]?>             GetBytes(string identifier)
 Task<Stream?>             GetStream(string identifier)
 Task<IEnumerable<string>> List(FileSearchObject? so = null)
+IAsyncEnumerable<string>  ListAsync(FileSearchObject? so = null)  // NET10+
 ```
 
 ### Write
@@ -183,6 +184,18 @@ var images = await storage.List(new FileSearchObject
     Recursive  = true,
     Type       = FileEntryTypes.Files
 });
+
+// Streaming variant (NET10+)
+await foreach (var image in storage.ListAsync(new FileSearchObject
+{
+    FolderUri  = "products/",
+    Extensions = [".jpg", ".webp"],
+    Recursive  = true,
+    Type       = FileEntryTypes.Files
+}))
+{
+    // process image identifier as it arrives
+}
 ```
 
 ---
@@ -280,7 +293,7 @@ var service = new GitHubService(
 | `Key` | `string?` | Personal Access Token |
 | `UserAgent` | `string?` | `User-Agent` header — GitHub requires a non-empty value |
 
-**Supported:** `Exists`, `GetBytes`, `GetStream`, `List`
+**Supported:** `Exists`, `GetBytes`, `GetStream`, `List`, `ListAsync`
 **Not supported:** `Save`, `Move`, `Delete` — throws `NotImplementedException`
 
 ---
