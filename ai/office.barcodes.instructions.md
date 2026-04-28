@@ -57,27 +57,27 @@ Part of **Regira Office**. For routing and full module overview, see [`office.in
 ### `IBarcodeWriter`
 
 ```csharp
-IImageFile Create(BarcodeInput input);
+Task<IImageFile> Create(BarcodeInput input, CancellationToken cancellationToken = default);
 ```
 
 ### `IBarcodeReader`
 
 ```csharp
-BarcodeReadResult? Read(IImageFile img, BarcodeFormat? format = null);
+Task<BarcodeReadResult?> Read(IImageFile img, BarcodeFormat? format = null, CancellationToken cancellationToken = default);
 ```
 
 ### `IQRCodeService` (extends both)
 
 ```csharp
-IImageFile          Create(string content);
-BarcodeReadResult?  Read(IImageFile img, BarcodeFormat? format = null);
+Task<IImageFile>          Create(string content, CancellationToken cancellationToken = default);
+Task<BarcodeReadResult?>  Read(IImageFile img, BarcodeFormat? format = null, CancellationToken cancellationToken = default);
 ```
 
 ### `IBarcodeService` (extends both)
 
 ```csharp
-IImageFile          Create(BarcodeInput input);
-BarcodeReadResult?  Read(IImageFile img, BarcodeFormat? format = null);
+Task<IImageFile>          Create(BarcodeInput input, CancellationToken cancellationToken = default);
+Task<BarcodeReadResult?>  Read(IImageFile img, BarcodeFormat? format = null, CancellationToken cancellationToken = default);
 ```
 
 ---
@@ -106,14 +106,14 @@ BarcodeReadResult?  Read(IImageFile img, BarcodeFormat? format = null);
 ```csharp
 // Generate a QR code
 IQRCodeService qr = new Regira.Office.Barcodes.ZXing.QRCodeService();
-IImageFile img = qr.Create("https://example.com");
+IImageFile img = await qr.Create("https://example.com");
 
 // Generate a Code128 barcode
 IBarcodeService bc = new Regira.Office.Barcodes.ZXing.BarcodeService();
-IImageFile barcode = bc.Create(new BarcodeInput { Content = "ABC-1234" });
+IImageFile barcode = await bc.Create(new BarcodeInput { Content = "ABC-1234" });
 
 // Read / scan a barcode
-BarcodeReadResult? result = bc.Read(barcode);
+BarcodeReadResult? result = await bc.Read(barcode);
 Console.WriteLine(result?.Contents?[0]);  // "ABC-1234"
 ```
 

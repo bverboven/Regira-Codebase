@@ -6,6 +6,6 @@ public interface IPdfPrinter
 {
     string DefaultPrinter { get; }
 
-    IEnumerable<string> List();
-    void Print(PdfPrinterInput input);
+    Task<IList<string>> List(CancellationToken cancellationToken = default);
+    Task Print(PdfPrinterInput input, CancellationToken cancellationToken = default);
 }

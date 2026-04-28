@@ -9,7 +9,7 @@ using Regira.Utilities;
 
 namespace Regira.Office.Excel.NpoiMapper;
 
-public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
+public class ExcelManager(ExcelManager.Options? options = null) : IExcelService
 {
     private readonly Options _options = options ?? new Options();
     public class Options
@@ -130,7 +130,7 @@ public class ExcelManager(ExcelManager.Options? options = null) : IExcelManager
     }
 }
 
-public class ExcelManager<T> : IExcelManager<T>
+public class ExcelManager<T> : IExcelService<T>
     where T : class, new()
 {
     public Task<IEnumerable<ExcelSheet<T>>> Read(IBinaryFile input, string[]? headers = null, CancellationToken cancellationToken = default)

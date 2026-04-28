@@ -7,8 +7,8 @@ namespace Office.Excel.Testing;
 [Parallelizable(ParallelScope.Self)]
 public class ClosedXMLTests
 {
-    IExcelManager CreateExcelManager() => new ExcelManager();
-    //IExcelManager<ExcelCountry> CreateTypedExcelManager() => new Regira.Office.Excel.ClosedXML.ExcelManager<ExcelCountry>();
+    IExcelService CreateExcelManager() => new ExcelManager();
+    //IExcelService<ExcelCountry> CreateTypedExcelManager() => new Regira.Office.Excel.ClosedXML.ExcelManager<ExcelCountry>();
 
     //[Test]
     //public Task List_To_Excel() => CreateTypedExcelManager()

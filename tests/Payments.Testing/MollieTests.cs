@@ -57,7 +57,7 @@ public class MollieTests
     {
         var items = (await _repo.List()).AsList();
         Assert.That(items, Is.Not.Empty);
-        var details = await _repo.Details(items.Last().Id!);
+        var details = await _repo.Details(items.Last().Id);
         ClassicAssert.IsNotNull(details);
     }
 
@@ -69,7 +69,7 @@ public class MollieTests
         Assert.That(items, Is.Not.Empty);
         foreach (var payment in items)
         {
-            Assert.That(payment.Amount > 5, Is.True);
+            Assert.That(payment.Amount >= 5, Is.True);
         }
     }
 

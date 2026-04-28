@@ -51,28 +51,28 @@ Part of **Regira Office**. For routing and full module overview, see [`office.in
 ### `IWordCreator`
 
 ```csharp
-Task<IMemoryFile> Create(WordTemplateInput input);
+Task<IMemoryFile> Create(WordTemplateInput input, CancellationToken cancellationToken = default);
 ```
 
 ### `IWordConverter`
 
 ```csharp
-Task<IMemoryFile> Convert(WordTemplateInput input, FileFormat format);
-Task<IMemoryFile> Convert(WordTemplateInput input, ConversionOptions options);
+Task<IMemoryFile> Convert(WordTemplateInput input, FileFormat format, CancellationToken cancellationToken = default);
+Task<IMemoryFile> Convert(WordTemplateInput input, ConversionOptions options, CancellationToken cancellationToken = default);
 ```
 
 ### `IWordMerger`
 
 ```csharp
-Task<IMemoryFile> Merge(params WordTemplateInput[] inputs);
+Task<IMemoryFile> Merge(IEnumerable<WordTemplateInput> inputs, CancellationToken cancellationToken = default);
 ```
 
 ### `IWordTextExtractor` / `IWordImageExtractor` / `IWordToImagesService`
 
 ```csharp
-Task<string>               GetText(WordTemplateInput input);
-IEnumerable<WordImage>     GetImages(WordTemplateInput input);
-IEnumerable<IImageFile>    ToImages(WordTemplateInput input);    // one image per page
+Task<string>                    GetText(WordTemplateInput input, CancellationToken cancellationToken = default);
+Task<IEnumerable<WordImage>>    GetImages(WordTemplateInput input, CancellationToken cancellationToken = default);
+Task<IEnumerable<IImageFile>>   ToImages(WordTemplateInput input, CancellationToken cancellationToken = default);    // one image per page
 ```
 
 ### `IWordManager`

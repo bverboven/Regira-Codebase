@@ -98,6 +98,46 @@ public class BinaryBlobService(AzureCommunicator communicator) : IFileService
             .OrderBy(f => f)
             .ToList();
     }
+#if NET10_0_OR_GREATER
+    public async IAsyncEnumerable<string> ListAsync(FileSearchObject? so = null)
+    {
+        so ??= new FileSearchObject();
+        await communicator.Open();
+
+        var recursive = so.Recursive;
+        var relativeFolderUri = FileNameUtility.GetRelativeUri(so.FolderUri, Root);
+        var excludedFolders = GetFolders(relativeFolderUri).Concat(new[] { relativeFolderUri }).ToHashSet();
+        var yieldedFolders = new HashSet<string>();
+
+        await foreach (var blob in ListBlobs(so))
+        {
+            var blobIdentifier = FileNameUtility.GetRelativeUri(blob.Name, Root);
+            var blobFolder = FileNameUtility.GetRelativeFolder(blobIdentifier, Root) ?? string.Empty;
+
+            if (!recursive && blobFolder != relativeFolderUri)
+                continue;
+
+            var matchesExtension = so.Extensions == null || so.Extensions.Any(e => e.TrimStart('*') == Path.GetExtension(blobIdentifier));
+
+            if (so.Type != FileEntryTypes.Directories && matchesExtension)
+                yield return blobIdentifier;
+
+            if (so.Type != FileEntryTypes.Files && (so.Extensions == null || matchesExtension))
+            {
+                foreach (var folder in GetFolders(blobIdentifier))
+                {
+                    var folderParent = FileNameUtility.GetRelativeFolder(folder, Root) ?? string.Empty;
+                    if (!excludedFolders.Contains(folder)
+                        && (recursive || folderParent == relativeFolderUri)
+                        && yieldedFolders.Add(folder))
+                    {
+                        yield return folder;
+                    }
+                }
+            }
+        }
+    }
+#endif
 
     protected IEnumerable<string> GetFolders(string uri)
     {
@@ -205,4 +245,5 @@ public class BinaryBlobService(AzureCommunicator communicator) : IFileService
         //blob.Properties.ContentType = contentType;
         return blob;
     }
+
 }

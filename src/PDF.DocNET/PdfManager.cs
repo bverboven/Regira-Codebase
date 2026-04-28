@@ -68,7 +68,7 @@ public class PdfManager(IImageService imageService) : IPdfService
         var ms = resultBytes != null
             ? new MemoryStream(resultBytes)
             : null;
-        return Task.FromResult<IMemoryFile?>(ms?.ToMemoryFile(ContentTypes.PDF));
+        return Task.FromResult(ms?.ToMemoryFile(ContentTypes.PDF));
     }
     public async Task<IMemoryFile?> RemovePages(IMemoryFile pdf, IEnumerable<int> pages, CancellationToken cancellationToken = default)
     {
@@ -181,7 +181,7 @@ public class PdfManager(IImageService imageService) : IPdfService
         var pdfBytes = DocLib.Instance.JpegToPdf(jpegImages.ToArray());
         return pdfBytes.ToMemoryFile(ContentTypes.PDF);
     }
-    public async Task<IEnumerable<IImageFile>> ToImages(IMemoryFile pdf, PdfToImagesOptions? options = null, CancellationToken cancellationToken = default)
+    public async Task<IList<IImageFile>> ToImages(IMemoryFile pdf, PdfToImagesOptions? options = null, CancellationToken cancellationToken = default)
     {
         var pageDimensions = new PageDimensions(
             options?.Size?.Width ?? PdfDefaults.ImageSize.Width,

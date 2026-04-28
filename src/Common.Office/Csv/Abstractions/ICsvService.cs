@@ -3,8 +3,8 @@ using Regira.Office.Csv.Models;
 
 namespace Regira.Office.Csv.Abstractions;
 
-public interface ICsvManager : ICsvManager<IDictionary<string, object>>;
-public interface ICsvManager<T>
+public interface ICsvService : ICsvService<IDictionary<string, object>>;
+public interface ICsvService<T>
 {
     Task<List<T>> Read(string input, CsvOptions? options = null, CancellationToken cancellationToken = default);
     Task<List<T>> Read(IBinaryFile input, CsvOptions? options = null, CancellationToken cancellationToken = default);

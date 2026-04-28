@@ -8,8 +8,8 @@ namespace Office.Excel.Testing;
 [Parallelizable(ParallelScope.Self)]
 public class NpoiMapperTests
 {
-    IExcelManager CreateExcelManager() => new ExcelManager();
-    IExcelManager<ExcelCountry> CreateTypedExcelManager() => new ExcelManager<ExcelCountry>();
+    IExcelService CreateExcelManager() => new ExcelManager();
+    IExcelService<ExcelCountry> CreateTypedExcelManager() => new ExcelManager<ExcelCountry>();
 
     [Test]
     public Task List_To_Excel() => CreateTypedExcelManager()

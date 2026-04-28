@@ -27,7 +27,7 @@ public class PaymentService(MollieConfig config)
             throw new ArgumentNullException(nameof(id));
         }
 
-        var response = await _paymentClient.GetPaymentAsync(id.ToString());
+        var response = await _paymentClient.GetPaymentAsync(id.ToString()!);
 
         if (response == null!)
         {

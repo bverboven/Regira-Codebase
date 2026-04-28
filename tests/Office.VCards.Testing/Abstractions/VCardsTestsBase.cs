@@ -10,45 +10,45 @@ namespace Office.VCards.Testing.Abstractions;
 public abstract class VCardsTestsBase(IVCardService manager)
 {
     [Test]
-    public virtual void Can_Read_Empty()
+    public virtual async Task Can_Read_Empty()
     {
         var content = @"BEGIN:VCARD
 VERSION:2.1
 END:VCARD";
-        var item = manager.Read(content);
+        var item = await manager.Read(content);
         ClassicAssert.IsNotNull(item);
     }
     [Test]
     public virtual void Read_Invalid_Expect_InvalidCardException()
     {
         var content = "";
-        Assert.Throws<InvalidCardException>(() => manager.Read(content));
+        Assert.ThrowsAsync<InvalidCardException>(async () => await manager.Read(content));
     }
 
     [Test]
-    public void Can_Read_V2_1() => CanRead(ContentSamples.VCards[VCardVersion.V2_1], VCardVersion.V2_1);
+    public Task Can_Read_V2_1() => CanRead(ContentSamples.VCards[VCardVersion.V2_1], VCardVersion.V2_1);
     [Test]
-    public virtual void Can_Read_V3_0() => CanRead(ContentSamples.VCards[VCardVersion.V3_0], VCardVersion.V3_0);
+    public virtual Task Can_Read_V3_0() => CanRead(ContentSamples.VCards[VCardVersion.V3_0], VCardVersion.V3_0);
     [Test]
-    public virtual void Can_Read_V4_0() => CanRead(ContentSamples.VCards[VCardVersion.V3_0], VCardVersion.V3_0);
+    public virtual Task Can_Read_V4_0() => CanRead(ContentSamples.VCards[VCardVersion.V3_0], VCardVersion.V3_0);
 
 
     [Test]
-    public virtual void Write_Empty()
+    public virtual async Task Write_Empty()
     {
-        var content = manager.Write(new VCard());
+        var content = await manager.Write(new VCard());
         Assert.That(content, Is.Not.Empty);
     }
     [Test]
-    public virtual void Can_Write_V2_1() => CanWrite(CardSamples.BramCard, VCardVersion.V2_1);
+    public virtual Task Can_Write_V2_1() => CanWrite(CardSamples.BramCard, VCardVersion.V2_1);
     [Test]
-    public virtual void Can_Write_V3_0() => CanWrite(CardSamples.BramCard, VCardVersion.V3_0);
+    public virtual Task Can_Write_V3_0() => CanWrite(CardSamples.BramCard, VCardVersion.V3_0);
     [Test]
-    public virtual void Can_Write_V4_0() => CanWrite(CardSamples.BramCard, VCardVersion.V4_0);
+    public virtual Task Can_Write_V4_0() => CanWrite(CardSamples.BramCard, VCardVersion.V4_0);
 
-    public virtual void CanRead(string content, VCardVersion version)
+    public virtual async Task CanRead(string content, VCardVersion version)
     {
-        var item = manager.Read(content);
+        var item = await manager.Read(content);
         ClassicAssert.IsNotNull(item);
         Assert.That(item.Name!.SurName, Is.EqualTo("Gump"));
         Assert.That(item.Name.GivenName, Is.EqualTo("Forrest"));
@@ -82,9 +82,9 @@ END:VCARD";
 
         Assert.That(item.Organization!.Name, Is.EqualTo("Bubba Gump Shrimp Co."));
     }
-    public virtual void CanWrite(VCard vCard, VCardVersion version)
+    public virtual async Task CanWrite(VCard vCard, VCardVersion version)
     {
-        var content = manager.Write(vCard, version);
+        var content = await manager.Write(vCard, version);
         Assert.That(!string.IsNullOrWhiteSpace(content), Is.True);
 
         var lines = content.Trim().Split(Environment.NewLine);

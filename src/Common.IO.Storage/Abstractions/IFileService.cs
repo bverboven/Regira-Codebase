@@ -8,6 +8,9 @@ public interface IFileService
     Task<byte[]?> GetBytes(string identifier);
     Task<Stream?> GetStream(string identifier);
     Task<IEnumerable<string>> List(FileSearchObject? so = null);
+#if NET10_0_OR_GREATER
+    IAsyncEnumerable<string> ListAsync(FileSearchObject? so = null);
+#endif
 
 
     Task Move(string sourceIdentifier, string targetIdentifier);

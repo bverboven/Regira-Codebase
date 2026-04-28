@@ -3,7 +3,7 @@ using Regira.Office.Mail.Abstractions;
 using Regira.Office.Mail.Models;
 
 namespace Regira.Security.Authentication.Web.Mail;
-public class IdentityMailer(IMailer mailer, IdentityMailerOptions options) : IEmailSender
+public class IdentityMailer(IMailService mailer, IdentityMailerOptions options) : IEmailSender
 {
 
     public Task SendEmailAsync(string email, string subject, string htmlMessage)

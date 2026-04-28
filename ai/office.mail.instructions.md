@@ -44,10 +44,11 @@ Task<IMailResponse> Send(
     string?                     subject,
     string?                     message,
     bool                        isHtml      = true,
-    IEnumerable<INamedFile>?    attachments = null);
+    IEnumerable<INamedFile>?    attachments = null,
+    CancellationToken           cancellationToken = default);
 
 // Full message object
-Task<IMailResponse> Send(IMessageObject message);
+Task<IMailResponse> Send(IMessageObject message, CancellationToken cancellationToken = default);
 ```
 
 ### `IMailResponse`

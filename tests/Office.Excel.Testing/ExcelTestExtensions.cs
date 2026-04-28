@@ -14,7 +14,7 @@ namespace Office.Excel.Testing;
 public static class ExcelTestExtensions
 {
     public static async Task Run_List_To_Excel<TService>(this TService service)
-        where TService : IExcelManager<ExcelCountry>
+        where TService : IExcelService<ExcelCountry>
     {
         var assetsDir = service.GetAssetsDir();
         var items = await ParseCountriesJson(assetsDir);
@@ -33,7 +33,7 @@ public static class ExcelTestExtensions
         Assert.That(file.Exists, Is.True);
     }
     public static async Task Run_Compare_DictionaryCollection_Input_With_Output<TService>(this TService service)
-        where TService : IExcelManager
+        where TService : IExcelService
     {
         var testData = CreateTestData();
         var dicList = testData.Select(x => DictionaryUtility.ToDictionary(x)).ToList();
@@ -57,7 +57,7 @@ public static class ExcelTestExtensions
         }
     }
     public static async Task Run_Compare_UnTyped_Input_With_Output<TService>(this TService service)
-        where TService : IExcelManager
+        where TService : IExcelService
     {
         var testData = CreateTestData();
         using var excelFile = (await service.CreateExcel(testData))
@@ -78,7 +78,7 @@ public static class ExcelTestExtensions
         }
     }
     public static async Task Run_Compare_Typed_Input_With_Output<TService>(this TService service)
-        where TService : IExcelManager
+        where TService : IExcelService
     {
         var testData = CreateTestData();
         using var excelFile = (await service.CreateExcel(testData))
@@ -102,7 +102,7 @@ public static class ExcelTestExtensions
         }
     }
     public static async Task Run_Read_With_Duplicate_Headers<TService>(this TService service)
-        where TService : IExcelManager
+        where TService : IExcelService
     {
         var assetsDir = service.GetAssetsDir();
         var inputPath = Path.Combine(assetsDir, "Input", "input-with-duplicates.xlsx");
@@ -114,7 +114,7 @@ public static class ExcelTestExtensions
     }
 
     public static async Task Run_Export_Countries_As_Dictionary<TService>(this TService service)
-        where TService : IExcelManager
+        where TService : IExcelService
     {
         var assetsDir = service.GetAssetsDir();
         var countriesJSON = await File.ReadAllTextAsync(Path.Combine(assetsDir, "Input", "countries.json"));
@@ -130,7 +130,7 @@ public static class ExcelTestExtensions
         Assert.That(file.Exists, Is.True);
     }
     public static async Task Run_Export_Countries<TService>(this TService service)
-        where TService : IExcelManager<ExcelCountry>
+        where TService : IExcelService<ExcelCountry>
     {
         var assetsDir = service.GetAssetsDir();
         var items = await ParseCountriesJson(assetsDir);
@@ -147,7 +147,7 @@ public static class ExcelTestExtensions
         Assert.That(file.Exists, Is.True);
     }
     public static async Task Run_Export_Countries_As_Sheet<TService>(this TService service)
-        where TService : IExcelManager
+        where TService : IExcelService
     {
         var assetsDir = service.GetAssetsDir();
         var countriesJSON = await File.ReadAllTextAsync(Path.Combine(assetsDir, "Input", "countries-2.json"));
@@ -169,7 +169,7 @@ public static class ExcelTestExtensions
     }
     
     public static async Task Run_From_Json<TService>(this TService service)
-        where TService : IExcelManager
+        where TService : IExcelService
     {
         var assetsDir = service.GetAssetsDir();
         var countriesJSON = await File.ReadAllTextAsync(Path.Combine(assetsDir, "Input", "countries.json"));
@@ -199,20 +199,20 @@ public static class ExcelTestExtensions
         return JsonSerializer.Deserialize<List<Country>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
     }
     internal static async Task<IMemoryFile> CreateExcel<TService>(this TService service, IEnumerable<object> input)
-        where TService : IExcelManager
+        where TService : IExcelService
     {
         var sheet = new ExcelSheet { Data = input.ToList() };
         return await service.Create([sheet]);
     }
     internal static async Task<IMemoryFile> CreateExcel<TService>(this TService service, IEnumerable<ExcelCountry> input)
-        where TService : IExcelManager<ExcelCountry>
+        where TService : IExcelService<ExcelCountry>
     {
         var sheet = new ExcelSheet<ExcelCountry> { Data = input.ToList() };
         return await service.Create([sheet]);
     }
 
     internal static string GetAssetsDir<TService>(this TService service)
-        where TService : IExcelService
+        where TService : IExcelServiceCore
     {
         var assemblyDir = AssemblyUtility.GetAssemblyDirectory()!;
         var assetsDir = new DirectoryInfo(Path.Combine(assemblyDir, "../../../", "Assets")).FullName;
@@ -221,7 +221,7 @@ public static class ExcelTestExtensions
         return assetsDir;
     }
     internal static Task<FileInfo> SaveExcel<TService>(this TService service, IMemoryFile excelFile, string fileName)
-        where TService : IExcelService
+        where TService : IExcelServiceCore
     {
         var assetsDir = service.GetAssetsDir();
         var serviceNamespace = service.GetType().Namespace!.Split(".").Last();

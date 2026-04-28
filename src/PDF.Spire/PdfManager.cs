@@ -75,7 +75,7 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
 
         return Task.FromResult(text.ToString());
     }
-    public Task<IEnumerable<IImageFile>> ToImages(IMemoryFile pdf, PdfToImagesOptions? options = null, CancellationToken cancellationToken = default)
+    public Task<IList<IImageFile>> ToImages(IMemoryFile pdf, PdfToImagesOptions? options = null, CancellationToken cancellationToken = default)
     {
         var images = new List<IImageFile>();
         using var doc = new PdfDocument(pdf.GetStream());
@@ -95,9 +95,9 @@ public class PdfManager : IPdfMerger, IPdfSplitter, IPdfToImageService, IPdfText
             }
 #pragma warning restore CA1416
         }
-        return Task.FromResult<IEnumerable<IImageFile>>(images);
+        return Task.FromResult<IList<IImageFile>>(images);
     }
-    
+
     public IMemoryFile ToMemoryFile(PdfDocument doc)
     {
         var ms = new MemoryStream();

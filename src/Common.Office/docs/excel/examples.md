@@ -14,7 +14,7 @@ public class Product
 
 public IEnumerable<Product> ImportProducts(byte[] excelBytes)
 {
-    IExcelManager<Product> excel = new Regira.Office.Excel.MiniExcel.ExcelManager<Product>();
+    IExcelService<Product> excel = new Regira.Office.Excel.MiniExcel.ExcelManager<Product>();
 
     var file   = excelBytes.ToBinaryFile("products.xlsx");
     var sheets = excel.Read(file);
@@ -32,7 +32,7 @@ Build multiple `ExcelSheet` objects and pass them to `Create()`.
 ```csharp
 public IMemoryFile ExportReport(IEnumerable<Order> orders, IEnumerable<Product> products)
 {
-    IExcelManager excel = new Regira.Office.Excel.EPPlus.ExcelManager();
+    IExcelService excel = new Regira.Office.Excel.EPPlus.ExcelManager();
 
     var orderSheet = new ExcelSheet
     {
@@ -89,7 +89,7 @@ IMemoryFile file = excel.Create([sheet]);
 Supply a `headers` array to receive only the columns you need.
 
 ```csharp
-IExcelManager excel = new Regira.Office.Excel.ClosedXML.ExcelManager();
+IExcelService excel = new Regira.Office.Excel.ClosedXML.ExcelManager();
 
 var file   = excelBytes.ToBinaryFile("report.xlsx");
 var sheets = excel.Read(file, headers: ["Name", "Email", "Phone"]);
@@ -109,7 +109,7 @@ Read an existing workbook, modify the data, and produce a new file.
 ```csharp
 public IMemoryFile ApplyDiscount(byte[] sourceBytes, decimal discountPct)
 {
-    IExcelManager excel = new Regira.Office.Excel.MiniExcel.ExcelManager();
+    IExcelService excel = new Regira.Office.Excel.MiniExcel.ExcelManager();
 
     var sheets = excel.Read(sourceBytes.ToBinaryFile("prices.xlsx")).ToList();
 

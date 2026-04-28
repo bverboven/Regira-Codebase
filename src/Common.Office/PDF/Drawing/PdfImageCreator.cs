@@ -10,10 +10,10 @@ public class PdfImageCreator(IPdfToImageService service, IPdfSplitter splitter) 
     public override async Task<IImageFile?> Create(PdfToImageLayerOptions input, CancellationToken cancellationToken = default)
     {
         var page = input.Page ?? 1;
-        var pageCount = await splitter.GetPageCount(input.File);
+        var pageCount = await splitter.GetPageCount(input.File, cancellationToken);
         var singlePagePdf = pageCount > 1
-            ? (await splitter.Split(input.File, [new PdfSplitRange { Start = page, End = page }])).Single()
+            ? (await splitter.Split(input.File, [new PdfSplitRange { Start = page, End = page }], cancellationToken)).Single()
             : input.File;
-        return (await service.ToImages(singlePagePdf, input.ToPdfToImageOptions())).SingleOrDefault();
+        return (await service.ToImages(singlePagePdf, input.ToPdfToImageOptions(), cancellationToken)).SingleOrDefault();
     }
 }

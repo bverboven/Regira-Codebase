@@ -30,6 +30,10 @@ public class DefaultTextFileService(IFileService binaryFileService, Encoding? en
         => binaryFileService.GetStream(identifier);
     public Task<IEnumerable<string>> List(FileSearchObject? so = null)
         => binaryFileService.List(so);
+#if NET10_0_OR_GREATER
+    public IAsyncEnumerable<string> ListAsync(FileSearchObject? so = null)
+        => binaryFileService.ListAsync(so);
+#endif
 
     public Task Move(string sourceIdentifier, string targetIdentifier)
         => binaryFileService.Move(sourceIdentifier, targetIdentifier);

@@ -11,7 +11,7 @@ public static class ServiceCollectionExtensions
         services
             .Configure<SendGridConfig>(configure.Invoke)
             .AddTransient(p => p.GetRequiredService<IOptionsSnapshot<SendGridConfig>>().Value)
-            .AddTransient<IMailer, SendGridMailer>();
+            .AddTransient<IMailService, SendGridMailer>();
 
         return services;
     }

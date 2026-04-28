@@ -7,7 +7,7 @@ namespace Office.Mail.Testing.Abstractions;
 
 public abstract class MailerTestsBase
 {
-    protected IMailer Mailer = null!;
+    protected IMailService Mailer = null!;
     protected readonly string Assets = new DirectoryInfo(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "../../..", "Assets")).FullName;
     // ReSharper disable AssignNullToNotNullAttribute
     // ReSharper restore AssignNullToNotNullAttribute

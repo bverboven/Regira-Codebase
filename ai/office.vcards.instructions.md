@@ -39,10 +39,10 @@ var manager = new VCardManager();
 
 ```csharp
 // Single vCard from a .vcf string
-VCard contact = manager.Read(vcfContent);
+VCard contact = await manager.Read(vcfContent);
 
 // Multiple vCards from a single .vcf file (multiple VCARD blocks)
-IEnumerable<VCard> contacts = manager.ReadMany(vcfContent);
+IEnumerable<VCard> contacts = await manager.ReadMany(vcfContent);
 ```
 
 ---
@@ -51,13 +51,13 @@ IEnumerable<VCard> contacts = manager.ReadMany(vcfContent);
 
 ```csharp
 // Single contact (default version: 3.0)
-string vcf = manager.Write(contact);
+string vcf = await manager.Write(contact);
 
 // Single contact, explicit version
-string vcf = manager.Write(contact, VCardVersion.V4_0);
+string vcf = await manager.Write(contact, VCardVersion.V4_0);
 
 // Multiple contacts into one .vcf string
-string vcf = manager.Write(contacts, VCardVersion.V3_0);
+string vcf = await manager.Write(contacts, VCardVersion.V3_0);
 ```
 
 ---

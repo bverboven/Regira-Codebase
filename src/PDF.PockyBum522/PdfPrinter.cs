@@ -10,12 +10,13 @@ public class PdfPrinter : IPdfPrinter
 {
     public string DefaultPrinter => new PrinterSettings().PrinterName;
 
-    public IEnumerable<string> List()
+    public Task<IList<string>> List(CancellationToken token = default)
     {
-        return PrinterSettings.InstalledPrinters.Cast<string>();
+        var items = PrinterSettings.InstalledPrinters.Cast<string>();
+        return Task.FromResult<IList<string>>(items.ToList());
     }
 
-    public void Print(PdfPrinterInput input)
+    public Task Print(PdfPrinterInput input, CancellationToken token = default)
     {
         var tempPath = Path.GetTempFileName();
         using (var fs = File.Create(tempPath))
@@ -41,5 +42,7 @@ public class PdfPrinter : IPdfPrinter
         {
             File.Delete(tempPath);
         }
+
+        return Task.CompletedTask;
     }
 }

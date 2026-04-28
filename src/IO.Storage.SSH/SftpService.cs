@@ -43,6 +43,14 @@ public class SftpService(SftpCommunicator communicator) : IFileService
             .Where(f => !(so.Extensions?.Any() ?? false) || so.Extensions.Any(e => e.TrimStart('*') == Path.GetExtension(f.Name)));
         return files.Select(f => FileNameUtility.GetRelativeUri(f.FullName, Root));
     }
+#if NET10_0_OR_GREATER
+    public async IAsyncEnumerable<string> ListAsync(FileSearchObject? so = null)
+    {
+        var items = await List(so);
+        foreach (var item in items)
+            yield return item;
+    }
+#endif
 
     protected IList<ISftpFile> List(SftpClient client, string path, bool recursive = false)
     {

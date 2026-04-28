@@ -1,11 +1,12 @@
-﻿using System.IO.Compression;
-using Regira.IO.Abstractions;
+﻿using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
 using Regira.IO.Storage.Abstractions;
 using Regira.IO.Utilities;
+using System.IO.Compression;
 
 namespace Regira.IO.Storage.Compression;
+
 public class ZipFileService(ZipFileCommunicator communicator) : IFileService, IDisposable
 {
     public string Root => string.Empty;
@@ -54,6 +55,29 @@ public class ZipFileService(ZipFileCommunicator communicator) : IFileService, ID
 
         return Task.FromResult(identifiers);
     }
+#if NET10_0_OR_GREATER
+    public async IAsyncEnumerable<string> ListAsync(FileSearchObject? so = null)
+    {
+        IEnumerable<string> identifiers = ZipArchive.Entries.Select(e => e.FullName);
+
+        if (so != null)
+        {
+            if (!string.IsNullOrWhiteSpace(so.FolderUri))
+            {
+                var folderUri = so.FolderUri!.TrimStart('/');
+                identifiers = identifiers.Where(x => x.TrimStart('/').StartsWith(folderUri, StringComparison.InvariantCultureIgnoreCase));
+            }
+            if (so.Extensions?.Any() == true)
+            {
+                identifiers = identifiers.Where(x => so.Extensions.Any(x.EndsWith));
+            }
+        }
+
+        foreach (var identifier in identifiers)
+            yield return identifier;
+    }
+#endif
+
     public Task<string> Save(string identifier, byte[] bytes, string? contentType = null)
     {
         var file = bytes.ToBinaryFile(contentType);

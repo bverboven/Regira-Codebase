@@ -1,6 +1,7 @@
 using Regira.IO.Storage.Abstractions;
 
 namespace Regira.IO.Storage.FileSystem;
+
 public class BinaryFileService(FileSystemOptions options) : IFileService
 {
     [Obsolete("Please use FileSystemOptions instead", false)]
@@ -48,7 +49,7 @@ public class BinaryFileService(FileSystemOptions options) : IFileService
 
         var searchOptions = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
         var absoluteFolderUri = ResolveUri(folderUri);
-        
+
         IEnumerable<string> result = Array.Empty<string>();
 
         if (Directory.Exists(absoluteFolderUri))
@@ -84,6 +85,50 @@ public class BinaryFileService(FileSystemOptions options) : IFileService
 
         return Task.FromResult(result);
     }
+#if NET10_0_OR_GREATER
+    public async IAsyncEnumerable<string> ListAsync(FileSearchObject? so = null)
+    {
+        so ??= new FileSearchObject();
+
+        var folderUri = so.FolderUri ?? "";
+        var recursive = so.Recursive;
+        var extensions = "*";
+
+        var listFiles = so.Type == FileEntryTypes.All || so.Type == FileEntryTypes.Files;
+        var listDirectories = so.Type == FileEntryTypes.All || so.Type == FileEntryTypes.Directories;
+
+        var searchOptions = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+        var absoluteFolderUri = ResolveUri(folderUri);
+
+        if (Directory.Exists(absoluteFolderUri))
+        {
+            // Enumerate files
+            if (listFiles)
+            {
+                var files = Directory.EnumerateFiles(absoluteFolderUri, extensions, searchOptions)
+                    .Select(fileUri => FileNameUtility.GetRelativeUri(fileUri, Root))
+                    .Where(f => so.Extensions == null || so.Extensions.Any(e => e.TrimStart('*') == Path.GetExtension(f)));
+
+                foreach (var file in files)
+                {
+                    yield return file;
+                }
+            }
+
+            // Enumerate directories
+            if (listDirectories)
+            {
+                var directories = Directory.EnumerateDirectories(absoluteFolderUri, "*", searchOptions)
+                    .Select(dirUri => FileNameUtility.GetRelativeUri(dirUri, Root));
+
+                foreach (var directory in directories)
+                {
+                    yield return directory;
+                }
+            }
+        }
+    }
+#endif
 
     public Task Move(string sourceIdentifier, string targetIdentifier)
     {

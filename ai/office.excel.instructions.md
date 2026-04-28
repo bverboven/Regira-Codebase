@@ -56,8 +56,8 @@ Part of **Regira Office**. For routing and full module overview, see [`office.in
 ### `IExcelReader` / `IExcelReader<T>`
 
 ```csharp
-IEnumerable<ExcelSheet>    Read(IBinaryFile input, string[]? headers = null);
-IEnumerable<ExcelSheet<T>> Read(IBinaryFile input, string[]? headers = null);  // generic
+Task<IEnumerable<ExcelSheet>>    Read(IBinaryFile input, string[]? headers = null, CancellationToken cancellationToken = default);
+Task<IEnumerable<ExcelSheet<T>>> Read(IBinaryFile input, string[]? headers = null, CancellationToken cancellationToken = default);  // generic
 ```
 
 `headers` — when supplied, only those columns are returned (by name).
@@ -65,11 +65,11 @@ IEnumerable<ExcelSheet<T>> Read(IBinaryFile input, string[]? headers = null);  /
 ### `IExcelWriter` / `IExcelWriter<T>`
 
 ```csharp
-IMemoryFile Create(IEnumerable<ExcelSheet> sheets);
-IMemoryFile Create(IEnumerable<ExcelSheet<T>> sheets);  // generic
+Task<IMemoryFile> Create(IEnumerable<ExcelSheet> sheets, CancellationToken cancellationToken = default);
+Task<IMemoryFile> Create(IEnumerable<ExcelSheet<T>> sheets, CancellationToken cancellationToken = default);  // generic
 ```
 
-### `IExcelManager` / `IExcelManager<T>`
+### `IExcelService` / `IExcelService<T>`
 
 Composite: `IExcelReader + IExcelWriter` (and their generic variants).
 
@@ -92,23 +92,23 @@ Composite: `IExcelReader + IExcelWriter` (and their generic variants).
 
 ```csharp
 // Construct directly (no DI extensions — pick any implementation)
-IExcelManager excel = new Regira.Office.Excel.MiniExcel.ExcelManager();
+IExcelService excel = new Regira.Office.Excel.MiniExcel.ExcelManager();
 
 // Read all sheets
 IBinaryFile file = bytes.ToBinaryFile("report.xlsx");
-var sheets       = excel.Read(file);
+var sheets       = await excel.Read(file);
 foreach (var sheet in sheets)
     foreach (var row in sheet.Data!)
         Console.WriteLine(row);   // Dictionary<string, object>
 
 // Read typed
-IExcelManager<Product> typed = new Regira.Office.Excel.MiniExcel.ExcelManager<Product>();
-var sheets = typed.Read(file);
+IExcelService<Product> typed = new Regira.Office.Excel.MiniExcel.ExcelManager<Product>();
+var sheets = await typed.Read(file);
 foreach (var product in sheets.First().Data!)
     Console.WriteLine(product.Name);
 
 // Write sheets to a new workbook
-IMemoryFile output = excel.Create(sheets);
+IMemoryFile output = await excel.Create(sheets);
 ```
 
 ---

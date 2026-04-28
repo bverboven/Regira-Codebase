@@ -8,7 +8,7 @@ using Regira.Utilities;
 
 namespace Regira.Office.Excel.EPPlus;
 
-public class ExcelManager : IExcelManager
+public class ExcelManager : IExcelService
 {
     public class Options
     {

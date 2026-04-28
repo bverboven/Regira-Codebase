@@ -11,7 +11,7 @@ namespace Regira.Office.OCR.PaddleOCR;
 
 public class OcrManager : IOcrService
 {
-    public Task<string?> Read(IMemoryFile imgFile, string? lang = null)
+    public Task<string?> Read(IMemoryFile imgFile, string? lang = null, CancellationToken token = default)
     {
         FullOcrModel model = ConvertLang(lang);
         using PaddleOcrAll all = new PaddleOcrAll(model, PaddleDevice.Mkldnn())

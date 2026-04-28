@@ -10,7 +10,7 @@ public class OcrManager : IOcrService
     public class Options
     {
         /// <summary>
-        /// 3 letter code ISO language
+        /// 2-letter code ISO language
         /// </summary>
         public string Language { get; set; } = "en";
         /// <summary>
@@ -30,7 +30,7 @@ public class OcrManager : IOcrService
     }
 
 
-    public Task<string?> Read(IMemoryFile imgFile, string? lang = null)
+    public Task<string?> Read(IMemoryFile imgFile, string? lang = null, CancellationToken token = default)
     {
         using var engine = new TesseractEngine(_dataDirectory, ConvertLang(lang ?? _lang), EngineMode.Default);
         using var img = Pix.LoadFromMemory(imgFile.GetBytes());

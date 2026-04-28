@@ -9,7 +9,7 @@ using Regira.Utilities;
 
 namespace Regira.Office.Csv.CsvHelper;
 
-public class CsvManager(CsvHelperOptions? options = null) : CsvManager<IDictionary<string, object>>(options), ICsvManager
+public class CsvManager(CsvHelperOptions? options = null) : CsvManager<IDictionary<string, object>>(options), ICsvService
 {
     protected internal override async Task<List<IDictionary<string, object>>> Read(TextReader tr, CsvOptions? options = null)
     {
@@ -67,8 +67,10 @@ public class CsvManager(CsvHelperOptions? options = null) : CsvManager<IDictiona
         }
     }
 }
-public class CsvManager<T>(CsvHelperOptions? defaultOptions = null) : ICsvManager<T>
+public class CsvManager<T>(CsvHelperOptions? defaultOptions = null) : ICsvService<T>
 {
+    private CsvHelperOptions? _defaultOptions = defaultOptions;
+
     public async Task<List<T>> Read(string input, CsvOptions? options = null, CancellationToken cancellationToken = default)
     {
         using var sr = new StringReader(input);
@@ -124,14 +126,14 @@ public class CsvManager<T>(CsvHelperOptions? defaultOptions = null) : ICsvManage
     protected CsvWriter GetWriter(TextWriter tw, CsvOptions? options) => new(tw, GetConfiguration(options), true);
     protected CsvConfiguration GetConfiguration(CsvOptions? options)
     {
-        defaultOptions ??= new CsvHelperOptions();
-        var config = new CsvConfiguration(options?.Culture ?? defaultOptions.Culture)
+        _defaultOptions ??= new CsvHelperOptions();
+        var config = new CsvConfiguration(options?.Culture ?? _defaultOptions.Culture)
         {
-            TrimOptions = defaultOptions.PreserveWhitespace ? TrimOptions.None : TrimOptions.Trim,
-            Delimiter = options?.Delimiter ?? defaultOptions.Delimiter,
+            TrimOptions = _defaultOptions.PreserveWhitespace ? TrimOptions.None : TrimOptions.Trim,
+            Delimiter = options?.Delimiter ?? _defaultOptions.Delimiter,
         };
 
-        if (defaultOptions.IgnoreBadData)
+        if (_defaultOptions.IgnoreBadData)
         {
             config.BadDataFound = null;
         }

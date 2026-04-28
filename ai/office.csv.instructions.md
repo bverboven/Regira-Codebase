@@ -32,12 +32,12 @@ Part of **Regira Office**. For routing and full module overview, see [`office.in
 
 ```csharp
 // Read
-Task<List<T>>     Read(string input,      CsvOptions? options = null);
-Task<List<T>>     Read(IBinaryFile input, CsvOptions? options = null);
+Task<List<T>>     Read(string input,      CsvOptions? options = null, CancellationToken cancellationToken = default);
+Task<List<T>>     Read(IBinaryFile input, CsvOptions? options = null, CancellationToken cancellationToken = default);
 
 // Write
-Task<string>      Write(IEnumerable<T> items,      CsvOptions? options = null);
-Task<IMemoryFile> WriteFile(IEnumerable<T> items,  CsvOptions? options = null);
+Task<string>      Write(IEnumerable<T> items,      CsvOptions? options = null, CancellationToken cancellationToken = default);
+Task<IMemoryFile> WriteFile(IEnumerable<T> items,  CsvOptions? options = null, CancellationToken cancellationToken = default);
 ```
 
 `ICsvManager` is shorthand for `ICsvManager<IDictionary<string, object>>`.

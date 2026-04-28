@@ -6,7 +6,7 @@ using Regira.Office.Mail.Models;
 
 namespace Regira.Office.Mail.Abstractions;
 
-public abstract class MailerBase : IMailer
+public abstract class MailerBase : IMailService
 {
     public virtual Task<IMailResponse> Send(IMailAddress sender, IEnumerable<IMailRecipient> recipients, string? subject, string? message, bool isHtml = true, IEnumerable<INamedFile>? attachments = null, CancellationToken cancellationToken = default)
     {

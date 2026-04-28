@@ -1,6 +1,6 @@
 # Regira Office.Excel
 
-Regira Office.Excel provides a **unified abstraction** for reading and writing Excel workbooks across multiple underlying libraries. All implementations share the same `IExcelManager` interface, making backends interchangeable.
+Regira Office.Excel provides a **unified abstraction** for reading and writing Excel workbooks across multiple underlying libraries. All implementations share the same `IExcelService` interface, making backends interchangeable.
 
 ## Projects
 
@@ -32,7 +32,7 @@ Regira Office.Excel provides a **unified abstraction** for reading and writing E
 
 ```csharp
 // Construct directly (no DI extensions — pick any implementation)
-IExcelManager excel = new Regira.Office.Excel.MiniExcel.ExcelManager();
+IExcelService excel = new Regira.Office.Excel.MiniExcel.ExcelManager();
 
 // Read all sheets from a file
 IBinaryFile file  = bytes.ToBinaryFile("report.xlsx");
@@ -64,7 +64,7 @@ IMemoryFile Create(IEnumerable<ExcelSheet>    sheets);
 IMemoryFile Create(IEnumerable<ExcelSheet<T>> sheets);  // generic
 ```
 
-### IExcelManager / IExcelManager\<T\>
+### IExcelService / IExcelService\<T\>
 
 Composite of `IExcelService + IExcelReader + IExcelWriter`. Use this as the injection target.
 
@@ -120,7 +120,7 @@ IMemoryFile file = ((Regira.Office.Excel.EPPlus.ExcelManager)excel).Create(myDat
 Lowest memory footprint — uses streaming under the hood. The only implementation with a **generic `ExcelManager<T>`** that maps rows directly to typed objects. Automatically renames duplicate column headers (`"Col"` → `"Col_2"`, `"Col_3"`, …).
 
 ```csharp
-IExcelManager<Product> excel = new Regira.Office.Excel.MiniExcel.ExcelManager<Product>();
+IExcelService<Product> excel = new Regira.Office.Excel.MiniExcel.ExcelManager<Product>();
 
 var sheets  = excel.Read(file);                 // IEnumerable<ExcelSheet<Product>>
 var products = sheets.First().Data!;            // ICollection<Product>
@@ -131,7 +131,7 @@ var products = sheets.First().Data!;            // ICollection<Product>
 Uses Npoi.Mapper for property-to-column binding. Also has a generic `ExcelManager<T>`. Good for scenarios where column names match property names (or are annotated).
 
 ```csharp
-IExcelManager<Order> excel = new Regira.Office.Excel.NpoiMapper.ExcelManager<Order>();
+IExcelService<Order> excel = new Regira.Office.Excel.NpoiMapper.ExcelManager<Order>();
 ```
 
 ## Implementation comparison

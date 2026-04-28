@@ -12,18 +12,20 @@ namespace Regira.Office.PDF.Spire;
 
 public class PdfPrinter : IPdfPrinter
 {
+#pragma warning disable CA1416
     public string DefaultPrinter => new PrinterSettings().PrinterName;
 
-    public IEnumerable<string> List()
+    public Task<IList<string>> List(CancellationToken token = default)
     {
-        return PrinterSettings.InstalledPrinters;
+        var items = PrinterSettings.InstalledPrinters.ToList();
+        return Task.FromResult<IList<string>>(items);
     }
-    public void Print(PdfPrinterInput input)
+    public Task Print(PdfPrinterInput input, CancellationToken token = default)
     {
         var printerName = input.PrinterName;
         var pageSize = GetPageSize(input.PageSize);
         var orientation = (PdfPageOrientation)Enum.Parse(typeof(PdfPageOrientation), input.PageOrientation.ToString());
-        
+
         using var pdfStream = input.PdfFile.GetStream()!;
         using var doc = new PdfDocument(pdfStream);
         doc.PageSettings.Size = pageSize;
@@ -36,6 +38,8 @@ public class PdfPrinter : IPdfPrinter
             doc.PrintSettings.PrinterName = printerName;
         }
         doc.Print();
+
+        return Task.CompletedTask;
     }
 
     private SizeF GetPageSize(PageSize size)
@@ -51,4 +55,5 @@ public class PdfPrinter : IPdfPrinter
         // ReSharper disable once PossibleNullReferenceException
         return (SizeF)value;
     }
+#pragma warning restore CA1416
 }

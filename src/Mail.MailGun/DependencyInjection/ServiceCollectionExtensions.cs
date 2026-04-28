@@ -11,7 +11,7 @@ public static class ServiceCollectionExtensions
         services
             .Configure<MailgunConfig>(configure.Invoke)
             .AddTransient(p => p.GetRequiredService<IOptionsSnapshot<MailgunConfig>>().Value)
-            .AddTransient<IMailer, MailGunMailer>();
+            .AddTransient<IMailService, MailGunMailer>();
 
         return services;
     }

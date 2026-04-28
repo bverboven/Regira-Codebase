@@ -1,5 +1,4 @@
-﻿using NUnit.Framework.Legacy;
-using Regira.Collections;
+﻿using Regira.Collections;
 using Regira.IO.Extensions;
 using Regira.IO.Storage.FileSystem;
 using Regira.Media.Drawing.Dimensions;
@@ -66,18 +65,18 @@ public static class PdfTestHelper
             }
             .Where(r => r.Start < pageCount && (r.End ?? 0) <= pageCount)
             .ToArray();
-        var splidPdfs = (await pdfSplitter.Split(pdfStream.ToBinaryFile(), ranges))
+        var splitPdfs = (await pdfSplitter.Split(pdfStream.ToBinaryFile(), ranges))
             .Select(x => x.ToBinaryFile())
             .ToArray();
 
-        using var merged = await pdfMerger.Merge(splidPdfs);
+        using var merged = await pdfMerger.Merge(splitPdfs);
         var expectedPageCount = ranges.Sum(r => (r.End ?? pageCount) - r.Start + 1);
-        var mergedPageCount = await pdfSplitter.GetPageCount(merged.ToBinaryFile());
+        var mergedPageCount = await pdfSplitter.GetPageCount(merged!.ToBinaryFile());
 
-        await FileSystemUtility.SaveStream(Path.Combine(outputDir, "split-merged.pdf"), merged.GetStream()!);
+        await FileSystemUtility.SaveStream(Path.Combine(outputDir, "split-merged.pdf"), merged!.GetStream()!);
         Assert.That(mergedPageCount, Is.EqualTo(expectedPageCount));
         // clean up
-        splidPdfs.Dispose();
+        splitPdfs.Dispose();
     }
 
     public static async Task ToImages(IPdfToImageService service, string inputFileName = "sample.pdf")
@@ -94,7 +93,7 @@ public static class PdfTestHelper
         var count = 0;
         foreach (var image in images)
         {
-            ClassicAssert.IsNotNull(image);
+            Assert.That(image, Is.Not.Null);
             var imgPath = Path.Combine(outputDir, $"pdf-img-{count + 1}.jpg");
             await File.WriteAllBytesAsync(imgPath, image.Bytes!);
             //Assert.IsTrue(size.Width >= image.Size.Width);

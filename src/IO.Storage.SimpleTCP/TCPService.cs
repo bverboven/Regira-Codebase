@@ -36,8 +36,12 @@ public class TCPService(TCPCommunicator communicator) : ITextFileService
     public Task<byte[]?> GetBytes(string identifier) => throw new NotSupportedException();
     public Task<Stream?> GetStream(string identifier) => throw new NotSupportedException();
     public Task<IEnumerable<string>> List(FileSearchObject? so = null) => throw new NotSupportedException();
+#if NET10_0_OR_GREATER
+    public IAsyncEnumerable<string> ListAsync(FileSearchObject? so = null) => throw new NotImplementedException();
+#endif
     public Task Move(string sourceIdentifier, string targetIdentifier) => throw new NotSupportedException();
     public Task Delete(string identifier) => throw new NotSupportedException();
     public Task<string?> GetContents(string identifier) => throw new NotSupportedException();
+
     #endregion
 }

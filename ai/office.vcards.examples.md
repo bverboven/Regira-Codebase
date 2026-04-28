@@ -21,34 +21,26 @@ public string ExportContact(Contact contact)
 ## Export multiple contacts
 
 ```csharp
-[HttpGet("contacts/export")]
-public IActionResult ExportAll()
+var contacts = _contactService.List();
+var manager  = new VCardManager();
+
+var cards = contacts.Select(c =>
 {
-    var contacts = _contactService.List();
-    var manager  = new VCardManager();
+    var v = new VCard();
+    v.NameViews      = new NameProperty(c.LastName, c.FirstName);
+    v.EmailAddresses = [new TextProperty(c.Email)];
+    return v;
+});
 
-    var cards = contacts.Select(c =>
-    {
-        var v = new VCard();
-        v.NameViews      = new NameProperty(c.LastName, c.FirstName);
-        v.EmailAddresses = [new TextProperty(c.Email)];
-        return v;
-    });
-
-    string vcf = manager.Write(cards, VCardVersion.V3_0);
-    return Content(vcf, "text/vcard");
-}
+string vcf = manager.Write(cards, VCardVersion.V3_0);
 ```
 
 ## Import contacts from an uploaded .vcf file
 
 ```csharp
-public async Task<IEnumerable<VCard>> ImportVcf(IFormFile file)
-{
-    using var reader = new StreamReader(file.OpenReadStream());
-    string vcfContent = await reader.ReadToEndAsync();
+using var reader = new StreamReader(file.OpenReadStream());
+string vcfContent = await reader.ReadToEndAsync();
 
-    var manager = new VCardManager();
-    return manager.ReadMany(vcfContent);
-}
+var manager = new VCardManager();
+return manager.ReadMany(vcfContent);
 ```

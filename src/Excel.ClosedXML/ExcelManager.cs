@@ -6,7 +6,7 @@ using Regira.Office.Excel.Abstractions;
 
 namespace Regira.Office.Excel.ClosedXML;
 
-public class ExcelManager : IExcelManager
+public class ExcelManager : IExcelService
 {
     public class Options
     {

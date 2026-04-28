@@ -35,7 +35,7 @@ public class PhoneNumberFormatter(CultureInfo? culture = null) : INormalizer, IF
             : null;
     }
 
-    internal PhoneNumber? ParseInput(string input)
+    internal PhoneNumber? ParseInput(string? input)
     {
         if (string.IsNullOrWhiteSpace(input))
         {

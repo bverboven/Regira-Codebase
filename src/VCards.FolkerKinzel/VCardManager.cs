@@ -11,35 +11,34 @@ namespace Regira.Office.VCards.FolkerKinzel;
 
 public class VCardManager : IVCardService
 {
-    public VCard Read(string content)
+    public async Task<VCard> Read(string content, CancellationToken token = default)
     {
-        return ReadMany(content).First();
+        var items = await ReadMany(content);
+        return items.FirstOrDefault() ?? throw new InvalidCardException("Invalid card", content);
     }
-    public IEnumerable<VCard> ReadMany(string content)
+    public Task<IEnumerable<VCard>> ReadMany(string content, CancellationToken token = default)
     {
-        //var tr = new StringReader(content);
-        //var items = FKvCard.DeserializeVcf(tr);
-        using var stream = FileUtility.GetStreamFromString(content);
+        using var stream = content.GetStreamFromString();
         var items = Vcf.Deserialize(stream);
         if (!items.Any())
         {
             throw new InvalidCardException("Invalid card", content);
         }
-        return items.Select(Convert);
+        return Task.FromResult(items.Select(Convert));
     }
 
-    public string Write(VCard item, VCardVersion version = VCardVersion.V3_0)
+    public Task<string> Write(VCard item, VCardVersion version = VCardVersion.V3_0, CancellationToken token = default)
     {
         var vCard = Convert(item);
         var stream = new MemoryStream();
         vCard.SerializeVcf(stream, GetVersion(version), null, VcfOpts.Default, true);
-        return FileUtility.GetString(stream)!;
+        return Task.FromResult(stream.GetString()!);
     }
-    public string Write(IEnumerable<VCard> items, VCardVersion version = VCardVersion.V3_0)
+    public Task<string> Write(IEnumerable<VCard> items, VCardVersion version = VCardVersion.V3_0, CancellationToken token = default)
     {
         var stream = new MemoryStream();
         items.Select(Convert).ToList().SerializeVcf(stream, GetVersion(version), null, VcfOpts.Default, true);
-        return FileUtility.GetString(stream)!;
+        return Task.FromResult(stream.GetString()!);
     }
 
     VCdVersion GetVersion(VCardVersion version)

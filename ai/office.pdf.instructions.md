@@ -69,31 +69,52 @@ Part of **Regira Office**. For routing and full module overview, see [`office.in
 ### `IHtmlToPdfService`
 
 ```csharp
-Task<IMemoryFile> Create(HtmlInput input);
+Task<IMemoryFile> Create(HtmlInput input, CancellationToken cancellationToken = default);
 ```
 
-### `IPdfMerger` / `IPdfSplitter`
+### `IPdfMerger`
 
 ```csharp
-IMemoryFile?              Merge(IEnumerable<IMemoryFile> items);
-IEnumerable<IMemoryFile>  Split(IMemoryFile pdf, IEnumerable<PdfSplitRange> ranges);
-int                       GetPageCount(IMemoryFile pdf);
-IMemoryFile?              RemovePages(IMemoryFile pdf, IEnumerable<int> pages);
+Task<IMemoryFile?>             Merge(IEnumerable<IMemoryFile> items, CancellationToken cancellationToken = default);
+```
+
+### `IPdfSplitter`
+
+```csharp
+Task<IEnumerable<IMemoryFile>>  Split(IMemoryFile pdf, IEnumerable<PdfSplitRange> ranges, CancellationToken cancellationToken = default);
+Task<int>                       GetPageCount(IMemoryFile pdf, CancellationToken cancellationToken = default);
+```
+
+### `IPdfEditor` (extends `IPdfMerger` + `IPdfSplitter`)
+
+```csharp
+Task<IMemoryFile?>  RemovePages(IMemoryFile pdf, IEnumerable<int> pages, CancellationToken cancellationToken = default);
 ```
 
 ### `IPdfToImageService` / `IImagesToPdfService`
 
 ```csharp
-IEnumerable<IImageFile>  ToImages(IMemoryFile pdf, PdfToImagesOptions? options = null);
-IMemoryFile?             ImagesToPdf(ImagesInput input);
+Task<IEnumerable<IImageFile>>  ToImages(IMemoryFile pdf, PdfToImagesOptions? options = null, CancellationToken cancellationToken = default);
+Task<IMemoryFile?>             ImagesToPdf(ImagesInput input, CancellationToken cancellationToken = default);
+```
+
+### `IPdfToImageAsyncService`
+
+```csharp
+IAsyncEnumerable<IImageFile>  ToImagesAsync(IMemoryFile pdf, PdfToImagesOptions? options = null);
 ```
 
 ### `IPdfTextExtractor`
 
 ```csharp
-string          GetText(IMemoryFile pdf);
-IList<string>   GetTextPerPage(IMemoryFile pdf);
-IMemoryFile?    RemoveEmptyPages(IMemoryFile pdf);
+Task<string>          GetText(IMemoryFile pdf, CancellationToken cancellationToken = default);
+```
+
+### `IPdfTextService` (extends `IPdfTextExtractor`)
+
+```csharp
+Task<IList<string>>   GetTextPerPage(IMemoryFile pdf, CancellationToken cancellationToken = default);
+Task<IMemoryFile?>    RemoveEmptyPages(IMemoryFile pdf, CancellationToken cancellationToken = default);
 ```
 
 ### `IPdfPrinter`
@@ -165,11 +186,11 @@ IMemoryFile file = await pdf.Create(new HtmlInput
 
 // Merge PDFs (DocNET)
 IPdfMerger merger = new Regira.Office.PDF.DocNET.PdfManager(imageService);
-IMemoryFile merged = merger.Merge([pdf1, pdf2, pdf3])!;
+IMemoryFile merged = (await merger.Merge([pdf1, pdf2, pdf3]))!;
 
 // Extract text (DocNET)
 IPdfTextExtractor extractor = new Regira.Office.PDF.DocNET.PdfManager(imageService);
-string text = extractor.GetText(pdfFile);
+string text = await extractor.GetText(pdfFile);
 ```
 
 ---
