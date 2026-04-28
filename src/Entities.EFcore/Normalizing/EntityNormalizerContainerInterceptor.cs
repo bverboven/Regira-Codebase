@@ -37,13 +37,13 @@ public class EntityNormalizerContainerInterceptor(IServiceProvider serviceProvid
                     var exclusiveNormalizer = matchingNormalizers.FirstOrDefault(x => x.IsExclusive);
                     if (exclusiveNormalizer != null)
                     {
-                        await exclusiveNormalizer.HandleNormalizeMany(entities);
+                        await exclusiveNormalizer.HandleNormalizeMany(entities, cancellationToken);
                     }
                     else
                     {
                         foreach (var normalizer in matchingNormalizers)
                         {
-                            await normalizer.HandleNormalizeMany(entities);
+                            await normalizer.HandleNormalizeMany(entities, cancellationToken);
                         }
                     }
                 }

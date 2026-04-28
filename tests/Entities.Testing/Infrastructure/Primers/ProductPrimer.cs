@@ -8,7 +8,7 @@ public class ProductPrimer : EntityPrimerBase<Product>
 {
     public const string DescriptionMessage = "Entity is prepared";
 
-    public override Task PrepareAsync(Product entity, EntityEntry _)
+    public override Task PrepareAsync(Product entity, EntityEntry _, CancellationToken token = default)
     {
         entity.Description = DescriptionMessage;
 

@@ -9,7 +9,7 @@ namespace Regira.Entities.EFcore.Primers;
 /// </summary>
 public class HasCreatedDbPrimer : EntityPrimerBase<IHasCreated>
 {
-    public override Task PrepareAsync(IHasCreated entity, EntityEntry entry)
+    public override Task PrepareAsync(IHasCreated entity, EntityEntry entry, CancellationToken token = default)
     {
         entity.Created = (DateTime)entry.OriginalValues[nameof(entity.Created)]!;
 

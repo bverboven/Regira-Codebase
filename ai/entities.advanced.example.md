@@ -256,7 +256,7 @@ public class ProjectInputDto
 ```csharp
 public class StakeholderProcessor(ProjectsContext dbContext) : IEntityProcessor<Stakeholder, EntityIncludes>
 {
-    public async Task Process(IList<Stakeholder> items, EntityIncludes? includes)
+    public async Task Process(IList<Stakeholder> items, EntityIncludes? includes, CancellationToken token = default)
     {
         var ids = items.Select(io => io.Id).ToList();
         var ownersWithNumberOfProjects = await dbContext.Set<Project>()
@@ -271,7 +271,7 @@ public class StakeholderProcessor(ProjectsContext dbContext) : IEntityProcessor<
 }
 public class StakeholderPrimer : EntityPrimerBase<Stakeholder>
 {
-    public override Task PrepareAsync(Stakeholder entity, EntityEntry entry)
+    public override Task PrepareAsync(Stakeholder entity, EntityEntry entry, CancellationToken token = default)
     {
         if (entity.Id == Guid.Empty)
             entity.Id = Guid.NewGuid();
@@ -353,7 +353,7 @@ public class ProjectIncludingQueryBuilder : IIncludableQueryBuilder<Project, int
 }
 public class ProjectPrepper : EntityPrepperBase<Project>
 {
-    public override Task Prepare(Project modified, Project? original)
+    public override Task Prepare(Project modified, Project? original, CancellationToken token = default)
     {
         modified.Slug ??= modified.Title?.ToLowerInvariant().Replace(' ', '-');
         return Task.CompletedTask;
@@ -364,7 +364,7 @@ public class ProjectNormalizer(ProjectsContext dbContext, INormalizer? normalize
     public override bool IsExclusive => true;
     private List<Stakeholder> _owners = null!;
 
-    public override async Task HandleNormalizeMany(IEnumerable<Project> items)
+    public override async Task HandleNormalizeMany(IEnumerable<Project> items, CancellationToken token = default)
     {
         var itemList = items as Project[] ?? items.ToArray();
         var ownerIds = itemList.Select(x => x.OwnerId).Distinct().ToList();
@@ -375,14 +375,14 @@ public class ProjectNormalizer(ProjectsContext dbContext, INormalizer? normalize
 
         var dbOwnerIds = ownerIds.Where(id => !pendingStakeholders.ContainsKey(id)).ToList();
         var dbStakeholders = dbOwnerIds.Count > 0
-            ? await dbContext.Set<Stakeholder>().Where(o => dbOwnerIds.Contains(o.Id)).ToListAsync()
+            ? await dbContext.Set<Stakeholder>().Where(o => dbOwnerIds.Contains(o.Id)).ToListAsync(token)
             : [];
 
         _owners = [.. pendingStakeholders.Values, .. dbStakeholders];
 
-        await base.HandleNormalizeMany(itemList);
+        await base.HandleNormalizeMany(itemList, token);
     }
-    public override Task HandleNormalize(Project item)
+    public override Task HandleNormalize(Project item, CancellationToken token = default)
     {
         var contentEntries = new List<string?> { item.Code, item.Title, item.Description };
 
@@ -405,20 +405,20 @@ public class ProjectAfterMapper(/*ILinkGenerator linkGenerator*/) : EntityAfterM
 public class ProjectManager(IEntityRepository<Project, ProjectSearchObject, ProjectSortBy, ProjectIncludes> service)
     : EntityWrappingServiceBase<Project, ProjectSearchObject, ProjectSortBy, ProjectIncludes>(service), IEntityService<Project, ProjectSearchObject, ProjectSortBy, ProjectIncludes>
 {
-    public override Task Add(Project item)
+    public override Task Add(Project item, CancellationToken token = default)
     {
         Validate(item);
-        return base.Add(item);
+        return base.Add(item, token);
     }
-    public override Task<Project?> Modify(Project item)
+    public override Task<Project?> Modify(Project item, CancellationToken token = default)
     {
         Validate(item);
-        return base.Modify(item);
+        return base.Modify(item, token);
     }
-    public override Task Save(Project item)
+    public override Task Save(Project item, CancellationToken token = default)
     {
         Validate(item);
-        return base.Save(item);
+        return base.Save(item, token);
     }
 
     public void Validate(Project item)

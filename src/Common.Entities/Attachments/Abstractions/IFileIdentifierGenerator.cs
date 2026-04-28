@@ -2,5 +2,5 @@
 
 public interface IFileIdentifierGenerator
 {
-    Task<string> Generate(IEntityAttachment entity);
+    Task<string> Generate(IEntityAttachment entity, CancellationToken token = default);
 }

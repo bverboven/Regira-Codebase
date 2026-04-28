@@ -9,7 +9,7 @@ namespace Regira.Entities.EFcore.Attachments;
 public class AttachmentFileService<TAttachment, TKey>(IFileService fileService) : IAttachmentFileService<TAttachment, TKey>
     where TAttachment : class, IAttachment<TKey>, new()
 {
-    public async Task<byte[]?> GetBytes(TAttachment item)
+    public async Task<byte[]?> GetBytes(TAttachment item, CancellationToken token = default)
     {
         if (item.HasContent())
         {
@@ -24,7 +24,7 @@ public class AttachmentFileService<TAttachment, TKey>(IFileService fileService) 
 
         return null;
     }
-    public async Task SaveFile(TAttachment item)
+    public async Task SaveFile(TAttachment item, CancellationToken token = default)
     {
         if (!item.HasContent())
         {
@@ -55,7 +55,7 @@ public class AttachmentFileService<TAttachment, TKey>(IFileService fileService) 
         item.Prefix = fileService.GetRelativeFolder(item.Identifier);
         item.FileName ??= Path.GetFileName(item.Identifier);
     }
-    public async Task RemoveFile(TAttachment item)
+    public async Task RemoveFile(TAttachment item, CancellationToken token = default)
     {
         if (string.IsNullOrWhiteSpace(item.Path))
         {

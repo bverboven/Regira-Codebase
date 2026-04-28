@@ -12,7 +12,7 @@ public class AttachmentPrimer(IAttachmentFileService<Attachment, int> fileServic
 public class AttachmentPrimer<TAttachment, TKey>(IAttachmentFileService<TAttachment, TKey> fileService) : EntityPrimerBase<TAttachment>
     where TAttachment : class, IAttachment<TKey>, new()
 {
-    public override async Task PrepareAsync(TAttachment entity, EntityEntry entry)
+    public override async Task PrepareAsync(TAttachment entity, EntityEntry entry, CancellationToken token = default)
     {
         if (entity is { Length: 0, Bytes: not null })
         {
@@ -28,7 +28,7 @@ public class AttachmentPrimer<TAttachment, TKey>(IAttachmentFileService<TAttachm
         {
             if (entity.HasContent())
             {
-                await fileService.SaveFile(entity);
+                await fileService.SaveFile(entity, token);
             }
         }
 
@@ -38,10 +38,10 @@ public class AttachmentPrimer<TAttachment, TKey>(IAttachmentFileService<TAttachm
             if (string.IsNullOrWhiteSpace(entity.Path))
             {
                 // make sure Path is known to physically delete the file
-                entity = (await entry.Context.Set<TAttachment>().SingleAsync(x => x.Id!.Equals(entity.Id)))!;
+                entity = (await entry.Context.Set<TAttachment>().SingleAsync(x => x.Id!.Equals(entity.Id), token))!;
             }
 
-            await fileService.RemoveFile(entity);
+            await fileService.RemoveFile(entity, token);
         }
     }
 }

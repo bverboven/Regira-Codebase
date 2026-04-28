@@ -32,21 +32,21 @@ public class EntityWriteService<TContext, TEntity, TKey>(
     protected TContext DbContext = dbContext;
     public virtual DbSet<TEntity> DbSet => DbContext.Set<TEntity>();
 
-    public virtual async Task Add(TEntity item)
+    public virtual async Task Add(TEntity item, CancellationToken token = default)
     {
-        await PrepareItem(item, null);
+        await PrepareItem(item, null, token);
 
         Logger?.LogDebug($"Adding new {typeof(TEntity).FullName}");
 
         DbSet.Add(item);
     }
-    public virtual async Task<TEntity?> Modify(TEntity item)
+    public virtual async Task<TEntity?> Modify(TEntity item, CancellationToken token = default)
     {
-        var original = await readService.Details(item.Id);
+        var original = await readService.Details(item.Id, token);
 
         Logger?.LogDebug($"Modifying {typeof(TEntity).FullName} #{item.Id} {(original == null ? "" : " with original")}");
 
-        await PrepareItem(item, original);
+        await PrepareItem(item, original, token);
 
         if (original != null)
         {
@@ -58,22 +58,22 @@ public class EntityWriteService<TContext, TEntity, TKey>(
 
         return original;
     }
-    public virtual Task Save(TEntity item)
-        => item.IsNew() ? Add(item) : Modify(item);
-    public virtual Task Remove(TEntity item)
+    public virtual Task Save(TEntity item, CancellationToken token = default)
+        => item.IsNew() ? Add(item, token) : Modify(item, token);
+    public virtual Task Remove(TEntity item, CancellationToken token = default)
     {
         DbSet.Remove(item);
         Logger?.LogDebug($"Removing {typeof(TEntity).FullName} #{item.Id}");
         return Task.CompletedTask;
     }
 
-    public virtual async Task PrepareItem(TEntity item, TEntity? original)
+    public virtual async Task PrepareItem(TEntity item, TEntity? original, CancellationToken token = default)
     {
         var matchingPreppers = preppers.FindMatchingServices(item);
         foreach (var prepper in matchingPreppers)
         {
             Logger?.LogDebug($"Preparing {typeof(TEntity).FullName} #{item.Id} using {prepper.GetType().FullName}");
-            await prepper.Prepare(item, original);
+            await prepper.Prepare(item, original, token);
         }
     }
 

@@ -37,7 +37,7 @@ public class EntityPrimerContainerInterceptor(IServiceProvider serviceProvider, 
                         if (primer.IsMatch(entriesGroup.Key))
                         {
                             logger?.LogDebug($"Priming {entriesGroup.Count()} {entriesGroup.Key.FullName} entries using {primer.GetType().FullName}");
-                            await primer.PrepareManyAsync(entriesGroup.ToArray());
+                            await primer.PrepareManyAsync(entriesGroup.ToArray(), cancellationToken);
                         }
                     }
                 }

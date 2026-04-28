@@ -28,9 +28,9 @@ public class TypedAttachmentService<TContext>(
     /// </summary>
     public virtual IQueryable<IEntityAttachment<int, int, int, Attachment>> Query => _querySets?.ConcatAll() ?? throw new NotImplementedException();
 
-    public async Task<IEntityAttachment<int, int, int, Attachment>?> Details(int id)
-        => (await List(new { id }, new PagingInfo { PageSize = 1 })).SingleOrDefault();
-    public async Task<IList<IEntityAttachment<int, int, int, Attachment>>> List(object? so = null, PagingInfo? pagingInfo = null)
+    public async Task<IEntityAttachment<int, int, int, Attachment>?> Details(int id, CancellationToken token = default)
+        => (await List(new { id }, new PagingInfo { PageSize = 1 }, token)).SingleOrDefault();
+    public async Task<IList<IEntityAttachment<int, int, int, Attachment>>> List(object? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default)
     {
         var query = Query
             .Filter(so?.ToSearchObject())
@@ -41,10 +41,10 @@ public class TypedAttachmentService<TContext>(
 #else
             .AsNoTrackingWithIdentityResolution()
 #endif
-            .ToListAsync();
+            .ToListAsync(token);
 
         return items;
     }
-    public Task<long> Count(object? so)
-        => Query.Filter(so?.ToSearchObject()).LongCountAsync();
+    public Task<long> Count(object? so, CancellationToken token = default)
+        => Query.Filter(so?.ToSearchObject()).LongCountAsync(token);
 }

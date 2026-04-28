@@ -143,17 +143,17 @@ using Regira.Entities.Services.Abstractions;
 
 public interface IEntityReadService<TEntity, in TKey>
 {
-    Task<TEntity?> Details(TKey id);
-    Task<IList<TEntity>> List(object? so = null, PagingInfo? pagingInfo = null);
-    Task<long> Count(object? so);
+    Task<TEntity?> Details(TKey id, CancellationToken token = default);
+    Task<IList<TEntity>> List(object? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default);
+    Task<long> Count(object? so, CancellationToken token = default);
 }
 
 public interface IEntityReadService<TEntity, in TKey, in TSearchObject>
     : IEntityReadService<TEntity, TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
 {
-    Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null);
-    Task<long> Count(TSearchObject? so);
+    Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default);
+    Task<long> Count(TSearchObject? so, CancellationToken token = default);
 }
 
 public interface IEntityReadService<TEntity, in TKey, TSearchObject, TSortBy, TIncludes>
@@ -167,8 +167,9 @@ public interface IEntityReadService<TEntity, in TKey, TSearchObject, TSortBy, TI
         IList<TSearchObject?> so,
         IList<TSortBy> sortBy,
         TIncludes? includes = null,
-        PagingInfo? pagingInfo = null);
-    Task<long> Count(IList<TSearchObject?> so);
+        PagingInfo? pagingInfo = null,
+        CancellationToken token = default);
+    Task<long> Count(IList<TSearchObject?> so, CancellationToken token = default);
 }
 ```
 
@@ -180,10 +181,10 @@ using Regira.Entities.Services.Abstractions;
 public interface IEntityWriteService<TEntity, TKey>
     where TEntity : class, IEntity<TKey>
 {
-    Task Add(TEntity item);
-    Task<TEntity?> Modify(TEntity item);
-    Task Save(TEntity item);           // Upsert: Add or Modify
-    Task Remove(TEntity item);
+    Task Add(TEntity item, CancellationToken token = default);
+    Task<TEntity?> Modify(TEntity item, CancellationToken token = default);
+    Task Save(TEntity item, CancellationToken token = default);  // Upsert: Add or Modify
+    Task Remove(TEntity item, CancellationToken token = default);
     Task<int> SaveChanges(CancellationToken token = default);
 }
 ```
@@ -246,13 +247,13 @@ public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject>(
 {
     protected readonly IEntityService<TEntity, TKey, TSearchObject> Service = service;
 
-    public virtual Task<TEntity?> Details(TKey id);
-    public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null);
-    public virtual Task<long> Count(TSearchObject? so);
-    public virtual Task Add(TEntity item);
-    public virtual Task<TEntity?> Modify(TEntity item);
-    public virtual Task Save(TEntity item);
-    public virtual Task Remove(TEntity item);
+    public virtual Task<TEntity?> Details(TKey id, CancellationToken token = default);
+    public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default);
+    public virtual Task<long> Count(TSearchObject? so, CancellationToken token = default);
+    public virtual Task Add(TEntity item, CancellationToken token = default);
+    public virtual Task<TEntity?> Modify(TEntity item, CancellationToken token = default);
+    public virtual Task Save(TEntity item, CancellationToken token = default);
+    public virtual Task Remove(TEntity item, CancellationToken token = default);
     public virtual Task<int> SaveChanges(CancellationToken token = default);
 }
 
@@ -275,15 +276,15 @@ public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject, TS
     where TIncludes : struct, Enum
 {
     // All IEntityService members are virtual — override as needed:
-    public virtual Task<TEntity?> Details(TKey id);
-    public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null);
-    public virtual Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null);
-    public virtual Task<long> Count(TSearchObject? so);
-    public virtual Task<long> Count(IList<TSearchObject?> so);
-    public virtual Task Add(TEntity item);
-    public virtual Task<TEntity?> Modify(TEntity item);
-    public virtual Task Save(TEntity item);
-    public virtual Task Remove(TEntity item);
+    public virtual Task<TEntity?> Details(TKey id, CancellationToken token = default);
+    public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default);
+    public virtual Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null, CancellationToken token = default);
+    public virtual Task<long> Count(TSearchObject? so, CancellationToken token = default);
+    public virtual Task<long> Count(IList<TSearchObject?> so, CancellationToken token = default);
+    public virtual Task Add(TEntity item, CancellationToken token = default);
+    public virtual Task<TEntity?> Modify(TEntity item, CancellationToken token = default);
+    public virtual Task Save(TEntity item, CancellationToken token = default);
+    public virtual Task Remove(TEntity item, CancellationToken token = default);
     public virtual Task<int> SaveChanges(CancellationToken token = default);
     public virtual TSearchObject? Convert(object? so);
 }
@@ -1086,7 +1087,7 @@ using Regira.Entities.EFcore.Processing.Abstractions;
 public interface IEntityProcessor<TEntity, in TIncludes>
     where TIncludes : struct, Enum
 {
-    Task Process(IList<TEntity> items, TIncludes? includes);
+    Task Process(IList<TEntity> items, TIncludes? includes, CancellationToken token = default);
 }
 ```
 
@@ -1097,12 +1098,12 @@ using Regira.Entities.EFcore.Preppers.Abstractions;
 
 public interface IEntityPrepper
 {
-    Task Prepare(object modified, object? original);
+    Task Prepare(object modified, object? original, CancellationToken token = default);
 }
 
 public interface IEntityPrepper<in TEntity> : IEntityPrepper
 {
-    Task Prepare(TEntity modified, TEntity? original);
+    Task Prepare(TEntity modified, TEntity? original, CancellationToken token = default);
 }
 ```
 
@@ -1113,14 +1114,14 @@ using Regira.Entities.EFcore.Primers.Abstractions;
 
 public interface IEntityPrimer
 {
-    Task PrepareManyAsync(IList<EntityEntry> entries);
-    Task PrepareAsync(object entity, EntityEntry entry);
+    Task PrepareManyAsync(IList<EntityEntry> entries, CancellationToken token = default);
+    Task PrepareAsync(object entity, EntityEntry entry, CancellationToken token = default);
     bool CanPrepare(object entity);
 }
 
 public interface IEntityPrimer<in T> : IEntityPrimer
 {
-    Task PrepareAsync(T entity, EntityEntry entry);
+    Task PrepareAsync(T entity, EntityEntry entry, CancellationToken token = default);
     bool CanPrepare(T entity);
 }
 ```
@@ -1133,14 +1134,14 @@ using Regira.Entities.EFcore.Normalizing.Abstractions;
 public interface IEntityNormalizer
 {
     bool IsExclusive { get; }
-    Task HandleNormalize(object item);
-    Task HandleNormalizeMany(IEnumerable<object> items);
+    Task HandleNormalize(object item, CancellationToken token = default);
+    Task HandleNormalizeMany(IEnumerable<object> items, CancellationToken token = default);
 }
 
 public interface IEntityNormalizer<in T> : IEntityNormalizer
 {
-    Task HandleNormalize(T item);
-    Task HandleNormalizeMany(IEnumerable<T> items);
+    Task HandleNormalize(T item, CancellationToken token = default);
+    Task HandleNormalizeMany(IEnumerable<T> items, CancellationToken token = default);
 }
 ```
 

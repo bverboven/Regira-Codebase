@@ -10,7 +10,7 @@ public class TitlePrimer : EntityPrimerBase<IHasNormalizedTitle>
 {
     private readonly DefaultNormalizer _normalizer = new(new NormalizeOptions { RemoveDiacritics = true, Transform = TextTransform.ToUpperCase });
 
-    public override Task PrepareAsync(IHasNormalizedTitle entity, EntityEntry entry)
+    public override Task PrepareAsync(IHasNormalizedTitle entity, EntityEntry entry, CancellationToken token = default)
     {
         entity.NormalizedTitle = _normalizer.Normalize(entity.Title);
 

@@ -23,17 +23,17 @@ IEntityService<TEntity, TKey, TSearchObject, TSortBy, TIncludes>
 
 ```csharp
 // Get single entity details by ID
-Task<TEntity?> Details(TKey id)
+Task<TEntity?> Details(TKey id, CancellationToken token = default)
 
 // List with custom SearchObject (enhanced filtering)
-Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
+Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default)
 // List with sorting and includes (complex filtering)
-Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null)
+Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null, CancellationToken token = default)
 
 // Count with custom (nullable) SearchObject
-Task<long> Count(TSearchObject? so)
+Task<long> Count(TSearchObject? so, CancellationToken token = default)
 // Count with multiple SearchObjects
-Task<long> Count(IList<TSearchObject?> so)
+Task<long> Count(IList<TSearchObject?> so, CancellationToken token = default)
 ```
 
 ### Write Operations
@@ -42,10 +42,10 @@ Task<long> Count(IList<TSearchObject?> so)
 - You **must call** `SaveChanges()` to commit all changes to the database
 
 ```csharp
-Task Save(TEntity item) // calls Add() or Modify() internally
-Task Add(TEntity item)
-Task<TEntity?> Modify(TEntity item)
-Task Remove(TEntity item)
+Task Save(TEntity item, CancellationToken token = default) // calls Add() or Modify() internally
+Task Add(TEntity item, CancellationToken token = default)
+Task<TEntity?> Modify(TEntity item, CancellationToken token = default)
+Task Remove(TEntity item, CancellationToken token = default)
 // Persist all changes to database
 Task<int> SaveChanges(CancellationToken token = default)
 ```
@@ -151,7 +151,7 @@ public interface IIncludableQueryBuilder<TEntity, TKey, TIncludes>
 public interface IEntityProcessor<TEntity, TIncludes>
     where TIncludes : struct, Enum
 {
-    Task Process(IList<TEntity> items, TIncludes? includes);
+    Task Process(IList<TEntity> items, TIncludes? includes, CancellationToken token = default);
 }
 ```
 
@@ -168,12 +168,12 @@ public interface IEntityProcessor<TEntity, TIncludes>
 // interface
 public interface IEntityPrepper<in TEntity> : IEntityPrepper
 {
-    Task Prepare(TEntity modified, TEntity? original);
+    Task Prepare(TEntity modified, TEntity? original, CancellationToken token = default);
 }
 // base class
 public abstract class EntityPrepperBase<TEntity> : IEntityPrepper<TEntity>
 {
-    public abstract Task Prepare(TEntity modified, TEntity? original);
+    public abstract Task Prepare(TEntity modified, TEntity? original, CancellationToken token = default);
 }
 ```
 
@@ -187,15 +187,15 @@ public abstract class EntityPrepperBase<TEntity> : IEntityPrepper<TEntity>
 // interface
 public interface IEntityPrimer<in T>
 {
-    Task PrepareAsync(T entity, EntityEntry entry);
+    Task PrepareAsync(T entity, EntityEntry entry, CancellationToken token = default);
     bool CanPrepare(T entity);
 }
 // base class
 public abstract class EntityPrimerBase<T> : IEntityPrimer<T>
 {
-    public virtual async Task PrepareManyAsync(IList<EntityEntry> entries)
+    public virtual async Task PrepareManyAsync(IList<EntityEntry> entries, CancellationToken token = default)
 
-    public abstract Task PrepareAsync(T entity, EntityEntry entry);
+    public abstract Task PrepareAsync(T entity, EntityEntry entry, CancellationToken token = default);
     public virtual bool CanPrepare(T? entity) => entity != null;
 }
 ```

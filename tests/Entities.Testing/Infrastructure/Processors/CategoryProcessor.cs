@@ -7,7 +7,7 @@ namespace Entities.Testing.Infrastructure.Processors;
 
 public class CategoryProcessor(ProductContext dbContext) : EntityProcessor<Category, EntityIncludes>
 {
-    public override async Task Process(IList<Category> items, EntityIncludes? _)
+    public override async Task Process(IList<Category> items, EntityIncludes? _, CancellationToken token = default)
     {
         var categoryIds = items
             .Select(x => x.Id)

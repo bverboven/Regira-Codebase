@@ -18,7 +18,7 @@ public class EntityAttachmentWriteService<TContext, TEntityAttachment, TEntityAt
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
     where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>
 {
-    public override Task Remove(TEntityAttachment item)
+    public override Task Remove(TEntityAttachment item, CancellationToken token = default)
     {
         // Cannot move this logic to the EntityAttachmentPrimer, since it's using an interface and not the typed Attachment class
         DbContext.Remove(item.Attachment!);

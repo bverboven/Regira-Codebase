@@ -11,10 +11,10 @@ public class DepartmentAdministratorNormalizer(ContosoContext dbContext, IEntity
 {
     public override bool IsExclusive => true;
 
-    public override async Task HandleNormalizeMany(IEnumerable<Department> items)
+    public override async Task HandleNormalizeMany(IEnumerable<Department> items, CancellationToken token = default)
     {
         var itemsList = items.ToArray();
-        await hasCoursesNormalizer.HandleNormalizeMany(itemsList);
+        await hasCoursesNormalizer.HandleNormalizeMany(itemsList, token);
 
         var adminIds = itemsList.Select(x => x.AdministratorId).Where(id => id.HasValue).Distinct().ToArray();
         var admins = await dbContext.Persons.Where(x => adminIds.Contains(x.Id)).ToListAsync();

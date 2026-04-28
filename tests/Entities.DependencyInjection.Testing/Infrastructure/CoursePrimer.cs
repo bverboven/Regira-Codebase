@@ -7,7 +7,7 @@ namespace Entities.DependencyInjection.Testing.Infrastructure;
 
 public class CoursePrimer : EntityPrimerBase<Course>
 {
-    public override Task PrepareAsync(Course entity, EntityEntry entry)
+    public override Task PrepareAsync(Course entity, EntityEntry entry, CancellationToken token = default)
     {
         if (entity.IsNew())
         {

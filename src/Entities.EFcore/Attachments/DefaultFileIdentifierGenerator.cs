@@ -8,7 +8,7 @@ public class DefaultFileIdentifierGenerator<TAttachmentKey, TAttachment>(IAttach
     : IFileIdentifierGenerator
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
 {
-    public virtual Task<string> Generate(IEntityAttachment entity)
+    public virtual Task<string> Generate(IEntityAttachment entity, CancellationToken token = default)
     {
         var entityType = entity.GetType();
         var idProp = entityType.GetProperty(nameof(EntityAttachment.ObjectId))!;

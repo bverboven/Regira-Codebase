@@ -21,28 +21,28 @@ public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject>(
 {
     protected readonly IEntityService<TEntity, TKey, TSearchObject> Service = service;
 
-    public virtual Task<TEntity?> Details(TKey id)
-        => Service.Details(id);
+    public virtual Task<TEntity?> Details(TKey id, CancellationToken token = default)
+        => Service.Details(id, token);
 
-    public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
-        => Service.List(so, pagingInfo);
-    public virtual Task<long> Count(TSearchObject? so)
-        => Service.Count(so);
+    public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default)
+        => Service.List(so, pagingInfo, token);
+    public virtual Task<long> Count(TSearchObject? so, CancellationToken token = default)
+        => Service.Count(so, token);
 
-    public virtual Task<IList<TEntity>> List(object? so, PagingInfo? pagingInfo)
-        => Service.List(so, pagingInfo);
-    public virtual Task<long> Count(object? so)
-        => Service.Count(so);
+    public virtual Task<IList<TEntity>> List(object? so, PagingInfo? pagingInfo, CancellationToken token = default)
+        => Service.List(so, pagingInfo, token);
+    public virtual Task<long> Count(object? so, CancellationToken token = default)
+        => Service.Count(so, token);
 
 
-    public virtual Task Add(TEntity item)
-        => Service.Add(item);
-    public virtual Task<TEntity?> Modify(TEntity item)
-        => Service.Modify(item);
-    public virtual Task Save(TEntity item)
-        => Service.Save(item);
-    public virtual Task Remove(TEntity item)
-        => Service.Remove(item);
+    public virtual Task Add(TEntity item, CancellationToken token = default)
+        => Service.Add(item, token);
+    public virtual Task<TEntity?> Modify(TEntity item, CancellationToken token = default)
+        => Service.Modify(item, token);
+    public virtual Task Save(TEntity item, CancellationToken token = default)
+        => Service.Save(item, token);
+    public virtual Task Remove(TEntity item, CancellationToken token = default)
+        => Service.Remove(item, token);
 
     public virtual Task<int> SaveChanges(CancellationToken token = default)
         => Service.SaveChanges(token);
@@ -63,30 +63,30 @@ public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject, TS
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
-    public virtual Task<TEntity?> Details(TKey id)
-        => service.Details(id);
-    public virtual Task<IList<TEntity>> List(object? so = null, PagingInfo? pagingInfo = null)
-        => service.List(so, pagingInfo);
-    public Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
-        => service.List(so, pagingInfo);
-    public virtual Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null)
-        => service.List(so, sortBy, includes, pagingInfo);
+    public virtual Task<TEntity?> Details(TKey id, CancellationToken token = default)
+        => service.Details(id, token);
+    public virtual Task<IList<TEntity>> List(object? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default)
+        => service.List(so, pagingInfo, token);
+    public Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default)
+        => service.List(so, pagingInfo, token);
+    public virtual Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null, CancellationToken token = default)
+        => service.List(so, sortBy, includes, pagingInfo, token);
 
-    public virtual Task<long> Count(object? so)
-        => service.Count(so);
-    public Task<long> Count(TSearchObject? so)
-        => service.Count(so);
-    public virtual Task<long> Count(IList<TSearchObject?> so)
-        => service.Count(so);
+    public virtual Task<long> Count(object? so, CancellationToken token = default)
+        => service.Count(so, token);
+    public Task<long> Count(TSearchObject? so, CancellationToken token = default)
+        => service.Count(so, token);
+    public virtual Task<long> Count(IList<TSearchObject?> so, CancellationToken token = default)
+        => service.Count(so, token);
 
-    public virtual Task Add(TEntity item)
-        => service.Add(item);
-    public virtual Task<TEntity?> Modify(TEntity item)
-        => service.Modify(item);
-    public virtual Task Save(TEntity item)
-        => service.Save(item);
-    public virtual Task Remove(TEntity item)
-        => service.Remove(item);
+    public virtual Task Add(TEntity item, CancellationToken token = default)
+        => service.Add(item, token);
+    public virtual Task<TEntity?> Modify(TEntity item, CancellationToken token = default)
+        => service.Modify(item, token);
+    public virtual Task Save(TEntity item, CancellationToken token = default)
+        => service.Save(item, token);
+    public virtual Task Remove(TEntity item, CancellationToken token = default)
+        => service.Remove(item, token);
 
     public virtual Task<int> SaveChanges(CancellationToken token = default)
         => service.SaveChanges(token);
