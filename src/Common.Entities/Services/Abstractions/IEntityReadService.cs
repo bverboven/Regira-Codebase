@@ -6,16 +6,16 @@ namespace Regira.Entities.Services.Abstractions;
 // With ID type
 public interface IEntityReadService<TEntity, in TKey>
 {
-    Task<TEntity?> Details(TKey id);
-    Task<IList<TEntity>> List(object? so = null, PagingInfo? pagingInfo = null);
-    Task<long> Count(object? so);
+    Task<TEntity?> Details(TKey id, CancellationToken token = default);
+    Task<IList<TEntity>> List(object? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default);
+    Task<long> Count(object? so, CancellationToken token = default);
 }
 
 public interface IEntityReadService<TEntity, in TKey, in TSearchObject> : IEntityReadService<TEntity, TKey>
     where TSearchObject : class, ISearchObject<TKey>, new()
 {
-    Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null);
-    Task<long> Count(TSearchObject? so);
+    Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default);
+    Task<long> Count(TSearchObject? so, CancellationToken token = default);
 }
 
 public interface IEntityReadService<TEntity, in TKey, TSearchObject, TSortBy, TIncludes> : IEntityReadService<TEntity, TKey, TSearchObject>
@@ -24,8 +24,8 @@ public interface IEntityReadService<TEntity, in TKey, TSearchObject, TSortBy, TI
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
-    Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null);
-    Task<long> Count(IList<TSearchObject?> so);
+    Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null, CancellationToken token = default);
+    Task<long> Count(IList<TSearchObject?> so, CancellationToken token = default);
 }
 
 // Without ID type

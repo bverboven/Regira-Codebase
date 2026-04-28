@@ -17,14 +17,15 @@ public static class DbContextExtensions
     /// </summary>
     /// <param name="dbContext"></param>
     /// <param name="entityType"></param>
+    /// <param name="token"></param>
     /// <returns></returns>
-    public static Task ApplyPrimers(this DbContext dbContext, Type? entityType = null)
+    public static Task ApplyPrimers(this DbContext dbContext, Type? entityType = null, CancellationToken token = default)
     {
         var primerContainer = dbContext.GetService<EntityPrimerContainer>();
-        return primerContainer.ApplyPrimers(entityType);
+        return primerContainer.ApplyPrimers(entityType, token);
     }
-    public static Task ApplyPrimers<T>(this DbContext dbContext)
-        => dbContext.ApplyPrimers(typeof(T));
+    public static Task ApplyPrimers<T>(this DbContext dbContext, CancellationToken token = default)
+        => dbContext.ApplyPrimers(typeof(T), token);
     #endregion
 
 

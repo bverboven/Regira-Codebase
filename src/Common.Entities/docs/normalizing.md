@@ -31,8 +31,8 @@ public abstract class EntityNormalizerBase<T>(INormalizer? normalizer = null) : 
 {
     public virtual bool IsExclusive => false;
 
-    public abstract Task HandleNormalize(T item);
-    public virtual async Task HandleNormalizeMany(IEnumerable<T> items) {...;
+    public abstract Task HandleNormalize(T item, CancellationToken token = default);
+    public virtual async Task HandleNormalizeMany(IEnumerable<T> items, CancellationToken token = default) {...;
 }
 ```
 

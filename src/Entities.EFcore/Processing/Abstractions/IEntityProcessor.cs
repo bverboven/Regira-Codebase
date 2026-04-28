@@ -3,5 +3,5 @@
 public interface IEntityProcessor<TEntity, TIncludes>
     where TIncludes : struct, Enum
 {
-    Task Process(IList<TEntity> items, TIncludes? includes);
+    Task Process(IList<TEntity> items, TIncludes? includes, CancellationToken token = default);
 }

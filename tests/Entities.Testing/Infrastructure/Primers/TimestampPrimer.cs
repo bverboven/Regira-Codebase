@@ -7,7 +7,7 @@ namespace Entities.Testing.Infrastructure.Primers;
 
 public class TimestampPrimer : EntityPrimerBase<IHasTimestamps>
 {
-    public override Task PrepareAsync(IHasTimestamps entity, EntityEntry entry)
+    public override Task PrepareAsync(IHasTimestamps entity, EntityEntry entry, CancellationToken token = default)
     {
         entity.Created = (DateTime)entry.OriginalValues[nameof(entity.Created)]!;
 

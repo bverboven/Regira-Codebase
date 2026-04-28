@@ -24,7 +24,7 @@ public class RelatedAttachmentsPrepper<TContext, TEntity, TEntityAttachment, TEn
     }
     private readonly Options _options = options ?? new Options();
 
-    public override Task Prepare(TEntity modified, TEntity? original)
+    public override Task Prepare(TEntity modified, TEntity? original, CancellationToken token = default)
     {
         if (original != null)
         {

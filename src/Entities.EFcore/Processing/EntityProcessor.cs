@@ -9,6 +9,6 @@ public class EntityProcessor<TEntity, TIncludes>(Func<IList<TEntity>, TIncludes?
     //Task IEntityProcessor.Process<T, TIncludes>(IList<T> items, TIncludes? includes)
     //    => Process(items.OfType<TEntity>().ToList(), includes);
 
-    public virtual Task Process(IList<TEntity> items, TIncludes? includes)
+    public virtual Task Process(IList<TEntity> items, TIncludes? includes, CancellationToken token = default)
         => process?.Invoke(items, includes) ?? Task.CompletedTask;
 }

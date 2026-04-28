@@ -11,7 +11,7 @@ public class RelatedCollectionPrepper<TContext, TEntity, TRelated, TEntityKey, T
     where TEntity : class, IEntity<TEntityKey>
     where TRelated : class, IEntity<TRelatedKey>
 {
-    public override Task Prepare(TEntity modified, TEntity? original)
+    public override Task Prepare(TEntity modified, TEntity? original, CancellationToken token = default)
     {
         if (original != null)
         {

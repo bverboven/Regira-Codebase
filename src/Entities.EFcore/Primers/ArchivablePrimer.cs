@@ -7,7 +7,7 @@ namespace Regira.Entities.EFcore.Primers;
 
 public class ArchivablePrimer : EntityPrimerBase<IArchivable>
 {
-    public override Task PrepareAsync(IArchivable entity, EntityEntry entry)
+    public override Task PrepareAsync(IArchivable entity, EntityEntry entry, CancellationToken token = default)
     {
         if (entry.State == EntityState.Deleted)
         {

@@ -6,7 +6,7 @@ namespace Entities.Testing.Infrastructure.Normalizers;
 
 public class PersonNormalizer(INormalizer? normalizer) : EntityNormalizerBase<Person>(normalizer)
 {
-    public override Task HandleNormalizeMany(IEnumerable<Person> items)
+    public override Task HandleNormalizeMany(IEnumerable<Person> items, CancellationToken token = default)
     {
         foreach (var item in items)
         {

@@ -34,9 +34,9 @@ The `AttachmentFileService` handles the physical file storage and retrieval for 
 ```csharp
 public class AttachmentFileService<TAttachment, TKey>(IFileService fileService) : IAttachmentFileService<TAttachment, TKey>
 {
-    public async Task<byte[]?> GetBytes(TAttachment item)
-    public async Task SaveFile(TAttachment item)
-    public async Task RemoveFile(TAttachment item)
+    public async Task<byte[]?> GetBytes(TAttachment item, CancellationToken token = default)
+    public async Task SaveFile(TAttachment item, CancellationToken token = default)
+    public async Task RemoveFile(TAttachment item, CancellationToken token = default)
 
     public string GetIdentifier(string fileName)
     public string GetRelativeFolder(TAttachment item)

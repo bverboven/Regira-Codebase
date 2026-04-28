@@ -33,7 +33,7 @@ public class EntityPrimerContainer
             .ToArray();
     }
 
-    public async Task ApplyPrimers(Type? entityType = null)
+    public async Task ApplyPrimers(Type? entityType = null, CancellationToken token = default)
     {
         var groupedEntries = _dbContext.GetPendingEntries()
             .GroupBy(e => e.Entity.GetType())
@@ -47,7 +47,7 @@ public class EntityPrimerContainer
                 var primers = Primers.Where(x => TypeUtility.ImplementsInterface(x.GetType(), primerType));
                 foreach (var primer in primers)
                 {
-                    await primer.PrepareManyAsync(entriesGroup.ToArray());
+                    await primer.PrepareManyAsync(entriesGroup.ToArray(), token);
                 }
             }
         }
@@ -56,9 +56,10 @@ public class EntityPrimerContainer
     /// 
     /// </summary>
     /// <typeparam name="T">Type of entity</typeparam>
+    /// <param name="token"></param>
     /// <returns></returns>
-    public Task ApplyPrimers<T>()
-        => ApplyPrimers(typeof(T));
+    public Task ApplyPrimers<T>(CancellationToken token = default)
+        => ApplyPrimers(typeof(T), token);
 }
 
 public static class EntityPrimerContainerExtensions

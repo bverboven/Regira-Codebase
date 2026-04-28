@@ -15,15 +15,15 @@ public class CategoryPrimer(
     private int _maxSortOrder;
 
 
-    public override async Task PrepareManyAsync(IList<EntityEntry> entries)
+    public override async Task PrepareManyAsync(IList<EntityEntry> entries, CancellationToken token = default)
     {
         _maxSortOrder = await dbContext.Categories.MaxAsync(x => (int?)x.SortOrder) ?? -1;
-        await base.PrepareManyAsync(entries);
+        await base.PrepareManyAsync(entries, token);
     }
-    public override async Task PrepareAsync(Category entity, EntityEntry entry)
+    public override async Task PrepareAsync(Category entity, EntityEntry entry, CancellationToken token = default)
     {
-        await timestampPrimer.PrepareAsync(entity, entry);
-        await normalizingPrimer.PrepareAsync(entity, entry);
+        await timestampPrimer.PrepareAsync(entity, entry, token);
+        await normalizingPrimer.PrepareAsync(entity, entry, token);
         if (entry.State == EntityState.Added)
         {
             entity.SortOrder = ++_maxSortOrder;

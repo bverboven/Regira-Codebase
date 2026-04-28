@@ -7,7 +7,7 @@ namespace Entities.Testing.Infrastructure.Primers;
 
 public class PasswordPrimer : EntityPrimerBase<IHasEncryptedPassword>
 {
-    public override Task PrepareAsync(IHasEncryptedPassword entity, EntityEntry entry)
+    public override Task PrepareAsync(IHasEncryptedPassword entity, EntityEntry entry, CancellationToken token = default)
     {
         if (!string.IsNullOrWhiteSpace(entity.Password))
         {

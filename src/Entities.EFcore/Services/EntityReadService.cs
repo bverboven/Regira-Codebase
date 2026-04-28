@@ -39,7 +39,7 @@ public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, 
     protected ILogger? Logger = loggerFactory?.CreateLogger<EntityWriteService<TContext, TEntity, TKey>>();
     public virtual DbSet<TEntity> DbSet => dbContext.Set<TEntity>();
     // Details
-    public virtual async Task<TEntity?> Details(TKey id)
+    public virtual async Task<TEntity?> Details(TKey id, CancellationToken token = default)
     {
         if (id == null || id.Equals(default(TKey)))
         {
@@ -56,7 +56,7 @@ public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, 
 #else
             .AsNoTrackingWithIdentityResolution()
 #endif
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(token);
 
         if (item == null || item.Id?.Equals(id) != true)
         {
@@ -69,14 +69,14 @@ public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, 
         foreach (var entityProcessor in entityProcessors)
         {
             Logger?.LogDebug($"Processing {typeof(TEntity).FullName} #{item.Id} using {entityProcessor.GetType().FullName}");
-            await entityProcessor.Process([item], includes);
+            await entityProcessor.Process([item], includes, token);
         }
 
         return item;
     }
 
     // List
-    public virtual async Task<IList<TEntity>> List(IList<TSearchObject?> searchObjects, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null)
+    public virtual async Task<IList<TEntity>> List(IList<TSearchObject?> searchObjects, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null, CancellationToken token = default)
     {
         Logger?.LogDebug($"Fetching list for {typeof(TEntity).FullName} sorting by {string.Join(",", sortBy)} includes {includes}");
 
@@ -86,29 +86,29 @@ public class EntityReadService<TContext, TEntity, TKey, TSearchObject, TSortBy, 
 #else
             .AsNoTrackingWithIdentityResolution()
 #endif
-            .ToListAsync();
+            .ToListAsync(token);
 
         foreach (var entityProcessor in entityProcessors)
         {
             Logger?.LogDebug($"Processing {typeof(TEntity).FullName} #({string.Join(",", items.Select(x => x.Id))}) using {entityProcessor.GetType().FullName}");
-            await entityProcessor.Process(items, includes);
+            await entityProcessor.Process(items, includes, token);
         }
 
         return items;
     }
 
-    public virtual async Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
-        => await List([so], [], null, pagingInfo);
-    Task<IList<TEntity>> IEntityReadService<TEntity, TKey>.List(object? so, PagingInfo? pagingInfo)
-        => List(Convert(so), pagingInfo);
+    public virtual async Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default)
+        => await List([so], [], null, pagingInfo, token);
+    Task<IList<TEntity>> IEntityReadService<TEntity, TKey>.List(object? so, PagingInfo? pagingInfo, CancellationToken token)
+        => List(Convert(so), pagingInfo, token);
 
     // Count
-    public virtual Task<long> Count(IList<TSearchObject?> searchObjects)
-        => queryBuilder.FilterList(dbContext.Set<TEntity>(), searchObjects).LongCountAsync();
-    public virtual Task<long> Count(TSearchObject? so = null)
-        => queryBuilder.Filter(DbSet, so).LongCountAsync();
-    Task<long> IEntityReadService<TEntity, TKey>.Count(object? so)
-        => Count(Convert(so));
+    public virtual Task<long> Count(IList<TSearchObject?> searchObjects, CancellationToken token = default)
+        => queryBuilder.FilterList(dbContext.Set<TEntity>(), searchObjects).LongCountAsync(token);
+    public virtual Task<long> Count(TSearchObject? so = null, CancellationToken token = default)
+        => queryBuilder.Filter(DbSet, so).LongCountAsync(token);
+    Task<long> IEntityReadService<TEntity, TKey>.Count(object? so, CancellationToken token)
+        => Count(Convert(so), token);
 
     // Helpers
     public virtual TSearchObject? Convert(object? so)

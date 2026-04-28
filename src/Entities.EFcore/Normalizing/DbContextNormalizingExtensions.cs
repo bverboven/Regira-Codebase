@@ -14,13 +14,14 @@ public static class DbContextNormalizingExtensions
     /// </summary>
     /// <param name="dbContext"></param>
     /// <param name="entityType"></param>
-    public static Task ApplyNormalizers(this DbContext dbContext, Type? entityType = null)
+    /// <param name="token"></param>
+    public static Task ApplyNormalizers(this DbContext dbContext, Type? entityType = null, CancellationToken token = default)
         => ApplyNormalizers(dbContext, dbContext.GetPendingEntries()
             .Where(e => e.State != EntityState.Deleted)
             .Where(x => entityType == null || x.Entity.GetType() == entityType || TypeUtility.GetBaseTypes(x.Entity.GetType()).Contains(entityType))
-            .Select(x => x.Entity));
+            .Select(x => x.Entity), token);
     /// <summary>
-    /// <inheritdoc cref="ApplyNormalizers(DbContext, Type?)"/>
+    /// <inheritdoc cref="ApplyNormalizers(DbContext, Type?, CancellationToken)"/>
     /// </summary>
     /// <typeparam name="T">Entity type</typeparam>
     /// <param name="dbContext"></param>
@@ -31,7 +32,8 @@ public static class DbContextNormalizingExtensions
     /// </summary>
     /// <param name="dbContext"></param>
     /// <param name="items"></param>
-    public static async Task ApplyNormalizers(this DbContext dbContext, IEnumerable<object> items)
+    /// <param name="token"></param>
+    public static async Task ApplyNormalizers(this DbContext dbContext, IEnumerable<object> items, CancellationToken token = default)
     {
         var normalizingContainer = dbContext.GetService<EntityNormalizerContainer>();
 
@@ -42,13 +44,13 @@ public static class DbContextNormalizingExtensions
             var exclusiveNormalizer = normalizers.FirstOrDefault(x => x.IsExclusive);
             if (exclusiveNormalizer != null)
             {
-                await exclusiveNormalizer.HandleNormalizeMany(typedItems);
+                await exclusiveNormalizer.HandleNormalizeMany(typedItems, token);
             }
             else
             {
                 foreach (var normalizer in normalizers)
                 {
-                    await normalizer.HandleNormalizeMany(typedItems);
+                    await normalizer.HandleNormalizeMany(typedItems, token);
                 }
             }
         }

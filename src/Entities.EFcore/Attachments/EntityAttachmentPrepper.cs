@@ -11,7 +11,7 @@ public class EntityAttachmentPrepper<TContext, TEntityAttachment, TEntityAttachm
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
     where TEntityAttachment : class, IEntityAttachment<TEntityAttachmentKey, TObjectKey, TAttachmentKey, TAttachment>
 {
-    public override Task Prepare(TEntityAttachment item, TEntityAttachment? original)
+    public override Task Prepare(TEntityAttachment item, TEntityAttachment? original, CancellationToken token = default)
     {
         item.Attachment ??= original?.Attachment;
 

@@ -326,7 +326,7 @@ public class ProductNormalizer : EntityNormalizerBase<Product>
         _normalizer = normalizer;
     }
 
-    public override async Task HandleNormalize(Product item)
+    public override async Task HandleNormalize(Product item, CancellationToken token = default)
     {
         var content = $"{item.Title} {item.Description}".Trim();
         item.NormalizedContent = await _normalizer.Normalize(content);

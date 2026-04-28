@@ -385,17 +385,17 @@ Examples:
 
 ```csharp
 // Read
-Task<TEntity?> Details(TKey id)
-Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
-Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes, PagingInfo? pagingInfo)
-Task<long> Count(TSearchObject? so)
-Task<long> Count(IList<TSearchObject?> so)
+Task<TEntity?> Details(TKey id, CancellationToken token = default)
+Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default)
+Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes, PagingInfo? pagingInfo, CancellationToken token = default)
+Task<long> Count(TSearchObject? so, CancellationToken token = default)
+Task<long> Count(IList<TSearchObject?> so, CancellationToken token = default)
 
 // Write
-Task Save(TEntity item)
-Task Add(TEntity item)
-Task<TEntity?> Modify(TEntity item)
-Task Remove(TEntity item)
+Task Save(TEntity item, CancellationToken token = default)
+Task Add(TEntity item, CancellationToken token = default)
+Task<TEntity?> Modify(TEntity item, CancellationToken token = default)
+Task Remove(TEntity item, CancellationToken token = default)
 Task<int> SaveChanges(CancellationToken token = default)
 ```
 

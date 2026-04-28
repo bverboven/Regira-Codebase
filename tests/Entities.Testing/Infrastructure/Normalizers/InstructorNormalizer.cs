@@ -10,7 +10,7 @@ namespace Entities.Testing.Infrastructure.Normalizers;
 
 public class InstructorNormalizer(IServiceProvider sp, INormalizer? normalizer) : DefaultEntityNormalizer<Instructor>(normalizer)
 {
-    public override async Task HandleNormalizeMany(IEnumerable<Instructor> items)
+    public override async Task HandleNormalizeMany(IEnumerable<Instructor> items, CancellationToken token = default)
     {
         // injecting DbContext directly will create circular dependency, so use a IServiceProvider
         var dbContext = sp.GetRequiredService<ContosoContext>();

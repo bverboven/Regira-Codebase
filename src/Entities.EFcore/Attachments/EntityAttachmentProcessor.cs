@@ -12,10 +12,10 @@ public class EntityAttachmentProcessor<TEntityAttachment, TKey, TObjectKey, TAtt
     where TAttachment : class, IAttachment<TAttachmentKey>, new()
     where TEntityAttachment : class, IEntityAttachment<TKey, TObjectKey, TAttachmentKey, TAttachment>
 {
-    public override Task Process(IList<TEntityAttachment> items, EntityIncludes? includes)
+    public override Task Process(IList<TEntityAttachment> items, EntityIncludes? includes, CancellationToken token = default)
     {
         var attachments = items.Select(x => x.Attachment!).ToArray();
 
-        return attachmentProcessor.Process(attachments, includes);
+        return attachmentProcessor.Process(attachments, includes, token);
     }
 }

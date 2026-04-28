@@ -10,7 +10,7 @@ namespace Regira.Entities.EFcore.Primers;
 /// </summary>
 public class HasLastModifiedDbPrimer : EntityPrimerBase<IHasLastModified>
 {
-    public override Task PrepareAsync(IHasLastModified entity, EntityEntry entry)
+    public override Task PrepareAsync(IHasLastModified entity, EntityEntry entry, CancellationToken token = default)
     {
         if (entry.State == EntityState.Modified)
         {

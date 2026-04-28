@@ -199,7 +199,7 @@ public class RelatedCategoryInputDto { public int Id,ChildId,ParentId; }
 // Entities/Categories/CategoryProcessor.cs — separate class processor using DbContext DI
 public class CategoryProcessor(WebshopDbContext dbContext) : IEntityProcessor<Category, CategoryIncludes>
 {
-    public async Task Process(IList<Category> items, CategoryIncludes? includes)
+    public async Task Process(IList<Category> items, CategoryIncludes? includes, CancellationToken token = default)
     {
         var itemIds = items.Select(x => x.Id).ToList();
         var counts = await dbContext.Categories
@@ -449,9 +449,9 @@ public class OrderLineInputDto { public int Id,OrderId,ProductId,Quantity; publi
 // Entities/Orders/OrderNormalizer.cs — enriches NormalizedContent with customer + product text
 public class OrderNormalizer(WebshopDbContext dbContext) : EntityNormalizerBase<Order>
 {
-    public override async Task HandleNormalize(Order item)
+    public override async Task HandleNormalize(Order item, CancellationToken token = default)
     {
-        await base.HandleNormalize(item);
+        await base.HandleNormalize(item, token);
         var productIds = item.OrderLines!.Select(ol => ol.ProductId).ToList();
         var productContents = await dbContext.Products
             .Where(p => productIds.Contains(p.Id))
@@ -484,9 +484,9 @@ public interface IOrderService : IEntityService<Order, OrderSearchObject, Entity
 public class OrderManager(IEntityRepository<Order, OrderSearchObject, EntitySortBy, OrderIncludes> service)
     : EntityWrappingServiceBase<Order, OrderSearchObject, EntitySortBy, OrderIncludes>(service), IOrderService
 {
-    public override Task Add(Order item) { Validate(item); if (string.IsNullOrWhiteSpace(item.Code)) item.Code = $"ORD-{DateTime.UtcNow:yyyyMMddHHmmssfff}"; return base.Add(item); }
-    public override Task<Order?> Modify(Order item) { Validate(item); return base.Modify(item); }
-    public override Task Save(Order item) { Validate(item); return base.Save(item); }
+    public override Task Add(Order item, CancellationToken token = default) { Validate(item); if (string.IsNullOrWhiteSpace(item.Code)) item.Code = $"ORD-{DateTime.UtcNow:yyyyMMddHHmmssfff}"; return base.Add(item, token); }
+    public override Task<Order?> Modify(Order item, CancellationToken token = default) { Validate(item); return base.Modify(item, token); }
+    public override Task Save(Order item, CancellationToken token = default) { Validate(item); return base.Save(item, token); }
     private static void Validate(Order item)
     {
         if (item.OrderLines?.Any() != true)
@@ -572,7 +572,7 @@ e.Prepare(async (item, dbContext) =>
 // Separate class:
 public class ProductPrepper : EntityPrepperBase<Product>
 {
-    public override Task Prepare(Product modified, Product? original)
+    public override Task Prepare(Product modified, Product? original, CancellationToken token = default)
     {
         modified.Slug ??= modified.Title.ToLowerInvariant().Replace(' ', '-');
         return Task.CompletedTask;
@@ -587,7 +587,7 @@ public class ProductPrepper : EntityPrepperBase<Product>
 // Entity-specific primer:
 public class ProductPrimer : EntityPrimerBase<Product>
 {
-    public override Task PrepareAsync(Product entity, EntityEntry entry)
+    public override Task PrepareAsync(Product entity, EntityEntry entry, CancellationToken token = default)
     {
         if (entry.State == EntityState.Added)
             entity.Code ??= Guid.NewGuid().ToString("N")[..8].ToUpper();
@@ -664,7 +664,7 @@ options.AddGlobalFilterQueryBuilder<FilterHasNormalizedContentQueryBuilder>();
 // Uses INormalizer to manually control normalization output:
 public class ProductNormalizer(INormalizer normalizer) : EntityNormalizerBase<Product>
 {
-    public override async Task HandleNormalize(Product item)
+    public override async Task HandleNormalize(Product item, CancellationToken token = default)
         => item.NormalizedContent = await normalizer.Normalize($"{item.Title} {item.Description}".Trim());
 }
 // Per-entity: e.AddNormalizer<ProductNormalizer>();

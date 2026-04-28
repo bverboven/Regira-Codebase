@@ -3,11 +3,11 @@
 public interface IEntityNormalizer
 {
     bool IsExclusive { get; }
-    Task HandleNormalize(object item);
-    Task HandleNormalizeMany(IEnumerable<object> items);
+    Task HandleNormalize(object item, CancellationToken token = default);
+    Task HandleNormalizeMany(IEnumerable<object> items, CancellationToken token = default);
 }
 public interface IEntityNormalizer<in T> : IEntityNormalizer
 {
-    Task HandleNormalize(T item);
-    Task HandleNormalizeMany(IEnumerable<T> items);
+    Task HandleNormalize(T item, CancellationToken token = default);
+    Task HandleNormalizeMany(IEnumerable<T> items, CancellationToken token = default);
 }

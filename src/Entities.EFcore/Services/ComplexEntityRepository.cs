@@ -21,32 +21,32 @@ public class EntityRepository<TEntity, TKey, TSearchObject, TSortBy, TIncludes>(
     where TSortBy : struct, Enum
     where TIncludes : struct, Enum
 {
-    public virtual Task<TEntity?> Details(TKey id)
-        => readService.Details(id);
-    public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null)
-        => readService.List(so, pagingInfo);
-    public Task<long> Count(TSearchObject? so)
-        => readService.Count(so);
+    public virtual Task<TEntity?> Details(TKey id, CancellationToken token = default)
+        => readService.Details(id, token);
+    public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default)
+        => readService.List(so, pagingInfo, token);
+    public Task<long> Count(TSearchObject? so, CancellationToken token = default)
+        => readService.Count(so, token);
 
-    public virtual Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null)
-        => readService.List(so, sortBy, includes, pagingInfo);
+    public virtual Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes = null, PagingInfo? pagingInfo = null, CancellationToken token = default)
+        => readService.List(so, sortBy, includes, pagingInfo, token);
 
-    public virtual Task<long> Count(IList<TSearchObject?> so)
-        => readService.Count(so);
+    public virtual Task<long> Count(IList<TSearchObject?> so, CancellationToken token = default)
+        => readService.Count(so, token);
 
-    Task<IList<TEntity>> IEntityReadService<TEntity, TKey>.List(object? so, PagingInfo? pagingInfo)
-        => readService.List(so, pagingInfo);
-    Task<long> IEntityReadService<TEntity, TKey>.Count(object? so)
-        => readService.Count(so);
+    Task<IList<TEntity>> IEntityReadService<TEntity, TKey>.List(object? so, PagingInfo? pagingInfo, CancellationToken token)
+        => readService.List(so, pagingInfo, token);
+    Task<long> IEntityReadService<TEntity, TKey>.Count(object? so, CancellationToken token)
+        => readService.Count(so, token);
 
-    public virtual Task Add(TEntity item)
-        => writeService.Add(item);
-    public virtual Task<TEntity?> Modify(TEntity item)
-        => writeService.Modify(item);
-    public virtual Task Save(TEntity item)
-        => writeService.Save(item);
-    public virtual Task Remove(TEntity item)
-        => writeService.Remove(item);
+    public virtual Task Add(TEntity item, CancellationToken token = default)
+        => writeService.Add(item, token);
+    public virtual Task<TEntity?> Modify(TEntity item, CancellationToken token = default)
+        => writeService.Modify(item, token);
+    public virtual Task Save(TEntity item, CancellationToken token = default)
+        => writeService.Save(item, token);
+    public virtual Task Remove(TEntity item, CancellationToken token = default)
+        => writeService.Remove(item, token);
 
     public virtual Task<int> SaveChanges(CancellationToken token = default)
         => writeService.SaveChanges(token);

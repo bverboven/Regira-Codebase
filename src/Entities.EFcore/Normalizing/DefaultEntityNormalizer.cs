@@ -22,7 +22,7 @@ public class DefaultEntityNormalizer<T>(IObjectNormalizer? objectNormalizer = nu
         : this(new ObjectNormalizer(new NormalizingOptions { DefaultNormalizer = normalizer }))
     { }
 
-    public override Task HandleNormalize(T item)
+    public override Task HandleNormalize(T item, CancellationToken token = default)
     {
         DefaultObjectNormalizer.HandleNormalize(item);
         return Task.CompletedTask;
