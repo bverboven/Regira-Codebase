@@ -24,12 +24,18 @@ public static class DrawImageUtility
     /// <param name="input">
     /// The input object of type <typeparamref name="T"/> used to create the <see cref="IImageFile"/>.
     /// </param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
     /// <returns>
     /// An <see cref="IImageFile"/> instance if a suitable <see cref="IImageCreator"/> is found and creation succeeds; otherwise, <c>null</c>.
     /// </returns>
-    public static IImageFile? Create<T>(this IEnumerable<IImageCreator> services, T input)
+    public static Task<IImageFile?> Create<T>(this IEnumerable<IImageCreator> services, T input, CancellationToken cancellationToken = default)
         where T : class
-        => services.FirstOrDefault(s => s.CanCreate(input))?.Create(input);
+    {
+        var creator = services.FirstOrDefault(s => s.CanCreate(input));
+        return creator is null
+            ? Task.FromResult<IImageFile?>(null)
+            : creator.Create(input, cancellationToken);
+    }
     /// <summary>
     /// Retrieves an <see cref="IImageFile"/> instance from the provided <paramref name="item"/> or creates one using the available <paramref name="services"/>.
     /// </summary>
@@ -39,11 +45,14 @@ public static class DrawImageUtility
     /// <param name="item">
     /// The <see cref="IImageLayer"/> instance containing the source object to retrieve or create the <see cref="IImageFile"/>.
     /// </param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
     /// <returns>
     /// An <see cref="IImageFile"/> instance if successfully retrieved or created; otherwise, <c>null</c>.
     /// </returns>
-    public static IImageFile? GetImageFile(this IEnumerable<IImageCreator> services, IImageLayer item)
-        => item.Source as IImageFile ?? services.Create(item.Source);
+    public static Task<IImageFile?> GetImageFile(this IEnumerable<IImageCreator> services, IImageLayer item, CancellationToken cancellationToken = default)
+        => item.Source is IImageFile imageFile
+            ? Task.FromResult<IImageFile?>(imageFile)
+            : services.Create(item.Source, cancellationToken);
 
     /// <summary>
     /// Calculates the coordinates for positioning an image within a target area based on the provided options, target size, image size, and DPI.

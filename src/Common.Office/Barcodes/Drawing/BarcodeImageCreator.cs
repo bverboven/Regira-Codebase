@@ -6,6 +6,6 @@ using Regira.Office.Barcodes.Models;
 namespace Regira.Office.Barcodes.Drawing;
 public class BarcodeImageCreator(IBarcodeWriter barcodeWriter) : ImageCreatorBase<BarcodeInput>
 {
-    public override IImageFile Create(BarcodeInput input)
-        => barcodeWriter.Create(input).GetAwaiter().GetResult();
+    public override async Task<IImageFile?> Create(BarcodeInput input, CancellationToken cancellationToken = default)
+        => await barcodeWriter.Create(input);
 }

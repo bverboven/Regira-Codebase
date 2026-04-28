@@ -151,7 +151,7 @@ public class PdfManager(IImageService imageService) : IPdfService
     }
 
 
-    public Task<IMemoryFile?> ImagesToPdf(ImagesInput input, CancellationToken cancellationToken = default)
+    public async Task<IMemoryFile?> ImagesToPdf(ImagesInput input, CancellationToken cancellationToken = default)
     {
         if (imageService == null)
         {
@@ -163,26 +163,25 @@ public class PdfManager(IImageService imageService) : IPdfService
             (int)(input.MaxDimensions.Width - (input.Margins.Left + input.Margins.Right)),
             (int)(input.MaxDimensions.Height - (input.Margins.Top + input.Margins.Bottom))
         };
-        var jpegImages = input.Images
-            .Select(imgBytes =>
-                {
-                    var imageFile = imageService.Parse(imgBytes)!;
-                    var resized = imageService.Resize(imageFile, maxDim);
-                    var jpeg = imageService.ChangeFormat(resized, ImageFormat.Jpeg);
-                    return new JpegImage
-                    {
-                        Bytes = jpeg.Bytes,
-                        Width = jpeg.Size?.Width ?? 0,
-                        Height = jpeg.Size?.Height ?? 0
-                    };
-                }
-            )
-            .ToArray();
+        var jpegImages = new List<JpegImage>();
+        foreach (var imgBytes in input.Images)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var imageFile = (await imageService.Parse(imgBytes, cancellationToken))!;
+            var resized = await imageService.Resize(imageFile, maxDim, cancellationToken: cancellationToken);
+            var jpeg = await imageService.ChangeFormat(resized, ImageFormat.Jpeg, cancellationToken);
+            jpegImages.Add(new JpegImage
+            {
+                Bytes = jpeg.Bytes,
+                Width = jpeg.Size?.Width ?? 0,
+                Height = jpeg.Size?.Height ?? 0
+            });
+        }
 
-        var pdfBytes = DocLib.Instance.JpegToPdf(jpegImages);
-        return Task.FromResult<IMemoryFile?>(pdfBytes.ToMemoryFile(ContentTypes.PDF));
+        var pdfBytes = DocLib.Instance.JpegToPdf(jpegImages.ToArray());
+        return pdfBytes.ToMemoryFile(ContentTypes.PDF);
     }
-    public Task<IEnumerable<IImageFile>> ToImages(IMemoryFile pdf, PdfToImagesOptions? options = null, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<IImageFile>> ToImages(IMemoryFile pdf, PdfToImagesOptions? options = null, CancellationToken cancellationToken = default)
     {
         var pageDimensions = new PageDimensions(
             options?.Size?.Width ?? PdfDefaults.ImageSize.Width,
@@ -194,14 +193,15 @@ public class PdfManager(IImageService imageService) : IPdfService
         var images = new List<IImageFile>(pageCount);
         for (var pageIndex = 0; pageIndex < pageCount; pageIndex++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             using var pr = docReader.GetPageReader(pageIndex);
             var imgBytes = pr.GetImage();
 
             var width = pr.GetPageWidth();
             var height = pr.GetPageHeight();
 
-            images.Add(imageService.Parse(imgBytes, new ImageSize(width, height), options?.Format)!);
+            images.Add((await imageService.Parse(imgBytes, new ImageSize(width, height), options?.Format, cancellationToken))!);
         }
-        return Task.FromResult<IEnumerable<IImageFile>>(images);
+        return images;
     }
 }

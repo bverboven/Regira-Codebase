@@ -6,6 +6,6 @@ namespace Regira.Media.Drawing.Services;
 
 public class CanvasImageCreator(IImageService service) : ImageCreatorBase<CanvasImageOptions>
 {
-    public override IImageFile Create(CanvasImageOptions input) 
-        => service.Create(input.Size, input.BackgroundColor, input.ImageFormat);
+    public override async Task<IImageFile?> Create(CanvasImageOptions input, CancellationToken cancellationToken = default)
+        => await service.Create(input.Size, input.BackgroundColor, input.ImageFormat, cancellationToken);
 }

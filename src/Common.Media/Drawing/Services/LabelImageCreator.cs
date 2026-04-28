@@ -6,6 +6,6 @@ namespace Regira.Media.Drawing.Services;
 
 public class LabelImageCreator(IImageService service) : ImageCreatorBase<LabelImageOptions>
 {
-    public override IImageFile Create(LabelImageOptions input)
-        => service.CreateTextImage(input);
+    public override async Task<IImageFile?> Create(LabelImageOptions input, CancellationToken cancellationToken = default)
+        => await service.CreateTextImage(input, cancellationToken);
 }

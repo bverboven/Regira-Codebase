@@ -7,13 +7,13 @@ namespace Regira.Office.PDF.Drawing;
 
 public class PdfImageCreator(IPdfToImageService service, IPdfSplitter splitter) : ImageCreatorBase<PdfToImageLayerOptions>
 {
-    public override IImageFile? Create(PdfToImageLayerOptions input)
+    public override async Task<IImageFile?> Create(PdfToImageLayerOptions input, CancellationToken cancellationToken = default)
     {
         var page = input.Page ?? 1;
-        var pageCount = splitter.GetPageCount(input.File).GetAwaiter().GetResult();
+        var pageCount = await splitter.GetPageCount(input.File);
         var singlePagePdf = pageCount > 1
-            ? splitter.Split(input.File, [new PdfSplitRange { Start = page, End = page }]).GetAwaiter().GetResult().Single()
+            ? (await splitter.Split(input.File, [new PdfSplitRange { Start = page, End = page }])).Single()
             : input.File;
-        return service.ToImages(singlePagePdf, input.ToPdfToImageOptions()).GetAwaiter().GetResult().SingleOrDefault();
+        return (await service.ToImages(singlePagePdf, input.ToPdfToImageOptions())).SingleOrDefault();
     }
 }
