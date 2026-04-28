@@ -20,21 +20,27 @@ namespace Regira.Drawing.SkiaSharp.Services;
 /// <remarks>
 /// This service is built on top of SkiaSharp and integrates with various abstractions and utilities for image manipulation.
 /// It supports multiple image formats and provides functionality for both memory-based and stream-based image operations.
+/// 
+/// All operations are exposed as <c>Task</c>-returning methods to enable async usage and cancellation, but the underlying
+/// SkiaSharp APIs are synchronous; the work is performed inline and wrapped via <see cref="Task.FromResult{T}"/>. Callers
+/// that need to offload work can do so with <see cref="Task.Run(System.Action)"/>.
 /// </remarks>
 public class ImageService : IImageService
 {
     /// <inheritdoc/>
-    public IImageFile? Parse(Stream? stream)
+    public Task<IImageFile?> Parse(Stream? stream, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         if (stream == null)
         {
-            return null;
+            return Task.FromResult<IImageFile?>(null);
         }
 
         using var bitmap = SKBitmap.Decode(stream);
         if (bitmap == null)
         {
-            return null;
+            return Task.FromResult<IImageFile?>(null);
         }
 
         var img = new ImageFile
@@ -42,21 +48,23 @@ public class ImageService : IImageService
             Stream = stream,
             Size = new[] { bitmap.Width, bitmap.Height }
         };
-        return img;
+        return Task.FromResult<IImageFile?>(img);
     }
     /// <inheritdoc/>
-    public IImageFile? Parse(byte[]? bytes)
+    public Task<IImageFile?> Parse(byte[]? bytes, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         if (bytes == null)
         {
-            return null;
+            return Task.FromResult<IImageFile?>(null);
         }
 
         using var ms = new MemoryStream(bytes);
         using var bitmap = SKBitmap.Decode(ms);
         if (bitmap == null)
         {
-            return null;
+            return Task.FromResult<IImageFile?>(null);
         }
 
         var img = new ImageFile
@@ -64,11 +72,13 @@ public class ImageService : IImageService
             Bytes = bytes,
             Size = new[] { bitmap.Width, bitmap.Height }
         };
-        return img;
+        return Task.FromResult<IImageFile?>(img);
     }
     /// <inheritdoc/>
-    public IImageFile? Parse(byte[] rawBytes, ImageSize size, ImageFormat? format = null)
+    public Task<IImageFile?> Parse(byte[] rawBytes, ImageSize size, ImageFormat? format = null, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         format ??= ImageFormat.Jpeg;
 
         using var skImg = SKImage.FromPixels(
@@ -79,17 +89,24 @@ public class ImageService : IImageService
         using var skBitmap = SKBitmap.FromImage(skImg);
         if (skBitmap == null)
         {
-            return null;
+            return Task.FromResult<IImageFile?>(null);
         }
 
         using var img = SkiaUtility.ChangeFormat(skBitmap, format.Value.ToSkiaFormat());
-        return img.ToImageFile(format.Value.ToSkiaFormat());
+        return Task.FromResult<IImageFile?>(img.ToImageFile(format.Value.ToSkiaFormat()));
     }
     /// <inheritdoc/>
-    public IImageFile? Parse(IMemoryFile file) => file.HasStream() ? Parse(file.Stream) : Parse(file.GetBytes());
+    public Task<IImageFile?> Parse(IMemoryFile file, CancellationToken cancellationToken = default) =>
+        file.HasStream() ? Parse(file.Stream, cancellationToken) : Parse(file.GetBytes(), cancellationToken);
 
     /// <inheritdoc/>
-    public ImageFormat GetFormat(IImageFile input)
+    public Task<ImageFormat> GetFormat(IImageFile input, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(GetFormatCore(input));
+    }
+
+    private static ImageFormat GetFormatCore(IImageFile input)
     {
         if (input.Stream != null && input.Stream != Stream.Null)
         {
@@ -105,91 +122,114 @@ public class ImageService : IImageService
         using var ms = new MemoryStream(bytes);
         return ConversionUtility.GetFormat(ms).ToImageFormat();
     }
+
     /// <inheritdoc/>
-    public IImageFile ChangeFormat(IImageFile input, ImageFormat targetFormat)
+    public Task<IImageFile> ChangeFormat(IImageFile input, ImageFormat targetFormat, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var skiaFormat = targetFormat.ToSkiaFormat();
         using var convertedBitmap = SkiaUtility.ChangeFormat(input.ToBitmap(), skiaFormat);
-        return convertedBitmap.ToImageFile(skiaFormat);
+        return Task.FromResult<IImageFile>(convertedBitmap.ToImageFile(skiaFormat));
     }
 
     /// <inheritdoc/>
-    public IImageFile CropRectangle(IImageFile input, ImageEdgeOffset rect)
+    public Task<IImageFile> CropRectangle(IImageFile input, ImageEdgeOffset rect, CancellationToken cancellationToken = default)
     {
-        var format = GetFormat(input);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var format = GetFormatCore(input);
         using var img = input.ToBitmap();
         var (topLeft, bottomRight) = DrawImageUtility.ToPoints(rect, new ImageSize(img.Width, img.Height));
         var skRect = new SKRect(topLeft.X, topLeft.Y, bottomRight.X, bottomRight.Y);
         using var croppedBitmap = SkiaUtility.CropRectangle(img, skRect);
-        return croppedBitmap.ToImageFile(format.ToSkiaFormat());
+        return Task.FromResult<IImageFile>(croppedBitmap.ToImageFile(format.ToSkiaFormat()));
     }
 
     /// <inheritdoc/>
-    public ImageSize GetDimensions(IImageFile input)
+    public Task<ImageSize> GetDimensions(IImageFile input, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         using var img = input.ToBitmap();
-        return new ImageSize(img.Width, img.Height);
+        return Task.FromResult(new ImageSize(img.Width, img.Height));
     }
     /// <inheritdoc/>
-    public IImageFile Resize(IImageFile input, ImageSize wantedSize, int quality = 80)
+    public Task<IImageFile> Resize(IImageFile input, ImageSize wantedSize, int quality = 80, CancellationToken cancellationToken = default)
     {
-        var format = GetFormat(input);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var format = GetFormatCore(input);
         using var sourceBitmap = input.ToBitmap();
         using var scaledBitmap = SkiaUtility.Resize(sourceBitmap, new SKSize(wantedSize.Width, wantedSize.Height), quality);
-        return scaledBitmap.ToImageFile(format.ToSkiaFormat());
+        return Task.FromResult<IImageFile>(scaledBitmap.ToImageFile(format.ToSkiaFormat()));
     }
     /// <inheritdoc/>
-    public IImageFile ResizeFixed(IImageFile input, ImageSize size, int quality = 80)
+    public Task<IImageFile> ResizeFixed(IImageFile input, ImageSize size, int quality = 80, CancellationToken cancellationToken = default)
     {
-        var format = GetFormat(input);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var format = GetFormatCore(input);
         using var sourceBitmap = input.ToBitmap();
         using var scaledBitmap = SkiaUtility.ResizeFixed(sourceBitmap, new SKSize(size.Width, size.Height), quality);
-        return scaledBitmap.ToImageFile(format.ToSkiaFormat());
+        return Task.FromResult<IImageFile>(scaledBitmap.ToImageFile(format.ToSkiaFormat()));
     }
 
     /// <inheritdoc/>
-    public IImageFile Rotate(IImageFile input, int degrees, Color? background = null)
+    public Task<IImageFile> Rotate(IImageFile input, int degrees, Color? background = null, CancellationToken cancellationToken = default)
     {
-        var format = GetFormat(input);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var format = GetFormatCore(input);
         using var sourceBitmap = input.ToBitmap();
         using var rotatedBitmap = SkiaUtility.Rotate(sourceBitmap, degrees, (background ?? Color.Transparent).ToSkiaColor());
-        return rotatedBitmap.ToImageFile(format.ToSkiaFormat());
+        return Task.FromResult<IImageFile>(rotatedBitmap.ToImageFile(format.ToSkiaFormat()));
     }
     /// <inheritdoc/>
-    public IImageFile FlipHorizontal(IImageFile input)
+    public Task<IImageFile> FlipHorizontal(IImageFile input, CancellationToken cancellationToken = default)
     {
-        var format = GetFormat(input);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var format = GetFormatCore(input);
         using var sourceBitmap = input.ToBitmap();
         using var flippedBitmap = SkiaUtility.FlipHorizontal(sourceBitmap);
-        return flippedBitmap.ToImageFile(format.ToSkiaFormat());
+        return Task.FromResult<IImageFile>(flippedBitmap.ToImageFile(format.ToSkiaFormat()));
     }
     /// <inheritdoc/>
-    public IImageFile FlipVertical(IImageFile input)
+    public Task<IImageFile> FlipVertical(IImageFile input, CancellationToken cancellationToken = default)
     {
-        var format = GetFormat(input);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var format = GetFormatCore(input);
         using var sourceBitmap = input.ToBitmap();
         using var flippedBitmap = SkiaUtility.FlipVertical(sourceBitmap);
-        return flippedBitmap.ToImageFile(format.ToSkiaFormat());
+        return Task.FromResult<IImageFile>(flippedBitmap.ToImageFile(format.ToSkiaFormat()));
     }
 
     /// <inheritdoc/>
-    public Color GetPixelColor(IImageFile input, int x, int y)
+    public Task<Color> GetPixelColor(IImageFile input, int x, int y, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         using var image = input.ToBitmap();
-        return SkiaUtility.GetPixelColor(image, x, y).ToColor();
+        return Task.FromResult(SkiaUtility.GetPixelColor(image, x, y).ToColor());
     }
     /// <inheritdoc/>
-    public IImageFile MakeTransparent(IImageFile input, Color? color = null)
+    public Task<IImageFile> MakeTransparent(IImageFile input, Color? color = null, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         color ??= new Color(245, 245, 245);
         using var sourceBitmap = input.ToBitmap();
         var transparentBitmap = SkiaUtility.MakeTransparent(sourceBitmap, color.Value.ToSkiaColor());
         // return as PNG image
-        return transparentBitmap.ToImageFile();
+        return Task.FromResult<IImageFile>(transparentBitmap.ToImageFile());
     }
     /// <inheritdoc/>
-    public IImageFile MakeOpaque(IImageFile input)
+    public Task<IImageFile> MakeOpaque(IImageFile input, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         using var inputBitmap = input.ToBitmap();
 
         var outputBitmap = new SKBitmap(inputBitmap.Width, inputBitmap.Height);
@@ -200,6 +240,7 @@ public class ImageService : IImageService
 
         for (int x = 0; x < inputBitmap.Width; x++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             for (int y = 0; y < inputBitmap.Height; y++)
             {
                 var pixelColor = inputBitmap.GetPixel(x, y);
@@ -211,27 +252,33 @@ public class ImageService : IImageService
             }
         }
 
-        return outputBitmap.ToImageFile();
+        return Task.FromResult<IImageFile>(outputBitmap.ToImageFile());
     }
 
     /// <inheritdoc/>
-    public IImageFile Create(ImageSize size, Color? backgroundColor = null, ImageFormat? format = null)
+    public Task<IImageFile> Create(ImageSize size, Color? backgroundColor = null, ImageFormat? format = null, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         using var img = SkiaUtility.Create(size.ToSkiaSize(), (backgroundColor ?? ImageDefaults.BackgroundColor).ToSkiaColor());
-        return img.ToImageFile((format ?? ImageDefaults.Format).ToSkiaFormat());
+        return Task.FromResult<IImageFile>(img.ToImageFile((format ?? ImageDefaults.Format).ToSkiaFormat()));
     }
     /// <inheritdoc/>
-    public IImageFile CreateTextImage(LabelImageOptions? options = null)
+    public Task<IImageFile> CreateTextImage(LabelImageOptions? options = null, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         using var img = SkiaUtility.CreateTextImage(options);
-        return img.ToImageFile();
+        return Task.FromResult<IImageFile>(img.ToImageFile());
     }
     /// <inheritdoc/>
-    public IImageFile Draw(IEnumerable<ImageLayer> imageLayers, IImageFile? target = null)
+    public Task<IImageFile> Draw(IEnumerable<ImageLayer> imageLayers, IImageFile? target = null, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var imagesCollection = imageLayers.ToArray();
         using var targetImage = target?.ToBitmap() ?? DrawUtility.CreateSizedCanvas(imagesCollection);
         DrawUtility.Draw(imagesCollection, targetImage);
-        return targetImage.ToImageFile();
+        return Task.FromResult<IImageFile>(targetImage.ToImageFile());
     }
 }

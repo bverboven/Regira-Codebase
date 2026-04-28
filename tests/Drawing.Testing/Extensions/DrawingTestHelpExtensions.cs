@@ -19,37 +19,37 @@ public static class DrawingTestHelpExtensions
         var transparentPath = Path.Combine(inputDir, "transparent-400x300.jpg");
         if (!File.Exists(transparentPath))
         {
-            using var img = service.Create(new ImageSize(400, 300), null, ImageFormat.Png);
+            using var img = await service.Create(new ImageSize(400, 300), null, ImageFormat.Png);
             await img.SaveAs(transparentPath);
         }
         var whitePath = Path.Combine(inputDir, "white-400x300.jpg");
         if (!File.Exists(whitePath))
         {
-            using var img = service.Create(new ImageSize(400, 300), "#FFFFFF", ImageFormat.Jpeg);
+            using var img = await service.Create(new ImageSize(400, 300), "#FFFFFF", ImageFormat.Jpeg);
             await img.SaveAs(whitePath);
         }
         var yellowPath = Path.Combine(inputDir, "yellow-200x150.jpg");
         if (!File.Exists(yellowPath))
         {
-            using var img = service.Create(new ImageSize(200, 150), "#FFFF00", ImageFormat.Jpeg);
+            using var img = await service.Create(new ImageSize(200, 150), "#FFFF00", ImageFormat.Jpeg);
             await img.SaveAs(yellowPath);
         }
         var redPath = Path.Combine(inputDir, "red-150x100.jpg");
         if (!File.Exists(redPath))
         {
-            using var img = service.Create(new ImageSize(150, 100), "#FF0000", ImageFormat.Jpeg);
+            using var img = await service.Create(new ImageSize(150, 100), "#FF0000", ImageFormat.Jpeg);
             await img.SaveAs(redPath);
         }
         var greenPath = Path.Combine(inputDir, "green-50x100.jpg");
         if (!File.Exists(greenPath))
         {
-            using var img = service.Create(new ImageSize(50, 100), "#00FF00", ImageFormat.Jpeg);
+            using var img = await service.Create(new ImageSize(50, 100), "#00FF00", ImageFormat.Jpeg);
             await img.SaveAs(greenPath);
         }
         var bluePath = Path.Combine(inputDir, "blue-50x50.jpg");
         if (!File.Exists(bluePath))
         {
-            using var img = service.Create(new ImageSize(50, 50), "#0000FF", ImageFormat.Jpeg);
+            using var img = await service.Create(new ImageSize(50, 50), "#0000FF", ImageFormat.Jpeg);
             await img.SaveAs(bluePath);
         }
     }
@@ -73,7 +73,7 @@ public static class DrawingTestHelpExtensions
         var bytes = await File.ReadAllBytesAsync(path);
 
         var img = bytes.ToBinaryFile().ToImageFile();
-        img.Size = service.GetDimensions(img);
+        img.Size = await service.GetDimensions(img);
         return img;
     }
     internal static Task<string?> ReadImageText(this IImageFile img)

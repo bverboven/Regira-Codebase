@@ -15,7 +15,7 @@ public class SnapshotService(IImageService imageService, IProcessHelper? process
 {
     readonly IProcessHelper _processHelper = processHelper ?? new ProcessHelper();
 
-    public async Task<IImageFile?> Snapshot(IBinaryFile input, ImageSize? size = null, TimeSpan? time = null)
+    public async Task<IImageFile?> Snapshot(IBinaryFile input, ImageSize? size = null, TimeSpan? time = null, CancellationToken cancellationToken = default)
     {
         var inputPath = input.GetPath();
         if (!size.HasValue || size.Value.Width == 0 || size.Value.Height == 0)
@@ -41,8 +41,8 @@ public class SnapshotService(IImageService imageService, IProcessHelper? process
         {
             throw new Exception("Empty file");
         }
-        using var jpeg = imageService.ChangeFormat(img, Drawing.Enums.ImageFormat.Jpeg);
-        var resized = imageService.Resize(jpeg, size.Value);
+        using var jpeg = await imageService.ChangeFormat(img, Drawing.Enums.ImageFormat.Jpeg, cancellationToken);
+        var resized = await imageService.Resize(jpeg, size.Value, cancellationToken: cancellationToken);
 
         File.Delete(tempPath);
 

@@ -18,7 +18,7 @@ public class AggregateImageCreator : ImageCreatorBase<AggregateImageOptions>
     public static AggregateImageCreator Create(IImageService service, IEnumerable<IImageCreator> imageCreators)
         => new(service, imageCreators);
 
-    public override IImageFile Create(AggregateImageOptions input)
+    public override async Task<IImageFile?> Create(AggregateImageOptions input, CancellationToken cancellationToken = default)
     {
         var builder = new ImageBuilder(_service, _imageCreators);
 
@@ -28,6 +28,6 @@ public class AggregateImageCreator : ImageCreatorBase<AggregateImageOptions>
         }
 
         builder.Add(input.ImageLayers.ToArray());
-        return builder.Build();
+        return await builder.Build(cancellationToken);
     }
 }

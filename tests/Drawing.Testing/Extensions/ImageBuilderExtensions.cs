@@ -43,18 +43,18 @@ public static class ImageBuilderExtensions
         };
 
         var drawBuilder = new ImageBuilder(service, []);
-        using var resultImg = drawBuilder
+        using var resultImg = await drawBuilder
             .Add(imageLayers)
             .Build();
         await service.SaveImage(resultImg, "build-no-target.jpg");
 
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 10, 10), new[] { 10, 10 });
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 150, 100), new[] { 290, 60 });
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 290, 90), new[] { 290, 60 });
-        AssertColor("#0000FF", service.GetPixelColor(resultImg, 290, 10), new[] { 290, 10 });
-        AssertColor("#0000FF", service.GetPixelColor(resultImg, 260, 40), new[] { 260, 40 });
-        AssertColor("#FF0000", service.GetPixelColor(resultImg, 10, 160), new[] { 10, 160 });
-        AssertColor("#FF0000", service.GetPixelColor(resultImg, 90, 190), new[] { 90, 190 });
+        AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 10, 10), new[] { 10, 10 });
+        AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 150, 100), new[] { 290, 60 });
+        AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 290, 90), new[] { 290, 60 });
+        AssertColor("#0000FF", await service.GetPixelColor(resultImg, 290, 10), new[] { 290, 10 });
+        AssertColor("#0000FF", await service.GetPixelColor(resultImg, 260, 40), new[] { 260, 40 });
+        AssertColor("#FF0000", await service.GetPixelColor(resultImg, 10, 160), new[] { 10, 160 });
+        AssertColor("#FF0000", await service.GetPixelColor(resultImg, 90, 190), new[] { 90, 190 });
     }
 
     public static async Task Build_WithTargetCanvas(this IImageService service)
@@ -110,21 +110,21 @@ public static class ImageBuilderExtensions
 
 
         var drawBuilder = new ImageBuilder(service, imageCreators);
-        using var resultImg = drawBuilder.Add(imageLayers)
+        using var resultImg = await drawBuilder.Add(imageLayers)
             .SetBaseLayer(target)
             .Build();
         await service.SaveImage(resultImg, "build-with-canvas.jpg");
 
-        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 10, 10));
-        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 150, 299));
-        AssertColor("#00FF00", service.GetPixelColor(resultImg, 390, 10));
-        AssertColor("#00FF00", service.GetPixelColor(resultImg, 360, 90));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 45, 35));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 330, 35));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 45, 160));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 350, 260));
-        AssertColor("#FF0000", service.GetPixelColor(resultImg, 20, 270));
-        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 399, 299));
+        AssertColor("#FFFFFF", await service.GetPixelColor(resultImg, 10, 10));
+        AssertColor("#FFFFFF", await service.GetPixelColor(resultImg, 150, 299));
+        AssertColor("#00FF00", await service.GetPixelColor(resultImg, 390, 10));
+        AssertColor("#00FF00", await service.GetPixelColor(resultImg, 360, 90));
+        AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 45, 35));
+        AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 330, 35));
+        AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 45, 160));
+        AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 350, 260));
+        AssertColor("#FF0000", await service.GetPixelColor(resultImg, 20, 270));
+        AssertColor("#FFFFFF", await service.GetPixelColor(resultImg, 399, 299));
     }
     public static async Task Build_WithTargetImage(this IImageService service)
     {
@@ -176,22 +176,22 @@ public static class ImageBuilderExtensions
 
 
         var drawBuilder = new ImageBuilder(service, imageCreators);
-        using var resultImg = drawBuilder
+        using var resultImg = await drawBuilder
             .SetBaseLayer(target)
             .Add(imageLayers)
             .Build();
         await service.SaveImage(resultImg, "build-with-target.jpg");
 
-        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 10, 10));
-        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 150, 299));
-        AssertColor("#00FF00", service.GetPixelColor(resultImg, 390, 10));
-        AssertColor("#00FF00", service.GetPixelColor(resultImg, 360, 90));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 45, 35));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 330, 35));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 45, 160));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 350, 260));
-        AssertColor("#FF0000", service.GetPixelColor(resultImg, 20, 270));
-        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 399, 299));
+        AssertColor("#FFFFFF", await service.GetPixelColor(resultImg, 10, 10));
+        AssertColor("#FFFFFF", await service.GetPixelColor(resultImg, 150, 299));
+        AssertColor("#00FF00", await service.GetPixelColor(resultImg, 390, 10));
+        AssertColor("#00FF00", await service.GetPixelColor(resultImg, 360, 90));
+        AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 45, 35));
+        AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 330, 35));
+        AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 45, 160));
+        AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 350, 260));
+        AssertColor("#FF0000", await service.GetPixelColor(resultImg, 20, 270));
+        AssertColor("#FFFFFF", await service.GetPixelColor(resultImg, 399, 299));
     }
 
     public static async Task Build_Images(this IImageService service)
@@ -260,22 +260,22 @@ public static class ImageBuilderExtensions
 
 
         var drawBuilder = new ImageBuilder(service, imageCreators);
-        using var resultImg = drawBuilder
+        using var resultImg = await drawBuilder
             .SetBaseLayer(target)
             .Add(imageLayers)
             .Build();
         await service.SaveImage(resultImg, "build-images.jpg");
 
-        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 10, 10));
-        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 150, 299));
-        AssertColor("#00FF00", service.GetPixelColor(resultImg, 390, 10));
-        AssertColor("#00FF00", service.GetPixelColor(resultImg, 360, 90));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 45, 35));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 330, 35));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 45, 160));
-        AssertColor("#FFFF00", service.GetPixelColor(resultImg, 350, 260));
-        //AssertColor("#FFFF00", service.GetPixelColor(resultImg, 200, 150));
-        AssertColor("#FF0000", service.GetPixelColor(resultImg, 20, 270));
-        AssertColor("#FFFFFF", service.GetPixelColor(resultImg, 399, 299));
+        AssertColor("#FFFFFF", await service.GetPixelColor(resultImg, 10, 10));
+        AssertColor("#FFFFFF", await service.GetPixelColor(resultImg, 150, 299));
+        AssertColor("#00FF00", await service.GetPixelColor(resultImg, 390, 10));
+        AssertColor("#00FF00", await service.GetPixelColor(resultImg, 360, 90));
+        AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 45, 35));
+        AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 330, 35));
+        AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 45, 160));
+        AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 350, 260));
+        //AssertColor("#FFFF00", await service.GetPixelColor(resultImg, 200, 150));
+        AssertColor("#FF0000", await service.GetPixelColor(resultImg, 20, 270));
+        AssertColor("#FFFFFF", await service.GetPixelColor(resultImg, 399, 299));
     }
 }

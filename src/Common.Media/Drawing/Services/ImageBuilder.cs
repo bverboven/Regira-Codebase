@@ -86,25 +86,28 @@ public class ImageBuilder(IImageService service, IEnumerable<IImageCreator> imag
     /// <summary>
     /// Builds and returns the resulting <see cref="IImageFile"/> by combining the base layer and additional image layers.
     /// </summary>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
     /// <returns>
     /// The constructed <see cref="IImageFile"/> containing the combined image layers.
     /// </returns>
     /// <exception cref="Exception">
     /// Thrown when the base layer cannot be converted into an <see cref="IImageFile"/>.
     /// </exception>
-    public IImageFile Build()
+    public async Task<IImageFile> Build(CancellationToken cancellationToken = default)
     {
         var target = _target != null
-            ? _imageCreators.GetImageFile(_target) ?? throw new Exception($"Could not create IImageFile from {_target.GetType()}")
+            ? await _imageCreators.GetImageFile(_target, cancellationToken) ?? throw new Exception($"Could not create IImageFile from {_target.GetType()}")
             : null;
 
-        var result = _items.Select(ToImageLayer)
-            .Aggregate(
-                target,
-                (img, imageLayer) => service.Draw([imageLayer], img)
-            )!;
+        IImageFile? result = target;
+        foreach (var item in _items)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var imageLayer = await ToImageLayer(item, cancellationToken);
+            result = await service.Draw([imageLayer], result, cancellationToken);
+        }
 
-        return result;
+        return result!;
     }
 
     /// <summary>
@@ -113,22 +116,26 @@ public class ImageBuilder(IImageService service, IEnumerable<IImageCreator> imag
     /// <param name="item">
     /// The <see cref="IImageLayer"/> instance to be converted.
     /// </param>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
     /// <returns>
     /// An <see cref="ImageLayer"/> instance containing the source and options from the provided <paramref name="item"/>.
     /// </returns>
     /// <exception cref="Exception">
     /// Thrown when the source object of the provided <paramref name="item"/> cannot be converted into an <see cref="IImageFile"/>.
     /// </exception>
-    protected ImageLayer ToImageLayer(IImageLayer item)
+    protected async Task<ImageLayer> ToImageLayer(IImageLayer item, CancellationToken cancellationToken = default)
     {
         if (item is ImageLayer imageLayer)
         {
             return imageLayer;
         }
 
+        var source = await _imageCreators.GetImageFile(item, cancellationToken)
+                     ?? throw new Exception($"Could not create IImageFile from {item.Source.GetType()}");
+
         return new ImageLayer
         {
-            Source = _imageCreators.GetImageFile(item) ?? throw new Exception($"Could not create IImageFile from {item.Source.GetType()}"),
+            Source = source,
             Options = item.Options
         };
     }

@@ -6,9 +6,10 @@ namespace Regira.Office.Word.Drawing;
 
 public class WordImageCreator(IWordToImagesService service) : ImageCreatorBase<WordToImageLayerOptions>
 {
-    public override IImageFile? Create(WordToImageLayerOptions input)
+    public override async Task<IImageFile?> Create(WordToImageLayerOptions input, CancellationToken cancellationToken = default)
     {
-        return service.ToImages(input.ToWordTemplateInput()).GetAwaiter().GetResult()
+        var images = await service.ToImages(input.ToWordTemplateInput());
+        return images
             .Skip((input.Page ?? 1) - 1)
             .FirstOrDefault();
     }
