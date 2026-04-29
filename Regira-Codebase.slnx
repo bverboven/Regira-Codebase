@@ -87,6 +87,7 @@
     <Project Path="src/Media.FFMpeg/Media.FFMpeg.csproj" />
   </Folder>
   <Folder Name="/src/Office/">
+    <Project Path="src/Common.Office.Clients/Common.Office.Clients.csproj" Id="e9aed47a-3e26-4def-95d0-5e042fa7a8ec" />
     <Project Path="src/Common.Office/Common.Office.csproj" />
   </Folder>
   <Folder Name="/src/Office/Barcodes/">
