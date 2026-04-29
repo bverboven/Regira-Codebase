@@ -351,3 +351,4 @@ nuget-push.txt
 /tests/Drawing.Testing/Assets/Input/GDI
 /tests/Drawing.Testing/Assets/Input/SkiaSharp
 /.claude/settings.local.json
+/.claude/settings.json
