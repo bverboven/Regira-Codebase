@@ -2,25 +2,19 @@ using Regira.IO.Extensions;
 using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Office.Barcodes.Abstractions;
 using Regira.Office.Barcodes.Models;
+using Regira.Office.Barcodes.Models.DTO;
 using Regira.Office.Clients.Abstractions;
-using QRCodeInputDto = Regira.Office.Clients.Models.QRCodeInput;
-using QRCodeInputModel = Regira.Office.Barcodes.Models.QRCodeInput;
 
-namespace Regira.Office.Clients.Barcodes;
+namespace Regira.Office.Clients.Services;
 
 public class QRCodeClient(HttpClient client) : OfficeClientBase(client), IQRCodeService
 {
     private const string CreatePath = "/qrcode/create";
     private const string ReadPath = "/qrcode/read";
 
-    public async Task<IImageFile> Create(QRCodeInputModel input, CancellationToken cancellationToken = default)
+    public async Task<IImageFile> Create(QRCodeInput input, CancellationToken cancellationToken = default)
     {
-        var dto = new QRCodeInputDto
-        {
-            Content = input.Content,
-            Size = input.Size.Width > 0 ? input.Size.Width : 200,
-            Color = input.Color.Hex
-        };
+        var dto = input.ToQRCodeInputDto();
         return await PostJsonForFileAsync(CreatePath, dto, cancellationToken);
     }
 

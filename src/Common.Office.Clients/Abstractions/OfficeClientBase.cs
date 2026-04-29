@@ -1,10 +1,10 @@
+using Regira.IO.Abstractions;
+using Regira.Media.Drawing.Models;
 using System.IO.Compression;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Regira.IO.Abstractions;
-using Regira.Media.Drawing.Models;
 
 namespace Regira.Office.Clients.Abstractions;
 
@@ -68,7 +68,11 @@ public abstract class OfficeClientBase(HttpClient client)
         var mediaType = response.Content.Headers.ContentType?.MediaType;
         if (mediaType != null && mediaType.Contains("json"))
             return await response.Content.ReadFromJsonAsync<string?>(JsonOptions, cancellationToken);
+#if NETSTANDARD2_0
         var text = await response.Content.ReadAsStringAsync();
+#else
+        var text = await response.Content.ReadAsStringAsync(cancellationToken);
+#endif
         return string.IsNullOrWhiteSpace(text) ? null : text;
     }
 
@@ -87,7 +91,11 @@ public abstract class OfficeClientBase(HttpClient client)
     {
         var response = await client.PostAsJsonAsync(url, body, JsonOptions, cancellationToken);
         await EnsureSuccess(response);
+#if NETSTANDARD2_0
         var text = await response.Content.ReadAsStringAsync();
+#else
+        var text = await response.Content.ReadAsStringAsync(cancellationToken);
+#endif
         return string.IsNullOrWhiteSpace(text) ? null : text;
     }
 
@@ -120,8 +128,7 @@ public abstract class OfficeClientBase(HttpClient client)
         return ms.ToArray();
     }
 
-    private static bool IsZip(byte[] bytes) =>
-        bytes.Length >= 4 && bytes[0] == 0x50 && bytes[1] == 0x4B && bytes[2] == 0x03 && bytes[3] == 0x04;
+    private static bool IsZip(byte[] bytes) => bytes.Length >= 4 && bytes[0] == 0x50 && bytes[1] == 0x4B && bytes[2] == 0x03 && bytes[3] == 0x04;
 
     private static IList<IMemoryFile> UnzipFiles(byte[] zipBytes)
     {

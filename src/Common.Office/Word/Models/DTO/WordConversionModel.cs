@@ -1,6 +1,6 @@
 ﻿using Regira.Office.Models;
 
-namespace Regira.Office.Clients.Models;
+namespace Regira.Office.Word.Models.DTO;
 
 public class WordConversionModel
 {

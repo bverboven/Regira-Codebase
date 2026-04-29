@@ -3,6 +3,7 @@ using OfficeOpenXml;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Office.Excel.Abstractions;
+using Regira.Office.Excel.Models;
 using Regira.Office.MimeTypes;
 using Regira.Utilities;
 

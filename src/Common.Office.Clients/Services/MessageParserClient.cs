@@ -4,7 +4,7 @@ using Regira.Office.Clients.Abstractions;
 using Regira.Office.Mail.Abstractions;
 using Regira.Office.Mail.Models;
 
-namespace Regira.Office.Clients.Mail;
+namespace Regira.Office.Clients.Services;
 
 public class MessageParserClient(HttpClient client) : OfficeClientBase(client), IMessageParser
 {

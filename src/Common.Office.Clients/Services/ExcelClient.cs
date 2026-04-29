@@ -1,10 +1,10 @@
 using Regira.IO.Abstractions;
 using Regira.Office.Clients.Abstractions;
-using Regira.Office.Clients.Models;
-using Regira.Office.Excel;
 using Regira.Office.Excel.Abstractions;
+using Regira.Office.Excel.Models;
+using Regira.Office.Excel.Models.DTO;
 
-namespace Regira.Office.Clients.Excel;
+namespace Regira.Office.Clients.Services;
 
 public class ExcelClient(HttpClient client) : OfficeClientBase(client), IExcelService
 {
@@ -13,12 +13,7 @@ public class ExcelClient(HttpClient client) : OfficeClientBase(client), IExcelSe
 
     public async Task<IMemoryFile> Create(IEnumerable<ExcelSheet> sheets, CancellationToken cancellationToken = default)
     {
-        var dto = sheets.Select(s => new ExcelSheetInputDto
-        {
-            Name = s.Name,
-            Data = (s.Data?.Select(item => item as IDictionary<string, object?> ?? new Dictionary<string, object?> { ["value"] = item }).ToList()
-                    ?? [])!
-        }).ToList();
+        var dto = sheets.Select(s => s.ToExcelSheetInputDto()).ToList();
         return await PostJsonForFileAsync(CreatePath, dto, cancellationToken);
     }
 

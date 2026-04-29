@@ -1,12 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Regira.Office.Barcodes.Abstractions;
-using Regira.Office.Clients.Barcodes;
-using Regira.Office.Clients.Csv;
-using Regira.Office.Clients.Excel;
-using Regira.Office.Clients.Mail;
-using Regira.Office.Clients.OCR;
-using Regira.Office.Clients.PDF;
-using Regira.Office.Clients.Word;
+using Regira.Office.Clients.Services;
 using Regira.Office.Csv.Abstractions;
 using Regira.Office.Excel.Abstractions;
 using Regira.Office.Mail.Abstractions;

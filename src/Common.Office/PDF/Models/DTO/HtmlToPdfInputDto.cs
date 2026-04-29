@@ -1,8 +1,8 @@
 ﻿using Regira.Office.Models;
 
-namespace Regira.Office.Clients.Models;
+namespace Regira.Office.PDF.Models.DTO;
 
-public class HtmlToPdfInput
+public class HtmlToPdfInputDto
 {
     public string HtmlContent { get; set; } = null!;
     public IDictionary<string, object?>? HtmlParameters { get; set; } = new Dictionary<string, object?>();

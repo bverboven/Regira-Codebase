@@ -2,11 +2,11 @@ using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Media.Drawing.Models.Abstractions;
 using Regira.Office.Clients.Abstractions;
-using Regira.Office.Clients.Models;
 using Regira.Office.PDF.Abstractions;
 using Regira.Office.PDF.Models;
+using Regira.Office.PDF.Models.DTO;
 
-namespace Regira.Office.Clients.PDF;
+namespace Regira.Office.Clients.Services;
 
 public class PdfClient(HttpClient client) : OfficeClientBase(client),
     IHtmlToPdfService, IImagesToPdfService, IPdfMerger, IPdfSplitter, IPdfTextExtractor, IPdfToImageService
@@ -19,19 +19,9 @@ public class PdfClient(HttpClient client) : OfficeClientBase(client),
     private const string TextPath = "/pdf/txt";
     private const string PageCountPath = "/pdf/page-count";
 
-    public async Task<IMemoryFile> Create(HtmlInput template, CancellationToken cancellationToken = default)
+    public async Task<IMemoryFile> Create(HtmlInput input, CancellationToken cancellationToken = default)
     {
-        var dto = new HtmlToPdfInput
-        {
-            HtmlContent = template.HtmlContent ?? string.Empty,
-            Orientation = template.Orientation,
-            Format = template.Format,
-            Margins = [template.Margins.Top, template.Margins.Right, template.Margins.Bottom, template.Margins.Left],
-            HeaderHtmlContent = template.HeaderHtmlContent,
-            HeaderHeight = template.HeaderHeight ?? 0,
-            FooterHtmlContent = template.FooterHtmlContent,
-            FooterHeight = template.FooterHeight ?? 0
-        };
+        var dto = input.ToHtmlToPdfInput();
         return await PostJsonForFileAsync(FromHtmlPath, dto, cancellationToken);
     }
 
@@ -86,13 +76,13 @@ public class PdfClient(HttpClient client) : OfficeClientBase(client),
         return files.Cast<IImageFile>().ToList();
     }
 
-    private static string BuildToImagesUrl(PdfToImagesOptions? options)
+    private static string BuildToImagesUrl(PdfToImagesOptions? input)
     {
-        if (options == null) return ToImagesPath;
+        if (input == null) return ToImagesPath;
         var parts = new List<string>();
-        if (options.Size?.Width > 0) parts.Add($"Width={options.Size.Value.Width}");
-        if (options.Size?.Height > 0) parts.Add($"Height={options.Size.Value.Height}");
-        parts.Add($"Format={options.Format}");
+        if (input.Size?.Width > 0) parts.Add($"Width={input.Size.Value.Width}");
+        if (input.Size?.Height > 0) parts.Add($"Height={input.Size.Value.Height}");
+        parts.Add($"Format={input.Format}");
         return parts.Count == 0 ? ToImagesPath : $"{ToImagesPath}?{string.Join("&", parts)}";
     }
 }

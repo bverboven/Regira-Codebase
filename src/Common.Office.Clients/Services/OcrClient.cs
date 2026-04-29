@@ -1,10 +1,10 @@
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Office.Clients.Abstractions;
-using Regira.Office.Clients.Models;
 using Regira.Office.OCR.Abstractions;
+using Regira.Office.OCR.Models.DTO;
 
-namespace Regira.Office.Clients.OCR;
+namespace Regira.Office.Clients.Services;
 
 public class OcrClient(HttpClient client) : OfficeClientBase(client), IOcrService
 {

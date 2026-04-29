@@ -1,8 +1,8 @@
 ﻿using Regira.Media.Drawing.Enums;
 
-namespace Regira.Office.Clients.Models;
+namespace Regira.Office.PDF.Models.DTO;
 
-public class PdfImagesInput
+public class PdfToImagesOptionsDto
 {
     public int? Width { get; set; }
     public int? Height { get; set; }

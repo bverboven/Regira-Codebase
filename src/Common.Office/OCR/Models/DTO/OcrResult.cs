@@ -1,4 +1,4 @@
-﻿namespace Regira.Office.Clients.Models;
+﻿namespace Regira.Office.OCR.Models.DTO;
 
 public enum Lang
 {

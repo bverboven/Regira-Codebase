@@ -1,4 +1,4 @@
-﻿namespace Regira.Office.Clients.Models;
+﻿namespace Regira.Office.Word.Models.DTO;
 
 public class WordImageModel
 {

@@ -3,6 +3,7 @@ using ClosedXML.Excel;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Office.Excel.Abstractions;
+using Regira.Office.Excel.Models;
 
 namespace Regira.Office.Excel.ClosedXML;
 

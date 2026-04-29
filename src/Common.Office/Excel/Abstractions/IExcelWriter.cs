@@ -1,4 +1,5 @@
 ﻿using Regira.IO.Abstractions;
+using Regira.Office.Excel.Models;
 
 namespace Regira.Office.Excel.Abstractions;
 

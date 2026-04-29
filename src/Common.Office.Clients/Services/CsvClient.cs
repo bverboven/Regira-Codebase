@@ -3,7 +3,7 @@ using Regira.Office.Clients.Abstractions;
 using Regira.Office.Csv.Abstractions;
 using Regira.Office.Csv.Models;
 
-namespace Regira.Office.Clients.Csv;
+namespace Regira.Office.Clients.Services;
 
 public class CsvClient(HttpClient client) : OfficeClientBase(client), ICsvService
 {

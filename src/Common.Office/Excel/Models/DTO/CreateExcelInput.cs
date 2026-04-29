@@ -1,4 +1,4 @@
-﻿namespace Regira.Office.Clients.Models;
+﻿namespace Regira.Office.Excel.Models.DTO;
 
 public class ExcelSheetInputDto
 {

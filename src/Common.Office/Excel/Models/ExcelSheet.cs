@@ -1,4 +1,4 @@
-﻿namespace Regira.Office.Excel;
+﻿namespace Regira.Office.Excel.Models;
 
 public class ExcelSheet : ExcelSheet<object>;
 
