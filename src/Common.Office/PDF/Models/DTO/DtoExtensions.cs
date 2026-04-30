@@ -18,7 +18,7 @@ public static class DtoExtensions
             FooterHtmlContent = input.FooterHtmlContent,
             FooterHeight = input.FooterHeight ?? 0
         };
-    public static HtmlInput ToHtmlInput(HtmlToPdfInputDto input)
+    public static HtmlInput ToHtmlInput(this HtmlToPdfInputDto input)
         => new()
         {
             HtmlContent = input.HtmlContent,
