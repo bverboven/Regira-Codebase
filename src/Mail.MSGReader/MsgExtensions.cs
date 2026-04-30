@@ -31,6 +31,8 @@ public static class MsgExtensions
         => new BinaryFileItem
         {
             FileName = item.FileName,
+            Length = item.Data?.Length ?? 0,
+            ContentType = item.MimeType,
             Bytes = item.Data
         };
 }

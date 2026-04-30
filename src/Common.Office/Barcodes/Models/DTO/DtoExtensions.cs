@@ -12,6 +12,15 @@ public static class DtoExtensions
             Color = input.Color.Hex,
             BackgroundColor = input.BackgroundColor.Hex
         };
+    public static BarcodeInput ToBarcodeInput(this BarcodeInputDto dto)
+        => new()
+        {
+            Content = dto.Content,
+            Format = dto.Format ?? BarcodeFormat.QRCode,
+            Size = new[] { dto.Width ?? 0, dto.Height ?? 0 },
+            Color = dto.Color ?? "#000000",
+            BackgroundColor = dto.BackgroundColor ?? "#FFFFFF"
+        };
 
     public static QRCodeInputDto ToQRCodeInputDto(this QRCodeInput input)
         => new()
@@ -19,5 +28,12 @@ public static class DtoExtensions
             Content = input.Content,
             Size = input.Size.Width > 0 ? input.Size.Width : 200,
             Color = input.Color.Hex
+        };
+    public static QRCodeInput ToQRCodeInput(this QRCodeInputDto dto)
+        => new()
+        {
+            Content = dto.Content,
+            Size = new[] { dto.Size > 0 ? dto.Size : 200, dto.Size > 0 ? dto.Size : 200 },
+            Color = dto.Color
         };
 }

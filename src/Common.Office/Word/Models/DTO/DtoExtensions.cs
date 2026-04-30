@@ -17,4 +17,13 @@ public static class DtoExtensions
         Headers = input.Headers?.Select(h => new WordHeaderFooterModel { Template = ToWordDocumentInputDto(h.Template), Type = h.Type }).ToList(),
         Footers = input.Footers?.Select(f => new WordHeaderFooterModel { Template = ToWordDocumentInputDto(f.Template), Type = f.Type }).ToList()
     };
+    public static WordTemplateInput ToWordTemplateInput(this WordDocumentInputDto dto) => new()
+    {
+        Template = dto.TemplateBytes.ToMemoryFile(),
+        GlobalParameters = dto.GlobalParameters,
+        CollectionParameters = dto.CollectionParameters,
+        Images = dto.Images?.Select(img => new WordImage { Name = img.Name!, File = img.Bytes.ToMemoryFile() }).ToList(),
+        Headers = dto.Headers?.Select(h => new WordHeaderFooterInput { Template = ToWordTemplateInput(h.Template), Type = h.Type }).ToList(),
+        Footers = dto.Footers?.Select(f => new WordHeaderFooterInput { Template = ToWordTemplateInput(f.Template), Type = f.Type }).ToList()
+    };
 }
