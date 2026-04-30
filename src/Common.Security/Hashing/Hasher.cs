@@ -1,15 +1,14 @@
-﻿using System.Text;
-using Regira.Security.Abstractions;
+﻿using Regira.Security.Abstractions;
 using Regira.Security.Core;
 using Regira.Security.Utilities;
+using System.Text;
 
 namespace Regira.Security.Hashing;
 
 public class Hasher(CryptoOptions? options = null) : IHasher
 {
-    private readonly string _salt = options?.Secret ?? DefaultSecuritySettings.SaltKey;
     private readonly Encoding _encoding = options?.Encoding ?? DefaultSecuritySettings.Encoding;
-    private readonly string _algorithm = options?.AlgorithmType ?? DefaultSecuritySettings.HashAlgorithm;
+    private readonly int _iterations = options?.Iterations ?? CryptoUtility.DefaultIterations;
 
 
     public string Hash(string? plainText)
@@ -20,7 +19,7 @@ public class Hasher(CryptoOptions? options = null) : IHasher
         // generate per-item salt
         var salt = CryptoUtility.GenerateSalt();
         // derive a 64-byte hash (512 bits) using PBKDF2
-        var hashBytes = CryptoUtility.DeriveBytes(plainTextBytes, 64, salt, CryptoUtility.DefaultIterations);
+        var hashBytes = CryptoUtility.DeriveBytes(plainTextBytes, 64, salt, _iterations);
 
         var result = new byte[salt.Length + hashBytes.Length];
         Buffer.BlockCopy(salt, 0, result, 0, salt.Length);
@@ -50,7 +49,7 @@ public class Hasher(CryptoOptions? options = null) : IHasher
         var hash = new byte[stored.Length - salt.Length];
         Buffer.BlockCopy(stored, salt.Length, hash, 0, hash.Length);
 
-        var derived = CryptoUtility.DeriveBytes(_encoding.GetBytes(plainText), hash.Length, salt, CryptoUtility.DefaultIterations);
+        var derived = CryptoUtility.DeriveBytes(_encoding.GetBytes(plainText), hash.Length, salt, _iterations);
 
         return CryptoUtility.FixedTimeEquals(derived, hash);
     }

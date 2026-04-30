@@ -5,6 +5,11 @@ using Regira.Security.Utilities;
 
 namespace Regira.Security.Hashing;
 
+/// <summary>
+/// Don't use this hasher for password hashing or sensitive data. It is a simple implementation that combines a hash with a salt, but it is not designed to be secure against modern attacks. 
+/// Use it only for non-sensitive data or when you need a simple hash without the overhead of more secure algorithms like bcrypt or PBKDF2.
+/// </summary>
+/// <param name="options"></param>
 public class SimpleHasher(CryptoOptions? options = null) : IHasher
 {
     private readonly string _salt = options?.Secret ?? DefaultSecuritySettings.SaltKey;

@@ -5,7 +5,7 @@ namespace Regira.Security.Utilities;
 public static class CryptoUtility
 {
     public const int DefaultSaltSize = 16; // 128-bit salt
-    public const int DefaultIterations = 10000;
+    public const int DefaultIterations = 500_000;
 
     public static HashAlgorithm CreateHasher(string? algorithm = null)
     {
@@ -25,10 +25,8 @@ public static class CryptoUtility
     {
         var salt = new byte[size];
 #if NETSTANDARD2_0
-        using (var rng = RandomNumberGenerator.Create())
-        {
-            rng.GetBytes(salt);
-        }
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(salt);
 #else
         RandomNumberGenerator.Fill(salt);
 #endif
@@ -37,7 +35,7 @@ public static class CryptoUtility
 
     public static Rfc2898DeriveBytes GetRfc2898DeriveBytes(byte[] key, byte[]? salt = null, int iterations = DefaultIterations)
     {
-        salt ??= GenerateSalt(DefaultSaltSize);
+        salt ??= GenerateSalt();
 #if NETSTANDARD2_0
             return new Rfc2898DeriveBytes(key, salt, iterations);
 #else
@@ -59,7 +57,7 @@ public static class CryptoUtility
 #endif
     }
 
-    public static bool FixedTimeEquals(byte[] a, byte[] b)
+    public static bool FixedTimeEquals(byte[]? a, byte[]? b)
     {
 #if NETSTANDARD2_0
         if (a == null || b == null) return false;

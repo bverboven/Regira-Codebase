@@ -17,10 +17,10 @@ public class BCryptNet_Hash_Tests
     public void Verify_Hasher_Success(string? plaintext, string? secret)
     {
         var hasher = new Hasher(new CryptoOptions { Secret = secret });
-        var hashed = hasher.Hash(plaintext);
+        var hashed = hasher.Hash(plaintext ?? string.Empty);
 
         var verifier = new Hasher(new CryptoOptions { Secret = secret });
-        var success = verifier.Verify(plaintext, hashed);
+        var success = verifier.Verify(plaintext ?? string.Empty, hashed);
         Assert.That(success, Is.True);
     }
     [Test]
