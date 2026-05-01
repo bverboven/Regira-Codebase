@@ -9,8 +9,8 @@ namespace Regira.Office.Clients.Services;
 
 public class BarcodeClient(HttpClient client) : OfficeClientBase(client), IBarcodeService
 {
-    private const string CreatePath = "/barcode/create";
-    private const string ReadPath = "/barcode/read";
+    private const string CreatePath = "barcode/create";
+    private const string ReadPath = "barcode/read";
 
     public async Task<IImageFile> Create(BarcodeInput input, CancellationToken cancellationToken = default)
     {

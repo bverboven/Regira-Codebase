@@ -76,8 +76,11 @@ public static class DrawingTestHelpExtensions
         img.Size = await service.GetDimensions(img);
         return img;
     }
-    internal static Task<string?> ReadImageText(this IImageFile img)
-        => new OcrManager().Read(img);
+    internal static async Task<string?> ReadImageText(this IImageFile img)
+    {
+        var result = await new OcrManager().Read(img);
+        return result.Text;
+    }
 
     internal static async Task SaveImage(this IImageService service, IImageFile file, string filename)
         => await file.SaveAs(Path.Combine(service.GetOutputDir(), filename));

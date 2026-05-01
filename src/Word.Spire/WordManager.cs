@@ -37,7 +37,7 @@ using Regira.Drawing.GDI.Utilities;
 
 namespace Regira.Office.Word.Spire;
 
-public class WordManager : IWordManager
+public class WordManager : IWordService
 {
     private const int MAX_DOCUMENT_INSERTS = 100;
     private int _insertDocumentCounter;

@@ -2,6 +2,7 @@
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Office.OCR.Abstractions;
+using Regira.Office.OCR.Models.DTO;
 using Sdcb.PaddleInference;
 using Sdcb.PaddleOCR;
 using Sdcb.PaddleOCR.Models;
@@ -11,7 +12,7 @@ namespace Regira.Office.OCR.PaddleOCR;
 
 public class OcrManager : IOcrService
 {
-    public Task<string?> Read(IMemoryFile imgFile, string? lang = null, CancellationToken token = default)
+    public Task<OcrResult> Read(IMemoryFile imgFile, string? lang = null, CancellationToken token = default)
     {
         FullOcrModel model = ConvertLang(lang);
         using PaddleOcrAll all = new PaddleOcrAll(model, PaddleDevice.Mkldnn())
@@ -23,7 +24,11 @@ public class OcrManager : IOcrService
         using Mat src = Cv2.ImDecode(bytes!, ImreadModes.Color);
         PaddleOcrResult result = all.Run(src);
         var content = result.Text;
-        return Task.FromResult<string?>(content);
+        return Task.FromResult(new OcrResult
+        {
+            Text = content,
+            Language = model.DetectionModel?.ToString() ?? "EnglishV3"
+        });
     }
 
 

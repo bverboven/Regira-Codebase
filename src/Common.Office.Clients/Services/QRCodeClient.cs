@@ -9,8 +9,8 @@ namespace Regira.Office.Clients.Services;
 
 public class QRCodeClient(HttpClient client) : OfficeClientBase(client), IQRCodeService
 {
-    private const string CreatePath = "/qrcode/create";
-    private const string ReadPath = "/qrcode/read";
+    private const string CreatePath = "qrcode/create";
+    private const string ReadPath = "qrcode/read";
 
     public async Task<IImageFile> Create(QRCodeInput input, CancellationToken cancellationToken = default)
     {

@@ -31,6 +31,7 @@
     <File Path="evaluations/IO.Storage-evaluation.md" />
   </Folder>
   <Folder Name="/Solution Items/">
+    <File Path=".claude/CLAUDE.md" />
     <File Path=".gitignore" />
     <File Path="LICENSE" />
     <File Path="README.md" />
@@ -174,6 +175,7 @@
     <Project Path="tests/IO.Testing/IO.Testing.csproj" />
     <Project Path="tests/Normalizing.Testing/Normalizing.Testing.csproj" />
     <Project Path="tests/Office.Barcodes.Testing/Office.Barcodes.Testing.csproj" />
+    <Project Path="tests/Office.Clients.Testing/Office.Clients.Testing.csproj" />
     <Project Path="tests/Office.Csv.Testing/Office.Csv.Testing.csproj" />
     <Project Path="tests/Office.Excel.Testing/Office.Excel.Testing.csproj" />
     <Project Path="tests/Office.Mail.Testing/Office.Mail.Testing.csproj" />

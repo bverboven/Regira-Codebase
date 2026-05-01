@@ -34,10 +34,10 @@ little universe";
         {
             Bytes = await File.ReadAllBytesAsync(input)
         };
-        var content = await service.Read(img);
-        Assert.That(content, Is.Not.Null);
+        var result = await service.Read(img);
+        Assert.That(result.Text, Is.Not.Null);
 
-        var contentLines = content
+        var contentLines = result.Text
             .ReplaceLineEndings()
             .ToLower()
             .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);

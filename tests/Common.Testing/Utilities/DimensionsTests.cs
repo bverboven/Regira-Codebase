@@ -2,7 +2,7 @@
 using Regira.Utilities;
 using System.Text.Json;
 
-namespace Common.Testing;
+namespace Common.Testing.Utilities;
 
 [TestFixture]
 [Parallelizable(ParallelScope.Self)]

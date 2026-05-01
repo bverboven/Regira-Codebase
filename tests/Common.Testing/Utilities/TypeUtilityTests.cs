@@ -2,7 +2,7 @@
 using NUnit.Framework.Legacy;
 using Regira.Utilities;
 
-namespace Common.Testing;
+namespace Common.Testing.Utilities;
 
 [TestFixture]
 [Parallelizable(ParallelScope.All)]

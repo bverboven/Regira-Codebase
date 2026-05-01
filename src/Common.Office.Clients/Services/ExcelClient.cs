@@ -8,8 +8,8 @@ namespace Regira.Office.Clients.Services;
 
 public class ExcelClient(HttpClient client) : OfficeClientBase(client), IExcelService
 {
-    private const string CreatePath = "/xlsx/create";
-    private const string ReadPath = "/xlsx/read";
+    private const string CreatePath = "xlsx/create";
+    private const string ReadPath = "xlsx/read";
 
     public async Task<IMemoryFile> Create(IEnumerable<ExcelSheet> sheets, CancellationToken cancellationToken = default)
     {

@@ -1,6 +1,8 @@
-﻿using Regira.IO.Abstractions;
+﻿using Regira.Globalization.Utilities;
+using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.Office.OCR.Abstractions;
+using Regira.Office.OCR.Models.DTO;
 using Tesseract;
 
 namespace Regira.Office.OCR.Tesseract;
@@ -30,22 +32,22 @@ public class OcrManager : IOcrService
     }
 
 
-    public Task<string?> Read(IMemoryFile imgFile, string? lang = null, CancellationToken token = default)
+    public Task<OcrResult> Read(IMemoryFile imgFile, string? lang = null, CancellationToken token = default)
     {
-        using var engine = new TesseractEngine(_dataDirectory, ConvertLang(lang ?? _lang), EngineMode.Default);
+        var ocrLang = ConvertLang(lang ?? _lang);
+        using var engine = new TesseractEngine(_dataDirectory, ocrLang, EngineMode.Default);
         using var img = Pix.LoadFromMemory(imgFile.GetBytes());
         var result = engine.Process(img);
         var text = result.GetText();
 
-        return Task.FromResult<string?>(text);
+        return Task.FromResult(new OcrResult
+        {
+            Text = text,
+            Language = ocrLang
+        });
     }
 
     public string ConvertLang(string? lang)
-    {
-        return (lang?.ToLower()) switch
-        {
-            "nl" => "nld",
-            _ => "eng",
-        };
-    }
+        => (!string.IsNullOrEmpty(lang) ? LanguageUtility.ToIso3Code(lang) : null)
+            ?? "eng";
 }

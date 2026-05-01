@@ -7,10 +7,10 @@ namespace Regira.Office.Clients.Services;
 
 public class CsvClient(HttpClient client) : OfficeClientBase(client), ICsvService
 {
-    private const string ParsePath = "/csv/parse";
-    private const string ParseFilePath = "/csv/parse/file";
-    private const string WritePath = "/csv/write";
-    private const string WriteFilePath = "/csv/write/file";
+    private const string ParsePath = "csv/parse";
+    private const string ParseFilePath = "csv/parse/file";
+    private const string WritePath = "csv/write";
+    private const string WriteFilePath = "csv/write/file";
 
     public async Task<List<IDictionary<string, object>>> Read(string input, CsvOptions? options = null, CancellationToken cancellationToken = default)
         => await PostStringForJsonAsync<List<IDictionary<string, object>>>(ParsePath, input, "text/plain", cancellationToken) ?? [];

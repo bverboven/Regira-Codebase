@@ -2,7 +2,7 @@ using NUnit.Framework.Legacy;
 using Regira.Utilities;
 using System.Text.Json;
 
-namespace Common.Testing;
+namespace Common.Testing.Utilities;
 
 struct Country
 {

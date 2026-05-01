@@ -11,10 +11,10 @@ namespace Regira.Office.Clients.Services;
 public class WordClient(HttpClient client) : OfficeClientBase(client),
     IWordCreator, IWordConverter, IWordMerger, IWordTextExtractor
 {
-    private const string CreatePath = "/word/create";
-    private const string ConvertPath = "/word/convert";
-    private const string MergePath = "/word/merge";
-    private const string TextPath = "/word/txt";
+    private const string CreatePath = "word/create";
+    private const string ConvertPath = "word/convert";
+    private const string MergePath = "word/merge";
+    private const string TextPath = "word/txt";
 
     public async Task<IMemoryFile> Create(WordTemplateInput input, CancellationToken cancellationToken = default)
     {

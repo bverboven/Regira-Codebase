@@ -3,7 +3,7 @@ using Regira.Utilities;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 
-namespace Common.Testing;
+namespace Common.Testing.Utilities;
 
 [TestFixture]
 [Parallelizable(ParallelScope.All)]

@@ -1,6 +1,6 @@
 ﻿using Regira.Utilities;
 
-namespace Common.Testing;
+namespace Common.Testing.Utilities;
 
 [Flags]
 public enum TestEnum

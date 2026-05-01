@@ -11,13 +11,13 @@ namespace Regira.Office.Clients.Services;
 public class PdfClient(HttpClient client) : OfficeClientBase(client),
     IHtmlToPdfService, IImagesToPdfService, IPdfMerger, IPdfSplitter, IPdfTextExtractor, IPdfToImageService
 {
-    private const string FromHtmlPath = "/pdf/from-html";
-    private const string FromImagesPath = "/pdf/from-images";
-    private const string ToImagesPath = "/pdf/to-images";
-    private const string MergePath = "/pdf/merge";
-    private const string SplitPath = "/pdf/split";
-    private const string TextPath = "/pdf/txt";
-    private const string PageCountPath = "/pdf/page-count";
+    private const string FromHtmlPath = "pdf/from-html";
+    private const string FromImagesPath = "pdf/from-images";
+    private const string ToImagesPath = "pdf/to-images";
+    private const string MergePath = "pdf/merge";
+    private const string SplitPath = "pdf/split";
+    private const string TextPath = "pdf/txt";
+    private const string PageCountPath = "pdf/page-count";
 
     public async Task<IMemoryFile> Create(HtmlInput input, CancellationToken cancellationToken = default)
     {

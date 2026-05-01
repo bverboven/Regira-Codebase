@@ -8,8 +8,8 @@ namespace Regira.Office.Clients.Services;
 
 public class MessageParserClient(HttpClient client) : OfficeClientBase(client), IMessageParser
 {
-    private const string MsgPath = "/mail/msg";
-    private const string EmlPath = "/mail/eml";
+    private const string MsgPath = "mail/msg";
+    private const string EmlPath = "mail/eml";
 
     public async Task<IMessageObject> Parse(IMemoryFile file, CancellationToken cancellationToken = default)
     {

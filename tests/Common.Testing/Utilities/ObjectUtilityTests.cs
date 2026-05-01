@@ -1,6 +1,6 @@
 ﻿using Regira.Utilities;
 
-namespace Common.Testing;
+namespace Common.Testing.Utilities;
 
 [TestFixture]
 public class ObjectUtilityTests
