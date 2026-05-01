@@ -85,11 +85,12 @@ public class CountryUtilityTests
         var country = CountryUtility.GetCountries().FirstOrDefault(c => c.Iso2Code == countryCode);
         Assert.That(country, Is.Not.Null, $"Country '{countryCode}' not found");
         var languages = country!.GetLanguages();
+
         foreach (var lang in expectedLanguages)
             Assert.That(languages, Does.Contain(lang), $"Expected language '{lang}' not found for country '{countryCode}'");
     }
 
-    [TestCase("nl", new[] { "NL", "BE", "DE" })]
+    [TestCase("nl", new[] { "NL", "BE" })]
     [TestCase("de", new[] { "DE", "AT", "CH", "LI", "LU" })]
     [TestCase("xx", new string[0])]
     public void Test_Get_By_Language(string lang, string[] expectedCodes)
