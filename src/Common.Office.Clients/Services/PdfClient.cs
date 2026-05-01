@@ -45,19 +45,24 @@ public class PdfClient(HttpClient client) : OfficeClientBase(client),
 
     public async Task<IEnumerable<IMemoryFile>> Split(IMemoryFile pdf, IEnumerable<PdfSplitRange> ranges, CancellationToken cancellationToken = default)
     {
-        var rangesParam = string.Join(",", ranges.Select(r => r.End.HasValue ? $"{r.Start}-{r.End}" : $"{r.Start}"));
-        using var content = new MultipartFormDataContent();
-        content.Add(new ByteArrayContent(pdf.GetBytes() ?? throw new ArgumentException("File has no content.", nameof(pdf))), "pdfFile", "file.pdf");
-        var files = await PostMultipartForFilesAsync($"{SplitPath}?ranges={rangesParam}", content, cancellationToken);
-        return files;
+        var pdfBytes = pdf.GetBytes() ?? throw new ArgumentException("File has no content.", nameof(pdf));
+        var results = new List<IMemoryFile>();
+        foreach (var range in ranges)
+        {
+            var rangeParam = range.End.HasValue ? $"{range.Start}-{range.End}" : $"{range.Start}";
+            using var content = new MultipartFormDataContent();
+            content.Add(new ByteArrayContent(pdfBytes), "pdfFile", "file.pdf");
+            results.Add(await PostMultipartForFileAsync($"{SplitPath}?ranges={rangeParam}", content, cancellationToken));
+        }
+        return results;
     }
 
     public async Task<int> GetPageCount(IMemoryFile pdf, CancellationToken cancellationToken = default)
     {
         using var content = new MultipartFormDataContent();
         content.Add(new ByteArrayContent(pdf.GetBytes() ?? throw new ArgumentException("File has no content.", nameof(pdf))), "files", "file.pdf");
-        var counts = await PostMultipartAsync<int[]>(PageCountPath, content, cancellationToken);
-        return counts?.FirstOrDefault() ?? 0;
+        var counts = await PostMultipartAsync<Dictionary<string, int>>(PageCountPath, content, cancellationToken);
+        return counts?.Values.Sum() ?? 0;
     }
 
     public async Task<string> GetText(IMemoryFile pdf, CancellationToken cancellationToken = default)

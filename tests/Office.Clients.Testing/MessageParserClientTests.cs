@@ -16,7 +16,7 @@ public class MessageParserClientTests : OfficeClientTestsBase
     public MessageParserClientTests()
     {
         var testsDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../"));
-        _inputDir = Path.Combine(testsDir, "Office.Mail.Testing", "Assets", "Input");
+        _inputDir = Path.Combine(testsDir, "Office.Mail.Testing", "Assets");
     }
 
     [SetUp]

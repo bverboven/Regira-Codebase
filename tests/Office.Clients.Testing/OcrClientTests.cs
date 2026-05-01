@@ -42,10 +42,10 @@ public class OcrClientTests : OfficeClientTestsBase
     {
         var file = new BinaryFileItem { Bytes = await File.ReadAllBytesAsync(Path.Combine(_assetsDir, "poem-nl.jpg")) };
 
-        var text = await _service.Read(file, "nl");
+        var result = await _service.Read(file, "nl");
 
-        Assert.That(text, Is.Not.Null);
-        Assert.That(text, Is.Not.Empty);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Text, Is.Not.Empty);
     }
 
     [Test]

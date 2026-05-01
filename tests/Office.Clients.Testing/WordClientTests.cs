@@ -80,9 +80,6 @@ public class WordClientTests : OfficeClientTestsBase
     [Test]
     public async Task GetText()
     {
-        Assert.Ignore("ToDo: update API");
-        return;
-
         var input = await LoadTemplate("doc-1.docx");
 
         var text = await _textExtractor.GetText(input);

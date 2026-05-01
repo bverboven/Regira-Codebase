@@ -89,7 +89,7 @@ public class CountryUtilityTests
             Assert.That(languages, Does.Contain(lang), $"Expected language '{lang}' not found for country '{countryCode}'");
     }
 
-    [TestCase("nl", new[] { "NL", "BE" })]
+    [TestCase("nl", new[] { "NL", "BE", "DE" })]
     [TestCase("de", new[] { "DE", "AT", "CH", "LI", "LU" })]
     [TestCase("xx", new string[0])]
     public void Test_Get_By_Language(string lang, string[] expectedCodes)

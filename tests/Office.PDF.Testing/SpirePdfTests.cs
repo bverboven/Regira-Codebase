@@ -11,11 +11,11 @@ public class SpirePdfTests
 
     [Test]
     public Task Split_1to10()
-        => PdfTestHelper.Split_Documents(_pdfService, "lorem-10-pages.pdf");
+        => PdfTestHelper.Split_Documents(_pdfService, "lorem-9-pages.pdf");
 
     [Test]
     public Task Merge_Split_Documents()
-        => PdfTestHelper.Merge_Split_Documents(_pdfService, _pdfService, "lorem-10-pages.pdf");
+        => PdfTestHelper.Merge_Split_Documents(_pdfService, _pdfService, "lorem-9-pages.pdf");
 
     [Test]
     public Task ToImages()

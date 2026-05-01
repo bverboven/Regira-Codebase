@@ -8,7 +8,7 @@ namespace Regira.Office.Clients.Services;
 
 public class OcrClient(HttpClient client) : OfficeClientBase(client), IOcrService
 {
-    private const string Path = "ocr";
+    private const string Path = "image2text";
 
     public async Task<OcrResult> Read(IMemoryFile imgFile, string? lang = null, CancellationToken cancellationToken = default)
     {

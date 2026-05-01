@@ -86,11 +86,11 @@ public class PdfClientTests : OfficeClientTestsBase
     [Test]
     public async Task GetPageCount()
     {
-        var file = new BinaryFileItem { Bytes = await File.ReadAllBytesAsync(Path.Combine(_inputDir, "lorem-10-pages.pdf")) };
+        var file = new BinaryFileItem { Bytes = await File.ReadAllBytesAsync(Path.Combine(_inputDir, "lorem-9-pages.pdf")) };
 
         var count = await _splitter.GetPageCount(file);
 
-        Assert.That(count, Is.EqualTo(10));
+        Assert.That(count, Is.EqualTo(9));
     }
 
     [Test]
