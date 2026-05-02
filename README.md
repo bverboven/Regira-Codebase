@@ -76,3 +76,24 @@ Regira is a collection of .NET libraries providing unified abstractions for comm
 | [Invoicing](src/Common.Invoicing) | Invoice models and structured number parsing |
 | [Payments](src/Common.Payments) | Payment abstractions and structured reference numbers |
 | [TreeList](src/TreeList) | Generic hierarchical tree structures with navigation extension methods |
+
+---
+
+## Using Regira in your project
+
+Consumer projects receive AI instruction files tailored to the Regira modules they actually use, rather than the full source repository `ai/` folder.
+
+1. Copy [`ai/regira.modules.template.json`](ai/regira.modules.template.json) to your project root as `regira.modules.json` and edit it to list your active modules.
+2. Run the sync script to generate the bootstrap and copy the selected instruction files:
+
+   ```powershell
+   # PowerShell (Windows, macOS, Linux)
+   pwsh tools/ai/sync-consumer-instructions.ps1
+
+   # Bash (requires bash 4.0+; see note for macOS)
+   ./tools/ai/sync-consumer-instructions.sh
+   ```
+
+3. Re-run the script whenever you add a module or change `aiVersion`.
+
+See [tools/ai/README.md](tools/ai/README.md) for full usage, output layout, and versioning details.
