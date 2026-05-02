@@ -1,5 +1,7 @@
 # Regira Codebase — Copilot Bootstrap
 
+See [`AGENTS.md`](./AGENTS.md) for the shared agent entrypoint in this repository.
+
 Use this file as a **router**, not as a full reference. Load the smallest relevant instruction set, then stop.
 
 This bootstrap is for the **source repository** where the full `ai/` folder is available locally. For a downstream app that only consumes Regira packages, start from [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) and follow [`consumer-project.migration-plan.md`](./consumer-project.migration-plan.md).
