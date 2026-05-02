@@ -25,8 +25,7 @@ Regira packages are published at `https://packages.regira.com/v3/index.json`. Ad
 ## Consumer-Project References
 
 - [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) — starter bootstrap for a consuming project
-- [`consumer-project.migration-plan.md`](./consumer-project.migration-plan.md) — phased migration plan toward a scalable consumer-project model
-- [`tools/ai/`](../tools/ai/) — sync scripts that render the bootstrap and copy instruction files into a consumer repo
+- [`tools/ai/README.md`](../tools/ai/README.md) — sync script usage, output layout, and versioning details for consumer projects
 
 ### Valid deep-reference suffixes for consumer manifests
 

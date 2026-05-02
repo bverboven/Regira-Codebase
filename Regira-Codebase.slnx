@@ -1,5 +1,7 @@
 <Solution>
   <Folder Name="/ai/">
+    <File Path="ai/AGENTS.md" />
+    <File Path="ai/consumer.bootstrap.template.md" />
     <File Path="ai/copilot-instructions.md" />
     <File Path="ai/entities.advanced.example.md" />
     <File Path="ai/entities.examples.md" />
@@ -7,23 +9,42 @@
     <File Path="ai/entities.namespaces.md" />
     <File Path="ai/entities.setup.md" />
     <File Path="ai/entities.signatures.md" />
+    <File Path="ai/invoicing.examples.md" />
     <File Path="ai/invoicing.instructions.md" />
+    <File Path="ai/io.storage.examples.md" />
     <File Path="ai/io.storage.instructions.md" />
+    <File Path="ai/learnings.md" />
+    <File Path="ai/media.examples.md" />
     <File Path="ai/media.instructions.md" />
+    <File Path="ai/office.barcodes.examples.md" />
     <File Path="ai/office.barcodes.instructions.md" />
+    <File Path="ai/office.csv.examples.md" />
     <File Path="ai/office.csv.instructions.md" />
+    <File Path="ai/office.excel.examples.md" />
     <File Path="ai/office.excel.instructions.md" />
     <File Path="ai/office.instructions.md" />
+    <File Path="ai/office.mail.examples.md" />
     <File Path="ai/office.mail.instructions.md" />
+    <File Path="ai/office.ocr.examples.md" />
     <File Path="ai/office.ocr.instructions.md" />
+    <File Path="ai/office.pdf.examples.md" />
     <File Path="ai/office.pdf.instructions.md" />
+    <File Path="ai/office.vcards.examples.md" />
     <File Path="ai/office.vcards.instructions.md" />
+    <File Path="ai/office.word.examples.md" />
     <File Path="ai/office.word.instructions.md" />
+    <File Path="ai/payments.examples.md" />
     <File Path="ai/payments.instructions.md" />
     <File Path="ai/project.setup.md" />
+    <File Path="ai/regira.modules.template.json" />
+    <File Path="ai/security.examples.md" />
     <File Path="ai/security.instructions.md" />
+    <File Path="ai/shared.setup.md" />
+    <File Path="ai/system.examples.md" />
     <File Path="ai/system.instructions.md" />
+    <File Path="ai/treelist.examples.md" />
     <File Path="ai/treelist.instructions.md" />
+    <File Path="ai/web.examples.md" />
     <File Path="ai/web.instructions.md" />
     <File Path="learnings.md" />
   </Folder>
@@ -196,5 +217,10 @@
     <Project Path="tools/ProjectFilesProcessor/ProjectFilesProcessor.csproj" />
     <Project Path="tools/ProjectsCleanerConsole/ProjectsCleanerConsole.csproj" />
     <Project Path="tools/VideoTestConsole/VideoTestConsole.csproj" />
+  </Folder>
+  <Folder Name="/tools/ai/">
+    <File Path="tools/ai/README.md" />
+    <File Path="tools/ai/sync-consumer-instructions.ps1" />
+    <File Path="tools/ai/sync-consumer-instructions.sh" />
   </Folder>
 </Solution>

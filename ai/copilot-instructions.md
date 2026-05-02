@@ -4,7 +4,7 @@ See [`AGENTS.md`](./AGENTS.md) for the shared agent entrypoint in this repositor
 
 Use this file as a **router**, not as a full reference. Load the smallest relevant instruction set, then stop.
 
-This bootstrap is for the **source repository** where the full `ai/` folder is available locally. For a downstream app that only consumes Regira packages, start from [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) and follow [`consumer-project.migration-plan.md`](./consumer-project.migration-plan.md).
+This bootstrap is for the **source repository** where the full `ai/` folder is available locally. For a downstream app that only consumes Regira packages, start from [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) and follow [`tools/ai/README.md`](../tools/ai/README.md).
 
 ## Core Rules
 
@@ -41,7 +41,7 @@ This bootstrap is for the **source repository** where the full `ai/` folder is a
 
 - [`shared.setup.md`](./shared.setup.md) — shared setup rules and the Regira NuGet feed
 - [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) — tiny bootstrap template for consumer projects
-- [`consumer-project.migration-plan.md`](./consumer-project.migration-plan.md) — phased plan for a scalable consumer-project model
+- [`tools/ai/README.md`](../tools/ai/README.md) — sync script usage, output layout, and versioning details for consumer projects
 
 ## General Instructions
 
