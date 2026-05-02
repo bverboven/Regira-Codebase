@@ -2,6 +2,8 @@
 
 Use this template in a project that **consumes** Regira packages but does not contain the full Regira source repository. Keep it small and project-specific.
 
+Pair it with a project template from [`project.setup.md`](./project.setup.md) and a local `regira.modules.json` manifest so onboarding becomes one action instead of a manual checklist.
+
 ## Suggested Template
 
 ```md
@@ -20,9 +22,14 @@ Rules:
 5. Ask for feedback instead of guessing missing APIs or project-specific conventions.
 ```
 
+## Suggested Manifest
+
+Use [`regira.modules.template.json`](./regira.modules.template.json) as the starting point for a project-local `regira.modules.json` file.
+
 ## What to Include Locally
 
 - a tiny project bootstrap like the template above
+- a `regira.modules.json` file that lists the selected Regira modules
 - only the module guides that the app actively uses
 - only the deep reference files that are important to the app
 

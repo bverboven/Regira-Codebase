@@ -1,0 +1,18 @@
+{
+  "aiVersion": "5.0.0",
+  "projectTemplate": "BasicApi",
+  "modules": [
+    "Entities",
+    "Security",
+    "Office.PDF"
+  ],
+  "references": {
+    "Entities": [
+      "setup",
+      "examples"
+    ],
+    "Office.PDF": [
+      "examples"
+    ]
+  }
+}

@@ -5,6 +5,13 @@
 This solution contains some reusable starter templates.
 Identify the user's use case and apply the matching template below as the starting point.
 
+For a **consumer project** that uses Regira NuGet packages, pair the chosen project template with:
+
+- [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md)
+- a project-local `regira.modules.json` file based on [`regira.modules.template.json`](./regira.modules.template.json)
+
+That keeps onboarding to one flow: choose the app template, choose the active Regira modules, then sync only the matching instruction files.
+
 ---
 
 ## Template Selection Guide
@@ -657,4 +664,3 @@ finally
     Log.CloseAndFlush();
 }
 ```
-

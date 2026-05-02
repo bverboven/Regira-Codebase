@@ -12,6 +12,37 @@ Consumer projects should receive:
 2. only the module guides they actually use
 3. deep reference files only when needed
 
+## Concrete Consumer Manifest
+
+Use a project-local `regira.modules.json` file as the source of truth for which Regira instructions should be present in a consumer repository.
+
+### Recommended v1 shape
+
+```json
+{
+  "aiVersion": "5.0.0",
+  "projectTemplate": "BasicApi",
+  "modules": [
+    "Entities",
+    "Security",
+    "Office.PDF"
+  ],
+  "references": {
+    "Entities": [ "setup", "examples" ],
+    "Office.PDF": [ "examples" ]
+  }
+}
+```
+
+### Field meanings
+
+- `aiVersion` — the pinned version of the instruction snapshot to copy from
+- `projectTemplate` — the project template selected from [`project.setup.md`](./project.setup.md)
+- `modules` — the enabled Regira module guides to copy into the consumer project
+- `references` — optional deep-reference files to include per module
+
+This format is intentionally simple so it can drive both manual onboarding and a future sync script.
+
 ## Phase 1 — Stabilize the Source Instruction System
 
 1. Keep [`copilot-instructions.md`](./copilot-instructions.md) as the source-repo bootstrap.
@@ -30,32 +61,49 @@ For each module, distinguish between:
 
 Keep module guides short. Load setup, examples, and exact references only on demand.
 
-## Phase 3 — Define Consumer Distribution
+## Phase 3 — Consumer Distribution and Starter Experience
 
-1. Create a small consumer bootstrap template.
-2. Introduce a manifest or selection mechanism for enabled Regira modules.
-3. Let each consumer project opt into only the modules it uses.
-4. Copy or sync only the selected instruction files into the consumer repo.
+Treat onboarding as one action:
 
-## Phase 4 — Provide a Starter Experience
+1. Pick the base project template from [`project.setup.md`](./project.setup.md).
+2. Add `regira.modules.json` to declare the active Regira modules.
+3. Generate or copy:
+   - the small bootstrap instruction file
+   - the selected module guides
+   - only the requested deep-reference files
+4. Make this the default starter flow for a new Regira consumer project.
 
-1. Offer a starter template for new consumer projects.
-2. Include:
-   - NuGet feed setup
-   - a small bootstrap instruction file
-   - selected module guides
-   - an optional manifest of enabled modules
-3. Make this starter the preferred way to begin a Regira-based app.
+In other words: **pick project template + pick active modules + sync selected instructions** should converge into one onboarding action.
 
-## Phase 5 — Add Update / Sync Capability
+## Phase 4 — Add Update / Sync Capability
 
-1. Introduce a lightweight internal process or tool to:
-   - add module instructions to a consumer project
-   - refresh them when source instructions change
-   - keep the selected files aligned with the project
-2. Make the sync version-aware so consumers can align instructions with the package versions they use.
+Start with a simple script-based implementation instead of a custom service:
 
-## Phase 6 — Consider MCP Only After the Content Model Is Stable
+1. Provide a checked-in PowerShell script and a matching bash script.
+2. The script reads `regira.modules.json`.
+3. The script copies the matching bootstrap, module guides, and optional deep references from a versioned AI snapshot into the consumer repo.
+4. The same script handles both first-time setup and later refreshes.
+
+Recommended v1 filenames:
+
+- `tools/ai/sync-consumer-instructions.ps1`
+- `tools/ai/sync-consumer-instructions.sh`
+
+### Who runs it and when
+
+- **New project creation** — run it immediately after choosing the project template
+- **Adding a Regira module** — run it after updating `regira.modules.json`
+- **Upgrading Regira packages** — run it after changing the pinned `aiVersion`
+- **Ongoing maintenance** — consumer-project maintainers run it manually; CI can later verify that checked-in instruction files still match the manifest
+
+### Versioning strategy
+
+- Pin the copied instructions with `aiVersion` instead of always pulling the latest content.
+- The simplest v1 rule is: map `aiVersion` to a Git tag or released snapshot of the `ai/` folder.
+- Consumer projects update deliberately by changing `aiVersion` and re-running the sync script.
+- Keep the instruction snapshot aligned with the Regira package version used by the consumer project whenever possible.
+
+## Phase 5 — Consider MCP Only After the Content Model Is Stable
 
 Add a custom MCP server only when you need centralized, query-based retrieval instead of copying files. Useful MCP scenarios include:
 
