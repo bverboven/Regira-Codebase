@@ -21,7 +21,7 @@
 ## Checklist
 
 1. Create an ASP.NET Core Web API project — use the **`BasicApi`** template in [`project.setup.md`](./project.setup.md) as the starting point.
-2. Add `NuGet.Config` with the Regira feed — see [`project.setup.md`](./project.setup.md) — **Shared Conventions → NuGet feed**.
+2. Add `NuGet.Config` with the Regira feed — see [`shared.setup.md`](./shared.setup.md).
 3. Add required packages to `.csproj`.
 4. Create `YourDbContext` deriving from `DbContext`.
 5. Configure `Program.cs`.
@@ -32,7 +32,7 @@
 
 ## NuGet Feed
 
-> **→ See:** [`project.setup.md`](./project.setup.md) — **Shared Conventions → NuGet feed** for the feed URL and `NuGet.Config` template.
+> **→ See:** [`shared.setup.md`](./shared.setup.md) — **NuGet feed**.
 
 ---
 

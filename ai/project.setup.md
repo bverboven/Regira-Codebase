@@ -70,18 +70,7 @@ MyProject/
 
 ### NuGet feed
 
-`Regira.*` packages are served from a private feed. Add `NuGet.Config` to the solution root:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-  <packageSources>
-    <clear />
-    <add key="NuGet" value="https://api.nuget.org/v3/index.json" />
-    <add key="Regira" value="https://packages.regira.com/v3/index.json" />
-  </packageSources>
-</configuration>
-```
+Shared setup: see [`shared.setup.md`](./shared.setup.md) — **NuGet feed**.
 
 ### Logging (serilog)
 

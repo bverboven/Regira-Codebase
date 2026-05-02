@@ -10,10 +10,7 @@
 dotnet add package Regira.TreeList
 ```
 
-> The Regira feed must be configured in `NuGet.Config`:
-> ```xml
-> <add key="Regira" value="https://packages.regira.com/v3/index.json" />
-> ```
+> Shared setup: see [`shared.setup.md`](./shared.setup.md) — **NuGet feed**.
 
 ---
 

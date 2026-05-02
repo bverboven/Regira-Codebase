@@ -1,4 +1,4 @@
-﻿# Regira Entities AI Agent Instructions
+# Regira Entities AI Agent Instructions
 
 > A generic, extensible framework for managing data entities in .NET with standardized CRUD operations, filtering, sorting, and includes.
 
@@ -24,7 +24,7 @@ Use this as the primary checklist.
 ### Create a New Regira API Project
 
 1. Create an ASP.NET Core Web API project targeting the latest .NET version (or the solution's target).
-2. Add `NuGet.Config` with the Regira feed (see below).
+2. Add `NuGet.Config` with the Regira feed — see [`shared.setup.md`](./shared.setup.md).
 3. Add the required Regira and EF Core packages to the project file.
 4. Create a `YourDbContext` deriving from `DbContext` and configure it.
 5. In `Program.cs`:

@@ -22,10 +22,7 @@
 <PackageReference Include="Regira.Drawing.GDI" Version="5.*" />
 ```
 
-> Add the Regira feed to `NuGet.Config`:
-> ```xml
-> <add key="Regira" value="https://packages.regira.com/v3/index.json" />
-> ```
+> Shared setup: see [`shared.setup.md`](./shared.setup.md) — **NuGet feed**.
 
 ---
 
