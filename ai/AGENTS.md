@@ -52,7 +52,7 @@ Follow standard C# naming conventions. Additionally:
 - Names must be **descriptive** but concise — avoid cryptic abbreviations and overly long identifiers
 - Generic type parameters: use a meaningful `T`-prefixed name (`TEntity`, `TKey`, `TDto`) rather than a bare single-letter `T` where context allows
 - Variable and Property names can be generic, when the context is clear. 
-  For example, in a `ProductService` class, a method parameter named `item` or `Items` is perfectly clear. This even enables to use of generic interfaces.
+  For example, in a `ProductService` class, a method parameter named `item` or `Items` is perfectly clear. This even enables the use of generic interfaces.
   However, when referring to a specific entity type, it's mandatory to use the entity name (e.g. `category`).
  
 ### Dependency Injection
