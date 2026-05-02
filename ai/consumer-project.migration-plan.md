@@ -67,8 +67,8 @@ Treat onboarding as one action:
 
 1. Pick the base project template from [`project.setup.md`](./project.setup.md).
 2. Add `regira.modules.json` to declare the active Regira modules.
-3. Generate or copy:
-   - the small bootstrap instruction file
+3. Generate:
+   - the small bootstrap instruction file from [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) and the active module list in `regira.modules.json`
    - the selected module guides
    - only the requested deep-reference files
 4. Make this the default starter flow for a new Regira consumer project.
@@ -83,13 +83,15 @@ For v1, use this destination layout inside the consumer repository:
 - `.github/instructions/regira/` — synced Regira module guides and deep-reference files
 - `regira.modules.json` — the project-local manifest at the repository root
 
+Keep the bootstrap thin and generated from the manifest on each sync. Project-specific guidance that should not be regenerated belongs in separate local instruction files.
+
 ## Phase 4 — Add Update / Sync Capability
 
 Start with a simple script-based implementation instead of a custom service:
 
 1. Provide a checked-in PowerShell script and a matching bash script.
 2. The script reads `regira.modules.json`.
-3. The script copies the matching bootstrap, module guides, and optional deep references from a versioned AI snapshot into the consumer repo.
+3. The script renders the bootstrap from the template plus the current module list, then copies the matching module guides and optional deep references from a versioned AI snapshot into the consumer repo.
 4. The same script handles both first-time setup and later refreshes.
 
 Recommended v1 filenames:
@@ -107,9 +109,9 @@ Recommended v1 filenames:
 ### Versioning strategy
 
 - Pin the copied instructions with `aiVersion` instead of always pulling the latest content.
-- The concrete v1 rule is: map `aiVersion` to a Git tag in the Regira source repository named `ai/v{aiVersion}` and copy the `ai/` folder from that tag.
+- The concrete v1 rule is: map `aiVersion` to a flat Git tag in the Regira source repository named `ai-v{aiVersion}` and copy the `ai/` folder from that tag.
 - The sync script should support an optional local override path for maintainers working inside a checked-out source repo, but consumer projects should not depend on having the source repo locally.
-- If the requested `ai/v{aiVersion}` tag does not exist, the script should fail with a clear error instead of guessing another source.
+- If the requested `ai-v{aiVersion}` tag does not exist, the script should fail with a clear error instead of guessing another source.
 - Consumer projects update deliberately by changing `aiVersion` and re-running the sync script.
 - Keep the instruction snapshot aligned with the Regira package version used by the consumer project whenever possible.
 
@@ -118,9 +120,9 @@ Recommended v1 filenames:
 Use a remote-first, tag-based lookup so the same script works for consumer repos that only have their own project checked out:
 
 1. Read `aiVersion` from `regira.modules.json`.
-2. Resolve it to the Regira Git tag `ai/v{aiVersion}`.
-3. Shallow-clone the tagged snapshot into a temporary location and read the `ai/` folder from there.
-4. Copy the bootstrap to `.github/copilot-instructions.md` and copy the selected module guides and requested deep-reference files into `.github/instructions/regira/`.
+2. Resolve it to the Regira Git tag `ai-v{aiVersion}`.
+3. Shallow-clone the tagged snapshot into a temporary location with sparse checkout limited to `ai/`.
+4. Render `.github/copilot-instructions.md` from [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) plus the active module list in `regira.modules.json`, then copy the selected module guides and requested deep-reference files into `.github/instructions/regira/`.
 5. Ignore `projectTemplate` during sync; it documents how the project started, but does not affect which files are copied.
 
 This keeps version resolution deterministic and makes the first script implementable with the shallow-clone path that works on hosted Git providers such as GitHub.

@@ -26,9 +26,13 @@ Rules:
 
 Use [`regira.modules.template.json`](./regira.modules.template.json) as the starting point for a project-local `regira.modules.json` file.
 
+## How the Template Is Used
+
+The sync script should render this template into `.github/copilot-instructions.md` from `regira.modules.json` on every run. Do not copy a fixed bootstrap from the source repo, because the active module list is consumer-specific.
+
 ## What to Include Locally
 
-- a tiny project bootstrap like the template above, stored as `.github/copilot-instructions.md`
+- a tiny generated project bootstrap like the template above, stored as `.github/copilot-instructions.md`
 - a `regira.modules.json` file that lists the selected Regira modules
 - only the module guides that the app actively uses, copied into `.github/instructions/regira/`
 - only the deep reference files that are important to the app, also copied into `.github/instructions/regira/`
