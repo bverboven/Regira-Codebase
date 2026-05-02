@@ -19,7 +19,7 @@ jobs:
       - name: Create and push tag
         run: |
           TAG="ai-v${{ inputs.version }}"
-          if [[ -n "$(git tag -l "$TAG")" ]]; then
+          if [[ -n "$(git ls-remote --tags origin "refs/tags/$TAG")" ]]; then
             echo "Tag $TAG already exists, skipping."
           else
             git config user.name "github-actions[bot]"
