@@ -28,10 +28,10 @@ Use [`regira.modules.template.json`](./regira.modules.template.json) as the star
 
 ## What to Include Locally
 
-- a tiny project bootstrap like the template above
+- a tiny project bootstrap like the template above, stored as `.github/copilot-instructions.md`
 - a `regira.modules.json` file that lists the selected Regira modules
-- only the module guides that the app actively uses
-- only the deep reference files that are important to the app
+- only the module guides that the app actively uses, copied into `.github/instructions/regira/`
+- only the deep reference files that are important to the app, also copied into `.github/instructions/regira/`
 
 ## What Not to Include by Default
 

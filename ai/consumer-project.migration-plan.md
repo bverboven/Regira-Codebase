@@ -75,6 +75,14 @@ Treat onboarding as one action:
 
 In other words: **pick project template + pick active modules + sync selected instructions** should converge into one onboarding action.
 
+### Default destination layout
+
+For v1, use this destination layout inside the consumer repository:
+
+- `.github/copilot-instructions.md` — the small local bootstrap
+- `.github/instructions/regira/` — synced Regira module guides and deep-reference files
+- `regira.modules.json` — the project-local manifest at the repository root
+
 ## Phase 4 — Add Update / Sync Capability
 
 Start with a simple script-based implementation instead of a custom service:
@@ -111,11 +119,11 @@ Use a remote-first, tag-based lookup so the same script works for consumer repos
 
 1. Read `aiVersion` from `regira.modules.json`.
 2. Resolve it to the Regira Git tag `ai/v{aiVersion}`.
-3. Export only the `ai/` folder from that tag into a temporary location.
-4. Copy the bootstrap, selected module guides, and requested deep-reference files into the consumer repo.
+3. Shallow-clone the tagged snapshot into a temporary location and read the `ai/` folder from there.
+4. Copy the bootstrap to `.github/copilot-instructions.md` and copy the selected module guides and requested deep-reference files into `.github/instructions/regira/`.
 5. Ignore `projectTemplate` during sync; it documents how the project started, but does not affect which files are copied.
 
-This keeps version resolution deterministic and makes the first script implementable with either `git archive --remote` or a shallow clone of the tagged snapshot.
+This keeps version resolution deterministic and makes the first script implementable with the shallow-clone path that works on hosted Git providers such as GitHub.
 
 ## Phase 5 — Consider MCP Only After the Content Model Is Stable
 
