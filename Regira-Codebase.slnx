@@ -2,7 +2,6 @@
   <Folder Name="/ai/">
     <File Path="ai/AGENTS.md" />
     <File Path="ai/consumer.bootstrap.template.md" />
-    <File Path="ai/copilot-instructions.md" />
     <File Path="ai/entities.advanced.example.md" />
     <File Path="ai/entities.examples.md" />
     <File Path="ai/entities.instructions.md" />
@@ -52,7 +51,6 @@
     <File Path="evaluations/IO.Storage-evaluation.md" />
   </Folder>
   <Folder Name="/Solution Items/">
-    <File Path=".claude/CLAUDE.md" />
     <File Path=".gitignore" />
     <File Path="LICENSE" />
     <File Path="README.md" />

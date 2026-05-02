@@ -178,6 +178,10 @@ PYEOF
 rm -f "$MODULES_TMP"
 echo "Rendered bootstrap -> $BOOTSTRAP_OUT"
 
+AGENTS_OUT="AGENTS.md"
+cp "$BOOTSTRAP_OUT" "$AGENTS_OUT"
+echo "Rendered bootstrap -> $AGENTS_OUT"
+
 # ---------------------------------------------------------------------------
 # 4. Copy module instruction guides
 # ---------------------------------------------------------------------------

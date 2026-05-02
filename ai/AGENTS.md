@@ -2,18 +2,25 @@
 
 **Primary goal:** When a request relates to a specific module below, consult the corresponding instruction file for detailed, context-specific guidance. Fall back to the [General Instructions](#general-instructions) only when no module instruction file applies.
 
+> **Scope**: This file is for the **source repository** where the full `ai/` folder is available locally. For a downstream project that only consumes Regira packages, see [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) and [`tools/ai/README.md`](../tools/ai/README.md).
+
 Don't assume syntax or signatures! 
 When you have to guess and the instruction files don't give you the required information: 
 - Stop and describe the problem!
 - ASK feedback from the user!
 
-After every significant task, analyze what went well and what failed. Update ./learnings.md with a 'Lessons Learned' section. Before starting any new task, read learnings.md to avoid repeating past mistakes.
+After every significant task, analyze what went well and what failed. Update `./learnings.md` with a 'Lessons Learned' section. Before starting any new task, read `learnings.md` to avoid repeating past mistakes. Treat it as **curated memory, not a running log** — if it becomes noisy, summarize it before relying on it as context.
 
 ---
 
 ## Module Instructions
 
 This codebase provides specialized AI instruction sets for its modules. **When a user's request relates to a Regira module, load the corresponding instruction file and follow its guidance precisely.** Follow the module's instruction file as the primary source. Apply General Instructions only for topics not covered by the module guide, or when strictly necessary to fulfil the request.
+
+**Loading rules:**
+1. **Never load the whole `ai/` folder.** Identify the module and load only its guide.
+2. Load deep references (`*.setup.md`, `*.examples.md`, `*.signatures.md`, `*.namespaces.md`) only when the task specifically needs them.
+3. For shared setup concerns (NuGet feed, DI patterns), use [`shared.setup.md`](./shared.setup.md) instead of duplicating them in module guides.
 
 ### Available Modules
 
@@ -32,6 +39,12 @@ This codebase provides specialized AI instruction sets for its modules. **When a
 | **Payments** | `Regira.Payments` | Payment provider integrations (Mollie, Pom) | `./payments.instructions.md` |
 
 When a module's instruction file is not yet available (or the topic isn't covered), apply general .NET best practices and the conventions in this file.
+
+### Shared References
+
+- [`shared.setup.md`](./shared.setup.md) — shared setup rules and the Regira NuGet feed
+- [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) — bootstrap template for consumer projects
+- [`tools/ai/README.md`](../tools/ai/README.md) — sync script usage, output layout, and versioning for consumer projects
 
 ---
 

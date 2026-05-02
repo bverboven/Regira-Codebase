@@ -2,6 +2,73 @@
 
 These scripts sync Regira AI instruction files into a consumer project that consumes Regira packages.
 
+## Getting started with a new consumer project
+
+Follow these steps when creating a project from scratch that will consume Regira packages.
+
+### 1. Scaffold the project
+
+Create your project directory and initialise it with the appropriate template.
+Consult [`ai/project.setup.md`](../../ai/project.setup.md) to pick the right template (`ConsoleWithLogging`, `BasicApi`, `SelfHostingApi`, or `SelfHostingApiWithAuth`).
+```
+dotnet new web -n MyWebshop   # or sln + project, depending on your preference
+```
+
+### 2. Add the Regira NuGet feed
+
+Create `NuGet.Config` at the repository root:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <clear />
+    <add key="NuGet" value="https://api.nuget.org/v3/index.json" />
+    <add key="Regira" value="https://packages.regira.com/v3/index.json" />
+  </packageSources>
+</configuration>
+```
+
+### 3. Create the manifest
+
+Copy the template and edit it to declare the Regira modules your project uses:
+
+```powershell
+# from your project root
+Copy-Item path\to\Regira-Codebase\ai\regira.modules.template.json regira.modules.json
+```
+
+Edit `regira.modules.json`:
+
+```json
+{
+  "aiVersion": "5.0.0",
+  "projectTemplate": "BasicApi",
+  "modules": ["Entities", "Security"],
+  "references": {
+    "Entities": ["setup", "examples"]
+  }
+}
+```
+
+Valid `references` suffixes: `setup`, `examples`, `signatures`, `namespaces`.
+
+### 4. Run the sync script
+
+```powershell
+# PowerShell — remote fetch (recommended for first run)
+pwsh path\to\Regira-Codebase\tools\ai\sync-consumer-instructions.ps1
+
+# PowerShell — local source checkout (faster if you have Regira-Codebase checked out)
+pwsh path\to\Regira-Codebase\tools\ai\sync-consumer-instructions.ps1 -SourcePath path\to\Regira-Codebase\ai
+```
+
+The script generates `AGENTS.md` and `.github/copilot-instructions.md` (same bootstrap content) and populates `.github/instructions/regira/` with the selected instruction files. Your AI assistant picks these up automatically.
+
+Re-run the script whenever you add a module or change `aiVersion`.
+
+---
+
 ## Prerequisites
 
 - **git** — required by both scripts for the remote-fetch path
@@ -30,15 +97,16 @@ pwsh tools/ai/sync-consumer-instructions.ps1 -SourcePath ../Regira-Codebase/ai
 
 1. Read `regira.modules.json` at the repository root.
 2. Resolve the pinned `aiVersion` to the Regira source-repo Git tag `ai-v{aiVersion}` and shallow-clone only the `ai/` folder (skipped when `--source` / `-SourcePath` is supplied).
-3. Render `.github/copilot-instructions.md` from `consumer.bootstrap.template.md` using the active module list.
+3. Render the bootstrap from `consumer.bootstrap.template.md` and write it to both `AGENTS.md` (project root) and `.github/copilot-instructions.md`.
 4. Copy the selected module guides into `.github/instructions/regira/`.
 5. Copy any requested deep-reference files into `.github/instructions/regira/`.
 
 ## Output layout
 
 ```
+AGENTS.md                          ← rendered bootstrap (OpenAI-compatible agents)
 .github/
-  copilot-instructions.md          ← rendered bootstrap
+  copilot-instructions.md          ← rendered bootstrap (GitHub Copilot)
   instructions/
     regira/
       entities.instructions.md

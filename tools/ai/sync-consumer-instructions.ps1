@@ -106,6 +106,10 @@ $bootstrapOut = Join-Path $destDir "copilot-instructions.md"
 [System.IO.File]::WriteAllText($bootstrapOut, $bootstrap, [System.Text.Encoding]::UTF8)
 Write-Host "Rendered bootstrap -> $bootstrapOut"
 
+$agentsOut = "AGENTS.md"
+[System.IO.File]::WriteAllText($agentsOut, $bootstrap, [System.Text.Encoding]::UTF8)
+Write-Host "Rendered bootstrap -> $agentsOut"
+
 # ---------------------------------------------------------------------------
 # 4. Copy module instruction guides
 # ---------------------------------------------------------------------------
