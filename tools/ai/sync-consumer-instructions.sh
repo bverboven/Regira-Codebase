@@ -11,6 +11,12 @@
 # Supports an optional --source override so maintainers working inside a
 # checked-out source repo can use their local ai/ folder directly.
 #
+# COMPATIBILITY NOTE:
+#   This script requires bash 4.0 or later (uses mapfile and ${var,,} lowercasing).
+#   macOS ships with bash 3.2 (/bin/bash). Run with a Homebrew-installed bash
+#   (brew install bash) or use the PowerShell equivalent instead:
+#     pwsh tools/ai/sync-consumer-instructions.ps1
+#
 # Usage:
 #   ./tools/ai/sync-consumer-instructions.sh [--manifest PATH] [--source PATH] [--dest PATH]
 #
@@ -27,6 +33,15 @@
 #   ./tools/ai/sync-consumer-instructions.sh --source ../Regira-Codebase/ai
 
 set -euo pipefail
+
+# Require bash 4.0+ (mapfile and ${var,,} are not available in bash 3.x shipped with macOS)
+if [[ "${BASH_VERSINFO[0]}" -lt 4 ]]; then
+    echo "Error: bash 4.0 or later is required (found ${BASH_VERSION})." >&2
+    echo "macOS ships with bash 3.2. Options:" >&2
+    echo "  1. Install a newer bash: brew install bash" >&2
+    echo "  2. Use the PowerShell equivalent: pwsh tools/ai/sync-consumer-instructions.ps1" >&2
+    exit 1
+fi
 
 # ---------------------------------------------------------------------------
 # Defaults
@@ -150,13 +165,17 @@ MODULE_LINES="${MODULE_LINES%$'\n'}"
 
 mkdir -p "$DEST"
 BOOTSTRAP_OUT="$DEST/copilot-instructions.md"
-# Replace {{MODULES}} with the module list
-python3 -c "
+# Write module lines to a temp file to avoid shell-quoting issues inside Python
+MODULES_TMP="$(mktemp -t modules.XXXXXX)"
+printf '%s' "$MODULE_LINES" > "$MODULES_TMP"
+python3 - "$TEMPLATE_FILE" "$MODULES_TMP" "$BOOTSTRAP_OUT" << 'PYEOF'
 import sys
-template = open('$TEMPLATE_FILE', encoding='utf-8').read()
-result   = template.replace('{{MODULES}}', '''$MODULE_LINES''')
-open('$BOOTSTRAP_OUT', 'w', encoding='utf-8').write(result)
-"
+template     = open(sys.argv[1], encoding='utf-8').read()
+module_lines = open(sys.argv[2], encoding='utf-8').read()
+result       = template.replace('{{MODULES}}', module_lines)
+open(sys.argv[3], 'w', encoding='utf-8').write(result)
+PYEOF
+rm -f "$MODULES_TMP"
 echo "Rendered bootstrap -> $BOOTSTRAP_OUT"
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,30 @@
+name: Tag AI release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "AI instruction version to tag (e.g. 5.0.0)"
+        required: true
+        type: string
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create and push tag
+        run: |
+          TAG="ai-v${{ inputs.version }}"
+          if [[ -n "$(git tag -l "$TAG")" ]]; then
+            echo "Tag $TAG already exists, skipping."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag "$TAG"
+            git push origin "$TAG"
+            echo "Created and pushed tag $TAG"
+          fi
