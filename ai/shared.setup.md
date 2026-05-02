@@ -27,6 +27,15 @@ Regira packages are published at `https://packages.regira.com/v3/index.json`. Ad
 - [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) — starter bootstrap for a consuming project
 - [`consumer-project.migration-plan.md`](./consumer-project.migration-plan.md) — phased migration plan toward a scalable consumer-project model
 
+### Valid deep-reference suffixes for consumer manifests
+
+When a consumer project's `regira.modules.json` includes a `references` section, use only these v1 suffix values:
+
+- `setup`
+- `examples`
+- `signatures`
+- `namespaces`
+
 ## Guidance for New Shared Content
 
 When adding new instruction files:

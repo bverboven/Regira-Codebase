@@ -37,9 +37,9 @@ Use a project-local `regira.modules.json` file as the source of truth for which 
 ### Field meanings
 
 - `aiVersion` — the pinned version of the instruction snapshot to copy from
-- `projectTemplate` — the project template selected from [`project.setup.md`](./project.setup.md)
+- `projectTemplate` — the project template selected from [`project.setup.md`](./project.setup.md); this is onboarding metadata only, and the sync script should ignore it
 - `modules` — the enabled Regira module guides to copy into the consumer project
-- `references` — optional deep-reference files to include per module
+- `references` — optional deep-reference files to include per module; valid v1 values are `setup`, `examples`, `signatures`, and `namespaces`
 
 This format is intentionally simple so it can drive both manual onboarding and a future sync script.
 
@@ -99,9 +99,23 @@ Recommended v1 filenames:
 ### Versioning strategy
 
 - Pin the copied instructions with `aiVersion` instead of always pulling the latest content.
-- The simplest v1 rule is: map `aiVersion` to a Git tag or released snapshot of the `ai/` folder.
+- The concrete v1 rule is: map `aiVersion` to a Git tag in the Regira source repository named `ai/v{aiVersion}` and copy the `ai/` folder from that tag.
+- The sync script should support an optional local override path for maintainers working inside a checked-out source repo, but consumer projects should not depend on having the source repo locally.
+- If the requested `ai/v{aiVersion}` tag does not exist, the script should fail with a clear error instead of guessing another source.
 - Consumer projects update deliberately by changing `aiVersion` and re-running the sync script.
 - Keep the instruction snapshot aligned with the Regira package version used by the consumer project whenever possible.
+
+### Source resolution in the sync script
+
+Use a remote-first, tag-based lookup so the same script works for consumer repos that only have their own project checked out:
+
+1. Read `aiVersion` from `regira.modules.json`.
+2. Resolve it to the Regira Git tag `ai/v{aiVersion}`.
+3. Export only the `ai/` folder from that tag into a temporary location.
+4. Copy the bootstrap, selected module guides, and requested deep-reference files into the consumer repo.
+5. Ignore `projectTemplate` during sync; it documents how the project started, but does not affect which files are copied.
+
+This keeps version resolution deterministic and makes the first script implementable with either `git archive --remote` or a shallow clone of the tagged snapshot.
 
 ## Phase 5 — Consider MCP Only After the Content Model Is Stable
 
