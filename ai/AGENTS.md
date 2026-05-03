@@ -2,7 +2,7 @@
 
 **Primary goal:** When a request relates to a specific module below, consult the corresponding instruction file for detailed, context-specific guidance. Fall back to the [General Instructions](#general-instructions) only when no module instruction file applies.
 
-> **Scope**: This file is for the **source repository** where the full source tree is available locally. Module instruction files live in each project's `src/<project>/ai/` subdirectory. For a downstream project that only consumes Regira packages, see [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) and [`tools/ai/README.md`](../tools/ai/README.md).
+> **Scope**: This file is for the **source repository** where the full source tree is available locally. Module instruction files live in each project's `src/<project>/ai/` subdirectory. For a downstream project that consumes Regira packages, start by adding `Regira.Setup`, build once, and have the consuming project's AI agent read the local `ai/regira.setup.instructions.md` file extracted into that project. See [`../src/Common.Setup/content/ai/regira.setup.instructions.md`](../src/Common.Setup/content/ai/regira.setup.instructions.md), [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md), and [`tools/ai/README.md`](../tools/ai/README.md).
 
 Don't assume syntax or signatures! 
 When you have to guess and the instruction files don't give you the required information: 
@@ -21,6 +21,8 @@ This codebase provides specialized AI instruction sets for its modules. **When a
 1. **Never load the whole `ai/` folder.** Identify the module and load only its guide.
 2. Load deep references (`*.setup.md`, `*.examples.md`, `*.signatures.md`, `*.namespaces.md`) only when the task specifically needs them.
 3. For shared setup concerns (NuGet feed, DI patterns), use [`shared.setup.md`](./shared.setup.md) instead of duplicating them in module guides.
+
+Only modules with dedicated AI guides are listed below. Consumer manifests use the names defined in [`module-sources.json`](./module-sources.json); this table groups them by source-repo guide family. In particular, consumers can select `Office` for the family overview or narrower `Office.*` submodules for PDF, Excel, Mail, OCR, barcodes, CSV, and vCards.
 
 ### Available Modules
 

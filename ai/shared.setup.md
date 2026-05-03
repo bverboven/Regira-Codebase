@@ -20,10 +20,11 @@ Regira packages are published at `https://packages.regira.com/v3/index.json`. Ad
 ## Source Repository vs Consumer Project
 
 - **Source repository**: the full `ai/` folder is available locally, so the bootstrap can route to module guides and deep references.
-- **Consumer project**: keep only a tiny local bootstrap plus the module guides that the app actually uses. Do not copy the entire `ai/` folder by default.
+- **Consumer project**: add `Regira.Setup`, build once, and let the consuming project's AI agent start from the extracted local `ai/regira.setup.instructions.md`. Keep only a tiny local bootstrap plus the module guides that the app actually uses. Do not copy the entire `ai/` folder by default.
 
 ## Consumer-Project References
 
+- [`../src/Common.Setup/content/ai/regira.setup.instructions.md`](../src/Common.Setup/content/ai/regira.setup.instructions.md) — canonical setup flow shipped by `Regira.Setup` and extracted locally as `ai/regira.setup.instructions.md`
 - [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) — starter bootstrap for a consuming project
 - [`tools/ai/README.md`](../tools/ai/README.md) — sync script usage, output layout, and versioning details for consumer projects
 

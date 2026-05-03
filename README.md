@@ -81,19 +81,30 @@ Regira is a collection of .NET libraries providing unified abstractions for comm
 
 ## Using Regira in your project
 
-Consumer projects receive AI instruction files tailored to the Regira modules they actually use, rather than the full source repository `ai/` folder.
+For a new project that consumes Regira packages, the default entrypoint is the `Regira.Setup` package. It installs a small local bootstrap for the consuming project's AI agent instead of copying the full source-repository `ai/` folder.
 
-1. Copy [`ai/regira.modules.template.json`](ai/regira.modules.template.json) to your project root as `regira.modules.json` and edit it to list your active modules.
-2. Run the sync script to generate the bootstrap, list the exact Regira guide paths, and copy the selected instruction files:
+1. Add the Regira NuGet feed to your repository root:
 
-   ```powershell
-   # PowerShell (Windows, macOS, Linux)
-   pwsh tools/ai/sync-consumer-instructions.ps1
-
-   # Bash (requires bash 4.0+; see note for macOS)
-   ./tools/ai/sync-consumer-instructions.sh
+   ```xml
+   <?xml version="1.0" encoding="utf-8"?>
+   <configuration>
+     <packageSources>
+       <clear />
+       <add key="NuGet" value="https://api.nuget.org/v3/index.json" />
+       <add key="Regira" value="https://packages.regira.com/v3/index.json" />
+     </packageSources>
+   </configuration>
    ```
 
-3. Re-run the script whenever you add a module or change `aiVersion`.
+2. Add `Regira.Setup` to the consuming project and build once so it can extract the local setup files:
 
-See [tools/ai/README.md](tools/ai/README.md) for full usage, output layout, and versioning details.
+   ```powershell
+   dotnet add <project>.csproj package Regira.Setup
+   dotnet build
+   ```
+
+3. After the first build, ask the AI agent in the consuming project to read `ai/regira.setup.instructions.md`.
+4. Let that local setup guide drive the next steps: selecting modules, creating `regira.modules.json`, running the local sync script, and loading only the generated `.github/instructions/regira/*.md` files that match the selected modules.
+5. Re-run the sync whenever you add a module or change `aiVersion`.
+
+`Regira.Setup` installs the consumer bootstrap, manifest template, and sync scripts into the consuming project on first build. See [src/Common.Setup/content/ai/regira.setup.instructions.md](src/Common.Setup/content/ai/regira.setup.instructions.md) for the authoritative consumer flow and [tools/ai/README.md](tools/ai/README.md) for the lower-level sync-script details and manual source-checkout workflow.

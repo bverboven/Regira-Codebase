@@ -1,15 +1,75 @@
 # tools/ai — Consumer-Project Sync Scripts
 
-These scripts sync Regira AI instruction files into a consumer project that consumes Regira packages.
+These scripts sync versioned Regira AI instruction files into a consuming project. In the default consumer flow, `Regira.Setup` installs these scripts locally on the first build. This README also documents the manual workflow for running them from a `Regira-Codebase` source checkout.
 
-## Getting started with a new consumer project
+## Recommended consumer flow
 
-Follow these steps when creating a project from scratch that will consume Regira packages.
+Start here for a new project that consumes Regira packages.
+
+### 1. Add the Regira NuGet feed
+
+Create `NuGet.Config` at the repository root:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <clear />
+    <add key="NuGet" value="https://api.nuget.org/v3/index.json" />
+    <add key="Regira" value="https://packages.regira.com/v3/index.json" />
+  </packageSources>
+</configuration>
+```
+
+### 2. Install `Regira.Setup` and build once
+
+```powershell
+dotnet add <project>.csproj package Regira.Setup
+dotnet build
+```
+
+The first build extracts the local consumer bootstrap into the project:
+
+- `ai/regira.setup.instructions.md`
+- `regira.modules.template.json`
+- `tools/ai/sync-consumer-instructions.ps1`
+- `tools/ai/sync-consumer-instructions.sh`
+- `AGENTS.md`
+- `.github/copilot-instructions.md`
+
+### 3. Hand off to the consuming project's AI agent
+
+Ask the AI agent in the consuming project to read `ai/regira.setup.instructions.md`.
+
+### 4. Let the local setup guide drive the sync
+
+The local setup guide should select the modules, create `regira.modules.json`, and run the sync script from the consumer project's repository root:
+
+```powershell
+pwsh tools/ai/sync-consumer-instructions.ps1
+```
+
+```sh
+./tools/ai/sync-consumer-instructions.sh
+```
+
+The script generates `AGENTS.md` and `.github/copilot-instructions.md` (same bootstrap content) and populates `.github/instructions/regira/` with the selected instruction files. The generated bootstrap also lists the exact `.github/instructions/regira/*.md` paths to load for the selected Regira modules.
+
+### 5. Re-run the sync when the manifest changes
+
+Re-run the script whenever you add a module or change `aiVersion`.
+
+---
+
+## Manual or source-checkout workflow
+
+Use this path only when you want to run the scripts from a local `Regira-Codebase` checkout instead of the `Regira.Setup` files installed into the consumer project.
 
 ### 1. Scaffold the project
 
 Create your project directory and initialise it with the appropriate template.
 Consult [`ai/project.setup.md`](../../ai/project.setup.md) to pick the right template (`ConsoleWithLogging`, `BasicApi`, `SelfHostingApi`, or `SelfHostingApiWithAuth`).
+
 ```
 dotnet new web -n MyWebshop   # or sln + project, depending on your preference
 ```
@@ -53,7 +113,7 @@ Edit `regira.modules.json`:
 
 Valid `references` suffixes: `setup`, `examples`, `signatures`, `namespaces`.
 
-### 4. Run the sync script
+### 4. Run the sync script from the source checkout
 
 ```powershell
 # PowerShell — remote fetch (recommended for first run)
@@ -62,9 +122,6 @@ pwsh path\to\Regira-Codebase\tools\ai\sync-consumer-instructions.ps1
 # PowerShell — local source checkout (faster if you have Regira-Codebase checked out)
 pwsh path\to\Regira-Codebase\tools\ai\sync-consumer-instructions.ps1 -SourcePath path\to\Regira-Codebase
 ```
-
-The script generates `AGENTS.md` and `.github/copilot-instructions.md` (same bootstrap content) and populates `.github/instructions/regira/` with the selected instruction files. Your AI assistant picks these up automatically.
-The generated bootstrap also lists the exact `.github/instructions/regira/*.md` paths to load for the selected Regira modules.
 
 Re-run the script whenever you add a module or change `aiVersion`.
 
@@ -83,15 +140,16 @@ Re-run the script whenever you add a module or change `aiVersion`.
 ## Usage
 
 ```sh
-# Bash — sync from the pinned remote tag
+# Consumer project — sync using the tools installed by Regira.Setup
 ./tools/ai/sync-consumer-instructions.sh
-
-# PowerShell — sync from the pinned remote tag
 pwsh tools/ai/sync-consumer-instructions.ps1
 
-# Use a local source checkout (both scripts support this)
+# Consumer project — use a local source checkout instead of the pinned remote tag
 ./tools/ai/sync-consumer-instructions.sh  --source ../Regira-Codebase
 pwsh tools/ai/sync-consumer-instructions.ps1 -SourcePath ../Regira-Codebase
+
+# Run directly from a Regira-Codebase checkout
+pwsh path/to/Regira-Codebase/tools/ai/sync-consumer-instructions.ps1
 ```
 
 ## What the scripts do
@@ -122,7 +180,7 @@ AGENTS.md                          ← rendered bootstrap (OpenAI-compatible age
 
 | Trigger | Action |
 |---------|--------|
-| New consumer project | Run immediately after creating `regira.modules.json` |
+| New consumer project | After `Regira.Setup` has extracted the local files, create `regira.modules.json` and run the sync |
 | Adding a Regira module | Update `regira.modules.json`, then re-run |
 | Upgrading Regira packages | Change `aiVersion` in `regira.modules.json`, then re-run |
 

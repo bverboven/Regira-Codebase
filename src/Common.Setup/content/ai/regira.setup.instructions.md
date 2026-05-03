@@ -15,6 +15,7 @@
 |--------|----------|---------------|
 | Entities | CRUD APIs, entity services, DTO mapping, EF Core repositories | `Regira.Entities`, `Regira.Entities.EFcore`, `Regira.Entities.Web` |
 | IO.Storage | File storage, uploads, Azure Blob, SFTP, ZIP | `Regira.IO.Storage`, `Regira.IO.Storage.Azure`, `Regira.IO.Storage.SSH` |
+| Office | Office family overview or when the user still needs to choose between PDF, Excel, Word, Mail, OCR, and related submodules | `Regira.Office` |
 | Office.PDF | HTML → PDF, PDF operations | `Regira.Office.PDF.SelectPdf`, `Regira.Office.PDF.Puppeteer` |
 | Office.Excel | Excel read/write | `Regira.Office.Excel.ClosedXML`, `Regira.Office.Excel.MiniExcel` |
 | Office.Word | Word document generation | `Regira.Office.Word.Spire` |
@@ -30,6 +31,8 @@
 | Invoicing | Invoice models, UBL/Peppol, AP gateway integrations | `Regira.Invoicing.UblSharp` |
 | Payments | Payment providers, payment links, webhooks | `Regira.Payments.Mollie`, `Regira.Payments.Pom` |
 | TreeList | Hierarchical tree structures | `Regira.TreeList` |
+
+> Use `Office` for the family overview or shared Office conventions. Add one or more concrete `Office.*` modules when the task is already narrowed to a specific capability.
 
 > Modules with multiple package options (e.g. Office.PDF, Office.Excel) have provider-selection guidance in their module guide. Load it after the sync to choose the right provider.
 
