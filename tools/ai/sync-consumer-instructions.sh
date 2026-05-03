@@ -44,22 +44,6 @@ if [[ "${BASH_VERSINFO[0]}" -lt 4 ]]; then
 fi
 
 # ---------------------------------------------------------------------------
-# Module -> project-relative ai/ directory mapping
-# ---------------------------------------------------------------------------
-declare -A MODULE_PROJECT_MAP=(
-    ["Entities"]="src/Common.Entities/ai"
-    ["IO.Storage"]="src/Common.IO.Storage/ai"
-    ["Office"]="src/Common.Office/ai"
-    ["Media"]="src/Common.Media/ai"
-    ["Web"]="src/Common.Web/ai"
-    ["Security"]="src/Common.Security/ai"
-    ["System"]="src/Common.System/ai"
-    ["Invoicing"]="src/Common.Invoicing/ai"
-    ["Payments"]="src/Common.Payments/ai"
-    ["TreeList"]="src/TreeList/ai"
-)
-
-# ---------------------------------------------------------------------------
 # Defaults
 # ---------------------------------------------------------------------------
 MANIFEST_PATH="regira.modules.json"
@@ -115,22 +99,51 @@ for module, suffixes in refs.items():
 "
 }
 
-# resolve_module_file <repo_root> <ai_dir> <module> <filename>
-# Checks the module project dir first, then falls back to ai/
+load_module_sources() {
+    python3 - "$1" << 'PYEOF'
+import json
+import sys
+
+with open(sys.argv[1], encoding='utf-8') as handle:
+    data = json.load(handle)
+
+for module, config in data.items():
+    print(f"{module}\t{config['sourcePath']}\t{config['baseName']}")
+PYEOF
+}
+
+module_file_name() {
+    local module="$1"
+    local suffix="$2"
+    local base_name="${MODULE_BASE_NAMES[$module]:-}"
+
+    if [[ -z "$base_name" ]]; then
+        return 1
+    fi
+
+    printf '%s.%s.md' "$base_name" "$suffix"
+}
+
 resolve_module_file() {
     local repo_root="$1"
-    local ai_dir="$2"
-    local module="$3"
-    local file_name="$4"
-    local project_dir="${MODULE_PROJECT_MAP[$module]:-}"
-    if [[ -n "$project_dir" ]]; then
-        local candidate="$repo_root/$project_dir/$file_name"
-        if [[ -f "$candidate" ]]; then
-            echo "$candidate"
-            return
-        fi
+    local module="$2"
+    local suffix="$3"
+    local source_path="${MODULE_SOURCE_PATHS[$module]:-}"
+    local file_name
+
+    if [[ -z "$source_path" ]]; then
+        return 1
     fi
-    echo "$ai_dir/$file_name"
+
+    file_name="$(module_file_name "$module" "$suffix")" || return 1
+
+    local candidate="$repo_root/$source_path/$file_name"
+    if [[ -f "$candidate" ]]; then
+        echo "$candidate"
+        return 0
+    fi
+
+    return 1
 }
 
 # ---------------------------------------------------------------------------
@@ -151,16 +164,9 @@ echo "modules   : ${MODULES[*]}"
 # 2. Resolve the source repository root
 # ---------------------------------------------------------------------------
 if [[ -n "$SOURCE_PATH" ]]; then
-    # Accept either the repo root or (for backward compat) the ai/ directory
-    if [[ -d "$SOURCE_PATH/ai" ]]; then
-        REPO_ROOT="$SOURCE_PATH"
-    elif [[ "$(basename "$SOURCE_PATH")" == "ai" ]]; then
-        REPO_ROOT="$(dirname "$SOURCE_PATH")"
-    else
-        REPO_ROOT="$SOURCE_PATH"
-    fi
-    if [[ ! -d "$REPO_ROOT" ]]; then
-        echo "Local source path not found: $REPO_ROOT" >&2
+    REPO_ROOT="$SOURCE_PATH"
+    if [[ ! -d "$REPO_ROOT/ai" ]]; then
+        echo "Local source path must be the Regira repository root: $REPO_ROOT" >&2
         exit 1
     fi
     echo "Using local source: $REPO_ROOT"
@@ -180,20 +186,38 @@ else
             exit 1
         fi
 
-        # Build list of sparse paths: shared ai/ plus all module project ai/ dirs
-        SPARSE_PATHS=("ai")
-        for proj_dir in "${MODULE_PROJECT_MAP[@]}"; do
-            SPARSE_PATHS+=("$proj_dir")
-        done
-
         git clone --depth 1 --filter=blob:none --sparse --branch "$TAG" "$REPO_URL" "$TMP_DIR"
-        git -C "$TMP_DIR" sparse-checkout set "${SPARSE_PATHS[@]}"
+        git -C "$TMP_DIR" sparse-checkout set ai
     fi
 
     REPO_ROOT="$TMP_DIR"
 fi
 
 AI_DIR="$REPO_ROOT/ai"
+MODULE_SOURCES_FILE="$AI_DIR/module-sources.json"
+if [[ ! -f "$MODULE_SOURCES_FILE" ]]; then
+    echo "Module source mapping not found: $MODULE_SOURCES_FILE" >&2
+    exit 1
+fi
+
+declare -A MODULE_SOURCE_PATHS=()
+declare -A MODULE_BASE_NAMES=()
+while IFS=$'\t' read -r module source_path base_name; do
+    MODULE_SOURCE_PATHS["$module"]="$source_path"
+    MODULE_BASE_NAMES["$module"]="$base_name"
+done < <(load_module_sources "$MODULE_SOURCES_FILE")
+
+if [[ -z "$SOURCE_PATH" ]]; then
+    declare -A UNIQUE_SOURCE_PATHS=()
+    SPARSE_PATHS=("ai")
+    for source_path in "${MODULE_SOURCE_PATHS[@]}"; do
+        if [[ -z "${UNIQUE_SOURCE_PATHS[$source_path]:-}" ]]; then
+            UNIQUE_SOURCE_PATHS["$source_path"]=1
+            SPARSE_PATHS+=("$source_path")
+        fi
+    done
+    git -C "$REPO_ROOT" sparse-checkout set "${SPARSE_PATHS[@]}"
+fi
 
 # ---------------------------------------------------------------------------
 # 3. Render the bootstrap from the template
@@ -212,19 +236,49 @@ done
 # Remove trailing newline so the substitution does not add a blank line
 MODULE_LINES="${MODULE_LINES%$'\n'}"
 
+GUIDE_LINES=""
+for module in "${MODULES[@]}"; do
+    if file_name="$(module_file_name "$module" "instructions")"; then
+        GUIDE_LINES="${GUIDE_LINES}- ${module}: .github/instructions/regira/${file_name}"$'\n'
+    else
+        echo "Warning: module source mapping not found (skipping bootstrap entry): $module" >&2
+    fi
+done
+
+while IFS=' ' read -r module ref; do
+    if [[ -z "$module" || -z "$ref" ]]; then
+        continue
+    fi
+
+    if file_name="$(module_file_name "$module" "$ref")"; then
+        GUIDE_LINES="${GUIDE_LINES}- ${module} ${ref}: .github/instructions/regira/${file_name}"$'\n'
+    else
+        echo "Warning: module source mapping not found for deep reference (skipping bootstrap entry): ${module}.${ref}" >&2
+    fi
+done < <(json_ref_keys "$MANIFEST_PATH")
+
+GUIDE_LINES="${GUIDE_LINES%$'\n'}"
+if [[ -z "$GUIDE_LINES" ]]; then
+    GUIDE_LINES="- No Regira module guides selected."
+fi
+
 mkdir -p "$DEST"
 BOOTSTRAP_OUT="$DEST/copilot-instructions.md"
 # Write module lines to a temp file to avoid shell-quoting issues inside Python
 MODULES_TMP="$(mktemp -t modules.XXXXXX)"
 printf '%s' "$MODULE_LINES" > "$MODULES_TMP"
-python3 - "$TEMPLATE_FILE" "$MODULES_TMP" "$BOOTSTRAP_OUT" << 'PYEOF'
+GUIDES_TMP="$(mktemp -t guides.XXXXXX)"
+printf '%s' "$GUIDE_LINES" > "$GUIDES_TMP"
+python3 - "$TEMPLATE_FILE" "$MODULES_TMP" "$GUIDES_TMP" "$BOOTSTRAP_OUT" << 'PYEOF'
 import sys
 template     = open(sys.argv[1], encoding='utf-8').read()
 module_lines = open(sys.argv[2], encoding='utf-8').read()
-result       = template.replace('{{MODULES}}', module_lines)
-open(sys.argv[3], 'w', encoding='utf-8').write(result)
+guide_lines  = open(sys.argv[3], encoding='utf-8').read()
+result       = template.replace('{{MODULES}}', module_lines).replace('{{MODULE_GUIDES}}', guide_lines)
+open(sys.argv[4], 'w', encoding='utf-8').write(result)
 PYEOF
 rm -f "$MODULES_TMP"
+rm -f "$GUIDES_TMP"
 echo "Rendered bootstrap -> $BOOTSTRAP_OUT"
 
 AGENTS_OUT="AGENTS.md"
@@ -238,13 +292,16 @@ REGIRA_DIR="$DEST/instructions/regira"
 mkdir -p "$REGIRA_DIR"
 
 for module in "${MODULES[@]}"; do
-    file_name="${module,,}.instructions.md"
-    src_file="$(resolve_module_file "$REPO_ROOT" "$AI_DIR" "$module" "$file_name")"
-    if [[ -f "$src_file" ]]; then
+    if ! file_name="$(module_file_name "$module" "instructions")"; then
+        echo "Warning: module source mapping not found (skipping): $module" >&2
+        continue
+    fi
+
+    if src_file="$(resolve_module_file "$REPO_ROOT" "$module" "instructions")"; then
         cp "$src_file" "$REGIRA_DIR/$file_name"
         echo "Copied module guide: $file_name"
     else
-        echo "Warning: module guide not found (skipping): $file_name" >&2
+        echo "Warning: module guide not found (skipping): $module" >&2
     fi
 done
 
@@ -252,13 +309,20 @@ done
 # 5. Copy deep-reference files
 # ---------------------------------------------------------------------------
 while IFS=' ' read -r module ref; do
-    file_name="${module,,}.${ref}.md"
-    src_file="$(resolve_module_file "$REPO_ROOT" "$AI_DIR" "$module" "$file_name")"
-    if [[ -f "$src_file" ]]; then
+    if [[ -z "$module" || -z "$ref" ]]; then
+        continue
+    fi
+
+    if ! file_name="$(module_file_name "$module" "$ref")"; then
+        echo "Warning: module source mapping not found for deep reference (skipping): ${module}.${ref}" >&2
+        continue
+    fi
+
+    if src_file="$(resolve_module_file "$REPO_ROOT" "$module" "$ref")"; then
         cp "$src_file" "$REGIRA_DIR/$file_name"
         echo "Copied deep reference: $file_name"
     else
-        echo "Warning: deep reference not found (skipping): $file_name" >&2
+        echo "Warning: deep reference not found (skipping): ${module}.${ref}" >&2
     fi
 done < <(json_ref_keys "$MANIFEST_PATH")
 

@@ -84,7 +84,7 @@ Regira is a collection of .NET libraries providing unified abstractions for comm
 Consumer projects receive AI instruction files tailored to the Regira modules they actually use, rather than the full source repository `ai/` folder.
 
 1. Copy [`ai/regira.modules.template.json`](ai/regira.modules.template.json) to your project root as `regira.modules.json` and edit it to list your active modules.
-2. Run the sync script to generate the bootstrap and copy the selected instruction files:
+2. Run the sync script to generate the bootstrap, list the exact Regira guide paths, and copy the selected instruction files:
 
    ```powershell
    # PowerShell (Windows, macOS, Linux)

@@ -15,7 +15,7 @@
     Path to regira.modules.json. Defaults to "regira.modules.json" in the current directory.
 
 .PARAMETER SourcePath
-    Optional path to the repository root (or its ai/ directory for backward compatibility).
+    Optional path to the repository root.
     When provided, the remote fetch is skipped.
 
 .PARAMETER Destination
@@ -39,22 +39,6 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 # ---------------------------------------------------------------------------
-# Module → project-relative ai/ directory mapping
-# ---------------------------------------------------------------------------
-$moduleProjectMap = [ordered]@{
-    "Entities"   = "src/Common.Entities/ai"
-    "IO.Storage" = "src/Common.IO.Storage/ai"
-    "Office"     = "src/Common.Office/ai"
-    "Media"      = "src/Common.Media/ai"
-    "Web"        = "src/Common.Web/ai"
-    "Security"   = "src/Common.Security/ai"
-    "System"     = "src/Common.System/ai"
-    "Invoicing"  = "src/Common.Invoicing/ai"
-    "Payments"   = "src/Common.Payments/ai"
-    "TreeList"   = "src/TreeList/ai"
-}
-
-# ---------------------------------------------------------------------------
 # 1. Read the manifest
 # ---------------------------------------------------------------------------
 if (-not (Test-Path $ManifestPath)) {
@@ -74,16 +58,9 @@ Write-Host "modules   : $($modules -join ', ')"
 # 2. Resolve the source repository root
 # ---------------------------------------------------------------------------
 if ($SourcePath) {
-    # Accept either the repo root or (for backward compat) the ai/ directory
-    if (Test-Path (Join-Path $SourcePath "ai")) {
-        $repoRoot = $SourcePath
-    } elseif (Split-Path $SourcePath -Leaf | Where-Object { $_ -eq "ai" }) {
-        $repoRoot = Split-Path $SourcePath -Parent
-    } else {
-        $repoRoot = $SourcePath
-    }
-    if (-not (Test-Path $repoRoot)) {
-        Write-Error "Local source path not found: $repoRoot"
+    $repoRoot = $SourcePath
+    if (-not (Test-Path (Join-Path $repoRoot "ai"))) {
+        Write-Error "Local source path must be the Regira repository root: $repoRoot"
         exit 1
     }
     Write-Host "Using local source: $repoRoot"
@@ -104,29 +81,75 @@ if ($SourcePath) {
             exit 1
         }
 
-        # Sparse-checkout the shared ai/ folder and all module project ai/ directories
-        $sparsePaths = @("ai") + @($moduleProjectMap.Values)
         git clone --depth 1 --filter=blob:none --sparse --branch $tag $repoUrl $tmpDir
-        git -C $tmpDir sparse-checkout set $sparsePaths
+        git -C $tmpDir sparse-checkout set ai
     }
 
     $repoRoot = $tmpDir
 }
 
 $aiDir = Join-Path $repoRoot "ai"
+$moduleSourcesPath = Join-Path $aiDir "module-sources.json"
+if (-not (Test-Path $moduleSourcesPath)) {
+    Write-Error "Module source mapping not found: $moduleSourcesPath"
+    exit 1
+}
+
+$moduleSources = Get-Content -Raw $moduleSourcesPath | ConvertFrom-Json -AsHashtable
+
+if (-not $SourcePath) {
+    $sparsePaths = @("ai") + @(
+        $moduleSources.Values |
+            ForEach-Object { $_["sourcePath"] } |
+            Sort-Object -Unique
+    )
+    git -C $repoRoot sparse-checkout set $sparsePaths
+}
 
 # ---------------------------------------------------------------------------
-# Helper: resolve an instruction file, checking the module project dir first
+# Helpers: resolve module source metadata and file paths
 # ---------------------------------------------------------------------------
-function Resolve-ModuleFile {
-    param([string]$Module, [string]$FileName)
-    $projectDir = $moduleProjectMap[$Module]
-    if ($projectDir) {
-        $candidate = Join-Path $repoRoot $projectDir $FileName
-        if (Test-Path $candidate) { return $candidate }
+function Get-ModuleSource {
+    param([string]$Module)
+
+    if ($moduleSources.ContainsKey($Module)) {
+        return $moduleSources[$Module]
     }
-    # Fallback to shared ai/ directory
-    return Join-Path $aiDir $FileName
+
+    return $null
+}
+
+function Get-ModuleFileName {
+    param([string]$Module, [string]$Suffix)
+
+    $moduleSource = Get-ModuleSource -Module $Module
+    if (-not $moduleSource) {
+        return $null
+    }
+
+    return "$($moduleSource["baseName"]).$Suffix.md"
+}
+
+function Resolve-ModuleFile {
+    param([string]$Module, [string]$Suffix)
+
+    $moduleSource = Get-ModuleSource -Module $Module
+    if (-not $moduleSource) {
+        return $null
+    }
+
+    $fileName = Get-ModuleFileName -Module $Module -Suffix $Suffix
+    $candidate = Join-Path $repoRoot $moduleSource["sourcePath"]
+    $candidate = Join-Path $candidate $fileName
+
+    if (Test-Path $candidate) {
+        return [ordered]@{
+            FileName = $fileName
+            FilePath = $candidate
+        }
+    }
+
+    return $null
 }
 
 # ---------------------------------------------------------------------------
@@ -140,7 +163,39 @@ if (-not (Test-Path $templateFile)) {
 
 $template    = Get-Content -Raw $templateFile
 $moduleLines = ($modules | ForEach-Object { "- $_" }) -join "`n"
-$bootstrap   = $template -replace [regex]::Escape("{{MODULES}}"), $moduleLines
+$guideLines  = @()
+
+foreach ($module in $modules) {
+    $fileName = Get-ModuleFileName -Module $module -Suffix "instructions"
+    if ($fileName) {
+        $guideLines += "- ${module}: .github/instructions/regira/$fileName"
+    } else {
+        Write-Warning "Module source mapping not found (skipping bootstrap entry): $module"
+    }
+}
+
+if ($references) {
+    foreach ($prop in $references.PSObject.Properties) {
+        $module = $prop.Name
+        foreach ($ref in @($prop.Value)) {
+            $fileName = Get-ModuleFileName -Module $module -Suffix $ref
+            if ($fileName) {
+                $guideLines += "- ${module} ${ref}: .github/instructions/regira/$fileName"
+            } else {
+                Write-Warning "Module source mapping not found for deep reference (skipping bootstrap entry): $module.$ref"
+            }
+        }
+    }
+}
+
+$moduleGuideLines = if ($guideLines.Count -gt 0) {
+    $guideLines -join "`n"
+} else {
+    "- No Regira module guides selected."
+}
+
+$bootstrap = $template -replace [regex]::Escape("{{MODULES}}"), $moduleLines
+$bootstrap = $bootstrap -replace [regex]::Escape("{{MODULE_GUIDES}}"), $moduleGuideLines
 
 $destDir = $Destination
 $null    = New-Item -ItemType Directory -Force -Path $destDir
@@ -159,14 +214,13 @@ $regiraDir = Join-Path $Destination "instructions" "regira"
 $null      = New-Item -ItemType Directory -Force -Path $regiraDir
 
 foreach ($module in $modules) {
-    $fileName = "$($module.ToLower()).instructions.md"
-    $srcFile  = Resolve-ModuleFile -Module $module -FileName $fileName
-    if (Test-Path $srcFile) {
-        $dest = Join-Path $regiraDir $fileName
-        Copy-Item $srcFile -Destination $dest -Force
-        Write-Host "Copied module guide: $fileName"
+    $moduleFile = Resolve-ModuleFile -Module $module -Suffix "instructions"
+    if ($moduleFile) {
+        $dest = Join-Path $regiraDir $moduleFile["FileName"]
+        Copy-Item $moduleFile["FilePath"] -Destination $dest -Force
+        Write-Host "Copied module guide: $($moduleFile["FileName"])"
     } else {
-        Write-Warning "Module guide not found (skipping): $fileName"
+        Write-Warning "Module guide not found (skipping): $module"
     }
 }
 
@@ -177,14 +231,13 @@ if ($references) {
     foreach ($prop in $references.PSObject.Properties) {
         $module = $prop.Name
         foreach ($ref in @($prop.Value)) {
-            $fileName = "$($module.ToLower()).$ref.md"
-            $srcFile  = Resolve-ModuleFile -Module $module -FileName $fileName
-            if (Test-Path $srcFile) {
-                $dest = Join-Path $regiraDir $fileName
-                Copy-Item $srcFile -Destination $dest -Force
-                Write-Host "Copied deep reference: $fileName"
+            $moduleFile = Resolve-ModuleFile -Module $module -Suffix $ref
+            if ($moduleFile) {
+                $dest = Join-Path $regiraDir $moduleFile["FileName"]
+                Copy-Item $moduleFile["FilePath"] -Destination $dest -Force
+                Write-Host "Copied deep reference: $($moduleFile["FileName"])"
             } else {
-                Write-Warning "Deep reference not found (skipping): $fileName"
+                Write-Warning "Deep reference not found (skipping): $module.$ref"
             }
         }
     }

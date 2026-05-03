@@ -11,7 +11,7 @@ Part of **Regira Office**. For routing and full module overview, see [`office.in
 | `Regira.Office.Excel` | Excel workbook reading and writing |
 
 **Related:**
-- [IO.Storage](./io.storage.instructions.md) — `IBinaryFile` / `IMemoryFile` used as input/output
+- [IO.Storage](../../Common.IO.Storage/ai/io.storage.instructions.md) — `IBinaryFile` / `IMemoryFile` used as input/output
 
 ---
 

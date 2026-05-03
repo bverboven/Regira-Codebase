@@ -11,8 +11,8 @@ Part of **Regira Office**. For routing and full module overview, see [`office.in
 | `Regira.Office.PDF` | HTML→PDF, PDF operations (merge/split/extract), printing |
 
 **Related:**
-- [Media / Drawing](./media.instructions.md) — `IImageService` required by `DocNET.PdfManager`; `IImageFile` ↔ PDF conversion
-- [IO.Storage](./io.storage.instructions.md) — `IMemoryFile` used for PDF input/output
+- [Media / Drawing](../../Common.Media/ai/media.instructions.md) — `IImageService` required by `DocNET.PdfManager`; `IImageFile` ↔ PDF conversion
+- [IO.Storage](../../Common.IO.Storage/ai/io.storage.instructions.md) — `IMemoryFile` used for PDF input/output
 
 ---
 

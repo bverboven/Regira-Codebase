@@ -11,8 +11,8 @@ Part of **Regira Office**. For routing and full module overview, see [`office.in
 | `Regira.Office.Barcodes` | Barcode and QR code generation and scanning |
 
 **Related:**
-- [Media / Drawing](./media.instructions.md) — `IImageFile` is the return type of `Create()`
-- [IO.Storage](./io.storage.instructions.md) — `IMemoryFile` for file input/output
+- [Media / Drawing](../../Common.Media/ai/media.instructions.md) — `IImageFile` is the return type of `Create()`
+- [IO.Storage](../../Common.IO.Storage/ai/io.storage.instructions.md) — `IMemoryFile` for file input/output
 
 ---
 

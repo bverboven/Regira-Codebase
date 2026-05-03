@@ -76,6 +76,8 @@ The script fetches the versioned instruction snapshot and writes:
 - `.github/copilot-instructions.md` — same bootstrap (picked up by GitHub Copilot)
 - `.github/instructions/regira/` — selected module guides
 
+The generated bootstrap files also list the exact `.github/instructions/regira/*.md` paths that the agent should load for the selected modules.
+
 ### 4 — Load module guides and complete setup
 
-After the sync, load the relevant `*.instructions.md` files from `.github/instructions/regira/` and follow their package installation and dependency injection setup guidance.
+After the sync, load the matching guide paths listed in `AGENTS.md` or `.github/copilot-instructions.md`, then follow the selected `*.instructions.md` files in `.github/instructions/regira/` for package installation and dependency injection setup guidance.

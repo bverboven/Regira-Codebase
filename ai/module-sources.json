@@ -1,0 +1,74 @@
+{
+  "Entities": {
+    "sourcePath": "src/Common.Entities/ai",
+    "baseName": "entities"
+  },
+  "IO.Storage": {
+    "sourcePath": "src/Common.IO.Storage/ai",
+    "baseName": "io.storage"
+  },
+  "Office": {
+    "sourcePath": "src/Common.Office/ai",
+    "baseName": "office"
+  },
+  "Office.PDF": {
+    "sourcePath": "src/Common.Office/ai",
+    "baseName": "office.pdf"
+  },
+  "Office.Excel": {
+    "sourcePath": "src/Common.Office/ai",
+    "baseName": "office.excel"
+  },
+  "Office.Word": {
+    "sourcePath": "src/Common.Office/ai",
+    "baseName": "office.word"
+  },
+  "Office.Mail": {
+    "sourcePath": "src/Common.Office/ai",
+    "baseName": "office.mail"
+  },
+  "Office.CSV": {
+    "sourcePath": "src/Common.Office/ai",
+    "baseName": "office.csv"
+  },
+  "Office.Barcodes": {
+    "sourcePath": "src/Common.Office/ai",
+    "baseName": "office.barcodes"
+  },
+  "Office.OCR": {
+    "sourcePath": "src/Common.Office/ai",
+    "baseName": "office.ocr"
+  },
+  "Office.VCards": {
+    "sourcePath": "src/Common.Office/ai",
+    "baseName": "office.vcards"
+  },
+  "Media": {
+    "sourcePath": "src/Common.Media/ai",
+    "baseName": "media"
+  },
+  "Web": {
+    "sourcePath": "src/Common.Web/ai",
+    "baseName": "web"
+  },
+  "Security": {
+    "sourcePath": "src/Common.Security/ai",
+    "baseName": "security"
+  },
+  "System": {
+    "sourcePath": "src/Common.System/ai",
+    "baseName": "system"
+  },
+  "Invoicing": {
+    "sourcePath": "src/Common.Invoicing/ai",
+    "baseName": "invoicing"
+  },
+  "Payments": {
+    "sourcePath": "src/Common.Payments/ai",
+    "baseName": "payments"
+  },
+  "TreeList": {
+    "sourcePath": "src/TreeList/ai",
+    "baseName": "treelist"
+  }
+}

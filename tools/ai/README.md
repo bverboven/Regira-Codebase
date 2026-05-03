@@ -64,6 +64,7 @@ pwsh path\to\Regira-Codebase\tools\ai\sync-consumer-instructions.ps1 -SourcePath
 ```
 
 The script generates `AGENTS.md` and `.github/copilot-instructions.md` (same bootstrap content) and populates `.github/instructions/regira/` with the selected instruction files. Your AI assistant picks these up automatically.
+The generated bootstrap also lists the exact `.github/instructions/regira/*.md` paths to load for the selected Regira modules.
 
 Re-run the script whenever you add a module or change `aiVersion`.
 
@@ -96,8 +97,8 @@ pwsh tools/ai/sync-consumer-instructions.ps1 -SourcePath ../Regira-Codebase
 ## What the scripts do
 
 1. Read `regira.modules.json` at the repository root.
-2. Resolve the pinned `aiVersion` to the Regira source-repo Git tag `ai-v{aiVersion}` and shallow-clone only the `ai/` folder (skipped when `--source` / `-SourcePath` is supplied).
-3. Render the bootstrap from `consumer.bootstrap.template.md` and write it to both `AGENTS.md` (project root) and `.github/copilot-instructions.md`.
+2. Resolve the pinned `aiVersion` to the Regira source-repo Git tag `ai-v{aiVersion}`, fetch the shared `ai/` folder, and extend sparse checkout with the module-specific `src/*/ai/` folders required by the selected modules (skipped when `--source` / `-SourcePath` is supplied).
+3. Render the bootstrap from `consumer.bootstrap.template.md` and write it to both `AGENTS.md` (project root) and `.github/copilot-instructions.md`, including the exact guide paths under `.github/instructions/regira/`.
 4. Copy the selected module guides into `.github/instructions/regira/`.
 5. Copy any requested deep-reference files into `.github/instructions/regira/`.
 
@@ -112,6 +113,7 @@ AGENTS.md                          ← rendered bootstrap (OpenAI-compatible age
       entities.instructions.md
       entities.setup.md
       entities.examples.md
+      office.pdf.instructions.md
       security.instructions.md
       ...
 ```

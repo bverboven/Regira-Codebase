@@ -11,7 +11,7 @@ Part of **Regira Office**. For routing and full module overview, see [`office.in
 | `Regira.Office.Mail` | Email sending via SendGrid and Mailgun |
 
 **Related:**
-- [IO.Storage](./io.storage.instructions.md) — `INamedFile` used for email attachments
+- [IO.Storage](../../Common.IO.Storage/ai/io.storage.instructions.md) — `INamedFile` used for email attachments
 
 ---
 

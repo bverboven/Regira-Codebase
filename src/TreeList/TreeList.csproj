@@ -15,7 +15,7 @@
   </PropertyGroup>
   <!-- MSBuild targets — auto-imported by NuGet restore -->
   <ItemGroup>
-    <None Include="build\Regira.TreeList.targets" Pack="true" PackagePath="build\" />
+    <None Include="build\Regira.TreeList.targets" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
 
   <!-- AI instruction files -->

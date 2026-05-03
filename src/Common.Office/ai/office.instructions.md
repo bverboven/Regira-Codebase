@@ -38,8 +38,8 @@
 
 ## Related Modules
 
-- [Drawing / Images](./media.instructions.md) — `IImageService` used by Barcodes, OCR, and PDF sub-modules
-- [IO.Storage](./io.storage.instructions.md) — `IFileService` for file input/output across backends
+- [Drawing / Images](../../Common.Media/ai/media.instructions.md) — `IImageService` used by Barcodes, OCR, and PDF sub-modules
+- [IO.Storage](../../Common.IO.Storage/ai/io.storage.instructions.md) — `IFileService` for file input/output across backends
 
 ---
 

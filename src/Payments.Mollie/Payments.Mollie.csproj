@@ -31,6 +31,7 @@
     <PackageReference Include="Mollie.Api" Version="4.19.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common.Payments\Common.Payments.csproj" />
     <ProjectReference Include="..\Common.Invoicing\Common.Invoicing.csproj" />
   </ItemGroup>
 </Project>
