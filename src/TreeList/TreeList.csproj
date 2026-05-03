@@ -13,4 +13,7 @@
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.1.0</Version>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+  </ItemGroup>
 </Project>
