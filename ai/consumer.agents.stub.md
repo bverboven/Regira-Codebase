@@ -7,7 +7,7 @@ Use this file as `AGENTS.md` at the repository root of a project that consumes R
 1. Ask the user what they are building if not already clear.
 2. Select the relevant Regira modules from the tables below.
 3. Ensure the Regira NuGet feed (`https://packages.regira.com/v3/index.json`) is configured alongside `nuget.org`.
-4. Read `projectTemplate` from `regira.modules.json` as AI-only metadata about the consumer app shape. Use it to keep setup advice consistent, but do not expect the sync script to consume it directly.
+4. Read `projectTemplate` from `regira.modules.json` to keep project-setup advice consistent with the template the project was initialized with. Treat it as AI-only metadata; the sync script does not consume it directly.
 5. Update `regira.modules.json` so it matches the selected sync-supported modules and any required deep references (`setup`, `examples`, `signatures`, `namespaces`).
 6. Add the matching `Regira.*` packages from the Regira feed to the appropriate consumer project(s).
 7. If `.github/instructions/regira/` is missing or stale relative to `regira.modules.json`, run or ask the user to run `pwsh tools/ai/sync-consumer-instructions.ps1` from the repository root. Use `-Force` if the cached remote snapshot may be stale or corrupted.

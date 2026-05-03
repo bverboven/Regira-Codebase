@@ -20,7 +20,7 @@ Regira packages are published at `https://packages.regira.com/v3/index.json`. Ad
 ## Source Repository vs Consumer Project
 
 - **Source repository**: the full `ai/` folder is available locally, so the bootstrap can route to module guides and deep references.
-- **Consumer project**: keep a repo-root `regira.modules.json` plus a canonical `AGENTS.md` bootstrap based on `consumer.agents.stub.md`. If the repository uses GitHub Copilot before the first sync, mirror `consumer.copilot.stub.md` into `.github/copilot-instructions.md`. Sync only the module guides that the app actually uses with the repo-root script.
+- **Consumer project**: prefer `pwsh tools/ai/sync-consumer-instructions.ps1 -Init` at repository root to create `NuGet.Config`, `regira.modules.json`, and the canonical `AGENTS.md` bootstrap, then let the same flow run the first sync. If the repository uses GitHub Copilot before the first sync and cannot run the init flow yet, mirror `consumer.copilot.stub.md` into `.github/copilot-instructions.md`. Sync only the module guides that the app actually uses with the repo-root script.
 
 ## Consumer-Project References
 

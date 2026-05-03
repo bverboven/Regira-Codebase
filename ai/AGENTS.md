@@ -2,7 +2,7 @@
 
 **Primary goal:** When a request relates to a specific module below, consult the corresponding instruction file for detailed, context-specific guidance. Fall back to the [General Instructions](#general-instructions) only when no module instruction file applies.
 
-> **Scope**: This file is for the **source repository** where the full source tree is available locally. Module instruction files live in each project's `src/<project>/ai/` subdirectory. For a downstream project that consumes Regira packages, keep a repo-root `regira.modules.json` plus an `AGENTS.md` bootstrap based on [`consumer.agents.stub.md`](./consumer.agents.stub.md), optionally mirror [`consumer.copilot.stub.md`](./consumer.copilot.stub.md) into `.github/copilot-instructions.md`, then run the repo-root sync described in [`tools/ai/README.md`](../tools/ai/README.md).
+> **Scope**: This file is for the **source repository** where the full source tree is available locally. Module instruction files live in each project's `src/<project>/ai/` subdirectory. For a downstream project that consumes Regira packages, prefer `pwsh tools/ai/sync-consumer-instructions.ps1 -Init` from the repository root to create `NuGet.Config`, `regira.modules.json`, and `AGENTS.md`, then let the same flow run the initial sync described in [`tools/ai/README.md`](../tools/ai/README.md). Keep the manual bootstrap with [`consumer.agents.stub.md`](./consumer.agents.stub.md) and [`consumer.copilot.stub.md`](./consumer.copilot.stub.md) as a fallback when the interactive PowerShell path is unavailable.
 
 Don't assume syntax or signatures! 
 When you have to guess and the instruction files don't give you the required information: 
@@ -52,7 +52,7 @@ When helping a downstream project adopt Regira packages:
 4. Treat `projectTemplate` in `regira.modules.json` as AI-only metadata about the consumer app shape. Use it to steer setup advice, but do not expect the sync scripts to consume it directly.
 5. Update `regira.modules.json` with the selected sync-supported modules and any needed deep references (`setup`, `examples`, `signatures`, `namespaces`).
 6. Add the matching `Regira.*` packages from the Regira feed to the relevant consumer project(s).
-7. Ensure the consumer repository has `AGENTS.md` based on [`consumer.agents.stub.md`](./consumer.agents.stub.md). If the project uses GitHub Copilot before the first sync, also mirror [`consumer.copilot.stub.md`](./consumer.copilot.stub.md) into `.github/copilot-instructions.md`.
+7. For a new consumer repository, prefer `pwsh tools/ai/sync-consumer-instructions.ps1 -Init` from the repository root so `NuGet.Config`, `regira.modules.json`, and `AGENTS.md` are created before the first sync. If the project is already bootstrapped or cannot use the init flow, ensure the consumer repository has `AGENTS.md` based on [`consumer.agents.stub.md`](./consumer.agents.stub.md). If the project uses GitHub Copilot before the first sync, also mirror [`consumer.copilot.stub.md`](./consumer.copilot.stub.md) into `.github/copilot-instructions.md`.
 8. Run the repo-root sync so `.github/instructions/regira/*.md` exists for the selected modules. Use `-Force` or `--force` when the cached remote snapshot may be stale or corrupted.
 9. After the sync, load only the matching generated guides for the selected modules.
 10. Refresh the downstream `AGENTS.md` by re-copying [`consumer.agents.stub.md`](./consumer.agents.stub.md) when you upgrade `aiVersion` or when Regira adds new module families that the static tables should know about.
