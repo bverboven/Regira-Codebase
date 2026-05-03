@@ -5,8 +5,9 @@
 .DESCRIPTION
     Reads regira.modules.json, fetches the matching versioned snapshot from the
     Regira source repository (via a shallow sparse clone of the ai-v{aiVersion} tag),
-    renders the bootstrap from consumer.bootstrap.template.md, and copies the
-    selected module guides and deep-reference files.
+    renders the bootstrap from consumer.bootstrap.template.md, writes the root
+    Copilot bootstrap, and copies the selected module guides and deep-reference
+    files.
 
     Supports an optional -SourcePath override so maintainers working inside a
     checked-out source repo can use their local repository root directly.
@@ -21,6 +22,10 @@
 .PARAMETER Destination
     Root destination folder for the generated files. Defaults to ".github".
 
+.PARAMETER Force
+    Refresh the cached remote snapshot for the selected aiVersion before syncing.
+    Use this when a tag was retagged during authoring or the temp cache became stale or corrupted.
+
 .EXAMPLE
     # Sync from the pinned remote tag
     ./tools/ai/sync-consumer-instructions.ps1
@@ -28,11 +33,16 @@
 .EXAMPLE
     # Use a local source checkout
     ./tools/ai/sync-consumer-instructions.ps1 -SourcePath ../Regira-Codebase
+
+.EXAMPLE
+    # Force a refresh of the cached remote snapshot
+    ./tools/ai/sync-consumer-instructions.ps1 -Force
 #>
 param(
     [string]$ManifestPath = "regira.modules.json",
     [string]$SourcePath   = "",
-    [string]$Destination  = ".github"
+    [string]$Destination  = ".github",
+    [switch]$Force
 )
 
 Set-StrictMode -Version Latest
@@ -64,9 +74,17 @@ if ($SourcePath) {
         exit 1
     }
     Write-Host "Using local source: $repoRoot"
+    if ($Force) {
+        Write-Host "Ignoring -Force because -SourcePath bypasses the cached remote snapshot."
+    }
 } else {
     $tag    = "ai-v$aiVersion"
     $tmpDir = Join-Path ([System.IO.Path]::GetTempPath()) "regira-ai-$aiVersion"
+
+    if ($Force -and (Test-Path $tmpDir)) {
+        Write-Host "Refreshing cached snapshot: $tmpDir"
+        Remove-Item $tmpDir -Recurse -Force
+    }
 
     if (Test-Path $tmpDir) {
         Write-Host "Reusing cached snapshot: $tmpDir"
@@ -202,10 +220,6 @@ $null    = New-Item -ItemType Directory -Force -Path $destDir
 $bootstrapOut = Join-Path $destDir "copilot-instructions.md"
 [System.IO.File]::WriteAllText($bootstrapOut, $bootstrap, [System.Text.Encoding]::UTF8)
 Write-Host "Rendered bootstrap -> $bootstrapOut"
-
-$agentsOut = "AGENTS.md"
-[System.IO.File]::WriteAllText($agentsOut, $bootstrap, [System.Text.Encoding]::UTF8)
-Write-Host "Rendered bootstrap -> $agentsOut"
 
 # ---------------------------------------------------------------------------
 # 4. Copy module instruction guides

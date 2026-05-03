@@ -7,6 +7,7 @@
 # Regira source repository (via a shallow sparse clone of the ai-v{aiVersion} tag),
 # renders the bootstrap from consumer.bootstrap.template.md, and copies the
 # selected module guides and deep-reference files.
+# Writes .github/copilot-instructions.md for GitHub Copilot while leaving AGENTS.md as the canonical static bootstrap.
 #
 # Supports an optional --source override so maintainers working inside a
 # checked-out source repo can use their local repository root directly.
@@ -18,12 +19,13 @@
 #     pwsh tools/ai/sync-consumer-instructions.ps1
 #
 # Usage:
-#   ./tools/ai/sync-consumer-instructions.sh [--manifest PATH] [--source PATH] [--dest PATH]
+#   ./tools/ai/sync-consumer-instructions.sh [--manifest PATH] [--source PATH] [--dest PATH] [--force]
 #
 # Options:
 #   --manifest PATH   Path to regira.modules.json (default: regira.modules.json)
 #   --source   PATH   Local repository root; skips remote fetch when provided
 #   --dest     PATH   Output root (default: .github)
+#   --force          Refresh the cached remote snapshot before syncing
 #
 # Examples:
 #   # Sync from the pinned remote tag
@@ -31,7 +33,9 @@
 #
 #   # Use a local source checkout
 #   ./tools/ai/sync-consumer-instructions.sh --source ../Regira-Codebase
-
+#
+#   # Force a refresh of the cached remote snapshot
+#   ./tools/ai/sync-consumer-instructions.sh --force
 set -euo pipefail
 
 # Require bash 4.0+ (mapfile and ${var,,} are not available in bash 3.x shipped with macOS)
@@ -49,6 +53,7 @@ fi
 MANIFEST_PATH="regira.modules.json"
 SOURCE_PATH=""
 DEST=".github"
+FORCE_REFRESH=0
 
 # ---------------------------------------------------------------------------
 # Parse arguments
@@ -58,6 +63,7 @@ while [[ $# -gt 0 ]]; do
         --manifest) MANIFEST_PATH="$2"; shift 2 ;;
         --source)   SOURCE_PATH="$2";   shift 2 ;;
         --dest)     DEST="$2";           shift 2 ;;
+        --force)    FORCE_REFRESH=1;      shift ;;
         *) echo "Unknown option: $1" >&2; exit 1 ;;
     esac
 done
@@ -170,10 +176,18 @@ if [[ -n "$SOURCE_PATH" ]]; then
         exit 1
     fi
     echo "Using local source: $REPO_ROOT"
+    if [[ "$FORCE_REFRESH" -eq 1 ]]; then
+        echo "Ignoring --force because --source bypasses the cached remote snapshot."
+    fi
 else
     TAG="ai-v${AI_VERSION}"
     TMP_DIR="${TMPDIR:-/tmp}/regira-ai-${AI_VERSION}"
     REPO_URL="https://github.com/bverboven/Regira-Codebase.git"
+
+    if [[ "$FORCE_REFRESH" -eq 1 && -d "$TMP_DIR" ]]; then
+        echo "Refreshing cached snapshot: $TMP_DIR"
+        rm -rf "$TMP_DIR"
+    fi
 
     if [[ -d "$TMP_DIR" ]]; then
         echo "Reusing cached snapshot: $TMP_DIR"
@@ -280,10 +294,6 @@ PYEOF
 rm -f "$MODULES_TMP"
 rm -f "$GUIDES_TMP"
 echo "Rendered bootstrap -> $BOOTSTRAP_OUT"
-
-AGENTS_OUT="AGENTS.md"
-cp "$BOOTSTRAP_OUT" "$AGENTS_OUT"
-echo "Rendered bootstrap -> $AGENTS_OUT"
 
 # ---------------------------------------------------------------------------
 # 4. Copy module instruction guides

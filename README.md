@@ -81,7 +81,7 @@ Regira is a collection of .NET libraries providing unified abstractions for comm
 
 ## Using Regira in your project
 
-For a new project that consumes Regira packages, the default entrypoint is the `Regira.Setup` package. It installs a small local bootstrap for the consuming project's AI agent instead of copying the full source-repository `ai/` folder.
+For a new project that consumes Regira packages, keep the consumer bootstrap at repository root. Commit `regira.modules.json` and `AGENTS.md`, then sync the Regira guides on demand from the repository root. If the project uses GitHub Copilot before the first sync, also add `.github/copilot-instructions.md` as a bridge to `AGENTS.md`.
 
 1. Add the Regira NuGet feed to your repository root:
 
@@ -96,15 +96,20 @@ For a new project that consumes Regira packages, the default entrypoint is the `
    </configuration>
    ```
 
-2. Add `Regira.Setup` to the consuming project and build once so it can extract the local setup files:
+2. Copy [`ai/regira.modules.template.json`](ai/regira.modules.template.json) to your repository root as `regira.modules.json`. `projectTemplate` in the manifest is AI-only metadata. The agent reads it to keep setup advice consistent, but the sync scripts do not consume it directly.
+
+3. Copy [`ai/consumer.agents.stub.md`](ai/consumer.agents.stub.md) to `AGENTS.md` in the consuming repository. That file tells the AI agent how to choose Regira modules from user requirements and which package families to install from the Regira feed.
+
+4. If the repository uses GitHub Copilot before the first sync, also copy [`ai/consumer.copilot.stub.md`](ai/consumer.copilot.stub.md) to `.github/copilot-instructions.md`.
+
+5. Vendor [`tools/ai/sync-consumer-instructions.ps1`](tools/ai/sync-consumer-instructions.ps1) into `tools/ai/` in the consuming repository, or run it directly from a local `Regira-Codebase` checkout.
 
    ```powershell
-   dotnet add <project>.csproj package Regira.Setup
-   dotnet build
+# canonical repo-root flow
+pwsh tools/ai/sync-consumer-instructions.ps1
+
    ```
 
-3. After the first build, ask the AI agent in the consuming project to read `ai/regira.setup.instructions.md`.
-4. Let that local setup guide drive the next steps: selecting modules, creating `regira.modules.json`, running the local sync script, and loading only the generated `.github/instructions/regira/*.md` files that match the selected modules.
-5. Re-run the sync whenever you add a module or change `aiVersion`.
+6. Re-run the sync whenever you add a module or change `aiVersion`. If the cached remote snapshot may be stale or corrupted, rerun the sync with `-Force`. When you upgrade `aiVersion` or when Regira adds new module families, re-copy [`ai/consumer.agents.stub.md`](ai/consumer.agents.stub.md) into `AGENTS.md` so the static module catalog stays current.
 
-`Regira.Setup` installs the consumer bootstrap, manifest template, and sync scripts into the consuming project on first build. See [src/Common.Setup/content/ai/regira.setup.instructions.md](src/Common.Setup/content/ai/regira.setup.instructions.md) for the authoritative consumer flow and [tools/ai/README.md](tools/ai/README.md) for the lower-level sync-script details and manual source-checkout workflow.
+`AGENTS.md` is the canonical consumer bootstrap for choosing Regira modules from user requirements. The sync updates `.github/copilot-instructions.md` and `.github/instructions/regira/*.md` at repository root. See [tools/ai/README.md](tools/ai/README.md) for the operational sync flow, [ai/consumer.agents.stub.md](ai/consumer.agents.stub.md) for the AGENTS bootstrap, and [ai/consumer.copilot.stub.md](ai/consumer.copilot.stub.md) for the Copilot bridge.
