@@ -1,0 +1,23 @@
+<Project>
+
+  <PropertyGroup>
+    <_RegiraPaymentsFilesRoot>$(MSBuildThisFileDirectory)..\contentFiles\any\any\ai\</_RegiraPaymentsFilesRoot>
+  </PropertyGroup>
+
+  <!--
+    Copies Payments AI instruction files into the consuming project's
+    .github/instructions/regira/ folder on first build.
+  -->
+  <Target Name="RegiraPaymentsExtractAiFiles"
+          BeforeTargets="BeforeBuild"
+          Condition="!Exists('$(ProjectDir).github\instructions\regira\payments.instructions.md')">
+
+    <MakeDir Directories="$(ProjectDir).github\instructions\regira" />
+
+    <Copy SourceFiles="$(_RegiraPaymentsFilesRoot)payments.instructions.md;$(_RegiraPaymentsFilesRoot)payments.examples.md"
+          DestinationFolder="$(ProjectDir).github\instructions\regira\"
+          SkipUnchangedFiles="true" />
+
+  </Target>
+
+</Project>

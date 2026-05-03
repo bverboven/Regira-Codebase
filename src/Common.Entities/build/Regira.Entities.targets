@@ -1,0 +1,23 @@
+<Project>
+
+  <PropertyGroup>
+    <_RegiraEntitiesFilesRoot>$(MSBuildThisFileDirectory)..\contentFiles\any\any\ai\</_RegiraEntitiesFilesRoot>
+  </PropertyGroup>
+
+  <!--
+    Copies Entities AI instruction files into the consuming project's
+    .github/instructions/regira/ folder on first build.
+  -->
+  <Target Name="RegiraEntitiesExtractAiFiles"
+          BeforeTargets="BeforeBuild"
+          Condition="!Exists('$(ProjectDir).github\instructions\regira\entities.instructions.md')">
+
+    <MakeDir Directories="$(ProjectDir).github\instructions\regira" />
+
+    <Copy SourceFiles="$(_RegiraEntitiesFilesRoot)entities.instructions.md;$(_RegiraEntitiesFilesRoot)entities.setup.md;$(_RegiraEntitiesFilesRoot)entities.examples.md;$(_RegiraEntitiesFilesRoot)entities.signatures.md;$(_RegiraEntitiesFilesRoot)entities.namespaces.md;$(_RegiraEntitiesFilesRoot)entities.advanced.example.md"
+          DestinationFolder="$(ProjectDir).github\instructions\regira\"
+          SkipUnchangedFiles="true" />
+
+  </Target>
+
+</Project>

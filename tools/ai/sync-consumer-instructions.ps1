@@ -9,13 +9,14 @@
     selected module guides and deep-reference files.
 
     Supports an optional -SourcePath override so maintainers working inside a
-    checked-out source repo can use their local ai/ folder directly.
+    checked-out source repo can use their local repository root directly.
 
 .PARAMETER ManifestPath
     Path to regira.modules.json. Defaults to "regira.modules.json" in the current directory.
 
 .PARAMETER SourcePath
-    Optional path to a local ai/ directory. When provided, the remote fetch is skipped.
+    Optional path to the repository root (or its ai/ directory for backward compatibility).
+    When provided, the remote fetch is skipped.
 
 .PARAMETER Destination
     Root destination folder for the generated files. Defaults to ".github".
@@ -26,7 +27,7 @@
 
 .EXAMPLE
     # Use a local source checkout
-    ./tools/ai/sync-consumer-instructions.ps1 -SourcePath ../Regira-Codebase/ai
+    ./tools/ai/sync-consumer-instructions.ps1 -SourcePath ../Regira-Codebase
 #>
 param(
     [string]$ManifestPath = "regira.modules.json",
@@ -36,6 +37,22 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+
+# ---------------------------------------------------------------------------
+# Module → project-relative ai/ directory mapping
+# ---------------------------------------------------------------------------
+$moduleProjectMap = [ordered]@{
+    "Entities"   = "src/Common.Entities/ai"
+    "IO.Storage" = "src/Common.IO.Storage/ai"
+    "Office"     = "src/Common.Office/ai"
+    "Media"      = "src/Common.Media/ai"
+    "Web"        = "src/Common.Web/ai"
+    "Security"   = "src/Common.Security/ai"
+    "System"     = "src/Common.System/ai"
+    "Invoicing"  = "src/Common.Invoicing/ai"
+    "Payments"   = "src/Common.Payments/ai"
+    "TreeList"   = "src/TreeList/ai"
+}
 
 # ---------------------------------------------------------------------------
 # 1. Read the manifest
@@ -54,15 +71,22 @@ Write-Host "aiVersion : $aiVersion"
 Write-Host "modules   : $($modules -join ', ')"
 
 # ---------------------------------------------------------------------------
-# 2. Resolve the ai/ source directory
+# 2. Resolve the source repository root
 # ---------------------------------------------------------------------------
 if ($SourcePath) {
-    $aiDir = $SourcePath
-    if (-not (Test-Path $aiDir)) {
-        Write-Error "Local source path not found: $aiDir"
+    # Accept either the repo root or (for backward compat) the ai/ directory
+    if (Test-Path (Join-Path $SourcePath "ai")) {
+        $repoRoot = $SourcePath
+    } elseif (Split-Path $SourcePath -Leaf | Where-Object { $_ -eq "ai" }) {
+        $repoRoot = Split-Path $SourcePath -Parent
+    } else {
+        $repoRoot = $SourcePath
+    }
+    if (-not (Test-Path $repoRoot)) {
+        Write-Error "Local source path not found: $repoRoot"
         exit 1
     }
-    Write-Host "Using local source: $aiDir"
+    Write-Host "Using local source: $repoRoot"
 } else {
     $tag    = "ai-v$aiVersion"
     $tmpDir = Join-Path ([System.IO.Path]::GetTempPath()) "regira-ai-$aiVersion"
@@ -80,11 +104,29 @@ if ($SourcePath) {
             exit 1
         }
 
+        # Sparse-checkout the shared ai/ folder and all module project ai/ directories
+        $sparsePaths = @("ai") + @($moduleProjectMap.Values)
         git clone --depth 1 --filter=blob:none --sparse --branch $tag $repoUrl $tmpDir
-        git -C $tmpDir sparse-checkout set ai
+        git -C $tmpDir sparse-checkout set $sparsePaths
     }
 
-    $aiDir = Join-Path $tmpDir "ai"
+    $repoRoot = $tmpDir
+}
+
+$aiDir = Join-Path $repoRoot "ai"
+
+# ---------------------------------------------------------------------------
+# Helper: resolve an instruction file, checking the module project dir first
+# ---------------------------------------------------------------------------
+function Resolve-ModuleFile {
+    param([string]$Module, [string]$FileName)
+    $projectDir = $moduleProjectMap[$Module]
+    if ($projectDir) {
+        $candidate = Join-Path $repoRoot $projectDir $FileName
+        if (Test-Path $candidate) { return $candidate }
+    }
+    # Fallback to shared ai/ directory
+    return Join-Path $aiDir $FileName
 }
 
 # ---------------------------------------------------------------------------
@@ -118,7 +160,7 @@ $null      = New-Item -ItemType Directory -Force -Path $regiraDir
 
 foreach ($module in $modules) {
     $fileName = "$($module.ToLower()).instructions.md"
-    $srcFile  = Join-Path $aiDir $fileName
+    $srcFile  = Resolve-ModuleFile -Module $module -FileName $fileName
     if (Test-Path $srcFile) {
         $dest = Join-Path $regiraDir $fileName
         Copy-Item $srcFile -Destination $dest -Force
@@ -136,7 +178,7 @@ if ($references) {
         $module = $prop.Name
         foreach ($ref in @($prop.Value)) {
             $fileName = "$($module.ToLower()).$ref.md"
-            $srcFile  = Join-Path $aiDir $fileName
+            $srcFile  = Resolve-ModuleFile -Module $module -FileName $fileName
             if (Test-Path $srcFile) {
                 $dest = Join-Path $regiraDir $fileName
                 Copy-Item $srcFile -Destination $dest -Force

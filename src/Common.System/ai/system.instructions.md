@@ -156,6 +156,6 @@ var roots  = tree.Roots;
 var leaves = tree.GetBottom().Select(n => n.Value.Id);
 ```
 
-`ProjectTree` extends `TreeList<Project>` — see [treelist.instructions.md](./treelist.instructions.md) for the full navigation API.
+`ProjectTree` extends `TreeList<Project>` — see [treelist.instructions.md](../../TreeList/ai/treelist.instructions.md) for the full navigation API.
 
 ---

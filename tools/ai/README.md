@@ -60,7 +60,7 @@ Valid `references` suffixes: `setup`, `examples`, `signatures`, `namespaces`.
 pwsh path\to\Regira-Codebase\tools\ai\sync-consumer-instructions.ps1
 
 # PowerShell — local source checkout (faster if you have Regira-Codebase checked out)
-pwsh path\to\Regira-Codebase\tools\ai\sync-consumer-instructions.ps1 -SourcePath path\to\Regira-Codebase\ai
+pwsh path\to\Regira-Codebase\tools\ai\sync-consumer-instructions.ps1 -SourcePath path\to\Regira-Codebase
 ```
 
 The script generates `AGENTS.md` and `.github/copilot-instructions.md` (same bootstrap content) and populates `.github/instructions/regira/` with the selected instruction files. Your AI assistant picks these up automatically.
@@ -89,8 +89,8 @@ Re-run the script whenever you add a module or change `aiVersion`.
 pwsh tools/ai/sync-consumer-instructions.ps1
 
 # Use a local source checkout (both scripts support this)
-./tools/ai/sync-consumer-instructions.sh  --source ../Regira-Codebase/ai
-pwsh tools/ai/sync-consumer-instructions.ps1 -SourcePath ../Regira-Codebase/ai
+./tools/ai/sync-consumer-instructions.sh  --source ../Regira-Codebase
+pwsh tools/ai/sync-consumer-instructions.ps1 -SourcePath ../Regira-Codebase
 ```
 
 ## What the scripts do
