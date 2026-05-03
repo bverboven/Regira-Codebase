@@ -1,7 +1,7 @@
 # Regira Entities — Project Setup
 
 > **AI Agent Rule**: Follow this guide to scaffold a new Regira Entities API project from scratch.
-> Start from the **`BasicApi`** template in [`project.setup.md`](./project.setup.md) and apply the Entities-specific additions below.
+> Start from the **`BasicApi`** template in [`project.setup.md`](../../../ai/project.setup.md) and apply the Entities-specific additions below.
 > Always combine with [`entities.namespaces.md`](./entities.namespaces.md) for exact `using` directives
 > and [`entities.examples.md`](./entities.examples.md) for complete working code.
 
@@ -20,8 +20,8 @@
 
 ## Checklist
 
-1. Create an ASP.NET Core Web API project — use the **`BasicApi`** template in [`project.setup.md`](./project.setup.md) as the starting point.
-2. Add `NuGet.Config` with the Regira feed — see [`project.setup.md`](./project.setup.md) — **Shared Conventions → NuGet feed**.
+1. Create an ASP.NET Core Web API project — use the **`BasicApi`** template in [`project.setup.md`](../../../ai/project.setup.md) as the starting point.
+2. Add `NuGet.Config` with the Regira feed — see [`project.setup.md`](../../../ai/project.setup.md) — **Shared Conventions → NuGet feed**.
 3. Add required packages to `.csproj`.
 4. Create `YourDbContext` deriving from `DbContext`.
 5. Configure `Program.cs`.
@@ -32,7 +32,7 @@
 
 ## NuGet Feed
 
-> **→ See:** [`project.setup.md`](./project.setup.md) — **Shared Conventions → NuGet feed** for the feed URL and `NuGet.Config` template.
+> **→ See:** [`project.setup.md`](../../../ai/project.setup.md) — **Shared Conventions → NuGet feed** for the feed URL and `NuGet.Config` template.
 
 ---
 
@@ -52,7 +52,7 @@
 
 ## Step 1: Project Files
 
-> Start from the **`BasicApi`** template in [`project.setup.md`](./project.setup.md) and apply the Entities-specific additions below.
+> Start from the **`BasicApi`** template in [`project.setup.md`](../../../ai/project.setup.md) and apply the Entities-specific additions below.
 
 ---
 

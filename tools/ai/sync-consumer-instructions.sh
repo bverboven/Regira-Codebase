@@ -9,7 +9,7 @@
 # selected module guides and deep-reference files.
 #
 # Supports an optional --source override so maintainers working inside a
-# checked-out source repo can use their local ai/ folder directly.
+# checked-out source repo can use their local repository root directly.
 #
 # COMPATIBILITY NOTE:
 #   This script requires bash 4.0 or later (uses mapfile and ${var,,} lowercasing).
@@ -22,7 +22,7 @@
 #
 # Options:
 #   --manifest PATH   Path to regira.modules.json (default: regira.modules.json)
-#   --source   PATH   Local ai/ directory; skips remote fetch when provided
+#   --source   PATH   Local repository root; skips remote fetch when provided
 #   --dest     PATH   Output root (default: .github)
 #
 # Examples:
@@ -30,7 +30,7 @@
 #   ./tools/ai/sync-consumer-instructions.sh
 #
 #   # Use a local source checkout
-#   ./tools/ai/sync-consumer-instructions.sh --source ../Regira-Codebase/ai
+#   ./tools/ai/sync-consumer-instructions.sh --source ../Regira-Codebase
 
 set -euo pipefail
 
@@ -42,6 +42,22 @@ if [[ "${BASH_VERSINFO[0]}" -lt 4 ]]; then
     echo "  2. Use the PowerShell equivalent: pwsh tools/ai/sync-consumer-instructions.ps1" >&2
     exit 1
 fi
+
+# ---------------------------------------------------------------------------
+# Module -> project-relative ai/ directory mapping
+# ---------------------------------------------------------------------------
+declare -A MODULE_PROJECT_MAP=(
+    ["Entities"]="src/Common.Entities/ai"
+    ["IO.Storage"]="src/Common.IO.Storage/ai"
+    ["Office"]="src/Common.Office/ai"
+    ["Media"]="src/Common.Media/ai"
+    ["Web"]="src/Common.Web/ai"
+    ["Security"]="src/Common.Security/ai"
+    ["System"]="src/Common.System/ai"
+    ["Invoicing"]="src/Common.Invoicing/ai"
+    ["Payments"]="src/Common.Payments/ai"
+    ["TreeList"]="src/TreeList/ai"
+)
 
 # ---------------------------------------------------------------------------
 # Defaults
@@ -73,12 +89,12 @@ require_tool git
 require_tool python3  # used for JSON parsing (available on all modern systems)
 
 json_value() {
-    # json_value <file> <key>  — extract a top-level string from JSON
+    # json_value <file> <key>  -- extract a top-level string from JSON
     python3 -c "import json,sys; d=json.load(open('$1')); print(d.get('$2',''))"
 }
 
 json_array() {
-    # json_array <file> <key>  — extract a top-level string array, one item per line
+    # json_array <file> <key>  -- extract a top-level string array, one item per line
     python3 -c "
 import json, sys
 d = json.load(open('$1'))
@@ -88,7 +104,7 @@ for v in d.get('$2', []):
 }
 
 json_ref_keys() {
-    # json_ref_keys <file>  — print each 'module ref' pair from references object
+    # json_ref_keys <file>  -- print each 'module ref' pair from references object
     python3 -c "
 import json, sys
 d = json.load(open('$1'))
@@ -97,6 +113,24 @@ for module, suffixes in refs.items():
     for s in suffixes:
         print(module, s)
 "
+}
+
+# resolve_module_file <repo_root> <ai_dir> <module> <filename>
+# Checks the module project dir first, then falls back to ai/
+resolve_module_file() {
+    local repo_root="$1"
+    local ai_dir="$2"
+    local module="$3"
+    local file_name="$4"
+    local project_dir="${MODULE_PROJECT_MAP[$module]:-}"
+    if [[ -n "$project_dir" ]]; then
+        local candidate="$repo_root/$project_dir/$file_name"
+        if [[ -f "$candidate" ]]; then
+            echo "$candidate"
+            return
+        fi
+    fi
+    echo "$ai_dir/$file_name"
 }
 
 # ---------------------------------------------------------------------------
@@ -114,15 +148,22 @@ echo "aiVersion : $AI_VERSION"
 echo "modules   : ${MODULES[*]}"
 
 # ---------------------------------------------------------------------------
-# 2. Resolve the ai/ source directory
+# 2. Resolve the source repository root
 # ---------------------------------------------------------------------------
 if [[ -n "$SOURCE_PATH" ]]; then
-    AI_DIR="$SOURCE_PATH"
-    if [[ ! -d "$AI_DIR" ]]; then
-        echo "Local source path not found: $AI_DIR" >&2
+    # Accept either the repo root or (for backward compat) the ai/ directory
+    if [[ -d "$SOURCE_PATH/ai" ]]; then
+        REPO_ROOT="$SOURCE_PATH"
+    elif [[ "$(basename "$SOURCE_PATH")" == "ai" ]]; then
+        REPO_ROOT="$(dirname "$SOURCE_PATH")"
+    else
+        REPO_ROOT="$SOURCE_PATH"
+    fi
+    if [[ ! -d "$REPO_ROOT" ]]; then
+        echo "Local source path not found: $REPO_ROOT" >&2
         exit 1
     fi
-    echo "Using local source: $AI_DIR"
+    echo "Using local source: $REPO_ROOT"
 else
     TAG="ai-v${AI_VERSION}"
     TMP_DIR="${TMPDIR:-/tmp}/regira-ai-${AI_VERSION}"
@@ -139,12 +180,20 @@ else
             exit 1
         fi
 
+        # Build list of sparse paths: shared ai/ plus all module project ai/ dirs
+        SPARSE_PATHS=("ai")
+        for proj_dir in "${MODULE_PROJECT_MAP[@]}"; do
+            SPARSE_PATHS+=("$proj_dir")
+        done
+
         git clone --depth 1 --filter=blob:none --sparse --branch "$TAG" "$REPO_URL" "$TMP_DIR"
-        git -C "$TMP_DIR" sparse-checkout set ai
+        git -C "$TMP_DIR" sparse-checkout set "${SPARSE_PATHS[@]}"
     fi
 
-    AI_DIR="$TMP_DIR/ai"
+    REPO_ROOT="$TMP_DIR"
 fi
+
+AI_DIR="$REPO_ROOT/ai"
 
 # ---------------------------------------------------------------------------
 # 3. Render the bootstrap from the template
@@ -190,7 +239,7 @@ mkdir -p "$REGIRA_DIR"
 
 for module in "${MODULES[@]}"; do
     file_name="${module,,}.instructions.md"
-    src_file="$AI_DIR/$file_name"
+    src_file="$(resolve_module_file "$REPO_ROOT" "$AI_DIR" "$module" "$file_name")"
     if [[ -f "$src_file" ]]; then
         cp "$src_file" "$REGIRA_DIR/$file_name"
         echo "Copied module guide: $file_name"
@@ -204,7 +253,7 @@ done
 # ---------------------------------------------------------------------------
 while IFS=' ' read -r module ref; do
     file_name="${module,,}.${ref}.md"
-    src_file="$AI_DIR/$file_name"
+    src_file="$(resolve_module_file "$REPO_ROOT" "$AI_DIR" "$module" "$file_name")"
     if [[ -f "$src_file" ]]; then
         cp "$src_file" "$REGIRA_DIR/$file_name"
         echo "Copied deep reference: $file_name"

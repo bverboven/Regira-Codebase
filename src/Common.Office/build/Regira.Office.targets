@@ -1,0 +1,23 @@
+<Project>
+
+  <PropertyGroup>
+    <_RegiraOfficeFilesRoot>$(MSBuildThisFileDirectory)..\contentFiles\any\any\ai\</_RegiraOfficeFilesRoot>
+  </PropertyGroup>
+
+  <!--
+    Copies Office AI instruction files into the consuming project's
+    .github/instructions/regira/ folder on first build.
+  -->
+  <Target Name="RegiraOfficeExtractAiFiles"
+          BeforeTargets="BeforeBuild"
+          Condition="!Exists('$(ProjectDir).github\instructions\regira\office.instructions.md')">
+
+    <MakeDir Directories="$(ProjectDir).github\instructions\regira" />
+
+    <Copy SourceFiles="$(_RegiraOfficeFilesRoot)office.instructions.md;$(_RegiraOfficeFilesRoot)office.pdf.instructions.md;$(_RegiraOfficeFilesRoot)office.pdf.examples.md;$(_RegiraOfficeFilesRoot)office.excel.instructions.md;$(_RegiraOfficeFilesRoot)office.excel.examples.md;$(_RegiraOfficeFilesRoot)office.word.instructions.md;$(_RegiraOfficeFilesRoot)office.word.examples.md;$(_RegiraOfficeFilesRoot)office.mail.instructions.md;$(_RegiraOfficeFilesRoot)office.mail.examples.md;$(_RegiraOfficeFilesRoot)office.csv.instructions.md;$(_RegiraOfficeFilesRoot)office.csv.examples.md;$(_RegiraOfficeFilesRoot)office.barcodes.instructions.md;$(_RegiraOfficeFilesRoot)office.barcodes.examples.md;$(_RegiraOfficeFilesRoot)office.ocr.instructions.md;$(_RegiraOfficeFilesRoot)office.ocr.examples.md;$(_RegiraOfficeFilesRoot)office.vcards.instructions.md;$(_RegiraOfficeFilesRoot)office.vcards.examples.md"
+          DestinationFolder="$(ProjectDir).github\instructions\regira\"
+          SkipUnchangedFiles="true" />
+
+  </Target>
+
+</Project>

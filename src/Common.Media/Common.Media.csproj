@@ -16,4 +16,15 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
+
+  <!-- MSBuild targets — auto-imported by NuGet restore -->
+  <ItemGroup>
+    <None Include="build\Regira.Media.targets" Pack="true" PackagePath="build\" />
+  </ItemGroup>
+
+  <!-- AI instruction files -->
+  <ItemGroup>
+    <None Include="ai\media.instructions.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+    <None Include="ai\media.examples.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+  </ItemGroup>
 </Project>

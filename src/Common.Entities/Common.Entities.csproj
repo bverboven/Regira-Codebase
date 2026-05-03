@@ -19,4 +19,19 @@
   <ItemGroup>
     <ProjectReference Include="..\Common.IO.Storage\Common.IO.Storage.csproj" />
   </ItemGroup>
+
+  <!-- MSBuild targets — auto-imported by NuGet restore -->
+  <ItemGroup>
+    <None Include="build\Regira.Entities.targets" Pack="true" PackagePath="build\" />
+  </ItemGroup>
+
+  <!-- AI instruction files -->
+  <ItemGroup>
+    <None Include="ai\entities.instructions.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+    <None Include="ai\entities.setup.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+    <None Include="ai\entities.examples.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+    <None Include="ai\entities.signatures.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+    <None Include="ai\entities.namespaces.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+    <None Include="ai\entities.advanced.example.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+  </ItemGroup>
 </Project>

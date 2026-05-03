@@ -1,0 +1,23 @@
+<Project>
+
+  <PropertyGroup>
+    <_RegiraMediaFilesRoot>$(MSBuildThisFileDirectory)..\contentFiles\any\any\ai\</_RegiraMediaFilesRoot>
+  </PropertyGroup>
+
+  <!--
+    Copies Media AI instruction files into the consuming project's
+    .github/instructions/regira/ folder on first build.
+  -->
+  <Target Name="RegiraMediaExtractAiFiles"
+          BeforeTargets="BeforeBuild"
+          Condition="!Exists('$(ProjectDir).github\instructions\regira\media.instructions.md')">
+
+    <MakeDir Directories="$(ProjectDir).github\instructions\regira" />
+
+    <Copy SourceFiles="$(_RegiraMediaFilesRoot)media.instructions.md;$(_RegiraMediaFilesRoot)media.examples.md"
+          DestinationFolder="$(ProjectDir).github\instructions\regira\"
+          SkipUnchangedFiles="true" />
+
+  </Target>
+
+</Project>

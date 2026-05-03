@@ -2,7 +2,7 @@
 
 **Primary goal:** When a request relates to a specific module below, consult the corresponding instruction file for detailed, context-specific guidance. Fall back to the [General Instructions](#general-instructions) only when no module instruction file applies.
 
-> **Scope**: This file is for the **source repository** where the full `ai/` folder is available locally. For a downstream project that only consumes Regira packages, see [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) and [`tools/ai/README.md`](../tools/ai/README.md).
+> **Scope**: This file is for the **source repository** where the full source tree is available locally. Module instruction files live in each project's `src/<project>/ai/` subdirectory. For a downstream project that only consumes Regira packages, see [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) and [`tools/ai/README.md`](../tools/ai/README.md).
 
 Don't assume syntax or signatures! 
 When you have to guess and the instruction files don't give you the required information: 
@@ -27,16 +27,16 @@ This codebase provides specialized AI instruction sets for its modules. **When a
 | Module | Namespace | Covers | Instructions |
 |--------|-----------|--------|--------------| 
 | **Project Templates** | *(scaffolding)* | Scaffolding new projects from reusable starter templates | `./project.setup.md` |
-| **Entities** | `Regira.Entities` | CRUD Services with built-in extras | `./entities.instructions.md` |
-| **TreeList** | `Regira.TreeList` | Hierarchical tree structures: build, navigate, and query nodes | `./treelist.instructions.md` |
-| **IO.Storage** | `Regira.IO.Storage` | File storage: local filesystem, Azure Blob, SFTP/SSH, GitHub, TCP, compression | `./io.storage.instructions.md` |
-| **Office** | `Regira.Office` | Document processing: Excel, Word, PDF, OCR, Barcodes, CSV, vCards | `./office.instructions.md` |
-| **Media** | `Regira.Media` | Image & video processing: drawing, resize/crop/rotate, FFmpeg | `./media.instructions.md` |
-| **Web** | `Regira.Web` | Web utilities: HTML generation (RazorLight), Swagger, mail providers | `./web.instructions.md` |
-| **Security** | `Regira.Security` | Authentication, hashing (BCrypt), cryptography | `./security.instructions.md` |
-| **System** | `Regira.System` | Hosting utilities, project/solution file tooling | `./system.instructions.md` |
-| **Invoicing** | `Regira.Invoicing` | Invoice creation and integrations (Billit, UBL, ViaAdValvas) | `./invoicing.instructions.md` |
-| **Payments** | `Regira.Payments` | Payment provider integrations (Mollie, Pom) | `./payments.instructions.md` |
+| **Entities** | `Regira.Entities` | CRUD Services with built-in extras | `../src/Common.Entities/ai/entities.instructions.md` |
+| **TreeList** | `Regira.TreeList` | Hierarchical tree structures: build, navigate, and query nodes | `../src/TreeList/ai/treelist.instructions.md` |
+| **IO.Storage** | `Regira.IO.Storage` | File storage: local filesystem, Azure Blob, SFTP/SSH, GitHub, TCP, compression | `../src/Common.IO.Storage/ai/io.storage.instructions.md` |
+| **Office** | `Regira.Office` | Document processing: Excel, Word, PDF, OCR, Barcodes, CSV, vCards | `../src/Common.Office/ai/office.instructions.md` |
+| **Media** | `Regira.Media` | Image & video processing: drawing, resize/crop/rotate, FFmpeg | `../src/Common.Media/ai/media.instructions.md` |
+| **Web** | `Regira.Web` | Web utilities: HTML generation (RazorLight), Swagger, mail providers | `../src/Common.Web/ai/web.instructions.md` |
+| **Security** | `Regira.Security` | Authentication, hashing (BCrypt), cryptography | `../src/Common.Security/ai/security.instructions.md` |
+| **System** | `Regira.System` | Hosting utilities, project/solution file tooling | `../src/Common.System/ai/system.instructions.md` |
+| **Invoicing** | `Regira.Invoicing` | Invoice creation and integrations (Billit, UBL, ViaAdValvas) | `../src/Common.Invoicing/ai/invoicing.instructions.md` |
+| **Payments** | `Regira.Payments` | Payment provider integrations (Mollie, Pom) | `../src/Common.Payments/ai/payments.instructions.md` |
 
 When a module's instruction file is not yet available (or the topic isn't covered), apply general .NET best practices and the conventions in this file.
 

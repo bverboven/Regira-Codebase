@@ -23,9 +23,14 @@
     <!-- Upgrading to v2.3.0 causes errors in other projects (LinkGenerator is missing) -->
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
   </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
-    <!-- Upgraded for vulnerabilities -->
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="10.0.7" />
+  <!-- MSBuild targets — auto-imported by NuGet restore -->
+  <ItemGroup>
+    <None Include="build\Regira.Web.targets" Pack="true" PackagePath="build\" />
+  </ItemGroup>
+
+  <!-- AI instruction files -->
+  <ItemGroup>
+    <None Include="ai\web.instructions.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+    <None Include="ai\web.examples.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
   </ItemGroup>
 </Project>

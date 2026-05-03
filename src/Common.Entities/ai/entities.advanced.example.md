@@ -26,7 +26,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 **Program.cs**
 ```csharp
-// Basic setup, see ./project.setup.md for more details and explanations
+// Basic setup, see ../../../ai/project.setup.md for more details and explanations
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ProjectsContext>((sp, options) =>
     // use DB provider at wish

@@ -1,0 +1,23 @@
+<Project>
+
+  <PropertyGroup>
+    <_RegiraIOStorageFilesRoot>$(MSBuildThisFileDirectory)..\contentFiles\any\any\ai\</_RegiraIOStorageFilesRoot>
+  </PropertyGroup>
+
+  <!--
+    Copies IO.Storage AI instruction files into the consuming project's
+    .github/instructions/regira/ folder on first build.
+  -->
+  <Target Name="RegiraIOStorageExtractAiFiles"
+          BeforeTargets="BeforeBuild"
+          Condition="!Exists('$(ProjectDir).github\instructions\regira\io.storage.instructions.md')">
+
+    <MakeDir Directories="$(ProjectDir).github\instructions\regira" />
+
+    <Copy SourceFiles="$(_RegiraIOStorageFilesRoot)io.storage.instructions.md;$(_RegiraIOStorageFilesRoot)io.storage.examples.md"
+          DestinationFolder="$(ProjectDir).github\instructions\regira\"
+          SkipUnchangedFiles="true" />
+
+  </Target>
+
+</Project>
