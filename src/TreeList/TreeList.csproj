@@ -17,7 +17,6 @@
   <ItemGroup>
     <None Include="build\Regira.TreeList.targets" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
-
   <!-- AI instruction files -->
   <ItemGroup>
     <None Include="ai\treelist.instructions.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />

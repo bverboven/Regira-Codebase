@@ -11,7 +11,7 @@
     <AssemblyName>Regira.Web</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.1.1</Version>
+    <Version>5.2.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
@@ -27,7 +27,6 @@
   <ItemGroup>
     <None Include="build\Regira.Web.targets" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
-
   <!-- AI instruction files -->
   <ItemGroup>
     <None Include="ai\web.instructions.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
