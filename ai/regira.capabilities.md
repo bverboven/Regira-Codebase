@@ -1,15 +1,14 @@
 # Regira Capability Catalog For AI Agents
 
-**Primary goal:** When a request relates to a specific module below, consult the corresponding instruction file for detailed, context-specific guidance. Fall back to the [General Instructions](#general-instructions) only when no module instruction file applies.
-
-> **Purpose**: This file is the canonical Regira feature-awareness file. It exists in the source repository so consuming AI agents can understand which Regira capabilities exist, how they are grouped, and where deeper module guidance lives. It is not the one-file consumer bootstrap to copy into an application repository.
+> **Role:** Load this file to map a request to the right Regira module family, package family, or deeper instruction file.
 >
-> **Consumer usage**: For a downstream application repository, copy [`AGENTS.md`](./AGENTS.md) to `.github/AGENTS.md` as the one-file consumer bootstrap. That bootstrap tells the agent how to choose a project template, choose NuGet packages, and generate code in the consumer app. If a consumer repository also keeps local synced guides, treat the synced shared setup guides plus the relevant module guides under `.github/instructions/regira/` as the local sources of truth when they are present.
+> **Boundaries:** This is not the consumer bootstrap. In a downstream application repository, [`AGENTS.md`](./AGENTS.md) is the execution entrypoint. For project scaffolding or app-shape changes, use [`project.setup.md`](./project.setup.md). For cross-module setup rules or sync mechanics, use [`shared.setup.md`](./shared.setup.md).
 
-Don't assume syntax or signatures! 
-When you have to guess and the instruction files don't give you the required information: 
-- Stop and describe the problem!
-- ASK feedback from the user!
+**Primary goal:** Route the request to the narrowest relevant guide. Fall back to the [General Instructions](#general-instructions) only when no module instruction file applies.
+
+When details are missing, do not guess syntax or signatures:
+- Stop and describe the gap.
+- Ask the user for confirmation.
 
 After every significant task, analyze what went well and what failed. Update `./learnings.md` with a 'Lessons Learned' section. Before starting any new task, read `learnings.md` to avoid repeating past mistakes. Treat it as **curated memory, not a running log** — if it becomes noisy, summarize it before relying on it as context.
 
@@ -21,8 +20,9 @@ This codebase provides specialized AI instruction sets for its modules. **When a
 
 **Loading rules:**
 1. **Never load the whole `ai/` folder.** Identify the module and load only its guide.
-2. Load deep references (`*.setup.md`, `*.examples.md`, `*.signatures.md`, `*.namespaces.md`) only when the task specifically needs them.
-3. For shared setup concerns (NuGet feed, DI patterns), use [`shared.setup.md`](./shared.setup.md) instead of duplicating them in module guides.
+2. For project scaffolding or app-shape changes, load [`project.setup.md`](./project.setup.md).
+3. For shared setup concerns reused across modules (NuGet feed, DI patterns, sync behavior), load [`shared.setup.md`](./shared.setup.md).
+4. Load deep references (`*.setup.md`, `*.examples.md`, `*.signatures.md`, `*.namespaces.md`) only when the task specifically needs them.
 
 Only modules with dedicated AI guides are listed below. Consumer manifests use the names defined in [`module-sources.json`](./module-sources.json); this table groups them by source-repo guide family. In particular, consumers can select `Office` for the family overview or narrower `Office.*` submodules for PDF, Excel, Mail, OCR, barcodes, CSV, and vCards.
 
@@ -36,7 +36,7 @@ Only modules with dedicated AI guides are listed below. Consumer manifests use t
 | **IO.Storage** | `Regira.IO.Storage` | File storage: local filesystem, Azure Blob, SFTP/SSH, GitHub, TCP, compression | `Regira.IO.Storage`, `Regira.IO.Storage.Azure`, `Regira.IO.Storage.SSH` | `../src/Common.IO.Storage/ai/io.storage.instructions.md` |
 | **Office** | `Regira.Office` | Document processing: Excel, Word, PDF, OCR, Barcodes, CSV, vCards | `Regira.Office` | `../src/Common.Office/ai/office.instructions.md` |
 | **Media** | `Regira.Media` | Image and video processing: drawing, resize, crop, rotate, FFmpeg | `Regira.Media`, `Regira.Drawing.SkiaSharp`, `Regira.Drawing.GDI`, `Regira.Media.FFMpeg` | `../src/Common.Media/ai/media.instructions.md` |
-| **Web** | `Regira.Web` | Web utilities: HTML generation, middleware, Swagger, mail providers | `Regira.Web`, `Regira.Web.HTML.RazorEngineCore`, `Regira.Web.Swagger` | `../src/Common.Web/ai/web.instructions.md` |
+| **Web** | `Regira.Web` | Web utilities: HTML generation, middleware, optional Swagger/OpenAPI auth helpers | `Regira.Web`, `Regira.Web.HTML.RazorEngineCore`; `Regira.Web.Swagger` only when explicit Swagger/OpenAPI auth support is needed | `../src/Common.Web/ai/web.instructions.md` |
 | **Security** | `Regira.Security` | Authentication, hashing, and cryptography | `Regira.Security`, `Regira.Security.Authentication`, `Regira.Security.Authentication.Web` | `../src/Common.Security/ai/security.instructions.md` |
 | **System** | `Regira.System` | Hosting utilities and project or solution file tooling | `Regira.System`, `Regira.System.Hosting` | `../src/Common.System/ai/system.instructions.md` |
 | **Invoicing** | `Regira.Invoicing` | Invoice creation and integrations (Billit, UBL, ViaAdValvas) | `Regira.Invoicing`, `Regira.Invoicing.UblSharp` | `../src/Common.Invoicing/ai/invoicing.instructions.md` |
@@ -44,16 +44,13 @@ Only modules with dedicated AI guides are listed below. Consumer manifests use t
 
 When a module's instruction file is not yet available (or the topic isn't covered), apply general .NET best practices and the conventions in this file.
 
-## Consumer Bootstrap Relationship
+## Adjacent Files
 
-For downstream application repositories:
+- [`AGENTS.md`](./AGENTS.md) — downstream consumer bootstrap and execution flow
+- [`project.setup.md`](./project.setup.md) — project-template baseline and app-shape defaults
+- [`shared.setup.md`](./shared.setup.md) — cross-module setup rules and sync mechanics
 
-1. Copy [`AGENTS.md`](./AGENTS.md) into the application repository as `.github/AGENTS.md`.
-2. Let that downstream `.github/AGENTS.md` file decide the project template, NuGet packages, and code changes.
-3. Use this file as the authoritative catalog of Regira capabilities, module families, and deeper guide locations.
-4. If a consumer repository also keeps local cached guides, treat the synced shared setup guides plus the relevant module guides as the local sources of truth when they are present.
-
-This file is the authoritative capability catalog. The downstream `.github/AGENTS.md` file is the execution-oriented bootstrap that applies those capabilities inside a consumer project.
+This file stays the capability catalog and module router.
 
 ### Additional Package Families
 
@@ -70,11 +67,8 @@ These package families are available on the Regira feed but do not currently hav
 | **Globalization** | Phone number parsing and formatting | `Regira.Globalization.LibPhoneNumber` |
 | **Serializing** | Newtonsoft.Json-based serialization | `Regira.Serializing.Newtonsoft` |
 
-### Shared References
+### Related References
 
-- [`AGENTS.md`](./AGENTS.md) — canonical downstream `AGENTS.md` bootstrap for module selection and package setup
-- [`project.setup.md`](./project.setup.md) — shared project-template guidance used in the source repo and synced into consumer repos when local guide sync is enabled
-- [`shared.setup.md`](./shared.setup.md) — shared setup rules and the Regira NuGet feed
 - [`consumer.copilot.stub.md`](./consumer.copilot.stub.md) — optional compatibility bridge for tools that require `.github/copilot-instructions.md`; not part of the normal one-file consumer flow
 - [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) — bootstrap template for consumer projects
 - [`tools/ai/README.md`](../tools/ai/README.md) — sync script usage, output layout, and versioning for consumer projects

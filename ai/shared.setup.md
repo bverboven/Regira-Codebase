@@ -1,6 +1,10 @@
 # Shared Setup for Regira AI Instructions
 
-Use this file for setup guidance that applies across multiple Regira modules. Module guides should reference this file instead of repeating the same shared setup blocks.
+> **Role:** Load this file for setup rules reused by multiple module guides and for consumer-guide sync or distribution mechanics.
+>
+> **Boundaries:** Use [`regira.capabilities.md`](./regira.capabilities.md) for module discovery and guide routing. Use [`project.setup.md`](./project.setup.md) for project-template choice and baseline app shape. Use [`AGENTS.md`](./AGENTS.md) or downstream `.github/AGENTS.md` for the execution-oriented consumer workflow.
+
+Use this file when a module guide needs shared setup without repeating it.
 
 ## NuGet Feed
 
@@ -17,20 +21,22 @@ Regira packages are published at `https://packages.regira.com/v3/index.json`. Ad
 </configuration>
 ```
 
-## Source Repository vs Consumer Project
+## Consumer Sync and Local Cache
 
-- **Source repository**: the full `ai/` folder is available locally, so the bootstrap can route to module guides and deep references.
-- **Consumer project**: the primary entrypoint is a single `.github/AGENTS.md` file based on [`AGENTS.md`](./AGENTS.md). The agent chooses the project template, package set, and code changes directly from that file.
+- **Source repository**: the full `ai/` folder is available locally, so this file can point to adjacent guides.
+- **Consumer project**: the normal entrypoint is `.github/AGENTS.md`; synced `.github/instructions/regira/*.md` files are optional cached guidance.
 
-For consumer projects, keep these responsibilities separate:
+Keep these responsibilities separate in consumer projects:
 
-- `.github/AGENTS.md` is the AI-facing bootstrap that decides project template, Regira modules, package routing, and when extracted local guides must be read before code generation.
-- `regira.modules.json` is an optional machine-readable manifest that pins `aiVersion`, records `projectTemplate`, and selects synced modules and deep references.
-- `.github/copilot-instructions.md` and `.github/instructions/regira/*.md` are optional local generated outputs. The sync can create them, and installed Regira packages can also extract `.github/instructions/regira/*.md` during build when those packages ship AI files. When these files exist, they provide local shared setup guidance (`project.setup.md`, `shared.setup.md`) plus module-specific docs.
+- `.github/AGENTS.md` decides project template, module selection, package routing, and when extracted local guides must be read before code generation.
+- `regira.modules.json` is an optional machine-readable manifest for `aiVersion`, `projectTemplate`, selected modules, and deep references.
+- `.github/copilot-instructions.md` and `.github/instructions/regira/*.md` are optional generated outputs created by sync tooling or package extraction.
+- `project.setup.md` stays focused on template selection and baseline app shape.
+- `shared.setup.md` stays focused on setup rules reused across modules and sync mechanics.
 
-Consumers do not need source-repository files for the normal flow. Use the optional sync tooling only when a team explicitly wants local cached shared setup and module instruction files.
+Consumers do not need the source-repository `ai/` folder for the normal one-file flow. Use sync only when a team explicitly wants local cached shared and module guidance.
 
-## Consumer-Project References
+## Related Files
 
 - [`AGENTS.md`](./AGENTS.md) — canonical downstream bootstrap to copy as `.github/AGENTS.md`
 - [`regira.capabilities.md`](./regira.capabilities.md) — canonical Regira capability catalog for AI agents
@@ -49,10 +55,11 @@ When a consumer project's `regira.modules.json` includes a `references` section,
 - `signatures`
 - `namespaces`
 
-## Guidance for New Shared Content
+## Authoring Rules
 
 When adding new instruction files:
 
 1. Put shared setup here if more than one module needs it.
 2. Keep module guides focused on routing, decision rules, pitfalls, and package-specific behavior.
 3. Put examples, setup walkthroughs, and exact signatures in separate deep-reference files.
+4. Do not duplicate the module catalog or project-template tables here.

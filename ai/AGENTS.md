@@ -132,11 +132,13 @@ When the consumer project already contains Regira packages, inspect the project'
 | Office.VCards | vCard contact files | `Regira.Office.VCards.FolkerKinzel` |
 | Media | Image processing, resize, crop, rotate, FFmpeg workflows | `Regira.Media`, `Regira.Drawing.SkiaSharp`, `Regira.Drawing.GDI`, `Regira.Media.FFMpeg` |
 | Security | Hashing, JWT, API key authentication, cryptography | `Regira.Security`, `Regira.Security.Authentication`, `Regira.Security.Authentication.Web` |
-| Web | Razor rendering, middleware, Swagger | `Regira.Web`, `Regira.Web.HTML.RazorEngineCore`, `Regira.Web.Swagger` |
+| Web | Razor rendering, middleware, optional Swagger/OpenAPI auth helpers | `Regira.Web`, `Regira.Web.HTML.RazorEngineCore`; `Regira.Web.Swagger` only for explicit Swagger/OpenAPI auth support |
 | System | Windows Service hosting, project tooling | `Regira.System`, `Regira.System.Hosting` |
 | Invoicing | Invoice models, UBL, Peppol, AP gateway integrations | `Regira.Invoicing`, `Regira.Invoicing.UblSharp` |
 | Payments | Payment providers, payment links, webhooks | `Regira.Payments`, `Regira.Payments.Mollie`, `Regira.Payments.Pom` |
 | TreeList | Hierarchical tree structures | `Regira.TreeList` |
+
+For Web APIs, [`project.setup.md`](./project.setup.md) already standardizes OpenAPI plus Scalar as the default API surface. Do not add `Regira.Web.Swagger` by default; only choose it when the user explicitly needs Swagger/OpenAPI auth customization.
 
 Use `Office` for the family overview or shared Office conventions. Add one or more concrete `Office.*` modules when the requested capability is already clear.
 

@@ -11,6 +11,7 @@
 
 **Defaults (unless instructed otherwise):**
 - **Database**: SQLite (`Microsoft.EntityFrameworkCore.Sqlite`)
+- **Database initialization**: prefer `Database.EnsureCreated()` for the default SQLite starter/test setup; keep the local database disposable and do not scaffold an initial migration unless the user explicitly asks for migrations or chooses a more mature database
 - **Mapping**: Mapster (`Regira.Entities.Mapping.Mapster`)
 - **Project structure**: Per-entity folder structure
 - **Service layer**: Default `EntityRepository` (unless complex logic requires wrapping)
@@ -101,6 +102,18 @@ builder.Services.AddEntityServices();
 ```
 
 > **Note:** `AddPrimerInterceptors(sp)` and `AddNormalizerInterceptors(sp)` require the `IServiceProvider` (`sp`) from the `AddDbContext` factory overload. Always use the `(sp, options) => ...` signature.
+
+> **SQLite starter note:** For the default SQLite starter/test setup, do not scaffold an initial EF migration. After `app = builder.Build()`, create a scope and call `Database.EnsureCreated()` instead:
+
+```csharp
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.EnsureCreated();
+}
+```
+
+> Treat the SQLite database as disposable test infrastructure. If the schema changes before the project adopts a mature database and explicit migrations, recreate the local SQLite database instead of adding migration files by default.
 
 ---
 

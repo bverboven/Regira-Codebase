@@ -43,7 +43,8 @@ Use this as the primary checklist.
 4. Register the entity on the `EntityServiceCollection` using `.For<TEntity,...>(...)`.
 5. Add an API controller inheriting from the full `EntityControllerBase` variant.
 6. Add `DbSet<TEntity>` to `YourDbContext` and configure relationships.
-7. Create and apply an EF migration as needed.
+7. If the project still uses the default SQLite starter database, keep it migration-free and rely on `Database.EnsureCreated()` with a disposable local database.
+8. Only create and apply EF migrations when the user explicitly wants migration-based schema management or has moved to a more mature database provider.
 
 ### Modify an Existing Entity
 
@@ -51,7 +52,8 @@ Use this as the primary checklist.
 2. Update DTOs and mapping configuration.
 3. Update `SearchObject`, enums, and query builders if filters/sorting change.
 4. Adjust processors, preppers, and normalizers if behavior changes.
-5. Create and apply a migration when the schema changes.
+5. If the project still uses the default SQLite starter database, keep the model aligned and recreate the local test database when schema changes require `EnsureCreated()` to rebuild it.
+6. Create and apply a migration only when the user explicitly wants migration-based schema management or the project has moved beyond the disposable SQLite starter setup.
 
 ---
 
@@ -181,6 +183,7 @@ Don't copy the example code, use it as a reference and follow the steps to creat
 
 **Defaults (unless instructed otherwise):**
 - **Database**: SQLite (`Microsoft.EntityFrameworkCore.Sqlite`)
+- **Database initialization**: for the default SQLite starter/test setup, prefer `Database.EnsureCreated()` over scaffolding an initial migration
 - **Mapping**: Mapster (`Regira.Entities.Mapping.Mapster`)
 - **Project structure**: Per-entity folder structure
 - **Service layer**: Default `EntityRepository` (unless complex logic requires wrapping)

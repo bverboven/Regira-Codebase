@@ -32,7 +32,9 @@ When implementing a new entity in an application:
 - [ ] Create **Controller** *(when using API)*
     - Add custom actions only when necessary, otherwise rely on built-in CRUD actions
     - Prefer extending SearchObject to extend filtering over adding extra actions
-- [ ] Create/apply database migration
+- [ ] Initialize the database
+    - Default SQLite starter/test setup: call `Database.EnsureCreated()` and keep the local database disposable
+    - Migration-based setup or mature database provider: create/apply an EF migration
 
 *Recommended (when using API)*
 

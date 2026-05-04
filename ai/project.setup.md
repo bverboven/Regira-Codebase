@@ -1,9 +1,12 @@
-# Copilot Instructions — Project Templates
+# Project Setup for Regira AI Instructions
 
+> **Role:** Load this file only when the task creates a new project or changes project shape, hosting, logging, authentication, OpenAPI, or baseline DI structure.
+>
+> **Boundaries:** Do not use this file for module discovery or package-family routing; use [`regira.capabilities.md`](./regira.capabilities.md) for that. For cross-module setup rules reused by multiple guides, use [`shared.setup.md`](./shared.setup.md).
+>
 > **NuGet package versions:** Always resolve to the **latest stable version** of every package unless the user explicitly requests a specific version. The version numbers shown throughout this document are illustrative only.
 
-This solution contains some reusable starter templates.
-Identify the user's use case and apply the matching template below as the starting point.
+This file owns the reusable starter templates. Choose the matching template first, then apply the setup baseline below.
 
 ---
 
