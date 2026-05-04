@@ -279,6 +279,8 @@ public class SearchObject<TKey> : ISearchObject<TKey>
 
 > `Includes` is a `[Flags]` enum — values are combined with bitwise OR.
 > The framework falls back to `EntityIncludes` if no custom includes options implemented.
+> Base `EntityIncludes` is intentionally minimal (`Default`, `All`). Use it when the entity only needs the base "no extra relations" versus "include all configured relations" behavior.
+> If the entity needs named domain-specific flags such as `Categories`, `Parents`, or `Children`, define a custom `[Flags]` enum and use that same `TIncludes` type consistently in `.For<>()`, `EntityControllerBase<>`, processors, and any direct `IEntityService<>` injections.
 > List function should not return navigation properties by default — they must be explicitly requested via the `includes` parameter to prevent over-fetching and performance issues.
 > Details function can return all navigation properties by default since it's for a single item and the consumer is likely to want the related data.
 
@@ -378,10 +380,14 @@ Add `DbSet<YourEntity>` and configure any relationships in `OnModelCreating`.
 
 > **→ See:** [`entities.setup.md`](./entities.setup.md) — Setup
 
+- After changing `.For<>()` generic arguments, run the app once in addition to `dotnet build`.
+- `dotnet build` verifies compilation, but startup DI validation is what catches mismatches between `.For<>()`, `EntityControllerBase<>`, and direct `IEntityService<...>` injections.
+
 ### Optional: Seed initial data
 
 - Seed after `Database.EnsureCreated()` or after applying migrations, preferably in a startup scope.
 - If you seed through `IEntityService`, the normal prepper and primer pipeline runs and you must still call `SaveChanges()` explicitly.
+- If you inject `IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>` into a startup seeder, background job, or hosted service, its generic arguments must exactly match the `.For<>()` registration, including `TIncludes`.
 - Use `DbContext` directly only when you intentionally want raw EF Core behavior instead of the entity-service pipeline.
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Database initialization and seeding

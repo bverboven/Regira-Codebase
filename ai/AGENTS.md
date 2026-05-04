@@ -11,7 +11,7 @@ Run this checklist before any code generation:
 - [ ] `NuGet.Config` includes the Regira feed `https://packages.regira.com/v3/index.json` alongside `nuget.org`
 - [ ] `dotnet restore` succeeded when package changes or first-time setup required it
 - [ ] `dotnet build` succeeded when installed Regira packages were expected to extract local AI guides
-- [ ] `.github/instructions/regira/` was checked for extracted `*.instructions.md` files and relevant setup references
+- [ ] `.github/instructions/regira/` was checked for extracted `*.instructions.md` files and relevant setup references in the consuming project directory (relative to the project that references the Regira packages, not assumed to be the solution root)
 - [ ] If `.github/instructions/regira/project.setup.md` exists locally, it was read before generating project shape, hosting, logging, authentication, or OpenAPI/UI setup
 - [ ] Every extracted guide relevant to the selected modules was read in full before writing application code
 
@@ -32,7 +32,7 @@ Only proceed to project scaffolding, infrastructure changes, or domain code once
 11. Prefer project-local instructions over shared Regira guidance when both exist.
 12. Ask for feedback instead of guessing missing APIs or project-specific conventions.
 
-If the project contains `.github/instructions/regira/*.md`, treat the extracted shared setup guides plus the matching module guides as the primary local instructions. Regira packages that carry AI files embed them inside the NuGet package under `ai/`. During `dotnet build`, their bundled `.targets` files copy those files into `.github/instructions/regira/` in the consumer repository. Use `Regira.Setup` when the consumer needs local copies of `project.setup.md` and `shared.setup.md` through the same package-extraction workflow.
+If the project contains `.github/instructions/regira/*.md`, treat the extracted shared setup guides plus the matching module guides as the primary local instructions. Regira packages that carry AI files embed them inside the NuGet package under `ai/`. During `dotnet build`, their bundled `.targets` files copy those files into `.github/instructions/regira/` under the consuming project directory (`$(ProjectDir)`), which may be a nested application folder rather than the solution root. Use `Regira.Setup` when the consumer needs local copies of `project.setup.md` and `shared.setup.md` through the same package-extraction workflow.
 
 ## Guide loading rules
 

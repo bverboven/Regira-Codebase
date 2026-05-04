@@ -338,7 +338,7 @@ public static IEntityServiceCollection<WebshopDbContext> AddProducts(this IEntit
         });
         e.Related(x => x.Categories);
         e.Includes((query, includes) => {
-            if (includes?.HasFlag(EntityIncludes.Categories) == true)
+            if (includes?.HasFlag(EntityIncludes.All) == true)
                 query = query.Include(x => x.Categories!).ThenInclude(pc => pc.Category);
             return query;
         });
