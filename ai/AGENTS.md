@@ -13,7 +13,8 @@ Run this checklist before any code generation:
 - [ ] `dotnet build` succeeded when installed Regira packages were expected to extract local AI guides
 - [ ] `.github/instructions/regira/` was checked for extracted `*.instructions.md` files and relevant setup references in the consuming project directory (relative to the project that references the Regira packages, not assumed to be the solution root)
 - [ ] If `.github/instructions/regira/project.setup.md` exists locally, it was read before generating project shape, hosting, logging, authentication, or OpenAPI/UI setup
-- [ ] Every extracted guide relevant to the selected modules was read in full before writing application code
+- [ ] Every extracted primary guide relevant to the selected modules (`project.setup.md`, `shared.setup.md`, matching `*.instructions.md`) was read in full before writing application code in that area
+- [ ] Deep references such as `*.setup.md`, `*.examples.md`, `*.signatures.md`, and `*.namespaces.md` were consulted on demand by section when the current task needed them
 
 Only proceed to project scaffolding, infrastructure changes, or domain code once all applicable checks are satisfied.
 
@@ -26,7 +27,7 @@ Only proceed to project scaffolding, infrastructure changes, or domain code once
 5. Ensure the Regira NuGet feed (`https://packages.regira.com/v3/index.json`) is configured alongside `nuget.org`.
 6. Add the matching `Regira.*` packages from the Regira feed to the appropriate consumer project(s).
 7. After adding Regira packages, run `dotnet restore` and `dotnet build` when needed so AI instruction files bundled inside the NuGet package `ai/` content can be extracted into `.github/instructions/regira/` in the consumer repository.
-8. Stop and read guides before generating any application code. After restore/build, check whether `.github/instructions/regira/` contains matching `*.instructions.md` files, shared setup files, or relevant deep references. If it does, read every relevant guide in full before writing entity, service, controller, DI, or infrastructure code. If no files were extracted, verify the feed is reachable and the restore/build succeeded before continuing.
+8. Stop and read guides before generating any application code. After restore/build, check whether `.github/instructions/regira/` contains matching `*.instructions.md` files, shared setup files, or relevant deep references. If it does, read the primary guides for the current task in full before writing code in that area: `project.setup.md` for app shape, `shared.setup.md` for shared setup concerns, and the matching `*.instructions.md` file for module-specific work. Consult deep references such as `*.setup.md`, `*.examples.md`, `*.signatures.md`, and `*.namespaces.md` on demand by section when the current task needs them. If no files were extracted, verify the feed is reachable and the restore/build succeeded before continuing.
 9. For an existing application, inspect the current `*.csproj` files and existing code before choosing more packages or scaffolding.
 10. Generate or extend the code so it matches the selected `projectTemplate`, installed Regira packages, local package-provided guides, and local project conventions.
 11. Prefer project-local instructions over shared Regira guidance when both exist.
@@ -37,6 +38,8 @@ If the project contains `.github/instructions/regira/*.md`, treat the extracted 
 ## Guide loading rules
 
 Use the narrowest relevant guidance instead of loading broad instruction sets up front.
+
+Primary guides (`project.setup.md`, `shared.setup.md`, matching `*.instructions.md`) should be read in full before generating code in that area. Deep references (`*.setup.md`, `*.examples.md`, `*.signatures.md`, `*.namespaces.md`) should be consulted surgically by section when the current task needs them.
 
 1. Never load the whole `ai/` folder when a narrower guide exists.
 2. For project scaffolding or app-shape changes, load `project.setup.md`.
@@ -95,7 +98,7 @@ Template consequences:
 4. Inspect existing `PackageReference` items when the installed Regira package set is part of the decision.
 5. Run `dotnet restore` and `dotnet build` when needed so installed Regira packages can extract any embedded `ai/*.md` files from the NuGet package into `.github/instructions/regira/`.
 6. Before writing any application code, check `.github/instructions/regira/` for extracted `*.instructions.md` guides, shared setup files, and relevant deep references.
-7. If extracted guides exist, read every relevant guide in full before generating entity models, services, controllers, DI registrations, or infrastructure code. Skipping this step is a workflow violation.
+7. If extracted guides exist, read the applicable primary guides in full before generating entity models, services, controllers, DI registrations, or infrastructure code. Use deep references by section when the current task needs exact examples, signatures, namespaces, or setup details. Skipping the relevant primary guides is a workflow violation.
 8. If no extracted guides exist, verify the feed is reachable and the restore/build succeeded, then continue with the setup baseline, package mapping tables, and general engineering rules in this file.
 9. Generate code that stays consistent with the selected `projectTemplate`, installed Regira packages, any extracted local guides, and local project conventions.
 
