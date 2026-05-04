@@ -206,6 +206,17 @@ Don't copy the example code, use it as a reference and follow the steps to creat
 
 ## Entity Implementation Workflow
 
+Use the table below to decide which extension points are actually needed before adding more classes.
+
+| Step | Default | Add it when |
+|------|---------|--------------|
+| 7. Processors | Skip by default | You need to fill `[NotMapped]` or other derived values after fetching from the database |
+| 8. Preppers | Skip by default | You must adjust entities before `SaveChanges()`, manage child collections, or set totals, codes, and foreign keys |
+| 9. Primers | Skip by default | You need EF Core interceptor behavior during `SaveChanges()` or transaction-aware stamping across modified entities |
+| 10. Mapping & AfterMappers | Skip extra mapping config by default | DTO shape diverges from the entity, nested related mappings need `AddMapping<TSource, TTarget>()`, or DTO enrichment requires custom logic or DI |
+
+Mnemonic: Preppers prepare entity state before `SaveChanges()`; Primers prepare entity state during `SaveChanges()` via EF Core interceptors.
+
 ### Step 1: Create Entity Model
 
 - Keep entities as POCOs — data only, no business logic
@@ -294,6 +305,8 @@ public class SearchObject<TKey> : ISearchObject<TKey>
 **Option A: Inline** — use for simple logic (< 10 lines), entity-specific, no DI needed.  
 **Option B: Separate class** — use when complex logic, DI, or reuse is required.
 
+**⚠️ Important:** Never reference `[NotMapped]` or processor-populated properties inside `.Filter(...)`, `.SortBy(...)`, or any query lambda that must be translated to SQL. Those values do not exist in the database query. If a filter needs derived data, move it into a separate query builder with DI and use database-backed joins or subqueries.
+
 ### Step 7: Processors (Optional)
 
 Use processors to fill `[NotMapped]` properties or enrich entities **after** fetching from the database.
@@ -318,20 +331,25 @@ Use processors to fill `[NotMapped]` properties or enrich entities **after** fet
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Primers
 
-### Step 10: Mapping & AfterMappers
+### Step 10: Mapping & AfterMappers (Optional extra configuration)
 
 - Skip mapping when using Mapster and DTO structure is similar to the entity and Mapster's conventions can handle it automatically
 - Use `.After(...)` to enrich the DTO after `Entity→DTO` mapping (computed properties, URLs)
 - Use `.AfterInput(...)` to modify the entity after `InputDto→Entity` mapping
+- `AddMapping<TSource, TTarget>()` is required for some non-obvious nested mappings:
+  - Same-type registration such as `e.AddMapping<ProductCategoryDto, ProductCategoryDto>()` enables nested output DTO projection
+  - Cross-type registration such as `e.AddMapping<ProductCategoryInputDto, ProductCategory>()` enables child `InputDto` collections used with `e.Related(...)`
 - Use `.After<TAfterMapper>()` for a separate class when DI is needed
 - Use `options.AddAfterMapper<T>()` to register a global AfterMapper
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > AfterMapper
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > AddMapping / AfterMapper
 
 ### Step 11: Configure Entities
 
 Use `.For<TEntity, ...>(...)` to register each entity and configure its services. The generic type arguments determine which features are enabled and which base controller to use.
 Child entities configured with `e.Related()` don't need their own `.For<>()` registration.
+
+Before writing the controller, verify the `.For<>()` registration and controller pairing in [`entities.signatures.md`](./entities.signatures.md). The controller must mirror the registration generics exactly.
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) (All entities)
 
@@ -359,6 +377,14 @@ Add `DbSet<YourEntity>` and configure any relationships in `OnModelCreating`.
 ### Step 14: Setup and add Entity services to DI
 
 > **→ See:** [`entities.setup.md`](./entities.setup.md) — Setup
+
+### Optional: Seed initial data
+
+- Seed after `Database.EnsureCreated()` or after applying migrations, preferably in a startup scope.
+- If you seed through `IEntityService`, the normal prepper and primer pipeline runs and you must still call `SaveChanges()` explicitly.
+- Use `DbContext` directly only when you intentionally want raw EF Core behavior instead of the entity-service pipeline.
+
+> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Database initialization and seeding
 
 ---
 

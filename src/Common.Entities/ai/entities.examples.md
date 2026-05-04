@@ -599,6 +599,25 @@ public class ProductPrimer : EntityPrimerBase<Product>
 // Global primer: options.AddPrimer<YourGlobalPrimer>();
 ```
 
+### AddMapping - nested DTOs and Related collections
+
+Use `AddMapping<TSource, TTarget>()` when nested output DTOs or child `InputDto` collections are not obvious enough for convention-based mapping alone.
+
+```csharp
+services.For<Product, ProductSearchObject, ProductSortBy, EntityIncludes>(e =>
+{
+    e.UseMapping<ProductDto, ProductInputDto>();
+
+    // Same-type registration looks unusual, but it tells the mapper how to project nested DTO collections.
+    e.AddMapping<ProductCategoryDto, ProductCategoryDto>();
+
+    // Cross-type registration is needed when InputDto child collections are synchronized via Related().
+    e.AddMapping<ProductCategoryInputDto, ProductCategory>();
+
+    e.Related(x => x.Categories);
+});
+```
+
 ### AfterMapper
 
 ```csharp
@@ -622,6 +641,26 @@ public class ProductAfterMapper(IHttpContextAccessor httpContextAccessor) : Enti
 // Registration: e.UseMapping<ProductDto, ProductInputDto>().After<ProductAfterMapper>();
 // Global:       options.AddAfterMapper<MyGlobalAfterMapper>();
 ```
+
+### Database initialization and seeding
+
+```csharp
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<WebshopDbContext>();
+    await dbContext.Database.EnsureCreatedAsync();
+
+    if (!await dbContext.Orders.AnyAsync())
+    {
+        dbContext.Orders.AddRange(SeedOrders());
+        await dbContext.SaveChangesAsync();
+    }
+}
+```
+
+- For the default SQLite starter/test setup, pair seeding with `EnsureCreated()`.
+- Use `DbContext` directly when you intentionally want raw EF Core startup seeding.
+- If you seed through `IEntityService`, remember that preppers and primers still run and `SaveChanges()` remains explicit.
 
 ### IQKeywordHelper — Q full-text search
 

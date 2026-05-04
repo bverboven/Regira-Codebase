@@ -2,7 +2,7 @@
 
 Use this file as the authoritative downstream bootstrap for choosing the project template, selecting Regira packages, and generating code inside a consumer repository.
 
-[`regira.capabilities.md`](./regira.capabilities.md) in the Regira source repository is the canonical catalog of Regira capabilities and module families. That file is not present in consumer repositories. Do not attempt to fetch it or guess its contents from memory. In a consumer repository, use this file plus any local `.github/instructions/regira/*.md` guides as the available sources of truth.
+This file is also the top-level Regira routing guide inside the source repository. In a consumer repository, use this file plus any local `.github/instructions/regira/*.md` guides as the available sources of truth.
 
 ## Pre-flight checklist
 
@@ -12,6 +12,7 @@ Run this checklist before any code generation:
 - [ ] `dotnet restore` succeeded when package changes or first-time setup required it
 - [ ] `dotnet build` succeeded when installed Regira packages were expected to extract local AI guides
 - [ ] `.github/instructions/regira/` was checked for extracted `*.instructions.md` files and relevant setup references
+- [ ] If `.github/instructions/regira/project.setup.md` exists locally, it was read before generating project shape, hosting, logging, authentication, or OpenAPI/UI setup
 - [ ] Every extracted guide relevant to the selected modules was read in full before writing application code
 
 Only proceed to project scaffolding, infrastructure changes, or domain code once all applicable checks are satisfied.
@@ -31,7 +32,25 @@ Only proceed to project scaffolding, infrastructure changes, or domain code once
 11. Prefer project-local instructions over shared Regira guidance when both exist.
 12. Ask for feedback instead of guessing missing APIs or project-specific conventions.
 
-If the project also contains `regira.modules.json`, use it as extra local context. If the project contains `.github/instructions/regira/*.md`, treat the extracted shared setup guides plus the matching module guides as the primary local instructions. Regira packages that carry AI files embed them inside the NuGet package under `ai/`. During `dotnet build`, their bundled `.targets` files copy those files into `.github/instructions/regira/` in the consumer repository.
+If the project contains `.github/instructions/regira/*.md`, treat the extracted shared setup guides plus the matching module guides as the primary local instructions. Regira packages that carry AI files embed them inside the NuGet package under `ai/`. During `dotnet build`, their bundled `.targets` files copy those files into `.github/instructions/regira/` in the consumer repository. Use `Regira.Setup` when the consumer needs local copies of `project.setup.md` and `shared.setup.md` through the same package-extraction workflow.
+
+## Guide loading rules
+
+Use the narrowest relevant guidance instead of loading broad instruction sets up front.
+
+1. Never load the whole `ai/` folder when a narrower guide exists.
+2. For project scaffolding or app-shape changes, load `project.setup.md`.
+3. For shared setup concerns reused across modules, load `shared.setup.md`.
+4. For module-specific work, load the matching `*.instructions.md` guide before writing code.
+5. Load deep references such as `*.setup.md`, `*.examples.md`, `*.signatures.md`, and `*.namespaces.md` only when the current task needs them.
+6. When details are missing, do not guess syntax or signatures. Stop, describe the gap, and ask the user for confirmation.
+
+When working in the Regira source repository itself:
+
+- `src/Common.Setup/ai/project.setup.md` owns reusable project-template and app-shape setup.
+- `src/Common.Setup/ai/shared.setup.md` owns shared setup rules reused across modules.
+- Module-specific guides live under the owning module's `src/*/ai/` folder.
+- Read `ai/learnings.md` before starting substantial work and keep it curated when a task exposes a durable lesson.
 
 ## Project template selection
 
@@ -51,13 +70,14 @@ For a new project, choose the template before creating files. For an existing pr
 
 ## Setup baseline
 
-Keep setup aligned with the selected `projectTemplate`. This file must remain enough for the normal one-file consumer flow even when no synced guides exist yet.
+Keep setup aligned with the selected `projectTemplate`. This file must remain enough for the normal one-file consumer flow even when no extracted local guides exist yet.
 
 - Use the latest stable .NET framework and latest C# features unless the consumer project already targets something else.
 - Add the Regira feed to `NuGet.Config` alongside `nuget.org` before restoring Regira packages.
 - Keep `Program.cs` thin and move service registration or middleware setup into extension methods.
 - Prefer `Microsoft.Extensions.DependencyInjection` and depend on abstractions instead of concrete implementations.
 - Use file-scoped namespaces.
+- For standard Web APIs, use `app.MapOpenApi()` plus `app.MapScalarApiReference()`. Do not add `Swashbuckle.AspNetCore` or call `UseSwaggerUI()` on the standard Regira API path.
 - Ask for feedback instead of guessing missing APIs, namespaces, signatures, or project-specific conventions.
 
 Template consequences:
@@ -76,20 +96,8 @@ Template consequences:
 5. Run `dotnet restore` and `dotnet build` when needed so installed Regira packages can extract any embedded `ai/*.md` files from the NuGet package into `.github/instructions/regira/`.
 6. Before writing any application code, check `.github/instructions/regira/` for extracted `*.instructions.md` guides, shared setup files, and relevant deep references.
 7. If extracted guides exist, read every relevant guide in full before generating entity models, services, controllers, DI registrations, or infrastructure code. Skipping this step is a workflow violation.
-8. If no extracted guides exist, verify the feed is reachable and the restore/build succeeded, then continue with the setup baseline and package mapping tables in this file.
+8. If no extracted guides exist, verify the feed is reachable and the restore/build succeeded, then continue with the setup baseline, package mapping tables, and general engineering rules in this file.
 9. Generate code that stays consistent with the selected `projectTemplate`, installed Regira packages, any extracted local guides, and local project conventions.
-
-## Shared code-generation rules
-
-- Use the latest stable .NET framework and latest C# features unless the consumer project already targets something else.
-- Keep `Program.cs` thin and move DI registration to extension methods.
-- Depend on abstractions rather than concrete implementations.
-- Prefer `Microsoft.Extensions.DependencyInjection` for registration.
-- Use file-scoped namespaces.
-- Keep names descriptive and prefer meaningful generic type names such as `TEntity`, `TKey`, and `TDto`.
-- Keep the solution simple. Avoid speculative abstractions.
-- Do not guess missing APIs, namespaces, or signatures. If exact package APIs are unclear from the local code, ask the user for confirmation.
-- When multiple provider packages exist, choose deliberately instead of guessing from the family name alone.
 
 ## Installed package routing
 
@@ -109,6 +117,7 @@ When the consumer project already contains Regira packages, inspect the project'
 | `Regira.Office.VCards*` | `Office.VCards` |
 | `Regira.Media*`, `Regira.Drawing.*` | `Media` |
 | `Regira.Security*` | `Security` |
+| `Regira.Setup` | `Setup` |
 | `Regira.Web*` | `Web` |
 | `Regira.System*` | `System` |
 | `Regira.Invoicing*` | `Invoicing` |
@@ -138,7 +147,7 @@ When the consumer project already contains Regira packages, inspect the project'
 | Payments | Payment providers, payment links, webhooks | `Regira.Payments`, `Regira.Payments.Mollie`, `Regira.Payments.Pom` |
 | TreeList | Hierarchical tree structures | `Regira.TreeList` |
 
-For Web APIs, [`project.setup.md`](./project.setup.md) already standardizes OpenAPI plus Scalar as the default API surface. Do not add `Regira.Web.Swagger` by default; only choose it when the user explicitly needs Swagger/OpenAPI auth customization.
+For Web APIs, the shared `project.setup.md` guide already standardizes OpenAPI plus Scalar as the default API surface. Swagger is deprecated, only use it when asked.
 
 Use `Office` for the family overview or shared Office conventions. Add one or more concrete `Office.*` modules when the requested capability is already clear.
 
@@ -146,7 +155,7 @@ Modules with multiple provider packages, such as `Office.PDF` or `Office.Excel`,
 
 ## Additional package families
 
-These package families are available from the Regira feed but do not currently have dedicated synced AI guides. Choose them from user needs, install the matching package, and rely on general project conventions plus package-specific code references.
+These package families are available from the Regira feed but do not currently have dedicated AI guides. Choose them from user needs, install the matching package, and rely on general project conventions plus package-specific code references.
 
 | Package family | Use when | Main packages |
 |----------------|----------|---------------|
@@ -157,13 +166,51 @@ These package families are available from the Regira feed but do not currently h
 | DAL.MySQL | MySQL or MariaDB connectivity and backup workflows | `Regira.DAL.MySQL`, `Regira.DAL.MySQL.MySqlBackup` |
 | DAL.PostgreSQL | PostgreSQL connectivity | `Regira.DAL.PostgreSQL` |
 | Globalization | Phone number parsing and formatting | `Regira.Globalization.LibPhoneNumber` |
+| Setup | Shared project-template and setup-guide extraction for local AI guidance | `Regira.Setup` |
 | Serializing | Newtonsoft.Json-based serialization | `Regira.Serializing.Newtonsoft` |
 
 ## Optional local cache
 
 If the application repository already contains local Regira metadata files, use them as extra context:
 
-- `regira.modules.json` can record the chosen template and selected module set.
 - `.github/instructions/regira/*.md` can provide richer shared setup and module-specific guidance. Installed Regira packages that ship AI files can extract them there from their packaged `ai/` content on build via their package targets.
+- `Regira.Setup` can be installed when the consumer needs `project.setup.md` and `shared.setup.md` extracted locally through the package-based guide flow.
 
 These files are optional. `AGENTS.md` must remain enough for the normal consumer flow.
+
+## General engineering rules
+
+Apply these conventions when no narrower module guide exists, or as a supplement when the module guide does not cover the topic. Reuse the setup baseline above for framework, feed, namespace, and web-API defaults instead of re-stating them elsewhere.
+
+### Project conventions
+
+- Unless the project already constrains you, prefer the latest stable .NET and C# features that fit the local code style.
+
+### Naming
+
+- Follow normal C# naming conventions.
+- Keep names descriptive but concise.
+- Prefer meaningful generic type names such as `TEntity`, `TKey`, and `TDto` over bare single-letter names when context allows.
+- Use generic names like `item` only when the surrounding type already makes the meaning obvious.
+
+### Dependency injection
+
+- Prefer `Microsoft.Extensions.DependencyInjection` with feature-focused `IServiceCollection` extension methods.
+- Avoid service-locator patterns unless a framework explicitly requires them.
+
+### Testing
+
+- Choose the smallest suitable test surface for the task.
+- Keep tests focused and behavior-oriented.
+
+### SOLID and simplicity
+
+- Default to SOLID design principles, but do not introduce abstractions that the current task does not need.
+- Prefer the simplest solution that correctly solves the current problem.
+- Avoid speculative flexibility and premature indirection.
+
+### Code quality
+
+- Use `null!` only when the framework or DI guarantees initialization.
+- Apply validation attributes such as `[Required]`, `[MaxLength]`, and `[Range]` when they drive both validation and schema behavior.
+- Depend on abstractions instead of concrete implementations when defining business logic.

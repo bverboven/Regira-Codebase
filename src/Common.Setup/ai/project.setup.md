@@ -2,7 +2,7 @@
 
 > **Role:** Load this file only when the task creates a new project or changes project shape, hosting, logging, authentication, OpenAPI, or baseline DI structure.
 >
-> **Boundaries:** Do not use this file for module discovery or package-family routing; use [`regira.capabilities.md`](./regira.capabilities.md) for that. For cross-module setup rules reused by multiple guides, use [`shared.setup.md`](./shared.setup.md).
+> **Boundaries:** Do not use this file for module discovery or package-family routing; use [`AGENTS.md`](../../../ai/AGENTS.md) for that. For cross-module setup rules reused by multiple guides, use [`shared.setup.md`](./shared.setup.md).
 >
 > **NuGet package versions:** Always resolve to the **latest stable version** of every package unless the user explicitly requests a specific version. The version numbers shown throughout this document are illustrative only.
 
@@ -175,6 +175,8 @@ Used by all templates. Web APIs use `"Default": "Information"`; `ConsoleWithLogg
 All API templates expose:
 - **OpenAPI JSON** `/openapi/v1.json` — `app.MapOpenApi()`
 - **Scalar UI** `/scalar` — `app.MapScalarApiReference()`
+
+Use this as the default API documentation surface for Regira projects. Do not add `Swashbuckle.AspNetCore` and do not call `app.UseSwaggerUI()` unless the user explicitly asks to deviate from the standard template.
 
 **Nuget packages — Web API**
 ```xml

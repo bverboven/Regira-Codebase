@@ -1,13 +1,7 @@
 <Solution>
   <Folder Name="/ai/">
     <File Path="ai/AGENTS.md" />
-    <File Path="ai/regira.capabilities.md" />
-    <File Path="ai/consumer.bootstrap.template.md" />
     <File Path="ai/learnings.md" />
-    <File Path="ai/module-sources.json" />
-    <File Path="ai/project.setup.md" />
-    <File Path="ai/regira.modules.template.json" />
-    <File Path="ai/shared.setup.md" />
   </Folder>
   <Folder Name="/evaluations/">
     <File Path="evaluations/IO.Storage-evaluation.md" />
@@ -22,6 +16,7 @@
     <Project Path="src/Caching.Runtime/Caching.Runtime.csproj" />
   </Folder>
   <Folder Name="/src/Core/">
+    <Project Path="src/Common.Setup/Common.Setup.csproj" Id="eefa5595-f0e7-4351-8eb2-6c58a34ec0dc" />
     <Project Path="src/Common/Common.csproj" />
   </Folder>
   <Folder Name="/src/DAL/">
@@ -177,10 +172,5 @@
     <Project Path="tools/ProjectFilesProcessor/ProjectFilesProcessor.csproj" />
     <Project Path="tools/ProjectsCleanerConsole/ProjectsCleanerConsole.csproj" />
     <Project Path="tools/VideoTestConsole/VideoTestConsole.csproj" />
-  </Folder>
-  <Folder Name="/tools/ai/">
-    <File Path="tools/ai/README.md" />
-    <File Path="tools/ai/sync-consumer-instructions.ps1" />
-    <File Path="tools/ai/sync-consumer-instructions.sh" />
   </Folder>
 </Solution>

@@ -2,6 +2,7 @@
 
 > **AI Agent Rule**: Follow this guide to scaffold a new Regira Entities API project from scratch.
 > Start from the **`BasicApi`** template in the shared `project.setup.md` guide and apply the Entities-specific additions below.
+> In consumer repositories, prefer extracted `.github/instructions/regira/project.setup.md` when it exists locally. If it is not available yet, use the fallback baseline in this guide and keep the API surface aligned with `app.MapOpenApi()` plus `app.MapScalarApiReference()`.
 > When available, combine with [`entities.namespaces.md`](./entities.namespaces.md) for exact `using` directives
 > and [`entities.examples.md`](./entities.examples.md) for complete working code.
 
@@ -54,6 +55,7 @@
 ## Step 1: Project Files
 
 > Start from the **`BasicApi`** template in the shared `project.setup.md` guide and apply the Entities-specific additions below.
+> If the shared guide is not available locally yet, use this minimum fallback baseline: ASP.NET Core Web API project, thin `Program.cs`, DI via extension methods, `app.MapOpenApi()`, `app.MapScalarApiReference()`, and no `UseSwaggerUI()`.
 
 ---
 
@@ -102,6 +104,8 @@ builder.Services.AddEntityServices();
 ```
 
 > **Note:** `AddPrimerInterceptors(sp)` and `AddNormalizerInterceptors(sp)` require the `IServiceProvider` (`sp`) from the `AddDbContext` factory overload. Always use the `(sp, options) => ...` signature.
+
+> **OpenAPI/UI note:** If the shared project guide is not available locally yet, keep the API surface aligned with the Regira baseline here as well: use `app.MapOpenApi()` plus `app.MapScalarApiReference()` and do not add `Swashbuckle.AspNetCore` or `UseSwaggerUI()`.
 
 > **SQLite starter note:** For the default SQLite starter/test setup, do not scaffold an initial EF migration. After `app = builder.Build()`, create a scope and call `Database.EnsureCreated()` instead:
 

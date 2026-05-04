@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>B.Verboven</Authors>
+    <RootNamespace>Regira.Setup</RootNamespace>
+    <PackageId>Regira.Setup</PackageId>
+    <AssemblyName>Regira.Setup</AssemblyName>
+    <Description>Shared Regira setup guides and AI instruction extraction support for consumer projects.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <Version>5.2.4</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="build\Regira.Setup.targets" Pack="true" PackagePath="buildTransitive\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ai\project.setup.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+    <None Include="ai\shared.setup.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Added for automated versioning -->
+    <ProjectReference Include="..\Common\Common.csproj" />
+  </ItemGroup>
+</Project>

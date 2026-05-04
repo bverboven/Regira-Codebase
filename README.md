@@ -91,8 +91,8 @@ The normal consumer flow is one committed bootstrap file:
 
 If an installed Regira package ships AI instruction files, those files live inside the NuGet package under its `ai/` content. During `dotnet build`, a bundled MSBuild `.targets` file extracts them into `.github/instructions/regira/` in the consumer repository. When those extracted local guides are present, the downstream agent should read the relevant local guides before generating Regira-related code.
 
+Install `Regira.Setup` when you also want the shared setup guides `project.setup.md` and `shared.setup.md` extracted locally into `.github/instructions/regira/`. Module packages can extract their own module-specific guides the same way.
+
 This same `.github/AGENTS.md` flow works for both a new empty folder and an existing application that needs extra Regira features.
 
-The canonical Regira capability catalog behind that bootstrap lives in [ai/regira.capabilities.md](ai/regira.capabilities.md) in this source repository. Consumer repositories do not need that file for the normal flow.
-
-The optional local guide-sync tooling is documented separately in [tools/ai/README.md](tools/ai/README.md). It is not part of the normal consumer flow, but it can copy shared setup guides such as `project.setup.md` and `shared.setup.md` into the consumer repository when a team wants a fuller local cache.
+In this source repository, [ai/AGENTS.md](ai/AGENTS.md) is also the top-level Regira routing guide. Consumer repositories do not need any additional root `ai/*.md` files for the normal flow.

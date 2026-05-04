@@ -1,0 +1,23 @@
+<Project>
+
+  <PropertyGroup>
+    <_RegiraSetupFilesRoot>$(MSBuildThisFileDirectory)..\contentFiles\any\any\ai\</_RegiraSetupFilesRoot>
+  </PropertyGroup>
+
+  <!--
+    Copies shared Regira setup guides into the consuming project's
+    .github/instructions/regira/ folder on first build.
+  -->
+  <Target Name="RegiraSetupExtractAiFiles"
+          BeforeTargets="BeforeBuild"
+          Condition="!Exists('$(ProjectDir).github\instructions\regira\project.setup.md') Or !Exists('$(ProjectDir).github\instructions\regira\shared.setup.md')">
+
+    <MakeDir Directories="$(ProjectDir).github\instructions\regira" />
+
+    <Copy SourceFiles="$(_RegiraSetupFilesRoot)project.setup.md;$(_RegiraSetupFilesRoot)shared.setup.md"
+          DestinationFolder="$(ProjectDir).github\instructions\regira\"
+          SkipUnchangedFiles="true" />
+
+  </Target>
+
+</Project>
