@@ -1,10 +1,20 @@
 # Regira Consumer Bootstrap
 
-Copy this file into `.github/AGENTS.md` in the application repository for a project that consumes Regira packages.
+Use this file as the authoritative downstream bootstrap for choosing the project template, selecting Regira packages, and generating code inside a consumer repository.
 
-This file is the consumer entrypoint. After copying it, ask the agent what to build or what Regira feature to add. The agent must choose the project template, choose the Regira NuGet packages, add them to the project, and write the code.
+[`regira.capabilities.md`](./regira.capabilities.md) in the Regira source repository is the canonical catalog of Regira capabilities and module families. That file is not present in consumer repositories. Do not attempt to fetch it or guess its contents from memory. In a consumer repository, use this file plus any local `.github/instructions/regira/*.md` guides as the available sources of truth.
 
-[`regira.capabilities.md`](./regira.capabilities.md) in the Regira repository is the canonical catalog of Regira capabilities and module families. This file is the consumer-facing bootstrap that turns that catalog into concrete package selection and code-generation behavior inside an application repository.
+## Pre-flight checklist
+
+Run this checklist before any code generation:
+
+- [ ] `NuGet.Config` includes the Regira feed `https://packages.regira.com/v3/index.json` alongside `nuget.org`
+- [ ] `dotnet restore` succeeded when package changes or first-time setup required it
+- [ ] `dotnet build` succeeded when installed Regira packages were expected to extract local AI guides
+- [ ] `.github/instructions/regira/` was checked for extracted `*.instructions.md` files and relevant setup references
+- [ ] Every extracted guide relevant to the selected modules was read in full before writing application code
+
+Only proceed to project scaffolding, infrastructure changes, or domain code once all applicable checks are satisfied.
 
 ## Default workflow
 
@@ -14,13 +24,14 @@ This file is the consumer entrypoint. After copying it, ask the agent what to bu
 4. Select the relevant Regira modules from the tables below.
 5. Ensure the Regira NuGet feed (`https://packages.regira.com/v3/index.json`) is configured alongside `nuget.org`.
 6. Add the matching `Regira.*` packages from the Regira feed to the appropriate consumer project(s).
-7. After adding Regira packages, run `dotnet build` when needed so AI instruction files bundled inside the NuGet package `ai/` content can be extracted into `.github/instructions/regira/` in the consumer repository.
-8. For an existing application, inspect the current `*.csproj` files and existing code before choosing more packages or scaffolding.
-9. Generate or extend the code so it matches the selected `projectTemplate`, installed Regira packages, local package-provided guides, and local project conventions.
-10. Prefer project-local instructions over shared Regira guidance when both exist.
-11. Ask for feedback instead of guessing missing APIs or project-specific conventions.
+7. After adding Regira packages, run `dotnet restore` and `dotnet build` when needed so AI instruction files bundled inside the NuGet package `ai/` content can be extracted into `.github/instructions/regira/` in the consumer repository.
+8. Stop and read guides before generating any application code. After restore/build, check whether `.github/instructions/regira/` contains matching `*.instructions.md` files, shared setup files, or relevant deep references. If it does, read every relevant guide in full before writing entity, service, controller, DI, or infrastructure code. If no files were extracted, verify the feed is reachable and the restore/build succeeded before continuing.
+9. For an existing application, inspect the current `*.csproj` files and existing code before choosing more packages or scaffolding.
+10. Generate or extend the code so it matches the selected `projectTemplate`, installed Regira packages, local package-provided guides, and local project conventions.
+11. Prefer project-local instructions over shared Regira guidance when both exist.
+12. Ask for feedback instead of guessing missing APIs or project-specific conventions.
 
-If the project also contains `regira.modules.json`, use it as extra local context. If the project contains `.github/instructions/regira/*.md`, treat those guides as the primary package-specific instructions for the matching installed Regira packages. Regira packages that carry AI files embed them inside the NuGet package under `ai/`. During `dotnet build`, their bundled `.targets` files copy those files into `.github/instructions/regira/` in the consumer repository.
+If the project also contains `regira.modules.json`, use it as extra local context. If the project contains `.github/instructions/regira/*.md`, treat the extracted shared setup guides plus the matching module guides as the primary local instructions. Regira packages that carry AI files embed them inside the NuGet package under `ai/`. During `dotnet build`, their bundled `.targets` files copy those files into `.github/instructions/regira/` in the consumer repository.
 
 ## Project template selection
 
@@ -38,16 +49,35 @@ Choose `projectTemplate` before selecting modules when the user is creating a ne
 
 For a new project, choose the template before creating files. For an existing project, infer the nearest matching template from the current app structure and stay consistent with it.
 
+## Setup baseline
+
+Keep setup aligned with the selected `projectTemplate`. This file must remain enough for the normal one-file consumer flow even when no synced guides exist yet.
+
+- Use the latest stable .NET framework and latest C# features unless the consumer project already targets something else.
+- Add the Regira feed to `NuGet.Config` alongside `nuget.org` before restoring Regira packages.
+- Keep `Program.cs` thin and move service registration or middleware setup into extension methods.
+- Prefer `Microsoft.Extensions.DependencyInjection` and depend on abstractions instead of concrete implementations.
+- Use file-scoped namespaces.
+- Ask for feedback instead of guessing missing APIs, namespaces, signatures, or project-specific conventions.
+
+Template consequences:
+
+- `ConsoleWithLogging`: use a host-based console or CLI setup with configuration and structured logging.
+- `BasicApi`: use an ASP.NET Core Web API baseline without authentication unless the user explicitly asks for auth.
+- `SelfHostingApi`: use a self-hosted internal API baseline and keep it compatible with Windows Service deployment when requested.
+- `SelfHostingApiWithAuth`: use self-hosted API scaffolding with API key and/or JWT Bearer authentication, and keep application endpoints protected by default.
+
 ## Code generation workflow
 
 1. Choose or confirm the `projectTemplate`.
 2. Choose the smallest Regira module set that covers the user's request.
 3. Ensure the NuGet feed exists and add the matching packages.
 4. Inspect existing `PackageReference` items when the installed Regira package set is part of the decision.
-5. Run `dotnet build` when needed so installed Regira packages can extract any embedded `ai/*.md` files from the NuGet package into `.github/instructions/regira/`.
-6. If local `.github/instructions/regira/*.instructions.md` guides exist, load the matching guide first.
-7. Otherwise use the shared rules and package mapping tables in this file.
-8. Generate code that stays consistent with the selected `projectTemplate`, installed Regira packages, any extracted local guides, and local project conventions.
+5. Run `dotnet restore` and `dotnet build` when needed so installed Regira packages can extract any embedded `ai/*.md` files from the NuGet package into `.github/instructions/regira/`.
+6. Before writing any application code, check `.github/instructions/regira/` for extracted `*.instructions.md` guides, shared setup files, and relevant deep references.
+7. If extracted guides exist, read every relevant guide in full before generating entity models, services, controllers, DI registrations, or infrastructure code. Skipping this step is a workflow violation.
+8. If no extracted guides exist, verify the feed is reachable and the restore/build succeeded, then continue with the setup baseline and package mapping tables in this file.
+9. Generate code that stays consistent with the selected `projectTemplate`, installed Regira packages, any extracted local guides, and local project conventions.
 
 ## Shared code-generation rules
 
@@ -132,6 +162,6 @@ These package families are available from the Regira feed but do not currently h
 If the application repository already contains local Regira metadata files, use them as extra context:
 
 - `regira.modules.json` can record the chosen template and selected module set.
-- `.github/instructions/regira/*.md` can provide richer module-specific guidance. Installed Regira packages that ship AI files can extract them there from their packaged `ai/` content on build via their package targets.
+- `.github/instructions/regira/*.md` can provide richer shared setup and module-specific guidance. Installed Regira packages that ship AI files can extract them there from their packaged `ai/` content on build via their package targets.
 
 These files are optional. `AGENTS.md` must remain enough for the normal consumer flow.

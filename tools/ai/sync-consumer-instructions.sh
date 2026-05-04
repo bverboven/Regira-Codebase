@@ -76,16 +76,43 @@ require_tool() {
 require_tool git
 require_tool python3  # used for JSON parsing (available on all modern systems)
 
+get_project_template_summary() {
+    local project_template="$1"
+
+    if [[ -z "$project_template" ]]; then
+        printf '%s' "No project template selected yet. Ask the user which project shape they need before changing scaffolding."
+        return 0
+    fi
+
+    case "$project_template" in
+        ConsoleWithLogging)
+            printf '%s' "Script, batch job, or CLI utility with host-based configuration and Serilog logging."
+            ;;
+        BasicApi)
+            printf '%s' "Standard hosted ASP.NET Core API with Minimal API or controllers and no authentication."
+            ;;
+        SelfHostingApi)
+            printf '%s' "Lightweight self-hosted internal API or Windows Service without authentication."
+            ;;
+        SelfHostingApiWithAuth)
+            printf '%s' "Self-hosted API with API key and/or JWT Bearer authentication."
+            ;;
+        *)
+            printf "Custom project template '%s'. Keep setup guidance aligned with the existing project conventions." "$project_template"
+            ;;
+    esac
+}
+
 json_value() {
     # json_value <file> <key>  -- extract a top-level string from JSON
-    python3 -c "import json,sys; d=json.load(open('$1')); print(d.get('$2',''))"
+    python3 -c "import json,sys; d=json.load(open('$1', encoding='utf-8-sig')); print(d.get('$2',''))"
 }
 
 json_array() {
     # json_array <file> <key>  -- extract a top-level string array, one item per line
     python3 -c "
 import json, sys
-d = json.load(open('$1'))
+d = json.load(open('$1', encoding='utf-8-sig'))
 for v in d.get('$2', []):
     print(v)
 "
@@ -95,7 +122,7 @@ json_ref_keys() {
     # json_ref_keys <file>  -- print each 'module ref' pair from references object
     python3 -c "
 import json, sys
-d = json.load(open('$1'))
+d = json.load(open('$1', encoding='utf-8-sig'))
 refs = d.get('references', {})
 for module, suffixes in refs.items():
     for s in suffixes:
@@ -108,7 +135,7 @@ load_module_sources() {
 import json
 import sys
 
-with open(sys.argv[1], encoding='utf-8') as handle:
+with open(sys.argv[1], encoding='utf-8-sig') as handle:
     data = json.load(handle)
 
 for module, config in data.items():
@@ -158,10 +185,13 @@ if [[ ! -f "$MANIFEST_PATH" ]]; then
     exit 1
 fi
 
-AI_VERSION="$(json_value "$MANIFEST_PATH" aiVersion)"
-mapfile -t MODULES < <(json_array "$MANIFEST_PATH" modules)
+AI_VERSION="$(json_value "$MANIFEST_PATH" aiVersion | tr -d '\r')"
+PROJECT_TEMPLATE="$(json_value "$MANIFEST_PATH" projectTemplate | tr -d '\r')"
+mapfile -t MODULES < <(json_array "$MANIFEST_PATH" modules | tr -d '\r')
+SHARED_GUIDE_FILES=("project.setup.md" "shared.setup.md")
 
 echo "aiVersion : $AI_VERSION"
+echo "template  : $PROJECT_TEMPLATE"
 echo "modules   : ${MODULES[*]}"
 
 # ---------------------------------------------------------------------------
@@ -217,7 +247,7 @@ declare -A MODULE_BASE_NAMES=()
 while IFS=$'\t' read -r module source_path base_name; do
     MODULE_SOURCE_PATHS["$module"]="$source_path"
     MODULE_BASE_NAMES["$module"]="$base_name"
-done < <(load_module_sources "$MODULE_SOURCES_FILE")
+done < <(load_module_sources "$MODULE_SOURCES_FILE" | tr -d '\r')
 
 if [[ -z "$SOURCE_PATH" ]]; then
     declare -A UNIQUE_SOURCE_PATHS=()
@@ -267,28 +297,49 @@ while IFS=' ' read -r module ref; do
     else
         echo "Warning: module source mapping not found for deep reference (skipping bootstrap entry): ${module}.${ref}" >&2
     fi
-done < <(json_ref_keys "$MANIFEST_PATH")
+done < <(json_ref_keys "$MANIFEST_PATH" | tr -d '\r')
 
 GUIDE_LINES="${GUIDE_LINES%$'\n'}"
 if [[ -z "$GUIDE_LINES" ]]; then
     GUIDE_LINES="- No Regira module guides selected."
 fi
 
+if [[ -z "$PROJECT_TEMPLATE" ]]; then
+    RESOLVED_PROJECT_TEMPLATE="Not specified"
+else
+    RESOLVED_PROJECT_TEMPLATE="$PROJECT_TEMPLATE"
+fi
+PROJECT_TEMPLATE_SUMMARY="$(get_project_template_summary "$PROJECT_TEMPLATE")"
+
 mkdir -p "$DEST"
 BOOTSTRAP_OUT="$DEST/copilot-instructions.md"
 # Write module lines to a temp file to avoid shell-quoting issues inside Python
+PROJECT_TEMPLATE_TMP="$(mktemp -t project-template.XXXXXX)"
+printf '%s' "$RESOLVED_PROJECT_TEMPLATE" > "$PROJECT_TEMPLATE_TMP"
+PROJECT_TEMPLATE_SUMMARY_TMP="$(mktemp -t project-template-summary.XXXXXX)"
+printf '%s' "$PROJECT_TEMPLATE_SUMMARY" > "$PROJECT_TEMPLATE_SUMMARY_TMP"
 MODULES_TMP="$(mktemp -t modules.XXXXXX)"
 printf '%s' "$MODULE_LINES" > "$MODULES_TMP"
 GUIDES_TMP="$(mktemp -t guides.XXXXXX)"
 printf '%s' "$GUIDE_LINES" > "$GUIDES_TMP"
-python3 - "$TEMPLATE_FILE" "$MODULES_TMP" "$GUIDES_TMP" "$BOOTSTRAP_OUT" << 'PYEOF'
+python3 - "$TEMPLATE_FILE" "$PROJECT_TEMPLATE_TMP" "$PROJECT_TEMPLATE_SUMMARY_TMP" "$MODULES_TMP" "$GUIDES_TMP" "$BOOTSTRAP_OUT" << 'PYEOF'
 import sys
-template     = open(sys.argv[1], encoding='utf-8').read()
-module_lines = open(sys.argv[2], encoding='utf-8').read()
-guide_lines  = open(sys.argv[3], encoding='utf-8').read()
-result       = template.replace('{{MODULES}}', module_lines).replace('{{MODULE_GUIDES}}', guide_lines)
-open(sys.argv[4], 'w', encoding='utf-8').write(result)
+template                 = open(sys.argv[1], encoding='utf-8').read()
+project_template         = open(sys.argv[2], encoding='utf-8').read()
+project_template_summary = open(sys.argv[3], encoding='utf-8').read()
+module_lines             = open(sys.argv[4], encoding='utf-8').read()
+guide_lines              = open(sys.argv[5], encoding='utf-8').read()
+result = (
+    template
+    .replace('{{PROJECT_TEMPLATE}}', project_template)
+    .replace('{{PROJECT_TEMPLATE_SUMMARY}}', project_template_summary)
+    .replace('{{MODULES}}', module_lines)
+    .replace('{{MODULE_GUIDES}}', guide_lines)
+)
+open(sys.argv[6], 'w', encoding='utf-8').write(result)
 PYEOF
+rm -f "$PROJECT_TEMPLATE_TMP"
+rm -f "$PROJECT_TEMPLATE_SUMMARY_TMP"
 rm -f "$MODULES_TMP"
 rm -f "$GUIDES_TMP"
 echo "Rendered bootstrap -> $BOOTSTRAP_OUT"
@@ -298,6 +349,16 @@ echo "Rendered bootstrap -> $BOOTSTRAP_OUT"
 # ---------------------------------------------------------------------------
 REGIRA_DIR="$DEST/instructions/regira"
 mkdir -p "$REGIRA_DIR"
+
+for shared_file in "${SHARED_GUIDE_FILES[@]}"; do
+    src_file="$AI_DIR/$shared_file"
+    if [[ -f "$src_file" ]]; then
+        cp "$src_file" "$REGIRA_DIR/$shared_file"
+        echo "Copied shared setup guide: $shared_file"
+    else
+        echo "Warning: shared setup guide not found (skipping): $shared_file" >&2
+    fi
+done
 
 for module in "${MODULES[@]}"; do
     if ! file_name="$(module_file_name "$module" "instructions")"; then
@@ -332,7 +393,7 @@ while IFS=' ' read -r module ref; do
     else
         echo "Warning: deep reference not found (skipping): ${module}.${ref}" >&2
     fi
-done < <(json_ref_keys "$MANIFEST_PATH")
+done < <(json_ref_keys "$MANIFEST_PATH" | tr -d '\r')
 
 echo ""
 echo "Sync complete."

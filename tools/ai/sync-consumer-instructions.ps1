@@ -757,6 +757,11 @@ function Resolve-ModuleFile {
     return $null
 }
 
+$sharedGuideFiles = @(
+    "project.setup.md",
+    "shared.setup.md"
+)
+
 # ---------------------------------------------------------------------------
 # 3. Render the bootstrap from the template
 # ---------------------------------------------------------------------------
@@ -822,6 +827,17 @@ Write-Host "Rendered bootstrap -> $bootstrapOut"
 # ---------------------------------------------------------------------------
 $regiraDir = Join-Path (Join-Path $Destination "instructions") "regira"
 $null      = New-Item -ItemType Directory -Force -Path $regiraDir
+
+foreach ($sharedGuideFile in $sharedGuideFiles) {
+    $source = Join-Path $aiDir $sharedGuideFile
+    if (Test-Path $source) {
+        $dest = Join-Path $regiraDir $sharedGuideFile
+        Copy-Item $source -Destination $dest -Force
+        Write-Host "Copied shared setup guide: $sharedGuideFile"
+    } else {
+        Write-Warning "Shared setup guide not found (skipping): $sharedGuideFile"
+    }
+}
 
 foreach ($module in $modules) {
     $moduleFile = Resolve-ModuleFile -Module $module -Suffix "instructions"

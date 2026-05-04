@@ -81,16 +81,18 @@ Regira is a collection of .NET libraries providing unified abstractions for comm
 
 ## Using Regira in your project
 
-The normal consumer flow is one file:
+Use this section as the human-facing guide. The downstream `.github/AGENTS.md` file is the AI-facing bootstrap the agent follows inside the consumer repository.
+
+The normal consumer flow is one committed bootstrap file:
 
 1. Copy [ai/AGENTS.md](ai/AGENTS.md) into the application repository as `.github/AGENTS.md`.
 2. Ask the agent what application to build, or which Regira feature to add to an existing application.
-3. The agent chooses the project template, selects the required Regira NuGet packages, adds them to the project, and writes the code.
+3. The agent uses `.github/AGENTS.md` to choose the project template, select the required Regira NuGet packages, add them to the project, and write the code.
 
-If an installed Regira package ships AI instruction files, those files live inside the NuGet package under its `ai/` content. During `dotnet build`, a bundled MSBuild `.targets` file extracts them into `.github/instructions/regira/` in the consumer repository. The consumer `.github/AGENTS.md` flow can use those extracted local guides when they are present.
+If an installed Regira package ships AI instruction files, those files live inside the NuGet package under its `ai/` content. During `dotnet build`, a bundled MSBuild `.targets` file extracts them into `.github/instructions/regira/` in the consumer repository. When those extracted local guides are present, the downstream agent should read the relevant local guides before generating Regira-related code.
 
 This same `.github/AGENTS.md` flow works for both a new empty folder and an existing application that needs extra Regira features.
 
-The canonical Regira capability catalog behind that bootstrap lives in [ai/regira.capabilities.md](ai/regira.capabilities.md).
+The canonical Regira capability catalog behind that bootstrap lives in [ai/regira.capabilities.md](ai/regira.capabilities.md) in this source repository. Consumer repositories do not need that file for the normal flow.
 
-The optional local guide-sync tooling is documented separately in [tools/ai/README.md](tools/ai/README.md). It is not part of the normal consumer flow.
+The optional local guide-sync tooling is documented separately in [tools/ai/README.md](tools/ai/README.md). It is not part of the normal consumer flow, but it can copy shared setup guides such as `project.setup.md` and `shared.setup.md` into the consumer repository when a team wants a fuller local cache.

@@ -24,16 +24,17 @@ Regira packages are published at `https://packages.regira.com/v3/index.json`. Ad
 
 For consumer projects, keep these responsibilities separate:
 
-- `.github/AGENTS.md` is the human-facing bootstrap that decides project template, Regira modules, and package routing from user requests.
+- `.github/AGENTS.md` is the AI-facing bootstrap that decides project template, Regira modules, package routing, and when extracted local guides must be read before code generation.
 - `regira.modules.json` is an optional machine-readable manifest that pins `aiVersion`, records `projectTemplate`, and selects synced modules and deep references.
-- `.github/copilot-instructions.md` and `.github/instructions/regira/*.md` are optional local generated outputs. The sync can create them, and installed Regira packages can also extract `.github/instructions/regira/*.md` during build when those packages ship AI files.
+- `.github/copilot-instructions.md` and `.github/instructions/regira/*.md` are optional local generated outputs. The sync can create them, and installed Regira packages can also extract `.github/instructions/regira/*.md` during build when those packages ship AI files. When these files exist, they provide local shared setup guidance (`project.setup.md`, `shared.setup.md`) plus module-specific docs.
 
-Consumers do not need source-repository files for the normal flow. Use the optional sync tooling only when a team explicitly wants local cached instruction files.
+Consumers do not need source-repository files for the normal flow. Use the optional sync tooling only when a team explicitly wants local cached shared setup and module instruction files.
 
 ## Consumer-Project References
 
 - [`AGENTS.md`](./AGENTS.md) — canonical downstream bootstrap to copy as `.github/AGENTS.md`
 - [`regira.capabilities.md`](./regira.capabilities.md) — canonical Regira capability catalog for AI agents
+- [`project.setup.md`](./project.setup.md) — canonical shared project-template guide; synced to `.github/instructions/regira/project.setup.md` when the optional sync is used
 - [`regira.modules.template.json`](./regira.modules.template.json) — template for the committed consumer manifest
 - [`consumer.copilot.stub.md`](./consumer.copilot.stub.md) — optional compatibility bridge for tools that require `.github/copilot-instructions.md`; not part of the normal one-file consumer flow
 - [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) — starter bootstrap for a consuming project

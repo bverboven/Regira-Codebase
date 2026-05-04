@@ -4,7 +4,7 @@
 
 > **Purpose**: This file is the canonical Regira feature-awareness file. It exists in the source repository so consuming AI agents can understand which Regira capabilities exist, how they are grouped, and where deeper module guidance lives. It is not the one-file consumer bootstrap to copy into an application repository.
 >
-> **Consumer usage**: For a downstream application repository, copy [`AGENTS.md`](./AGENTS.md) to `.github/AGENTS.md` as the one-file consumer bootstrap. That bootstrap tells the agent how to choose a project template, choose NuGet packages, and generate code in the consumer app. If a consumer repository also keeps local synced guides, treat those as optional extra context.
+> **Consumer usage**: For a downstream application repository, copy [`AGENTS.md`](./AGENTS.md) to `.github/AGENTS.md` as the one-file consumer bootstrap. That bootstrap tells the agent how to choose a project template, choose NuGet packages, and generate code in the consumer app. If a consumer repository also keeps local synced guides, treat the synced shared setup guides plus the relevant module guides under `.github/instructions/regira/` as the local sources of truth when they are present.
 
 Don't assume syntax or signatures! 
 When you have to guess and the instruction files don't give you the required information: 
@@ -51,7 +51,7 @@ For downstream application repositories:
 1. Copy [`AGENTS.md`](./AGENTS.md) into the application repository as `.github/AGENTS.md`.
 2. Let that downstream `.github/AGENTS.md` file decide the project template, NuGet packages, and code changes.
 3. Use this file as the authoritative catalog of Regira capabilities, module families, and deeper guide locations.
-4. If a consumer repository also keeps local cached guides, treat those as optional extra context.
+4. If a consumer repository also keeps local cached guides, treat the synced shared setup guides plus the relevant module guides as the local sources of truth when they are present.
 
 This file is the authoritative capability catalog. The downstream `.github/AGENTS.md` file is the execution-oriented bootstrap that applies those capabilities inside a consumer project.
 
@@ -73,6 +73,7 @@ These package families are available on the Regira feed but do not currently hav
 ### Shared References
 
 - [`AGENTS.md`](./AGENTS.md) — canonical downstream `AGENTS.md` bootstrap for module selection and package setup
+- [`project.setup.md`](./project.setup.md) — shared project-template guidance used in the source repo and synced into consumer repos when local guide sync is enabled
 - [`shared.setup.md`](./shared.setup.md) — shared setup rules and the Regira NuGet feed
 - [`consumer.copilot.stub.md`](./consumer.copilot.stub.md) — optional compatibility bridge for tools that require `.github/copilot-instructions.md`; not part of the normal one-file consumer flow
 - [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) — bootstrap template for consumer projects
