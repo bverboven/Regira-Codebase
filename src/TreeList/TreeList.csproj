@@ -13,7 +13,7 @@
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.1.0</Version>
   </PropertyGroup>
-  <!-- MSBuild targets — auto-imported by NuGet restore -->
+  <!-- MSBuild targets — auto-imported into consuming builds via NuGet buildTransitive -->
   <ItemGroup>
     <None Include="build\Regira.TreeList.targets" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>

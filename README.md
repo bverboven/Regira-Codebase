@@ -81,27 +81,16 @@ Regira is a collection of .NET libraries providing unified abstractions for comm
 
 ## Using Regira in your project
 
-For a new project that consumes Regira packages, prefer the interactive bootstrap from the repository root instead of copying each bootstrap file by hand.
+The normal consumer flow is one file:
 
-```powershell
-# Consumer repository — vendored script
-pwsh tools/ai/sync-consumer-instructions.ps1 -Init
+1. Copy [ai/AGENTS.md](ai/AGENTS.md) into the application repository as `.github/AGENTS.md`.
+2. Ask the agent what application to build, or which Regira feature to add to an existing application.
+3. The agent chooses the project template, selects the required Regira NuGet packages, adds them to the project, and writes the code.
 
-# Consumer repository — run directly from a local Regira-Codebase checkout
-pwsh path\to\Regira-Codebase\tools\ai\sync-consumer-instructions.ps1 -Init
-```
+If an installed Regira package ships AI instruction files, those files live inside the NuGet package under its `ai/` content. During `dotnet build`, a bundled MSBuild `.targets` file extracts them into `.github/instructions/regira/` in the consumer repository. The consumer `.github/AGENTS.md` flow can use those extracted local guides when they are present.
 
-The init flow asks for `aiVersion`, `projectTemplate`, the initial Regira modules, and optional deep references per module. It ensures `NuGet.Config` contains the Regira feed, writes `regira.modules.json`, copies `AGENTS.md`, optionally vendors the PowerShell sync script into `tools/ai/` when you started from an external checkout, and then runs the normal sync to render `.github/copilot-instructions.md` and `.github/instructions/regira/*.md`.
+This same `.github/AGENTS.md` flow works for both a new empty folder and an existing application that needs extra Regira features.
 
-After the initial bootstrap, re-run the sync whenever you add a module or change `aiVersion`:
+The canonical Regira capability catalog behind that bootstrap lives in [ai/regira.capabilities.md](ai/regira.capabilities.md).
 
-```powershell
-pwsh tools/ai/sync-consumer-instructions.ps1
-
-# Refresh the cached remote snapshot if needed
-pwsh tools/ai/sync-consumer-instructions.ps1 -Force
-```
-
-`projectTemplate` in the manifest remains AI-only metadata. The agent reads it to keep setup advice consistent, but the sync scripts do not consume it directly. When you upgrade `aiVersion` or when Regira adds new module families, re-copy [`ai/consumer.agents.stub.md`](ai/consumer.agents.stub.md) into `AGENTS.md` so the static module catalog stays current.
-
-If you need explicit control over each bootstrap file, the manual fallback remains documented in [tools/ai/README.md](tools/ai/README.md). `AGENTS.md` stays the canonical consumer bootstrap for choosing Regira modules from user requirements. See [ai/consumer.agents.stub.md](ai/consumer.agents.stub.md) for the AGENTS bootstrap and [ai/consumer.copilot.stub.md](ai/consumer.copilot.stub.md) for the optional pre-sync Copilot bridge.
+The optional local guide-sync tooling is documented separately in [tools/ai/README.md](tools/ai/README.md). It is not part of the normal consumer flow.

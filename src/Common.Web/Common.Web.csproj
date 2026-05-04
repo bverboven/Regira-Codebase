@@ -23,7 +23,7 @@
     <!-- Upgrading to v2.3.0 causes errors in other projects (LinkGenerator is missing) -->
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
   </ItemGroup>
-  <!-- MSBuild targets — auto-imported by NuGet restore -->
+  <!-- MSBuild targets — auto-imported into consuming builds via NuGet buildTransitive -->
   <ItemGroup>
     <None Include="build\Regira.Web.targets" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>

@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/ai/">
     <File Path="ai/AGENTS.md" />
+    <File Path="ai/regira.capabilities.md" />
     <File Path="ai/consumer.bootstrap.template.md" />
     <File Path="ai/learnings.md" />
     <File Path="ai/module-sources.json" />

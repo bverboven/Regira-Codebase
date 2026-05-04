@@ -16,7 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
-  <!-- MSBuild targets — auto-imported by NuGet restore -->
+  <!-- MSBuild targets — auto-imported into consuming builds via NuGet buildTransitive -->
   <ItemGroup>
     <None Include="build\Regira.Invoicing.targets" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>

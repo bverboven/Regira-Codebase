@@ -9,8 +9,8 @@
 # selected module guides and deep-reference files.
 # Writes .github/copilot-instructions.md for GitHub Copilot while leaving AGENTS.md as the canonical static bootstrap.
 #
-# Supports an optional --source override so maintainers working inside a
-# checked-out source repo can use their local repository root directly.
+# Supports an optional --source override for local repository-root testing
+# without fetching the pinned remote snapshot.
 #
 # COMPATIBILITY NOTE:
 #   This script requires bash 4.0 or later (uses mapfile and ${var,,} lowercasing).
@@ -31,8 +31,6 @@
 #   # Sync from the pinned remote tag
 #   ./tools/ai/sync-consumer-instructions.sh
 #
-#   # Use a local source checkout
-#   ./tools/ai/sync-consumer-instructions.sh --source ../Regira-Codebase
 #
 #   # Force a refresh of the cached remote snapshot
 #   ./tools/ai/sync-consumer-instructions.sh --force

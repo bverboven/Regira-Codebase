@@ -10,12 +10,12 @@
     files.
 
     Use -Init for a first-run interactive bootstrap that can create or update
-    NuGet.Config, write regira.modules.json, copy AGENTS.md, optionally vendor
+    NuGet.Config, write regira.modules.json, copy .github/AGENTS.md, optionally vendor
     this PowerShell script into the consumer repository, and then continue with
     the normal sync.
 
-    Supports an optional -SourcePath override so maintainers working inside a
-    checked-out source repo can use their local repository root directly.
+    Supports an optional -SourcePath override for local repository-root testing
+    without fetching the pinned remote snapshot.
 
 .PARAMETER ManifestPath
     Path to regira.modules.json. Defaults to "regira.modules.json" in the current directory.
@@ -67,6 +67,12 @@ $repoUrl = "https://github.com/bverboven/Regira-Codebase.git"
 $nugetFeedUrl = "https://api.nuget.org/v3/index.json"
 $regiraFeedUrl = "https://packages.regira.com/v3/index.json"
 $deepReferenceSuffixes = @("setup", "examples", "signatures", "namespaces")
+$projectTemplateDescriptions = [ordered]@{
+    ConsoleWithLogging = "Script, batch job, or CLI utility with host-based configuration and Serilog logging."
+    BasicApi = "Standard hosted ASP.NET Core API with Minimal API or controllers and no authentication."
+    SelfHostingApi = "Lightweight self-hosted internal API or Windows Service without authentication."
+    SelfHostingApiWithAuth = "Self-hosted API with API key and/or JWT Bearer authentication."
+}
 
 function Get-AbsolutePath {
     param([string]$Path)
@@ -115,6 +121,65 @@ function Get-LocalTemplateDefaults {
     }
 
     return Get-Content -Raw $templatePath | ConvertFrom-Json
+}
+
+function ConvertTo-Hashtable {
+    param([object]$InputObject)
+
+    if ($null -eq $InputObject) {
+        return $null
+    }
+
+    if ($InputObject -is [System.Collections.IDictionary]) {
+        $dictionary = @{}
+        foreach ($key in $InputObject.Keys) {
+            $dictionary[$key] = ConvertTo-Hashtable -InputObject $InputObject[$key]
+        }
+
+        return $dictionary
+    }
+
+    if (($InputObject -is [System.Collections.IEnumerable]) -and -not ($InputObject -is [string])) {
+        return @($InputObject | ForEach-Object { ConvertTo-Hashtable -InputObject $_ })
+    }
+
+    $properties = @($InputObject.PSObject.Properties)
+    if ($InputObject -is [psobject] -and $properties.Count -gt 0) {
+        $dictionary = @{}
+        foreach ($property in $properties) {
+            $dictionary[$property.Name] = ConvertTo-Hashtable -InputObject $property.Value
+        }
+
+        return $dictionary
+    }
+
+    return $InputObject
+}
+
+function Read-JsonAsHashtable {
+    param([string]$Path)
+
+    $json = Get-Content -Raw $Path
+    $convertFromJson = Get-Command ConvertFrom-Json
+    if ($convertFromJson.Parameters.ContainsKey("AsHashtable")) {
+        return $json | ConvertFrom-Json -AsHashtable
+    }
+
+    return ConvertTo-Hashtable -InputObject ($json | ConvertFrom-Json)
+}
+
+function Get-ProjectTemplateSummary {
+    param([string]$ProjectTemplate)
+
+    if ([string]::IsNullOrWhiteSpace($ProjectTemplate)) {
+        return "No project template selected yet. Ask the user which project shape they need before changing scaffolding."
+    }
+
+    if ($projectTemplateDescriptions.Contains($ProjectTemplate)) {
+        return $projectTemplateDescriptions[$ProjectTemplate]
+    }
+
+    return "Custom project template '$ProjectTemplate'. Keep setup guidance aligned with the existing project conventions."
 }
 
 function Prompt-Input {
@@ -196,7 +261,7 @@ function Resolve-SelectionValues {
         [string[]]$Default = @()
     )
 
-    $tokens = Split-CommaValues -Value $InputValue
+    $tokens = @(Split-CommaValues -Value $InputValue)
     if ($tokens.Count -eq 0) {
         return @($Default)
     }
@@ -266,13 +331,15 @@ function Prompt-ReferenceSelection {
         [string[]]$DefaultReferences = @()
     )
 
-    $defaultLabel = if ($DefaultReferences.Count -gt 0) {
-        $DefaultReferences -join ", "
+    $normalizedDefaultReferences = @($DefaultReferences | Where-Object { $null -ne $_ })
+
+    $defaultLabel = if ($normalizedDefaultReferences.Count -gt 0) {
+        $normalizedDefaultReferences -join ", "
     } else {
         ""
     }
 
-    $prompt = if ($DefaultReferences.Count -gt 0) {
+    $prompt = if ($normalizedDefaultReferences.Count -gt 0) {
         "Deep references for $Module (comma-separated: setup, examples, signatures, namespaces; press Enter to reuse the current list; type none to clear)"
     } else {
         "Deep references for $Module (comma-separated: setup, examples, signatures, namespaces; blank for none)"
@@ -284,7 +351,7 @@ function Prompt-ReferenceSelection {
             return @()
         }
 
-        $items = Split-CommaValues -Value $rawSelection
+        $items = @(Split-CommaValues -Value $rawSelection)
         if ($items.Count -eq 0) {
             return @()
         }
@@ -553,7 +620,7 @@ function Invoke-InteractiveBootstrap {
         exit 1
     }
 
-    $moduleSources = Get-Content -Raw $moduleSourcesPath | ConvertFrom-Json -AsHashtable
+    $moduleSources = Read-JsonAsHashtable -Path $moduleSourcesPath
     $availableModules = @($moduleSources.Keys | Sort-Object)
     $defaultModules = Get-ModuleDefaultsFromManifest -Manifest $existingManifest
     $projectTemplate = Prompt-RequiredInput -Label "projectTemplate" -Default $defaultProjectTemplate
@@ -562,7 +629,7 @@ function Invoke-InteractiveBootstrap {
     $selectedReferences = [ordered]@{}
     foreach ($module in $selectedModules) {
         $defaultReferences = Get-ReferencesForModule -References $existingReferences -Module $module
-        $references = Prompt-ReferenceSelection -Module $module -DefaultReferences $defaultReferences
+        $references = @(Prompt-ReferenceSelection -Module $module -DefaultReferences $defaultReferences)
         if ($references.Count -gt 0) {
             $selectedReferences[$module] = $references
         }
@@ -571,8 +638,8 @@ function Invoke-InteractiveBootstrap {
     Ensure-NuGetConfig -ConsumerRoot $consumerRoot
     Write-ConsumerManifest -Path $ResolvedManifestPath -AiVersion $aiVersion -ProjectTemplate $projectTemplate -Modules $selectedModules -References $selectedReferences
 
-    $agentsSource = Join-Path $aiDir "consumer.agents.stub.md"
-    $agentsDestination = Join-Path $consumerRoot "AGENTS.md"
+    $agentsSource = Join-Path $aiDir "AGENTS.md"
+    $agentsDestination = Join-Path $consumerRoot ".github\AGENTS.md"
     if (-not (Test-Path $agentsSource)) {
         Write-Error "Consumer AGENTS bootstrap not found: $agentsSource"
         exit 1
@@ -613,10 +680,12 @@ if (-not (Test-Path $resolvedManifestPath)) {
 
 $manifest    = Get-Content -Raw $resolvedManifestPath | ConvertFrom-Json
 $aiVersion   = $manifest.aiVersion
+$projectTemplate = if ($manifest.PSObject.Properties["projectTemplate"]) { [string]$manifest.projectTemplate } else { "" }
 $modules     = @($manifest.modules)
 $references  = Get-ManifestReferences -Manifest $manifest
 
 Write-Host "aiVersion : $aiVersion"
+Write-Host "template  : $projectTemplate"
 Write-Host "modules   : $($modules -join ', ')"
 
 # ---------------------------------------------------------------------------
@@ -631,7 +700,7 @@ if (-not (Test-Path $moduleSourcesPath)) {
     exit 1
 }
 
-$moduleSources = Get-Content -Raw $moduleSourcesPath | ConvertFrom-Json -AsHashtable
+$moduleSources = Read-JsonAsHashtable -Path $moduleSourcesPath
 
 if (-not $SourcePath) {
     $sparsePaths = @("ai") + @(
@@ -730,7 +799,16 @@ $moduleGuideLines = if ($guideLines.Count -gt 0) {
     "- No Regira module guides selected."
 }
 
-$bootstrap = $template -replace [regex]::Escape("{{MODULES}}"), $moduleLines
+$resolvedProjectTemplate = if ([string]::IsNullOrWhiteSpace($projectTemplate)) {
+    "Not specified"
+} else {
+    $projectTemplate
+}
+$projectTemplateSummary = Get-ProjectTemplateSummary -ProjectTemplate $projectTemplate
+
+$bootstrap = $template -replace [regex]::Escape("{{PROJECT_TEMPLATE}}"), $resolvedProjectTemplate
+$bootstrap = $bootstrap -replace [regex]::Escape("{{PROJECT_TEMPLATE_SUMMARY}}"), $projectTemplateSummary
+$bootstrap = $bootstrap -replace [regex]::Escape("{{MODULES}}"), $moduleLines
 $bootstrap = $bootstrap -replace [regex]::Escape("{{MODULE_GUIDES}}"), $moduleGuideLines
 
 $destDir = $Destination
@@ -742,7 +820,7 @@ Write-Host "Rendered bootstrap -> $bootstrapOut"
 # ---------------------------------------------------------------------------
 # 4. Copy module instruction guides
 # ---------------------------------------------------------------------------
-$regiraDir = Join-Path $Destination "instructions" "regira"
+$regiraDir = Join-Path (Join-Path $Destination "instructions") "regira"
 $null      = New-Item -ItemType Directory -Force -Path $regiraDir
 
 foreach ($module in $modules) {

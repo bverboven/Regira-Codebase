@@ -20,13 +20,22 @@ Regira packages are published at `https://packages.regira.com/v3/index.json`. Ad
 ## Source Repository vs Consumer Project
 
 - **Source repository**: the full `ai/` folder is available locally, so the bootstrap can route to module guides and deep references.
-- **Consumer project**: prefer `pwsh tools/ai/sync-consumer-instructions.ps1 -Init` at repository root to create `NuGet.Config`, `regira.modules.json`, and the canonical `AGENTS.md` bootstrap, then let the same flow run the first sync. If the repository uses GitHub Copilot before the first sync and cannot run the init flow yet, mirror `consumer.copilot.stub.md` into `.github/copilot-instructions.md`. Sync only the module guides that the app actually uses with the repo-root script.
+- **Consumer project**: the primary entrypoint is a single `.github/AGENTS.md` file based on [`AGENTS.md`](./AGENTS.md). The agent chooses the project template, package set, and code changes directly from that file.
+
+For consumer projects, keep these responsibilities separate:
+
+- `.github/AGENTS.md` is the human-facing bootstrap that decides project template, Regira modules, and package routing from user requests.
+- `regira.modules.json` is an optional machine-readable manifest that pins `aiVersion`, records `projectTemplate`, and selects synced modules and deep references.
+- `.github/copilot-instructions.md` and `.github/instructions/regira/*.md` are optional local generated outputs. The sync can create them, and installed Regira packages can also extract `.github/instructions/regira/*.md` during build when those packages ship AI files.
+
+Consumers do not need source-repository files for the normal flow. Use the optional sync tooling only when a team explicitly wants local cached instruction files.
 
 ## Consumer-Project References
 
+- [`AGENTS.md`](./AGENTS.md) — canonical downstream bootstrap to copy as `.github/AGENTS.md`
+- [`regira.capabilities.md`](./regira.capabilities.md) — canonical Regira capability catalog for AI agents
 - [`regira.modules.template.json`](./regira.modules.template.json) — template for the committed consumer manifest
-- [`consumer.agents.stub.md`](./consumer.agents.stub.md) — canonical downstream `AGENTS.md` bootstrap with module-selection guidance and package mapping
-- [`consumer.copilot.stub.md`](./consumer.copilot.stub.md) — optional GitHub Copilot bridge that points to `AGENTS.md` before the first sync
+- [`consumer.copilot.stub.md`](./consumer.copilot.stub.md) — optional compatibility bridge for tools that require `.github/copilot-instructions.md`; not part of the normal one-file consumer flow
 - [`consumer.bootstrap.template.md`](./consumer.bootstrap.template.md) — starter bootstrap for a consuming project
 - [`tools/ai/README.md`](../tools/ai/README.md) — sync script usage, output layout, and versioning details for consumer projects
 
