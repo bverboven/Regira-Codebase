@@ -24,11 +24,11 @@ Regira packages are published at `https://packages.regira.com/v3/index.json`. Ad
 ## Consumer Local Guides
 
 - **Source repository**: the full `ai/` folder is available locally, so this file can point to adjacent guides.
-- **Consumer project**: the normal entrypoint is `.github/AGENTS.md`; extracted `.github/instructions/regira/*.md` files are optional local guidance.
+- **Consumer project**: the normal entrypoint is `./AGENTS.md`; extracted `.github/instructions/regira/*.md` files are optional local guidance.
 
 Keep these responsibilities separate in consumer projects:
 
-- `.github/AGENTS.md` decides project template, module selection, package routing, and when extracted local guides must be read before code generation.
+- `./AGENTS.md` decides project template, module selection, package routing, and when extracted local guides must be read before code generation.
 - `.github/instructions/regira/*.md` are optional local guides created by package extraction.
 - `Regira.Setup` is the package path for extracting the shared setup guides `project.setup.md` and `shared.setup.md` during build.
 - Module packages that ship AI files can extract their own module-specific guides during build through their package targets.
@@ -39,7 +39,7 @@ Consumers do not need the source-repository `ai/` folder for the normal one-file
 
 ## Related Files
 
-- [`AGENTS.md`](../../../ai/AGENTS.md) — canonical downstream bootstrap to copy as `.github/AGENTS.md`
+- [`AGENTS.md`](../../../ai/AGENTS.md) — canonical downstream bootstrap to copy as `./AGENTS.md`
 - [`project.setup.md`](./project.setup.md) — canonical shared project-template guide; extractable to `.github/instructions/regira/project.setup.md` through `Regira.Setup`
 
 ## Authoring Rules

@@ -194,7 +194,7 @@ Apply these conventions when no narrower module guide exists, or as a supplement
 - Follow normal C# naming conventions.
 - Keep names descriptive but concise.
 - Prefer meaningful generic type names such as `TEntity`, `TKey`, and `TDto` over bare single-letter names when context allows.
-- Use generic names like `item` only when the surrounding type already makes the meaning obvious.
+- Use generic names like `item` when the surrounding type already makes the meaning obvious.
 
 ### Dependency injection
 
@@ -211,9 +211,4 @@ Apply these conventions when no narrower module guide exists, or as a supplement
 - Default to SOLID design principles, but do not introduce abstractions that the current task does not need.
 - Prefer the simplest solution that correctly solves the current problem.
 - Avoid speculative flexibility and premature indirection.
-
-### Code quality
-
-- Use `null!` only when the framework or DI guarantees initialization.
-- Apply validation attributes such as `[Required]`, `[MaxLength]`, and `[Range]` when they drive both validation and schema behavior.
 - Depend on abstractions instead of concrete implementations when defining business logic.
