@@ -46,6 +46,15 @@ namespace Regira.Invoicing.Billit.Mapping
                         UnitPriceExcl = line.UnitPriceExcl,
                         VATPercentage = line.VatPercentage,
                     })
+                    .ToList(),
+                Attachments = item.Attachments?
+                    .Skip(1)
+                    .Select(file => new FileInput
+                    {
+                        FileContent = file.GetBytes()!,
+                        FileName = file.FileName!,
+                        MimeType = file.ContentType!
+                    })
                     .ToList()
             };
         }
