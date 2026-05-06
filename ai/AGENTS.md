@@ -20,18 +20,7 @@ Only proceed to project scaffolding, infrastructure changes, or domain code once
 
 ## Default workflow
 
-1. Ask the user what they are building if not already clear.
-2. Decide whether the user is creating a new project or extending an existing application.
-3. Choose the `projectTemplate` first.
-4. Select the relevant Regira modules from the tables below.
-5. Ensure the Regira NuGet feed (`https://packages.regira.com/v3/index.json`) is configured alongside `nuget.org`.
-6. Add the matching `Regira.*` packages from the Regira feed to the appropriate consumer project(s).
-7. After adding Regira packages, run `dotnet restore` and `dotnet build` when needed so AI instruction files bundled inside the NuGet package `ai/` content can be extracted into `.github/instructions/regira/` in the consumer repository.
-8. Stop and read guides before generating any application code. After restore/build, check whether `.github/instructions/regira/` contains matching `*.instructions.md` files, shared setup files, or relevant deep references. If it does, read the primary guides for the current task in full before writing code in that area: `project.setup.md` for app shape, `shared.setup.md` for shared setup concerns, and the matching `*.instructions.md` file for module-specific work. Consult deep references such as `*.setup.md`, `*.examples.md`, `*.signatures.md`, and `*.namespaces.md` on demand by section when the current task needs them. If no files were extracted, verify the feed is reachable and the restore/build succeeded before continuing.
-9. For an existing application, inspect the current `*.csproj` files and existing code before choosing more packages or scaffolding.
-10. Generate or extend the code so it matches the selected `projectTemplate`, installed Regira packages, local package-provided guides, and local project conventions.
-11. Prefer project-local instructions over shared Regira guidance when both exist.
-12. Ask for feedback instead of guessing missing APIs or project-specific conventions.
+Ask the user what they're building if it isn't already clear, then follow the **Code generation workflow** below. For an existing project, inspect current `*.csproj` files before choosing packages or scaffolding. Prefer project-local instructions over shared Regira guidance when both exist, and ask for feedback rather than guessing missing APIs or conventions.
 
 If the project contains `.github/instructions/regira/*.md`, treat the extracted shared setup guides plus the matching module guides as the primary local instructions. Regira packages that carry AI files embed them inside the NuGet package under `ai/`. During `dotnet build`, their bundled `.targets` files copy those files into `.github/instructions/regira/` under the consuming project directory (`$(ProjectDir)`), which may be a nested application folder rather than the solution root. Use `Regira.Setup` when the consumer needs local copies of `project.setup.md` and `shared.setup.md` through the same package-extraction workflow.
 

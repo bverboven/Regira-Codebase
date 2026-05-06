@@ -694,7 +694,8 @@ but can also be registered manually if you want to customize the configuration.
 | Normalizer not running | `AddNormalizerInterceptors(sp)` missing or wrong overload | Use `(sp, options) =>` factory overload in `AddDbContext` |
 | Primers not running | `AddPrimerInterceptors(sp)` missing | Same as above |
 | Save not persisting | `SaveChanges()` not called | ⚠️ **EF Core Pattern**: Write operations only track changes. Must call `SaveChanges()` to persist. Base controllers do this automatically; custom code (services, jobs, direct `IEntityService` usage) must call `await service.SaveChanges()` explicitly. |
-| `Count(null)` / `List(null)` compiler error | Ambiguous overload between typed and untyped variants | Pass an empty search object: `await service.Count(new TSearchObject())` |
+| `List(null)` compiler error | Ambiguous overload between typed and untyped variants | Omit the argument (`service.List()`) or cast: `service.List((TSearchObject?)null)`. `Count` is not affected — use `await service.Count()` with no arguments. |
+| `SetSortOrder()` does not compile on `ICollection<T>` | Extension targets `IEnumerable<ISortable>`, not `ICollection<T>` | Use `items.SetSortOrder()` when `T : ISortable` (generic overload), or cast: `(items as IEnumerable<ISortable>)?.SetSortOrder()` |
 | Soft delete not working | `IArchivable` not implemented or `ArchivablePrimer` not registered | Check entity implements `IArchivable`; use `UseDefaults()` |
 | `AddPrimerInterceptors` has no overload taking 0 args | Missing `IServiceProvider` | Use `AddDbContext<T>((sp, options) => ...)` and pass `sp` |
 | `EntityWrappingServiceBase` — infinite loop | Inner service is the wrapper itself | Ensure `UseEntityService<T>()` registers the wrapper; `AddTransient` registers the interface |

@@ -15,7 +15,7 @@ public interface IEntityReadService<TEntity, in TKey, in TSearchObject> : IEntit
     where TSearchObject : class, ISearchObject<TKey>, new()
 {
     Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default);
-    Task<long> Count(TSearchObject? so, CancellationToken token = default);
+    Task<long> Count(TSearchObject? so = null, CancellationToken token = default);
 }
 
 public interface IEntityReadService<TEntity, in TKey, TSearchObject, TSortBy, TIncludes> : IEntityReadService<TEntity, TKey, TSearchObject>

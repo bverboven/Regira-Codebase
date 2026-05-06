@@ -508,7 +508,7 @@ public static IEntityServiceCollection<WebshopDbContext> AddOrders(this IEntityS
             .Include(x => x.Customer!)
             .Include(x => x.OrderLines!.OrderBy(l => l.SortOrder))
                 .ThenInclude(ol => ol.Product!));
-        e.Related(x => x.OrderLines, item => item.OrderLines?.SetSortOrder());
+        e.Related(x => x.OrderLines, item => item.OrderLines?.SetSortOrder()); // OrderLine must implement ISortable; if using ICollection<T> where T does not, cast: (item.OrderLines as IEnumerable<ISortable>)?.SetSortOrder()
         e.Prepare((order, original) =>
         {
             if (order.OrderLines?.Any() == true)

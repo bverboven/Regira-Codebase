@@ -26,7 +26,7 @@ public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject>(
 
     public virtual Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default)
         => Service.List(so, pagingInfo, token);
-    public virtual Task<long> Count(TSearchObject? so, CancellationToken token = default)
+    public virtual Task<long> Count(TSearchObject? so = null, CancellationToken token = default)
         => Service.Count(so, token);
 
     public virtual Task<IList<TEntity>> List(object? so, PagingInfo? pagingInfo, CancellationToken token = default)
@@ -74,7 +74,7 @@ public abstract class EntityWrappingServiceBase<TEntity, TKey, TSearchObject, TS
 
     public virtual Task<long> Count(object? so, CancellationToken token = default)
         => service.Count(so, token);
-    public Task<long> Count(TSearchObject? so, CancellationToken token = default)
+    public Task<long> Count(TSearchObject? so = null, CancellationToken token = default)
         => service.Count(so, token);
     public virtual Task<long> Count(IList<TSearchObject?> so, CancellationToken token = default)
         => service.Count(so, token);

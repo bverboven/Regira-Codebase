@@ -153,7 +153,7 @@ public interface IEntityReadService<TEntity, in TKey, in TSearchObject>
     where TSearchObject : class, ISearchObject<TKey>, new()
 {
     Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default);
-    Task<long> Count(TSearchObject? so, CancellationToken token = default);
+    Task<long> Count(TSearchObject? so = null, CancellationToken token = default);
 }
 
 public interface IEntityReadService<TEntity, in TKey, TSearchObject, TSortBy, TIncludes>
@@ -411,7 +411,7 @@ public static class EntityExtensions
 {
     public static bool IsNew<TKey>(this IEntity<TKey> item);
     public static void AdjustIdForEfCore(this IEnumerable<IEntity<int>> items);
-    public static void SetSortOrder(this IEnumerable<ISortable> items);
+    public static void SetSortOrder<T>(this IEnumerable<T> items) where T : ISortable;
 }
 ```
 
@@ -1249,7 +1249,3 @@ public class EntityServiceCollectionOptions(IServiceCollection services)
 - [Entities Examples](./entities.examples.md) — Working code patterns
 - [Entities Namespaces](./entities.namespaces.md) — Full namespace listing
 
-> **⚠️ Null ambiguity — `List` / `Count`:** Passing a bare `null` is ambiguous when both the
-> `object?` and `TSearchObject?` overloads are in scope. Always cast explicitly:
-> `service.List((MySearchObject?)null)` or `service.Count((MySearchObject?)null)`.
-> Alternatively, omit the argument entirely when `PagingInfo` is not needed — the default covers it.
