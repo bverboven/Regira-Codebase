@@ -86,10 +86,11 @@ Template consequences:
 3. Ensure the NuGet feed exists and add the matching packages.
 4. Inspect existing `PackageReference` items when the installed Regira package set is part of the decision.
 5. Run `dotnet restore` and `dotnet build` when needed so installed Regira packages can extract any embedded `ai/*.md` files from the NuGet package into `.github/instructions/regira/`.
-6. Before writing any application code, check `.github/instructions/regira/` for extracted `*.instructions.md` guides, shared setup files, and relevant deep references.
-7. If extracted guides exist, read the applicable primary guides in full before generating entity models, services, controllers, DI registrations, or infrastructure code. Use deep references by section when the current task needs exact examples, signatures, namespaces, or setup details. Skipping the relevant primary guides is a workflow violation.
-8. If no extracted guides exist, verify the feed is reachable and the restore/build succeeded, then continue with the setup baseline, package mapping tables, and general engineering rules in this file.
-9. Generate code that stays consistent with the selected `projectTemplate`, installed Regira packages, any extracted local guides, and local project conventions.
+6. **New project checkpoint**: When creating a project from scratch, stop here after completing steps 1–5. Summarize what was set up (template chosen, packages added, restore/build outcome) and explicitly ask the user whether to continue before writing any application code. This gives the user the opportunity to review the initial setup, switch to plan mode, or adjust the package selection before any code is generated.
+7. Before writing any application code, check `.github/instructions/regira/` for extracted `*.instructions.md` guides, shared setup files, and relevant deep references.
+8. If extracted guides exist, read the applicable primary guides in full before generating entity models, services, controllers, DI registrations, or infrastructure code. Use deep references by section when the current task needs exact examples, signatures, namespaces, or setup details. Skipping the relevant primary guides is a workflow violation.
+9. If no extracted guides exist, verify the feed is reachable and the restore/build succeeded, then continue with the setup baseline, package mapping tables, and general engineering rules in this file.
+10. Generate code that stays consistent with the selected `projectTemplate`, installed Regira packages, any extracted local guides, and local project conventions.
 
 ## Installed package routing
 
