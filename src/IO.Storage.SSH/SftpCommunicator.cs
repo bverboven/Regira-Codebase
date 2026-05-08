@@ -32,7 +32,7 @@ public class SftpCommunicator : IDisposable
     {
         if (_client.IsConnected)
         {
-            Close().Wait();
+            _client.Disconnect();
         }
         _client.Dispose();
     }

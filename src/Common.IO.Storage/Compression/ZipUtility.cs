@@ -108,7 +108,10 @@ public static class ZipUtility
     }
 
     public static ZipArchiveEntry? Find(this ZipArchive zipArchive, string identifier)
-        => zipArchive.Entries.SingleOrDefault(e => e.FullName == identifier);
+    {
+        var normalizedIdentifier = identifier.Replace('\\', '/').TrimStart('/');
+        return zipArchive.Entries.SingleOrDefault(e => e.FullName.Replace('\\', '/').TrimStart('/') == normalizedIdentifier);
+    }
 
     public static string[] ExtractFiles(string targetDirectory, IEnumerable<ZipArchiveEntry> entries)
     {

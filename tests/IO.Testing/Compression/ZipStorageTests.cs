@@ -59,4 +59,14 @@ public class ZipStorageTests
     public async Task Update_File() => await StorageTestContext.Test_Update_File();
     [Test]
     public async Task Remove_File() => await StorageTestContext.Test_Remove_File();
+
+    [Test]
+    public async Task GetStream_With_Forward_Slashes()
+    {
+        var identifier = StorageTestContext.SourceFiles.First().Identifier!.Replace('\\', '/');
+
+        Assert.That(await StorageTestContext.FileService.Exists(identifier), Is.True);
+        await using var stream = await StorageTestContext.FileService.GetStream(identifier);
+        Assert.That(stream, Is.Not.Null);
+    }
 }
