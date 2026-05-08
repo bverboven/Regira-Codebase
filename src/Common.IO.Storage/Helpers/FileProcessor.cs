@@ -41,7 +41,7 @@ public class FileProcessor(IFileService fileService) : IFileProcessor
                 return handleFile(absoluteUri, fileService);
             })
             .ToArray();
-        Task.WaitAll(handleFilesFuncs);
+        await Task.WhenAll(handleFilesFuncs);
 #endif
 
         // recursive
@@ -65,7 +65,7 @@ public class FileProcessor(IFileService fileService) : IFileProcessor
             var dirTasks = directoryUris
                 .Select(dirUri => ProcessFiles(new FileSearchObject { FolderUri = dirUri, Extensions = so.Extensions, Recursive = so.Recursive }, handleFile, processRecursively))
                 .ToArray();
-            Task.WaitAll(dirTasks);
+            await Task.WhenAll(dirTasks);
 #endif
         }
     }

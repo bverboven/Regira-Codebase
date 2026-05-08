@@ -20,7 +20,7 @@ public class ZipFileService(ZipFileCommunicator communicator) : IFileService, ID
                 .ToBinaryFile($"{Guid.NewGuid()}.zip")
                 .ToZipArchive();
 
-    public Task<bool> Exists(string identifier) => Task.FromResult(ZipArchive.Find(identifier.Replace('/', '\\')) != null);
+    public Task<bool> Exists(string identifier) => Task.FromResult(ZipArchive.Find(identifier) != null);
     public Task<Stream?> GetStream(string identifier)
     {
         var entry = ZipArchive.Find(identifier);

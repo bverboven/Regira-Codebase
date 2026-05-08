@@ -31,7 +31,14 @@ public class AzureCommunicator(AzureOptions config)
             Container = new BlobContainerClient(_connectionString, _containerName);
             if (!await Container.ExistsAsync())
             {
-                await Container.CreateAsync();
+                if (config.AutoCreate)
+                {
+                    await Container.CreateAsync();
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Blob container '{_containerName}' does not exist. Set AutoCreate = true or create the container manually.");
+                }
             }
 
             IsOpened = true;

@@ -178,7 +178,8 @@ public class BinaryBlobService(AzureCommunicator communicator) : IFileService
         await communicator.Open();
         var sourceBlob = GetBlobReference(sourceIdentifier);
         var targetBlob = GetBlobReference(targetIdentifier);
-        await targetBlob.StartCopyFromUriAsync(GetBlobUri(sourceIdentifier));
+        var copyOperation = await targetBlob.StartCopyFromUriAsync(GetBlobUri(sourceIdentifier));
+        await copyOperation.WaitForCompletionAsync();
         await sourceBlob.DeleteIfExistsAsync();
     }
     public async Task<string> Save(string identifier, byte[] bytes, string? contentType = null)
@@ -219,22 +220,13 @@ public class BinaryBlobService(AzureCommunicator communicator) : IFileService
 
 
     public string GetAbsoluteUri(string identifier)
-    {
-        communicator.Open().GetAwaiter().GetResult();
-        return FileNameUtility.GetUri(identifier, Root);
-    }
+        => FileNameUtility.GetUri(identifier, Root);
 
     public string GetIdentifier(string uri)
-    {
-        communicator.Open().GetAwaiter().GetResult();
-        return FileNameUtility.GetRelativeUri(uri, Root);
-    }
+        => FileNameUtility.GetRelativeUri(uri, Root);
 
     public string? GetRelativeFolder(string identifier)
-    {
-        communicator.Open().GetAwaiter().GetResult();
-        return FileNameUtility.GetRelativeFolder(identifier, Root);
-    }
+        => FileNameUtility.GetRelativeFolder(identifier, Root);
 
     public Uri GetBlobUri(string identifier)
         => new(GetAbsoluteUri(identifier));
