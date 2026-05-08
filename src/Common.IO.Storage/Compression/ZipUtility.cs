@@ -1,9 +1,9 @@
-using System.IO.Compression;
 using Regira.IO.Abstractions;
 using Regira.IO.Extensions;
 using Regira.IO.Models;
 using Regira.IO.Storage.FileSystem;
 using Regira.IO.Storage.Helpers;
+using System.IO.Compression;
 
 namespace Regira.IO.Storage.Compression;
 
@@ -100,15 +100,19 @@ public static class ZipUtility
     }
     public static void RemoveFiles(this ZipArchive zipArchive, IEnumerable<IBinaryFile> files)
     {
-        var entries = zipArchive.Entries.Where(e => files.Any(f => (f.Identifier ?? f.FileName) == e.FullName)).ToArray();
+        var entries = zipArchive.Entries.Where(e => files.Any(f =>
+        {
+            var identifier = NormalizePath(f.Identifier ?? f.FileName);
+            return identifier == NormalizePath(e.FullName);
+        })).ToArray();
         foreach (var entry in entries)
         {
             entry.Delete();
         }
     }
-
     public static ZipArchiveEntry? Find(this ZipArchive zipArchive, string identifier)
-        => zipArchive.Entries.SingleOrDefault(e => e.FullName == identifier);
+        => zipArchive.Entries.SingleOrDefault(e => NormalizePath(e.FullName) == NormalizePath(identifier));
+
 
     public static string[] ExtractFiles(string targetDirectory, IEnumerable<ZipArchiveEntry> entries)
     {
@@ -175,4 +179,7 @@ public static class ZipUtility
     {
         return entry.FullName.EndsWith("/");
     }
+
+    private static string? NormalizePath(string? path)
+        => path?.Replace('\\', '/').TrimStart('/');
 }
