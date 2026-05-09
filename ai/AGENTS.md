@@ -4,6 +4,233 @@ Use this file as the authoritative downstream bootstrap for choosing the project
 
 This file is also the top-level Regira routing guide inside the source repository. In a consumer repository, use this file plus any local `.github/instructions/regira/*.md` guides as the available sources of truth.
 
+## Section index
+
+Use this grouped index to jump directly to the section you need across all primary instruction files.
+
+### Core bootstrap
+
+- `ai/AGENTS.md`
+  - **Pre-flight checklist** — Mandatory readiness checks. [Link](ai/AGENTS.md#pre-flight-checklist)
+  - **Default workflow** — Standard execution flow. [Link](ai/AGENTS.md#default-workflow)
+  - **Guide loading rules** — What to read and when. [Link](ai/AGENTS.md#guide-loading-rules)
+  - **Project template selection** — Pick the right template. [Link](ai/AGENTS.md#project-template-selection)
+  - **Setup baseline** — Default setup conventions. [Link](ai/AGENTS.md#setup-baseline)
+  - **Code generation workflow** — Ordered generation steps. [Link](ai/AGENTS.md#code-generation-workflow)
+  - **Installed package routing** — Map packages to modules. [Link](ai/AGENTS.md#installed-package-routing)
+  - **Primary Regira package families** — Core module catalog. [Link](ai/AGENTS.md#primary-regira-package-families)
+  - **Additional package families** — Extra package options. [Link](ai/AGENTS.md#additional-package-families)
+  - **Optional local cache** — Local instruction sources. [Link](ai/AGENTS.md#optional-local-cache)
+  - **General engineering rules** — Fallback coding conventions. [Link](ai/AGENTS.md#general-engineering-rules)
+
+### Setup guides
+
+- `src/Common.Setup/ai/project.setup.md`
+  - **Template Selection Guide** — Template choice criteria. [Link](src/Common.Setup/ai/project.setup.md#template-selection-guide)
+  - **Shared Conventions** — Cross-template defaults. [Link](src/Common.Setup/ai/project.setup.md#shared-conventions)
+  - **Template 1 — `ConsoleWithLogging`** — Console template blueprint. [Link](src/Common.Setup/ai/project.setup.md#template-1-consolewithlogging)
+  - **Template 2 — `BasicApi`** — Basic API blueprint. [Link](src/Common.Setup/ai/project.setup.md#template-2-basicapi)
+  - **Template 3 — `SelfHostingApi`** — Self-hosting API blueprint. [Link](src/Common.Setup/ai/project.setup.md#template-3-selfhostingapi)
+  - **Template 4 — `SelfHostingApiWithAuth`** — Auth API blueprint. [Link](src/Common.Setup/ai/project.setup.md#template-4-selfhostingapiwithauth)
+
+- `src/Common.Setup/ai/shared.setup.md`
+  - **NuGet Feed** — Regira feed setup. [Link](src/Common.Setup/ai/shared.setup.md#nuget-feed)
+  - **Consumer Local Guides** — Using extracted local docs. [Link](src/Common.Setup/ai/shared.setup.md#consumer-local-guides)
+  - **Related Files** — Connected reference files. [Link](src/Common.Setup/ai/shared.setup.md#related-files)
+  - **Authoring Rules** — Guide authoring constraints. [Link](src/Common.Setup/ai/shared.setup.md#authoring-rules)
+
+- `src/Common.Entities/ai/entities.setup.md`
+  - **Defaults** — Default entities setup. [Link](src/Common.Entities/ai/entities.setup.md#defaults)
+  - **Checklist** — Step-by-step setup checks. [Link](src/Common.Entities/ai/entities.setup.md#checklist)
+  - **NuGet Feed** — Regira feed setup. [Link](src/Common.Entities/ai/entities.setup.md#nuget-feed)
+  - **Packages** — Required package set. [Link](src/Common.Entities/ai/entities.setup.md#packages)
+  - **Step 1: Project Files** — Create base project files. [Link](src/Common.Entities/ai/entities.setup.md#step-1-project-files)
+  - **Step 2: Create DbContext** — Create EF Core context. [Link](src/Common.Entities/ai/entities.setup.md#step-2-create-dbcontext)
+  - **Step 3: Program.cs** — Wire app startup. [Link](src/Common.Entities/ai/entities.setup.md#step-3-programcs)
+  - **Step 4: Create the DI Extension Method** — Register services in DI. [Link](src/Common.Entities/ai/entities.setup.md#step-4-create-the-di-extension-method)
+
+### Business and platform modules
+
+- `src/Common.Entities/ai/entities.instructions.md`
+  - **Projects** — Supported projects/packages. [Link](src/Common.Entities/ai/entities.instructions.md#projects)
+  - **Quick Agent Playbook** — Fast decision workflow. [Link](src/Common.Entities/ai/entities.instructions.md#quick-agent-playbook)
+  - **Namespace Reference** — Namespaces to import. [Link](src/Common.Entities/ai/entities.instructions.md#namespace-reference)
+  - **Signatures Reference** — Method signature lookup. [Link](src/Common.Entities/ai/entities.instructions.md#signatures-reference)
+  - **Core Understanding** — Core architecture model. [Link](src/Common.Entities/ai/entities.instructions.md#core-understanding)
+  - **Decision-Making Guidelines** — How to choose patterns. [Link](src/Common.Entities/ai/entities.instructions.md#decision-making-guidelines)
+  - **Project Creation Workflow** — New project sequence. [Link](src/Common.Entities/ai/entities.instructions.md#project-creation-workflow)
+  - **Entity Implementation Workflow** — Entity build sequence. [Link](src/Common.Entities/ai/entities.instructions.md#entity-implementation-workflow)
+  - **Custom Entity Services** — Custom service patterns. [Link](src/Common.Entities/ai/entities.instructions.md#custom-entity-services)
+  - **Global Services** — Global service usage. [Link](src/Common.Entities/ai/entities.instructions.md#global-services)
+  - **Normalizing** — Normalization guidance. [Link](src/Common.Entities/ai/entities.instructions.md#normalizing)
+  - **Attachments** — File attachment patterns. [Link](src/Common.Entities/ai/entities.instructions.md#attachments)
+  - **Error Handling** — Error handling rules. [Link](src/Common.Entities/ai/entities.instructions.md#error-handling)
+  - **Built-in Query Extensions** — Query extension helpers. [Link](src/Common.Entities/ai/entities.instructions.md#built-in-query-extensions)
+  - **Common Patterns** — Reusable implementation patterns. [Link](src/Common.Entities/ai/entities.instructions.md#common-patterns)
+  - **Response Types** — Supported response models. [Link](src/Common.Entities/ai/entities.instructions.md#response-types)
+  - **Best Practices** — Recommended defaults. [Link](src/Common.Entities/ai/entities.instructions.md#best-practices)
+  - **Quick Reference: Built-in Entity Interfaces** — Entity interface cheat sheet. [Link](src/Common.Entities/ai/entities.instructions.md#quick-reference-built-in-entity-interfaces)
+  - **Quick Reference: Built-in Services** — Service cheat sheet. [Link](src/Common.Entities/ai/entities.instructions.md#quick-reference-built-in-services)
+  - **Troubleshooting** — Common issue resolution. [Link](src/Common.Entities/ai/entities.instructions.md#troubleshooting)
+  - **See Also** — Related references. [Link](src/Common.Entities/ai/entities.instructions.md#see-also)
+
+- `src/Common.IO.Storage/ai/io.storage.instructions.md`
+  - **IO Abstractions (from `Regira.Common`)** — Shared file abstractions. [Link](src/Common.IO.Storage/ai/io.storage.instructions.md#io-abstractions-from-regiracommon)
+  - **Installation** — Installation guidance. [Link](src/Common.IO.Storage/ai/io.storage.instructions.md#installation)
+  - **Key Concept: Identifier vs. Path vs. URI** — Identifier and path semantics. [Link](src/Common.IO.Storage/ai/io.storage.instructions.md#key-concept-identifier-vs-path-vs-uri)
+  - **IFileService** — File service contract. [Link](src/Common.IO.Storage/ai/io.storage.instructions.md#ifileservice)
+  - **FileSearchObject** — File search filter model. [Link](src/Common.IO.Storage/ai/io.storage.instructions.md#filesearchobject)
+  - **Implementations** — Storage backend implementations. [Link](src/Common.IO.Storage/ai/io.storage.instructions.md#implementations)
+  - **ZIP / Compression** — Archive support. [Link](src/Common.IO.Storage/ai/io.storage.instructions.md#zip-compression)
+  - **Helpers** — Utility helpers. [Link](src/Common.IO.Storage/ai/io.storage.instructions.md#helpers)
+  - **DI Registration** — Dependency registration. [Link](src/Common.IO.Storage/ai/io.storage.instructions.md#di-registration)
+  - **Backend Comparison** — Provider comparison table. [Link](src/Common.IO.Storage/ai/io.storage.instructions.md#backend-comparison)
+
+- `src/Common.Invoicing/ai/invoicing.instructions.md`
+  - **Projects** — Supported projects/packages. [Link](src/Common.Invoicing/ai/invoicing.instructions.md#projects)
+  - **Installation** — Installation guidance. [Link](src/Common.Invoicing/ai/invoicing.instructions.md#installation)
+  - **Billit** — Billit provider integration. [Link](src/Common.Invoicing/ai/invoicing.instructions.md#billit)
+  - **UblSharp — UBL Conversion** — UBL conversion flow. [Link](src/Common.Invoicing/ai/invoicing.instructions.md#ublsharp-ubl-conversion)
+  - **ViaAdValvas — Peppol Transmission** — Peppol transmission flow. [Link](src/Common.Invoicing/ai/invoicing.instructions.md#viaadvalvas-peppol-transmission)
+  - **Typical End-to-End Flow** — Invoice lifecycle overview. [Link](src/Common.Invoicing/ai/invoicing.instructions.md#typical-end-to-end-flow)
+
+- `src/Common.Media/ai/media.instructions.md`
+  - **Projects** — Supported projects/packages. [Link](src/Common.Media/ai/media.instructions.md#projects)
+  - **Installation** — Installation guidance. [Link](src/Common.Media/ai/media.instructions.md#installation)
+  - **Backend Comparison** — Provider comparison table. [Link](src/Common.Media/ai/media.instructions.md#backend-comparison)
+  - **Core Models** — Core data models. [Link](src/Common.Media/ai/media.instructions.md#core-models)
+  - **IImageService — Image Operations** — Image service API. [Link](src/Common.Media/ai/media.instructions.md#iimageservice-image-operations)
+  - **Layer Composition — `ImageBuilder`** — Image layer composition. [Link](src/Common.Media/ai/media.instructions.md#layer-composition-imagebuilder)
+  - **Text Images** — Text rendering images. [Link](src/Common.Media/ai/media.instructions.md#text-images)
+  - **Simple DI Registration** — Minimal DI setup. [Link](src/Common.Media/ai/media.instructions.md#simple-di-registration)
+  - **Quick Example** — Minimal working example. [Link](src/Common.Media/ai/media.instructions.md#quick-example)
+
+- `src/Common.Payments/ai/payments.instructions.md`
+  - **Projects** — Supported projects/packages. [Link](src/Common.Payments/ai/payments.instructions.md#projects)
+  - **Installation** — Installation guidance. [Link](src/Common.Payments/ai/payments.instructions.md#installation)
+  - **Shared Abstraction** — Shared payments abstraction. [Link](src/Common.Payments/ai/payments.instructions.md#shared-abstraction)
+  - **Mollie** — Mollie provider integration. [Link](src/Common.Payments/ai/payments.instructions.md#mollie)
+  - **POM** — POM provider integration. [Link](src/Common.Payments/ai/payments.instructions.md#pom)
+  - **Provider Comparison** — Provider capabilities. [Link](src/Common.Payments/ai/payments.instructions.md#provider-comparison)
+
+- `src/Common.Security/ai/security.instructions.md`
+  - **Projects** — Supported projects/packages. [Link](src/Common.Security/ai/security.instructions.md#projects)
+  - **Installation** — Installation guidance. [Link](src/Common.Security/ai/security.instructions.md#installation)
+  - **Encryption** — Encryption APIs. [Link](src/Common.Security/ai/security.instructions.md#encryption)
+  - **Hashing** — Hashing APIs. [Link](src/Common.Security/ai/security.instructions.md#hashing)
+  - **Hashing Decision Guide** — Hashing selection help. [Link](src/Common.Security/ai/security.instructions.md#hashing-decision-guide)
+  - **JWT Authentication** — JWT auth setup. [Link](src/Common.Security/ai/security.instructions.md#jwt-authentication)
+  - **API Key Authentication** — API key auth setup. [Link](src/Common.Security/ai/security.instructions.md#api-key-authentication)
+  - **Pre-built Auth Controllers (`Security.Authentication.Web`)** — Ready-made auth endpoints. [Link](src/Common.Security/ai/security.instructions.md#pre-built-auth-controllers-securityauthenticationweb)
+
+- `src/Common.System/ai/system.instructions.md`
+  - **Projects** — Supported projects/packages. [Link](src/Common.System/ai/system.instructions.md#projects)
+  - **Installation** — Installation guidance. [Link](src/Common.System/ai/system.instructions.md#installation)
+  - **System.Hosting** — Hosting utilities. [Link](src/Common.System/ai/system.instructions.md#systemhosting)
+  - **System.Projects — `.csproj` Parsing** — Project parsing helpers. [Link](src/Common.System/ai/system.instructions.md#systemprojects-csproj-parsing)
+
+- `src/Common.Web/ai/web.instructions.md`
+  - **Projects** — Supported projects/packages. [Link](src/Common.Web/ai/web.instructions.md#projects)
+  - **Installation** — Installation guidance. [Link](src/Common.Web/ai/web.instructions.md#installation)
+  - **HTML Template Parsing** — HTML parsing services. [Link](src/Common.Web/ai/web.instructions.md#html-template-parsing)
+  - **Template Engine Comparison** — Template engine trade-offs. [Link](src/Common.Web/ai/web.instructions.md#template-engine-comparison)
+  - **Common.Web Middleware** — Built-in middleware. [Link](src/Common.Web/ai/web.instructions.md#commonweb-middleware)
+  - **Web.Swagger** — Swagger helpers. [Link](src/Common.Web/ai/web.instructions.md#webswagger)
+  - **System.Hosting — `WebHostOptions`** — Web host options. [Link](src/Common.Web/ai/web.instructions.md#systemhosting-webhostoptions)
+  - **System.Hosting — Background Tasks** — Hosted background tasks. [Link](src/Common.Web/ai/web.instructions.md#systemhosting-background-tasks)
+
+- `src/TreeList/ai/treelist.instructions.md`
+  - **Installation** — Installation guidance. [Link](src/TreeList/ai/treelist.instructions.md#installation)
+  - **Namespaces** — Namespace quick list. [Link](src/TreeList/ai/treelist.instructions.md#namespaces)
+  - **Core Types** — Core tree types. [Link](src/TreeList/ai/treelist.instructions.md#core-types)
+  - **Building a Tree** — Tree construction flow. [Link](src/TreeList/ai/treelist.instructions.md#building-a-tree)
+  - **Single-Node Navigation Extensions** — Single-node traversal helpers. [Link](src/TreeList/ai/treelist.instructions.md#single-node-navigation-extensions)
+  - **Collection Navigation Extensions** — Collection traversal helpers. [Link](src/TreeList/ai/treelist.instructions.md#collection-navigation-extensions)
+  - **`ToTreeList` Extension Overloads** — Tree conversion overloads. [Link](src/TreeList/ai/treelist.instructions.md#totreelist-extension-overloads)
+  - **`ToTreeView`** — Tree view projection. [Link](src/TreeList/ai/treelist.instructions.md#totreeview)
+  - **`OrderByHierarchy`** — Hierarchy ordering. [Link](src/TreeList/ai/treelist.instructions.md#orderbyhierarchy)
+  - **`ReverseTree`** — Reverse hierarchy transform. [Link](src/TreeList/ai/treelist.instructions.md#reversetree)
+  - **Error Handling & Circular Reference Detection** — Safety and cycle handling. [Link](src/TreeList/ai/treelist.instructions.md#error-handling-circular-reference-detection)
+
+### Office modules
+
+- `src/Common.Office/ai/office.instructions.md`
+  - **Sub-Modules** — Office module map. [Link](src/Common.Office/ai/office.instructions.md#sub-modules)
+  - **When to Load Which File** — File-loading decision guide. [Link](src/Common.Office/ai/office.instructions.md#when-to-load-which-file)
+  - **Related Modules** — Neighboring modules. [Link](src/Common.Office/ai/office.instructions.md#related-modules)
+
+- `src/Common.Office/ai/office.pdf.instructions.md`
+  - **Module Context** — Module scope and purpose. [Link](src/Common.Office/ai/office.pdf.instructions.md#module-context)
+  - **Installation** — Installation guidance. [Link](src/Common.Office/ai/office.pdf.instructions.md#installation)
+  - **Backend Comparison** — Provider comparison table. [Link](src/Common.Office/ai/office.pdf.instructions.md#backend-comparison)
+  - **Interfaces** — Interfaces guidance. [Link](src/Common.Office/ai/office.pdf.instructions.md#interfaces)
+  - **Models** — Models guidance. [Link](src/Common.Office/ai/office.pdf.instructions.md#models)
+  - **Usage** — Usage guidance. [Link](src/Common.Office/ai/office.pdf.instructions.md#usage)
+
+- `src/Common.Office/ai/office.excel.instructions.md`
+  - **Module Context** — Module scope and purpose. [Link](src/Common.Office/ai/office.excel.instructions.md#module-context)
+  - **Installation** — Installation guidance. [Link](src/Common.Office/ai/office.excel.instructions.md#installation)
+  - **Backend Comparison** — Provider comparison table. [Link](src/Common.Office/ai/office.excel.instructions.md#backend-comparison)
+  - **Interfaces** — Interfaces guidance. [Link](src/Common.Office/ai/office.excel.instructions.md#interfaces)
+  - **Models** — Models guidance. [Link](src/Common.Office/ai/office.excel.instructions.md#models)
+  - **Usage** — Usage guidance. [Link](src/Common.Office/ai/office.excel.instructions.md#usage)
+
+- `src/Common.Office/ai/office.word.instructions.md`
+  - **Module Context** — Module scope and purpose. [Link](src/Common.Office/ai/office.word.instructions.md#module-context)
+  - **Installation** — Installation guidance. [Link](src/Common.Office/ai/office.word.instructions.md#installation)
+  - **Backend Comparison** — Provider comparison table. [Link](src/Common.Office/ai/office.word.instructions.md#backend-comparison)
+  - **Interfaces** — Interfaces guidance. [Link](src/Common.Office/ai/office.word.instructions.md#interfaces)
+  - **Models** — Models guidance. [Link](src/Common.Office/ai/office.word.instructions.md#models)
+  - **Usage** — Usage guidance. [Link](src/Common.Office/ai/office.word.instructions.md#usage)
+
+- `src/Common.Office/ai/office.mail.instructions.md`
+  - **Module Context** — Module scope and purpose. [Link](src/Common.Office/ai/office.mail.instructions.md#module-context)
+  - **Installation** — Installation guidance. [Link](src/Common.Office/ai/office.mail.instructions.md#installation)
+  - **`IMailer`** — Mailer contract. [Link](src/Common.Office/ai/office.mail.instructions.md#imailer)
+  - **Core Models** — Core data models. [Link](src/Common.Office/ai/office.mail.instructions.md#core-models)
+  - **Configuration** — Mailer configuration. [Link](src/Common.Office/ai/office.mail.instructions.md#configuration)
+  - **DI Registration** — Dependency registration. [Link](src/Common.Office/ai/office.mail.instructions.md#di-registration)
+  - **Exceptions** — Exception behavior. [Link](src/Common.Office/ai/office.mail.instructions.md#exceptions)
+  - **Testing — `DummyMailer`** — Test mailer usage. [Link](src/Common.Office/ai/office.mail.instructions.md#testing-dummymailer)
+  - **Web DTOs — `MailInput`** — Web DTO mapping. [Link](src/Common.Office/ai/office.mail.instructions.md#web-dtos-mailinput)
+  - **ASP.NET Identity Integration** — Identity integration hooks. [Link](src/Common.Office/ai/office.mail.instructions.md#aspnet-identity-integration)
+
+- `src/Common.Office/ai/office.csv.instructions.md`
+  - **Module Context** — Module scope and purpose. [Link](src/Common.Office/ai/office.csv.instructions.md#module-context)
+  - **Installation** — Installation guidance. [Link](src/Common.Office/ai/office.csv.instructions.md#installation)
+  - **`ICsvManager` / `ICsvManager<T>`** — CSV manager contracts. [Link](src/Common.Office/ai/office.csv.instructions.md#icsvmanager-icsvmanagert)
+  - **`CsvOptions`** — CSV option model. [Link](src/Common.Office/ai/office.csv.instructions.md#csvoptions)
+  - **Notes** — Important caveats. [Link](src/Common.Office/ai/office.csv.instructions.md#notes)
+  - **Usage** — Usage guidance. [Link](src/Common.Office/ai/office.csv.instructions.md#usage)
+
+- `src/Common.Office/ai/office.barcodes.instructions.md`
+  - **Module Context** — Module scope and purpose. [Link](src/Common.Office/ai/office.barcodes.instructions.md#module-context)
+  - **Installation** — Installation guidance. [Link](src/Common.Office/ai/office.barcodes.instructions.md#installation)
+  - **Backend Comparison** — Provider comparison table. [Link](src/Common.Office/ai/office.barcodes.instructions.md#backend-comparison)
+  - **Interfaces** — Interfaces guidance. [Link](src/Common.Office/ai/office.barcodes.instructions.md#interfaces)
+  - **Models** — Models guidance. [Link](src/Common.Office/ai/office.barcodes.instructions.md#models)
+  - **Usage** — Usage guidance. [Link](src/Common.Office/ai/office.barcodes.instructions.md#usage)
+
+- `src/Common.Office/ai/office.ocr.instructions.md`
+  - **Module Context** — Module scope and purpose. [Link](src/Common.Office/ai/office.ocr.instructions.md#module-context)
+  - **Installation** — Installation guidance. [Link](src/Common.Office/ai/office.ocr.instructions.md#installation)
+  - **Backend Comparison** — Provider comparison table. [Link](src/Common.Office/ai/office.ocr.instructions.md#backend-comparison)
+  - **`IOcrService`** — OCR service contract. [Link](src/Common.Office/ai/office.ocr.instructions.md#iocrservice)
+  - **Tesseract** — Tesseract backend notes. [Link](src/Common.Office/ai/office.ocr.instructions.md#tesseract)
+  - **PaddleOCR** — PaddleOCR backend notes. [Link](src/Common.Office/ai/office.ocr.instructions.md#paddleocr)
+  - **Notes** — Important caveats. [Link](src/Common.Office/ai/office.ocr.instructions.md#notes)
+
+- `src/Common.Office/ai/office.vcards.instructions.md`
+  - **Module Context** — Module scope and purpose. [Link](src/Common.Office/ai/office.vcards.instructions.md#module-context)
+  - **Installation** — Installation guidance. [Link](src/Common.Office/ai/office.vcards.instructions.md#installation)
+  - **`VCardManager`** — vCard manager API. [Link](src/Common.Office/ai/office.vcards.instructions.md#vcardmanager)
+  - **Reading** — vCard read flow. [Link](src/Common.Office/ai/office.vcards.instructions.md#reading)
+  - **Writing** — vCard write flow. [Link](src/Common.Office/ai/office.vcards.instructions.md#writing)
+  - **`VCardVersion`** — Version selection rules. [Link](src/Common.Office/ai/office.vcards.instructions.md#vcardversion)
+  - **Notes** — Important caveats. [Link](src/Common.Office/ai/office.vcards.instructions.md#notes)
+
+___BEGIN___COMMAND_DONE_MARKER___0
+
 ## Pre-flight checklist
 
 Run this checklist before any code generation:
