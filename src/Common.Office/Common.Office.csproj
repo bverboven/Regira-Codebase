@@ -43,5 +43,6 @@
     <None Include="ai\office.ocr.examples.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
     <None Include="ai\office.vcards.instructions.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
     <None Include="ai\office.vcards.examples.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+    <None Include="ai\office-agent.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
   </ItemGroup>
 </Project>

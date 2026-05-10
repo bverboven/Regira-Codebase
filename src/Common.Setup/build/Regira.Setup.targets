@@ -20,4 +20,20 @@
 
   </Target>
 
+  <!--
+    Copies Regira slash commands into the consuming project's
+    .claude/commands/ folder on first build.
+  -->
+  <Target Name="RegiraSetupExtractCommandFiles"
+          BeforeTargets="BeforeBuild"
+          Condition="!Exists('$(ProjectDir).claude\commands\new-project.md')">
+
+    <MakeDir Directories="$(ProjectDir).claude\commands" />
+
+    <Copy SourceFiles="$(_RegiraSetupFilesRoot)commands\new-project.md;$(_RegiraSetupFilesRoot)commands\new-entity.md;$(_RegiraSetupFilesRoot)commands\sync-guides.md;$(_RegiraSetupFilesRoot)commands\update-guide.md;$(_RegiraSetupFilesRoot)commands\evaluate.md"
+          DestinationFolder="$(ProjectDir).claude\commands\"
+          SkipUnchangedFiles="true" />
+
+  </Target>
+
 </Project>

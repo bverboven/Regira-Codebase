@@ -20,6 +20,13 @@
   <ItemGroup>
     <None Include="ai\project.setup.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
     <None Include="ai\shared.setup.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+    <None Include="ai\CLAUDE.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+    <None Include="ai\copilot-instructions.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+    <None Include="ai\commands\new-project.md" Pack="true" PackagePath="contentFiles\any\any\ai\commands\" />
+    <None Include="ai\commands\new-entity.md" Pack="true" PackagePath="contentFiles\any\any\ai\commands\" />
+    <None Include="ai\commands\sync-guides.md" Pack="true" PackagePath="contentFiles\any\any\ai\commands\" />
+    <None Include="ai\commands\update-guide.md" Pack="true" PackagePath="contentFiles\any\any\ai\commands\" />
+    <None Include="ai\commands\evaluate.md" Pack="true" PackagePath="contentFiles\any\any\ai\commands\" />
   </ItemGroup>
   <ItemGroup>
     <!-- Added for automated versioning -->

@@ -31,5 +31,6 @@
     <None Include="ai\entities.signatures.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
     <None Include="ai\entities.namespaces.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
     <None Include="ai\entities.advanced.example.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+    <None Include="ai\entities-agent.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
   </ItemGroup>
 </Project>

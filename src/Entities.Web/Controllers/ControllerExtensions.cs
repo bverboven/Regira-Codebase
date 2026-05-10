@@ -208,4 +208,17 @@ public static class ControllerExtensions
 
         return ctrl.DeleteResult(model, sw.ElapsedMilliseconds);
     }
+
+    public static TService GetRequiredEntityService<TService>(this ControllerBase ctrl)
+    {
+        try
+        {
+            return ctrl.HttpContext.RequestServices.GetRequiredService<TService>();
+        }
+        catch (Exception ex)
+        {
+            // ToDo: check services for this entity
+            throw;
+        }
+    }
 }

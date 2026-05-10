@@ -20,4 +20,20 @@
 
   </Target>
 
+  <!--
+    Copies the Entities subagent prompt into the consuming project's
+    .claude/agents/ folder on first build.
+  -->
+  <Target Name="RegiraEntitiesExtractAgentFiles"
+          BeforeTargets="BeforeBuild"
+          Condition="!Exists('$(ProjectDir).claude\agents\entities-agent.md')">
+
+    <MakeDir Directories="$(ProjectDir).claude\agents" />
+
+    <Copy SourceFiles="$(_RegiraEntitiesFilesRoot)entities-agent.md"
+          DestinationFolder="$(ProjectDir).claude\agents\"
+          SkipUnchangedFiles="true" />
+
+  </Target>
+
 </Project>

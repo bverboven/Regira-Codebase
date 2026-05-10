@@ -20,4 +20,20 @@
 
   </Target>
 
+  <!--
+    Copies the Office subagent prompt into the consuming project's
+    .claude/agents/ folder on first build.
+  -->
+  <Target Name="RegiraOfficeExtractAgentFiles"
+          BeforeTargets="BeforeBuild"
+          Condition="!Exists('$(ProjectDir).claude\agents\office-agent.md')">
+
+    <MakeDir Directories="$(ProjectDir).claude\agents" />
+
+    <Copy SourceFiles="$(_RegiraOfficeFilesRoot)office-agent.md"
+          DestinationFolder="$(ProjectDir).claude\agents\"
+          SkipUnchangedFiles="true" />
+
+  </Target>
+
 </Project>
