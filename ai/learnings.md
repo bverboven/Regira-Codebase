@@ -2,5 +2,3 @@
 ---
 
 ## Lessons Learned
-
-- ...

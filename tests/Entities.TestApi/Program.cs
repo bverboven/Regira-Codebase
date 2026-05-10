@@ -56,6 +56,15 @@ builder.Host.UseSerilog((_, config) => config
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
 );
 
+// Validate that all constructor-injected dependencies are registered when the app is built.
+// This catches missing registrations at startup rather than on the first request.
+// Note: does not cover GetRequiredEntityService<T> calls (those are resolved dynamically).
+builder.Host.UseDefaultServiceProvider(o =>
+{
+    o.ValidateOnBuild = true;
+    o.ValidateScopes = true;
+});
+
 builder.Services
     .AddProblemDetails();
 

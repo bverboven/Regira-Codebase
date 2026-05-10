@@ -27,7 +27,7 @@ public static class ControllerExtensions
         var sw = new Stopwatch();
         sw.Start();
 
-        var service = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, TKey>>();
+        var service = ctrl.GetRequiredEntityService<IEntityService<TEntity, TKey>>();
         var item = await service.Details(id);
         if (item == null)
         {
@@ -51,7 +51,7 @@ public static class ControllerExtensions
         var sw = new Stopwatch();
         sw.Start();
 
-        var service = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, TKey>>();
+        var service = ctrl.GetRequiredEntityService<IEntityService<TEntity, TKey>>();
         var items = await service.List(so, pagingInfo);
 
         var mapper = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityMapper>();
@@ -71,7 +71,7 @@ public static class ControllerExtensions
         var sw = new Stopwatch();
         sw.Start();
 
-        var service = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, TKey, TSo, TSortBy, TIncludes>>();
+        var service = ctrl.GetRequiredEntityService<IEntityService<TEntity, TKey, TSo, TSortBy, TIncludes>>();
         var items = await service
             .List(so, sortBy, includes.ToBitmask(), pagingInfo);
 
@@ -89,7 +89,7 @@ public static class ControllerExtensions
     public static async Task<ActionResult<SearchResult<TDto>>> Search<TEntity, TKey, TDto>(this ControllerBase ctrl, SearchObject<TKey>? so = null, PagingInfo? pagingInfo = null)
         where TEntity : class, IEntity<TKey>
     {
-        var service = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, TKey>>();
+        var service = ctrl.GetRequiredEntityService<IEntityService<TEntity, TKey>>();
 
         var sw = new Stopwatch();
         sw.Start();
@@ -115,7 +115,7 @@ public static class ControllerExtensions
         where TSortBy : struct, Enum
         where TIncludes : struct, Enum
     {
-        var service = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, TKey, TSo, TSortBy, TIncludes>>();
+        var service = ctrl.GetRequiredEntityService<IEntityService<TEntity, TKey, TSo, TSortBy, TIncludes>>();
 
         var sw = new Stopwatch();
         sw.Start();
@@ -152,7 +152,7 @@ public static class ControllerExtensions
             }
             var isNew = item.IsNew();
 
-            var service = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, TKey>>();
+            var service = ctrl.GetRequiredEntityService<IEntityService<TEntity, TKey>>();
             if (!isNew)
             {
                 var exists = await service.Count(new { item.Id }) == 1;
@@ -191,7 +191,7 @@ public static class ControllerExtensions
         var sw = new Stopwatch();
         sw.Start();
 
-        var service = ctrl.HttpContext.RequestServices.GetRequiredService<IEntityService<TEntity, TKey>>();
+        var service = ctrl.GetRequiredEntityService<IEntityService<TEntity, TKey>>();
         var item = (await service.List(new { id })).SingleOrDefault();
         if (item == null)
         {
@@ -210,15 +210,68 @@ public static class ControllerExtensions
     }
 
     public static TService GetRequiredEntityService<TService>(this ControllerBase ctrl)
+        where TService : notnull
     {
         try
         {
             return ctrl.HttpContext.RequestServices.GetRequiredService<TService>();
         }
-        catch (Exception ex)
+        catch (InvalidOperationException ex)
         {
-            // ToDo: check services for this entity
-            throw;
+            var requestedType = typeof(TService);
+
+            if (requestedType.IsGenericType)
+            {
+                var services = ctrl.HttpContext.RequestServices.GetService<IServiceCollection>();
+                if (services != null)
+                {
+                    var entityType = requestedType.GetGenericArguments()[0];
+
+                    var entityServiceOpenGenerics = new HashSet<Type>
+                    {
+                        typeof(IEntityService<>),
+                        typeof(IEntityService<,>),
+                        typeof(IEntityService<,,>),
+                        typeof(IEntityService<,,,>),
+                        typeof(IEntityService<,,,,>)
+                    };
+
+                    var registered = services
+                        .Where(d =>
+                            d.ServiceType.IsGenericType
+                            && entityServiceOpenGenerics.Contains(d.ServiceType.GetGenericTypeDefinition())
+                            && d.ServiceType.GetGenericArguments()[0] == entityType)
+                        .Select(d => d.ServiceType.Name + FormatTypeArgs(d.ServiceType))
+                        .Distinct()
+                        .ToList();
+
+                    if (registered.Count > 0)
+                    {
+                        throw new InvalidOperationException(
+                            $"No service of type '{requestedType.Name}{FormatTypeArgs(requestedType)}' was registered. " +
+                            $"The following IEntityService registrations exist for '{entityType.Name}': " +
+                            string.Join(", ", registered) + ". " +
+                            $"Make sure all generic parameters in .For<>() exactly match what the controller extension is requesting.",
+                            ex);
+                    }
+
+                    throw new InvalidOperationException(
+                        $"No service of type '{requestedType.Name}{FormatTypeArgs(requestedType)}' was registered, " +
+                        $"and no entity services for '{entityType.Name}' were found. " +
+                        $"Register it via .For<{entityType.Name}>() or an appropriate overload.",
+                        ex);
+                }
+            }
+
+            throw new InvalidOperationException(
+                $"No service of type '{requestedType.Name}' was registered. " +
+                $"Register entity services using .For<>() with matching generic type parameters.",
+                ex);
         }
     }
+
+    private static string FormatTypeArgs(Type type) =>
+        type.IsGenericType
+            ? "<" + string.Join(", ", type.GetGenericArguments().Select(a => a.Name)) + ">"
+            : string.Empty;
 }

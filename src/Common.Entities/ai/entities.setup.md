@@ -105,6 +105,18 @@ builder.Services.AddEntityServices();
 
 > **Note:** `AddPrimerInterceptors(sp)` and `AddNormalizerInterceptors(sp)` require the `IServiceProvider` (`sp`) from the `AddDbContext` factory overload. Always use the `(sp, options) => ...` signature.
 
+> **ValidateOnBuild:** Add the following to catch missing or mismatched entity service registrations at app startup rather than on the first request. A wrong generic parameter in `.For<>()` — or a `.For<>()` call that was never added — will throw immediately when the host builds instead of silently producing a confusing runtime error.
+>
+> ```csharp
+> builder.Host.UseDefaultServiceProvider(o =>
+> {
+>     o.ValidateOnBuild = true;
+>     o.ValidateScopes = true;
+> });
+> ```
+>
+> This validates constructor-injected dependencies only. Services resolved manually (e.g. via `GetRequiredEntityService<T>()` in controller extension methods) are not covered — those are caught by the improved error message in `ControllerExtensions.GetRequiredEntityService` instead.
+
 > **OpenAPI/UI note:** If the shared project guide is not available locally yet, keep the API surface aligned with the Regira baseline here as well: use `app.MapOpenApi()` plus `app.MapScalarApiReference()` and do not add `Swashbuckle.AspNetCore` or `UseSwaggerUI()`.
 
 > **SQLite starter note:** For the default SQLite starter/test setup, do not scaffold an initial EF migration. After `app = builder.Build()`, create a scope and call `Database.EnsureCreated()` instead:
