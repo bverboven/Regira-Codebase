@@ -121,7 +121,7 @@ When the consumer project already contains Regira packages, inspect the project'
 
 | Module | Use when | Main packages |
 |--------|----------|---------------|
-| Entities | CRUD APIs, entity services, DTO mapping, EF Core repositories | `Regira.Entities`, `Regira.Entities.EFcore`, `Regira.Entities.Web` |
+| Entities | CRUD APIs, entity services, DTO mapping, EF Core repositories | `Regira.Entities.DependencyInjection`, `Regira.Entities.Mapping.Mapster` (default mapping); also `Regira.Entities`, `Regira.Entities.EFcore`, `Regira.Entities.Web` |
 | IO.Storage | File storage, uploads, Azure Blob, SFTP, ZIP | `Regira.IO.Storage`, `Regira.IO.Storage.Azure`, `Regira.IO.Storage.SSH` |
 | Office | Office family overview or when the user still needs to choose between PDF, Excel, Word, Mail, OCR, and related submodules | `Regira.Office` |
 | Office.PDF | HTML to PDF, PDF operations, printing | `Regira.Office.PDF.SelectPdf`, `Regira.Office.PDF.Puppeteer` |

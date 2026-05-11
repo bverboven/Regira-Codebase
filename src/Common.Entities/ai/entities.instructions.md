@@ -686,6 +686,8 @@ but can also be registered manually if you want to customize the configuration.
 
 ## Troubleshooting
 
+Always use the latest .net version (net10 atm) unless rquested otherwise.
+
 | Problem | Likely Cause | Fix |
 |---------|-------------|-----|
 | Navigation properties not loaded | Missing `Includes` config or wrong flag | Check `e.Includes(...)` and that the client sends the correct `includes` flag |
@@ -704,6 +706,7 @@ but can also be registered manually if you want to customize the configuration.
 | Unsure how to implement a pattern or need a working example | No reference at hand | Copy from the matching section in [`entities.examples.md`](./entities.examples.md) |
 | `dotnet restore` fails with "Detected package downgrade" | Project targets a framework that is lower than what a dependency requires | Use latest `<TargetFramework>` in the `.csproj` |
 
+---
 
 ## See Also
 
