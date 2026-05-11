@@ -50,6 +50,9 @@ string Decrypt(string encryptedText, string? key = null);
 Fast. Same key always produces the same ciphertext. Use for non-sensitive reversible encoding.
 
 ```csharp
+using Regira.Security.Encryption; // SymmetricEncrypter
+using Regira.Security.Core;       // CryptoOptions
+
 var enc = new SymmetricEncrypter(new CryptoOptions { Secret = "my-app-key" });
 string cipher = enc.Encrypt("sensitive value");
 string plain  = enc.Decrypt(cipher);
@@ -60,6 +63,9 @@ string plain  = enc.Decrypt(cipher);
 Slower but produces different ciphertext on each call. **Recommended for stored secrets.**
 
 ```csharp
+using Regira.Security.Encryption; // AesEncrypter
+using Regira.Security.Core;       // CryptoOptions
+
 var enc = new AesEncrypter(new CryptoOptions { Secret = "my-app-key" });
 string cipher = enc.Encrypt("sensitive value");
 string plain  = enc.Decrypt(cipher);
@@ -77,9 +83,11 @@ string plain  = enc.Decrypt(cipher);
 
 ## Hashing
 
-### `IHasher`
+### `IHasher` — `Regira.Security.Abstractions`
 
 ```csharp
+using Regira.Security.Abstractions; // IHasher
+
 string Hash(string? plainText);
 bool   Verify(string? plainText, string hashedValue);
 ```
@@ -135,9 +143,12 @@ Fast but weaker. Use for non-password data only (e.g. cache keys, checksums).
 | `NameClaimType` | `string` | `"name"` | Claim used as user name |
 | `RoleClaimType` | `string` | `"role"` | Claim used as role |
 
-### `ITokenHelper`
+### `ITokenHelper` — `Regira.Security.Authentication.Jwt.Abstraction`
 
 ```csharp
+using Regira.Security.Authentication.Jwt.Abstraction; // ITokenHelper
+using Regira.Security.Authentication.Jwt.Models;      // JwtTokenOptions
+
 string      Create(IEnumerable<Claim> claims, string? audience = null, int? lifeSpan = null);
 Task<bool>  Validate(string token);
 ```
@@ -154,9 +165,11 @@ services.AddJwtAuthentication(options =>
 // Registers ITokenHelper as transient and configures JwtBearer scheme.
 ```
 
-### `ClaimsPrincipal` Extension Methods
+### `ClaimsPrincipal` Extension Methods — `Regira.Security.Authentication.Jwt.Extensions`
 
 ```csharp
+using Regira.Security.Authentication.Jwt.Extensions; // FindUserId, FindUserName, FindEmail
+
 string? userId = User.FindUserId();    // NameIdentifier claim
 string? name   = User.FindUserName();  // Name claim
 string? email  = User.FindEmail();     // Email claim
@@ -243,3 +256,38 @@ Each base controller requires `[ApiController]` and a `[Route]` attribute on the
 | `auth/password/reset` | POST | Reset password with token |
 
 ---
+
+## Namespace Quick Reference
+
+> **AI Agent Rule**: Always use exact namespaces. Do NOT guess or invent namespaces.
+
+### `Regira.Security` package
+
+| Type | Namespace |
+|------|-----------|
+| `IHasher` | `Regira.Security.Abstractions` |
+| `Hasher` (PBKDF2) | `Regira.Security.Hashing` |
+| `SimpleHasher` (double-SHA) | `Regira.Security.Hashing` |
+| `IEncrypter` | `Regira.Security.Encryption` |
+| `SymmetricEncrypter` | `Regira.Security.Encryption` |
+| `AesEncrypter` | `Regira.Security.Encryption` |
+| `CryptoOptions` | `Regira.Security.Core` |
+
+### `Regira.Security.Hashing.BCryptNet` package
+
+| Type | Namespace |
+|------|-----------|
+| `Hasher` (BCrypt) | `Regira.Security.Hashing.BCryptNet` |
+
+### `Regira.Security.Authentication` package
+
+| Type | Namespace |
+|------|-----------|
+| `ITokenHelper` | `Regira.Security.Authentication.Jwt.Abstraction` |
+| `JwtTokenOptions` | `Regira.Security.Authentication.Jwt.Models` |
+| `AddJwtAuthentication()` (extension) | `Regira.Security.Authentication.Jwt.Extensions` |
+| `FindUserId()` / `FindUserName()` / `FindEmail()` (extensions on `ClaimsPrincipal`) | `Regira.Security.Authentication.Jwt.Extensions` |
+| `IApiKeyOwnerService` | `Regira.Security.Authentication.ApiKey.Abstraction` |
+| `ApiKeyOwner` | `Regira.Security.Authentication.ApiKey.Models` |
+| `ApiKeyAuthenticationOptions` | `Regira.Security.Authentication.ApiKey.Models` |
+| `AddApiKeyAuthentication()` (extension) | `Regira.Security.Authentication.ApiKey.Extensions` |
