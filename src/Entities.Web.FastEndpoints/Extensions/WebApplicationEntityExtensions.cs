@@ -47,7 +47,7 @@ public static class WebApplicationEntityExtensions
     /// <param name="app">The application builder.</param>
     /// <param name="routePrefix">Default route prefix (default: <c>"api"</c>).</param>
     /// <param name="configure">Optional callback to customise routes or add per-entity overrides.</param>
-    public static WebApplication MapEntityCrudEndpoints(
+    public static WebApplication MapEntityEndpoints(
         this WebApplication app,
         string routePrefix = "api",
         Action<EntityAutoEndpointsOptions>? configure = null)
@@ -61,7 +61,7 @@ public static class WebApplicationEntityExtensions
             app.Logger.LogWarning(
                 "{Method} could not find {IServiceCollection} in the DI container. " +
                 "Ensure UseEntities<TContext>() has been called during service registration.",
-                nameof(MapEntityCrudEndpoints), nameof(IServiceCollection));
+                nameof(MapEntityEndpoints), nameof(IServiceCollection));
             return app;
         }
 

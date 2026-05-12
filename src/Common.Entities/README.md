@@ -22,8 +22,8 @@ Understanding the generic type system is crucial:
 
 ### Architecture
 
-- An Entity Controller requires an `IEntityService` to perform operations.
-- The Controller should implement all generic types of the service, but can add an extra Dto and InputDto type
+- An Entity Controller (or FastEndpoints endpoint) requires an `IEntityService` to perform operations.
+- A controller should implement all generic types of the service, but can add an extra Dto and InputDto type
 - An `IEntityService` is implemented by `EntityRepository` by default, but can be replaced by any custom implementation.
 
 Main **functionality** of the service:
@@ -59,7 +59,7 @@ Assuming a `Repository` with a `DbContext` is being used.
    1. Primers (Interceptors)
    1. Submit changes
 
-*\*: only executed when using API controllers*
+*\*: only executed when using API controllers or FastEndpoints endpoints*
 
 **Pipeline Details:**
 - **QueryBuilders**: Build IQueryable based on SearchObject, SortBy & Includes
@@ -93,7 +93,7 @@ builder.Services
 1. [Entity Models](docs/models.md) — Creating and structuring entity models
 1. [Services](docs/services.md) — Implementing entity services and repositories
 1. [Mapping](docs/mapping.md) — Mapping Entities to and from DTOs
-1. [Controllers](docs/controllers.md) — Creating Web API controllers
+1. [Web Endpoints](docs/web-endpoints.md) — Exposing entity operations as HTTP endpoints
 1. [Normalizing](docs/normalizing.md) — Data normalization techniques
 1. [Attachments](docs/attachments.md) — Managing file attachments
 1. [Built-in Features](docs/built-in-features.md) — Ready to use components

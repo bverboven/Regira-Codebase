@@ -3,7 +3,7 @@ using Regira.Entities.Models.Abstractions;
 namespace Regira.Entities.Web.FastEndpoints.Models;
 
 /// <summary>
-/// Configuration for <see cref="Extensions.WebApplicationEntityExtensions.MapEntityCrudEndpoints"/>.
+/// Configuration for <see cref="Extensions.WebApplicationEntityExtensions.MapEntityEndpoints"/>.
 /// </summary>
 public class EntityAutoEndpointsOptions
 {
