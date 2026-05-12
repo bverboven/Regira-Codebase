@@ -28,7 +28,7 @@ internal static class EntityEndpointHelper
         {
             var mapper = services.GetRequiredService<IEntityMapper>();
             var item = mapper.Map<TEntity>(model!);
-            if (!id?.Equals(default(TKey)) ?? false)
+            if (id != null && !id.Equals(default(TKey)))
             {
                 item.Id = id;
             }

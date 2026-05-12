@@ -41,7 +41,13 @@ public abstract class EntityCreateEndpointBase<TEntity, TKey, TDto, TInputDto>
             return;
         }
 
-        await Send.OkAsync(result!, ct);
+        if (result == null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        await Send.OkAsync(result, ct);
     }
 }
 
