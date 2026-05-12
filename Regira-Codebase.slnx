@@ -33,6 +33,7 @@
     <Project Path="src/Entities.Mapping.AutoMapper/Entities.Mapping.AutoMapper.csproj" />
     <Project Path="src/Entities.Mapping.Mapster/Entities.Mapping.Mapster.csproj" />
     <Project Path="src/Entities.Web/Entities.Web.csproj" />
+    <Project Path="src/Entities.Web.FastEndpoints/Entities.Web.FastEndpoints.csproj" />
   </Folder>
   <Folder Name="/src/Globalization/">
     <Project Path="src/Globalization.LibPhoneNumber/Globalization.LibPhoneNumber.csproj" />
