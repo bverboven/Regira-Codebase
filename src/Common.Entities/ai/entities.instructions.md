@@ -144,7 +144,7 @@ Base controllers call `SaveChanges()` automatically, but when using `IEntityServ
 **FastEndpoints (preferred — no per-entity controller boilerplate):**
 - Call `app.MapEntityEndpoints()` in `Program.cs` — auto-registers CRUD routes for every `IEntityService<,>` in DI
 - No per-entity code needed; routes follow `api/{entityname}s` convention
-- Use `EntityAutoEndpointsOptions` to override routes for irregular plurals or custom prefixes
+- Use `EntityAutoEndpointsOptions` to override routes for fully custom paths (irregular plurals are handled automatically)
 - Note: auto-registration uses raw entities (no DTOs); use endpoint base classes for DTO-aware endpoints
 
 **Use `EntityControllerBase` when:**
@@ -373,11 +373,11 @@ Before writing the controller, verify the `.For<>()` registration and controller
 
 No per-entity step needed. `app.MapEntityEndpoints()` (called once in `Program.cs`) automatically covers every entity registered via `.For<>()`. Routes follow the `api/{entityname}s` convention.
 
-For irregular plurals or custom route prefixes, configure via `EntityAutoEndpointsOptions`:
+Use `EntityAutoEndpointsOptions` only for fully custom routes (e.g. versioning, renamed paths):
 ```csharp
 app.MapEntityEndpoints(configure: options =>
 {
-    options.For<Category>("api/categories");
+    options.For<Product>("v2/shop/items"); // fully custom path
 });
 ```
 

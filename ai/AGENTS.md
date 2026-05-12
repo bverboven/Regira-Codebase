@@ -64,7 +64,7 @@ For a new project, choose the template before creating files. For an existing pr
 
 Keep setup aligned with the selected `projectTemplate`. This file must remain enough for the normal one-file consumer flow even when no extracted local guides exist yet.
 
-- Use the latest stable .NET framework and latest C# features unless the consumer project already targets something else.
+- Use the latest stable .NET framework and latest C# features unless the consumer project already targets something else. Current LTS version is **.NET 10**.
 - Add the Regira feed to `NuGet.Config` alongside `nuget.org` before restoring Regira packages.
 - Keep `Program.cs` thin and move service registration or middleware setup into extension methods.
 - Prefer `Microsoft.Extensions.DependencyInjection` and depend on abstractions instead of concrete implementations.

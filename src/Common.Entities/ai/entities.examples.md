@@ -11,13 +11,10 @@ For the correct **namespaces**: see [`entities.namespaces.md`](./entities.namesp
 
 ## Structure
 
+With FastEndpoints auto-registration, no `Controllers/` folder is needed. Add one only when using `EntityControllerBase` or manual endpoint classes.
+
 ```
 Webshop.API/
-├── Controllers/
-│   ├── CategoryController.cs
-│   ├── CustomerController.cs
-│   ├── OrderController.cs
-│   └── ProductController.cs
 ├── Data/
 │   └── WebshopDbContext.cs
 ├── Entities/
@@ -523,7 +520,36 @@ public static IEntityServiceCollection<WebshopDbContext> AddOrders(this IEntityS
 }
 ```
 
-## Controllers
+## Web Endpoints
+
+### FastEndpoints (Preferred)
+
+All entity CRUD routes are auto-registered by a single call in `Program.cs`. No per-entity code needed.
+
+```csharp
+// Program.cs
+builder.Services.AddFastEndpoints();
+// ...
+app.UseFastEndpoints();
+app.MapEntityEndpoints();
+// Auto-registered routes (Humanizer handles pluralization):
+//   /api/products/*, /api/categories/*, /api/customers/*, /api/orders/*
+
+// Routes per entity (example for Product):
+// GET    /api/products/{id}    — Details
+// GET    /api/products         — List
+// POST   /api/products         — Create
+// POST   /api/products/save    — Save (upsert)
+// PUT    /api/products/{id}    — Modify
+// DELETE /api/products/{id}    — Delete
+
+// Use For<TEntity>(route) only for fully custom paths:
+// app.MapEntityEndpoints(configure: o => o.For<Product>("v2/shop/items"));
+```
+
+### Controllers (Advanced)
+
+Use `EntityControllerBase` when the project already relies on MVC controllers:
 
 ```csharp
 // Controllers/CategoryController.cs ~ For<Category, CategorySearchObject, EntitySortBy, CategoryIncludes>()

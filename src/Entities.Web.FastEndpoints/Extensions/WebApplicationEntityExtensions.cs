@@ -49,7 +49,7 @@ public static class WebApplicationEntityExtensions
     /// <param name="configure">Optional callback to customise routes or add per-entity overrides.</param>
     public static WebApplication MapEntityEndpoints(
         this WebApplication app,
-        string routePrefix = "api",
+        string routePrefix = "",
         Action<EntityAutoEndpointsOptions>? configure = null)
     {
         var options = new EntityAutoEndpointsOptions { RoutePrefix = routePrefix };

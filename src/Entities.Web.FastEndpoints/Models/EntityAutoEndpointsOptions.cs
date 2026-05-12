@@ -1,3 +1,4 @@
+using Humanizer;
 using Regira.Entities.Models.Abstractions;
 
 namespace Regira.Entities.Web.FastEndpoints.Models;
@@ -35,8 +36,5 @@ public class EntityAutoEndpointsOptions
             ? route
             : $"{RoutePrefix}/{Pluralize(entityType.Name.ToLowerInvariant())}";
 
-    private static string Pluralize(string name)
-        => name.EndsWith('s') ? name : $"{name}s";
-    // Note: this is a simple English convention. Use For<TEntity>(route) to override
-    // routes for entities with irregular plurals (e.g. Category, Person, Status).
+    private static string Pluralize(string name) => name.Pluralize();
 }

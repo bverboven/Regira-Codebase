@@ -60,21 +60,14 @@ Use the optional `configure` callback to change the route prefix or override ind
 // Change prefix from "api" to "v1"
 app.MapEntityEndpoints(routePrefix: "v1");
 
-// Override specific entity routes (useful for irregular plurals)
+// Override with a fully custom route (versioning, renamed paths, etc.)
 app.MapEntityEndpoints(configure: options =>
 {
-    options.For<Category>("api/categories");
-    options.For<Person>("api/people");
-});
-
-// Both at once
-app.MapEntityEndpoints(routePrefix: "v2", configure: options =>
-{
-    options.For<Category>("v2/categories");
+    options.For<Product>("v2/shop/items");
 });
 ```
 
-Default pluralization is a simple English convention (`name + "s"`). Use `For<TEntity>(route)` for irregular plurals (Category → categories, Person → people, Status → statuses).
+Pluralization uses [Humanizer](https://github.com/Humanizr/Humanizer), so irregular plurals are handled automatically: `Category` → `categories`, `Person` → `people`, `Status` → `statuses`. Use `For<TEntity>(route)` only when you need a completely custom path.
 
 ### Manual FastEndpoints Base Classes
 

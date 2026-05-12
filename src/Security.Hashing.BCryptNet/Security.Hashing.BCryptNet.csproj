@@ -11,12 +11,12 @@
     <AssemblyName>Regira.Security.Hashing.BCryptNet</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.2.5</Version>
+    <Version>5.2.6</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Security\Common.Security.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
   </ItemGroup>
 </Project>

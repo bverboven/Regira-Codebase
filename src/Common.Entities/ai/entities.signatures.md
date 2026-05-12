@@ -400,7 +400,7 @@ public class EntityAutoEndpointsOptions
     // Default route prefix. Default: "api"
     public string RoutePrefix { get; set; }
 
-    // Override the route for a specific entity (use for irregular plurals)
+    // Override the route for a specific entity (for fully custom paths; irregular plurals are handled automatically)
     public EntityAutoEndpointsOptions For<TEntity>(string route)
         where TEntity : class, IEntity;
 
