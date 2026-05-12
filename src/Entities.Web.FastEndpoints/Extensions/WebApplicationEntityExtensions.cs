@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Regira.Entities.Extensions;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
@@ -57,6 +58,10 @@ public static class WebApplicationEntityExtensions
         var serviceCollection = app.Services.GetService<IServiceCollection>();
         if (serviceCollection == null)
         {
+            app.Logger.LogWarning(
+                "{Method} could not find {IServiceCollection} in the DI container. " +
+                "Ensure UseEntities<TContext>() has been called during service registration.",
+                nameof(MapEntityCrudEndpoints), nameof(IServiceCollection));
             return app;
         }
 
@@ -201,7 +206,7 @@ public static class WebApplicationEntityExtensions
             IEntityService<TEntity, TKey> service,
             CancellationToken ct) =>
         {
-            var item = (await service.List(new { id }, token: ct)).SingleOrDefault();
+            var item = await service.Details(id, ct);
             if (item == null)
             {
                 return Results.NotFound();

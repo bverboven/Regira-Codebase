@@ -37,4 +37,6 @@ public class EntityAutoEndpointsOptions
 
     private static string Pluralize(string name)
         => name.EndsWith('s') ? name : $"{name}s";
+    // Note: this is a simple English convention. Use For<TEntity>(route) to override
+    // routes for entities with irregular plurals (e.g. Category, Person, Status).
 }
