@@ -4,6 +4,7 @@ using Regira.IO.Extensions;
 using Regira.IO.Storage.GitHub;
 using Regira.Serializing.Newtonsoft.Json;
 using System.Net;
+using System.Text;
 namespace IO.Testing.GitHub;
 
 [TestFixture]
@@ -12,7 +13,7 @@ public class GitHubStorageTests
     public StorageTestHelper.StorageTestContext<GitHubService> StorageTestContext { get; set; } = null!;
     private GitHubCommunicator _communicator = null!;
 
-    [SetUp]
+    [OneTimeSetUp]
     public async Task Setup()
     {
         var config = new ConfigurationBuilder()
@@ -36,7 +37,7 @@ public class GitHubStorageTests
         }
     }
 
-    [TearDown]
+    [OneTimeTearDown]
     public async Task TearDown()
     {
         try
@@ -82,9 +83,36 @@ public class GitHubStorageTests
 #endif
 
     [Test]
-    public async Task Add_File() => await StorageTestContext.Test_Add_File();
+    public async Task Add_File()
+    {
+        const string id = "temp-write/file-add.txt";
+        var bytes = Encoding.UTF8.GetBytes("add-test");
+        var uri = await StorageTestContext.FileService.Save(id, bytes);
+        Assert.That(uri, Is.Not.Empty);
+        var saved = await StorageTestContext.FileService.GetBytes(id);
+        Assert.That(saved, Is.EquivalentTo(bytes));
+        await StorageTestContext.FileService.Delete(id);
+    }
     [Test]
-    public async Task Update_File() => await StorageTestContext.Test_Update_File();
+    public async Task Update_File()
+    {
+        const string id = "temp-write/file-update.txt";
+        var original = Encoding.UTF8.GetBytes("original");
+        await StorageTestContext.FileService.Save(id, original);
+        var updated = Encoding.UTF8.GetBytes("updated");
+        await StorageTestContext.FileService.Save(id, updated);
+        var saved = await StorageTestContext.FileService.GetBytes(id);
+        Assert.That(saved, Is.Not.EquivalentTo(original));
+        Assert.That(saved, Is.EquivalentTo(updated));
+        await StorageTestContext.FileService.Delete(id);
+    }
     [Test]
-    public async Task Remove_File() => await StorageTestContext.Test_Remove_File();
+    public async Task Remove_File()
+    {
+        const string id = "temp-write/file-remove.txt";
+        await StorageTestContext.FileService.Save(id, Encoding.UTF8.GetBytes("remove-test"));
+        Assert.That(await StorageTestContext.FileService.Exists(id), Is.True);
+        await StorageTestContext.FileService.Delete(id);
+        Assert.That(await StorageTestContext.FileService.Exists(id), Is.False);
+    }
 }

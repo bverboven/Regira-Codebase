@@ -22,6 +22,7 @@ public class GitHubCommunicator : IDisposable
         Client = new HttpClient { BaseAddress = new Uri(Root) };
         Client.DefaultRequestHeaders.UserAgent.ParseAdd(
             options.UserAgent ?? Assembly.GetExecutingAssembly().GetName().Name);
+        Client.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue { NoCache = true };
         if (!string.IsNullOrEmpty(options.Key))
             Client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", options.Key);
