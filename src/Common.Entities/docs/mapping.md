@@ -67,7 +67,7 @@ services
 1. [Entity Models](models.md) — Creating and structuring entity models
 1. [Services](services.md) — Implementing entity services and repositories
 1. **[Mapping](mapping.md)** — Mapping Entities to and from DTOs
-1. [Controllers](controllers.md) — Creating Web API controllers
+1. [Web Endpoints](web-endpoints.md) — Exposing entity operations as HTTP endpoints
 1. [Normalizing](normalizing.md) — Data normalization techniques
 1. [Attachments](attachments.md) — Managing file attachments
 1. [Built-in Features](built-in-features.md) — Ready to use components

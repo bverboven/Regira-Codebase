@@ -33,6 +33,7 @@
     <Project Path="src/Entities.Mapping.AutoMapper/Entities.Mapping.AutoMapper.csproj" />
     <Project Path="src/Entities.Mapping.Mapster/Entities.Mapping.Mapster.csproj" />
     <Project Path="src/Entities.Web/Entities.Web.csproj" />
+    <Project Path="src/Entities.Web.FastEndpoints/Entities.Web.FastEndpoints.csproj" />
   </Folder>
   <Folder Name="/src/Globalization/">
     <Project Path="src/Globalization.LibPhoneNumber/Globalization.LibPhoneNumber.csproj" />
@@ -147,6 +148,7 @@
     <Project Path="tests/Entities.TestApi/Entities.TestApi.csproj" />
     <Project Path="tests/Entities.Testing/Entities.Testing.csproj" />
     <Project Path="tests/Entities.Web.Testing/Entities.Web.Testing.csproj" />
+    <Project Path="tests/Entities.Web.FastEndpoints.Testing/Entities.Web.FastEndpoints.Testing.csproj" />
     <Project Path="tests/Hosting.Testing/Hosting.Testing.csproj" />
     <Project Path="tests/IO.Testing/IO.Testing.csproj" />
     <Project Path="tests/Normalizing.Testing/Normalizing.Testing.csproj" />
