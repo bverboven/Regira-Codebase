@@ -1,21 +1,23 @@
 <Project>
 
   <PropertyGroup>
-    <_RegiraPaymentsFilesRoot>$(MSBuildThisFileDirectory)..\contentFiles\any\any\ai\</_RegiraPaymentsFilesRoot>
+    <_RegiraPaymentsFilesRoot>$(MSBuildThisFileDirectory)..\ai\</_RegiraPaymentsFilesRoot>
+    <_RegiraBaseDir Condition="'$(SolutionDir)' != '' And '$(SolutionDir)' != '*Undefined*'">$(SolutionDir)</_RegiraBaseDir>
+    <_RegiraBaseDir Condition="'$(_RegiraBaseDir)' == ''">$(ProjectDir)</_RegiraBaseDir>
   </PropertyGroup>
 
   <!--
     Copies Payments AI instruction files into the consuming project's
-    .github/instructions/regira/ folder on first build.
+    .regira/instructions/ folder on first build.
   -->
   <Target Name="RegiraPaymentsExtractAiFiles"
           BeforeTargets="BeforeBuild"
-          Condition="!Exists('$(ProjectDir).github\instructions\regira\payments.instructions.md')">
+          Condition="!Exists('$(_RegiraBaseDir).regira\instructions\payments.instructions.md')">
 
-    <MakeDir Directories="$(ProjectDir).github\instructions\regira" />
+    <MakeDir Directories="$(_RegiraBaseDir).regira\instructions" />
 
     <Copy SourceFiles="$(_RegiraPaymentsFilesRoot)payments.instructions.md;$(_RegiraPaymentsFilesRoot)payments.examples.md"
-          DestinationFolder="$(ProjectDir).github\instructions\regira\"
+          DestinationFolder="$(_RegiraBaseDir).regira\instructions\"
           SkipUnchangedFiles="true" />
 
   </Target>

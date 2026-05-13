@@ -1,7 +1,5 @@
-using System.Net;
-using System.Net.Http.Json;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +9,8 @@ using Regira.Entities.Services.Abstractions;
 using Regira.Entities.Web.FastEndpoints.Extensions;
 using Regira.Entities.Web.FastEndpoints.Models;
 using Regira.Entities.Web.Models;
+using System.Net;
+using System.Net.Http.Json;
 using Xunit;
 
 namespace Entities.Web.FastEndpoints.Testing;
@@ -26,7 +26,7 @@ public class WebApplicationEntityExtensionsTests
 
         await using var host = await TestApplication<Widget>.CreateAsync(service);
 
-        var response = await host.Client.GetAsync("/api/widgets");
+        var response = await host.Client.GetAsync("/widgets");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -43,17 +43,17 @@ public class WebApplicationEntityExtensionsTests
         await using var host = await TestApplication<Widget>.CreateAsync();
 
         var routes = GetCrudRoutes(host.App)
-            .Where(route => route.Contains("/api/widgets", StringComparison.OrdinalIgnoreCase))
+            .Where(route => route.Contains("/widgets", StringComparison.OrdinalIgnoreCase))
             .OrderBy(route => route)
             .ToArray();
 
         Assert.Equal([
-            "DELETE /api/widgets/{id}",
-            "GET /api/widgets",
-            "GET /api/widgets/{id}",
-            "POST /api/widgets",
-            "POST /api/widgets/save",
-            "PUT /api/widgets/{id}"
+            "DELETE /widgets/{id}",
+            "GET /widgets",
+            "GET /widgets/{id}",
+            "POST /widgets",
+            "POST /widgets/save",
+            "PUT /widgets/{id}"
         ], routes);
     }
 
@@ -66,7 +66,7 @@ public class WebApplicationEntityExtensionsTests
             configureServices: services => AddEntityService(services, duplicate));
 
         var routes = GetCrudRoutes(host.App)
-            .Where(route => route.Contains("/api/widgets", StringComparison.OrdinalIgnoreCase))
+            .Where(route => route.Contains("/widgets", StringComparison.OrdinalIgnoreCase))
             .ToArray();
 
         Assert.Equal(6, routes.Length);
@@ -83,8 +83,8 @@ public class WebApplicationEntityExtensionsTests
         var routes = GetCrudRoutes(host.App);
 
         Assert.Equal(12, routes.Length);
-        Assert.Contains("GET /api/widgets", routes);
-        Assert.Contains("GET /api/gadgets", routes);
+        Assert.Contains("GET /widgets", routes);
+        Assert.Contains("GET /gadgets", routes);
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class WebApplicationEntityExtensionsTests
         var routes = GetCrudRoutes(host.App);
 
         Assert.Contains("GET /v2/widgets", routes);
-        Assert.DoesNotContain("GET /api/widgets", routes);
+        Assert.DoesNotContain("GET /widgets", routes);
     }
 
     [Fact]
@@ -124,7 +124,7 @@ public class WebApplicationEntityExtensionsTests
     {
         await using var host = await TestApplication<Widget>.CreateAsync();
 
-        var response = await host.Client.GetAsync("/api/widgets/404");
+        var response = await host.Client.GetAsync("/widgets/404");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -134,7 +134,7 @@ public class WebApplicationEntityExtensionsTests
     {
         await using var host = await TestApplication<Widget>.CreateAsync();
 
-        var response = await host.Client.PostAsJsonAsync("/api/widgets", new Widget { Name = "Created" });
+        var response = await host.Client.PostAsJsonAsync("/widgets", new Widget { Name = "Created" });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -156,7 +156,7 @@ public class WebApplicationEntityExtensionsTests
 
         await using var host = await TestApplication<Widget>.CreateAsync(service);
 
-        var response = await host.Client.DeleteAsync("/api/widgets/1");
+        var response = await host.Client.DeleteAsync("/widgets/1");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -220,7 +220,7 @@ public class WebApplicationEntityExtensionsTests
 
             if (registerServiceCollection)
             {
-                builder.Services.AddSingleton<IServiceCollection>(builder.Services);
+                builder.Services.AddSingleton(builder.Services);
             }
 
             service ??= new InMemoryEntityService<TEntity>();
@@ -241,7 +241,7 @@ public class WebApplicationEntityExtensionsTests
         }
     }
 
-    private sealed class InMemoryEntityService<TEntity>(IEnumerable<TEntity>? seed = null) : IEntityService<TEntity, int>
+    private sealed class InMemoryEntityService<TEntity>(IList<TEntity>? seed = null) : IEntityService<TEntity, int>
         where TEntity : class, IEntity<int>
     {
         private readonly Dictionary<int, TEntity> _items = seed?.ToDictionary(item => item.Id) ?? [];
@@ -324,7 +324,7 @@ public class WebApplicationEntityExtensionsTests
                 }
             }
 
-            id = default;
+            id = 0;
             return false;
         }
     }
@@ -338,6 +338,7 @@ public class WebApplicationEntityExtensionsTests
     private sealed class Gadget : IEntity<int>
     {
         public int Id { get; set; }
+        // ReSharper disable once UnusedMember.Local
         public string Name { get; set; } = string.Empty;
     }
 }

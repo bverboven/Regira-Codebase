@@ -12,21 +12,22 @@
     <Description>Shared Regira setup guides and AI instruction extraction support for consumer projects.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.3.0</Version>
+    <Version>5.3.1</Version>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="build\Regira.Setup.props" Pack="true" PackagePath="buildTransitive\" />
     <None Include="build\Regira.Setup.targets" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ai\project.setup.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
-    <None Include="ai\shared.setup.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
-    <None Include="ai\CLAUDE.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
-    <None Include="ai\copilot-instructions.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
-    <None Include="ai\commands\new-project.md" Pack="true" PackagePath="contentFiles\any\any\ai\commands\" />
-    <None Include="ai\commands\new-entity.md" Pack="true" PackagePath="contentFiles\any\any\ai\commands\" />
-    <None Include="ai\commands\sync-guides.md" Pack="true" PackagePath="contentFiles\any\any\ai\commands\" />
-    <None Include="ai\commands\update-guide.md" Pack="true" PackagePath="contentFiles\any\any\ai\commands\" />
-    <None Include="ai\commands\evaluate.md" Pack="true" PackagePath="contentFiles\any\any\ai\commands\" />
+    <None Include="ai\project.setup.md" Pack="true" PackagePath="ai\" />
+    <None Include="ai\shared.setup.md" Pack="true" PackagePath="ai\" />
+    <None Include="ai\CLAUDE.md" Pack="true" PackagePath="ai\" />
+    <None Include="ai\copilot-instructions.md" Pack="true" PackagePath="ai\" />
+    <None Include="ai\commands\new-project.md" Pack="true" PackagePath="ai\commands\" />
+    <None Include="ai\commands\new-entity.md" Pack="true" PackagePath="ai\commands\" />
+    <None Include="ai\commands\sync-guides.md" Pack="true" PackagePath="ai\commands\" />
+    <None Include="ai\commands\update-guide.md" Pack="true" PackagePath="ai\commands\" />
+    <None Include="ai\commands\evaluate.md" Pack="true" PackagePath="ai\commands\" />
   </ItemGroup>
   <ItemGroup>
     <!-- Added for automated versioning -->

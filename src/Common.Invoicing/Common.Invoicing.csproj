@@ -11,18 +11,19 @@
     <AssemblyName>Regira.Invoicing</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.3.0</Version>
+    <Version>5.3.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
   <!-- MSBuild targets — auto-imported into consuming builds via NuGet buildTransitive -->
   <ItemGroup>
+    <None Include="build\Regira.Invoicing.props" Pack="true" PackagePath="buildTransitive\" />
     <None Include="build\Regira.Invoicing.targets" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
   <!-- AI instruction files -->
   <ItemGroup>
-    <None Include="ai\invoicing.instructions.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
-    <None Include="ai\invoicing.examples.md" Pack="true" PackagePath="contentFiles\any\any\ai\" />
+    <None Include="ai\invoicing.instructions.md" Pack="true" PackagePath="ai\" />
+    <None Include="ai\invoicing.examples.md" Pack="true" PackagePath="ai\" />
   </ItemGroup>
 </Project>

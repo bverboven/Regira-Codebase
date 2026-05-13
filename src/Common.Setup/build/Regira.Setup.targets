@@ -1,21 +1,23 @@
 <Project>
 
   <PropertyGroup>
-    <_RegiraSetupFilesRoot>$(MSBuildThisFileDirectory)..\contentFiles\any\any\ai\</_RegiraSetupFilesRoot>
+    <_RegiraSetupFilesRoot>$(MSBuildThisFileDirectory)..\ai\</_RegiraSetupFilesRoot>
+    <_RegiraBaseDir Condition="'$(SolutionDir)' != '' And '$(SolutionDir)' != '*Undefined*'">$(SolutionDir)</_RegiraBaseDir>
+    <_RegiraBaseDir Condition="'$(_RegiraBaseDir)' == ''">$(ProjectDir)</_RegiraBaseDir>
   </PropertyGroup>
 
   <!--
     Copies shared Regira setup guides into the consuming project's
-    .github/instructions/regira/ folder on first build.
+    .regira/instructions/ folder on first build.
   -->
   <Target Name="RegiraSetupExtractAiFiles"
           BeforeTargets="BeforeBuild"
-          Condition="!Exists('$(ProjectDir).github\instructions\regira\project.setup.md') Or !Exists('$(ProjectDir).github\instructions\regira\shared.setup.md')">
+          Condition="!Exists('$(_RegiraBaseDir).regira\instructions\project.setup.md') Or !Exists('$(_RegiraBaseDir).regira\instructions\shared.setup.md')">
 
-    <MakeDir Directories="$(ProjectDir).github\instructions\regira" />
+    <MakeDir Directories="$(_RegiraBaseDir).regira\instructions" />
 
     <Copy SourceFiles="$(_RegiraSetupFilesRoot)project.setup.md;$(_RegiraSetupFilesRoot)shared.setup.md"
-          DestinationFolder="$(ProjectDir).github\instructions\regira\"
+          DestinationFolder="$(_RegiraBaseDir).regira\instructions\"
           SkipUnchangedFiles="true" />
 
   </Target>
@@ -26,12 +28,12 @@
   -->
   <Target Name="RegiraSetupExtractCommandFiles"
           BeforeTargets="BeforeBuild"
-          Condition="!Exists('$(ProjectDir).claude\commands\new-project.md')">
+          Condition="!Exists('$(_RegiraBaseDir).claude\commands\new-project.md')">
 
-    <MakeDir Directories="$(ProjectDir).claude\commands" />
+    <MakeDir Directories="$(_RegiraBaseDir).claude\commands" />
 
     <Copy SourceFiles="$(_RegiraSetupFilesRoot)commands\new-project.md;$(_RegiraSetupFilesRoot)commands\new-entity.md;$(_RegiraSetupFilesRoot)commands\sync-guides.md;$(_RegiraSetupFilesRoot)commands\update-guide.md;$(_RegiraSetupFilesRoot)commands\evaluate.md"
-          DestinationFolder="$(ProjectDir).claude\commands\"
+          DestinationFolder="$(_RegiraBaseDir).claude\commands\"
           SkipUnchangedFiles="true" />
 
   </Target>

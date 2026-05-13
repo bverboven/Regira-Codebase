@@ -1,21 +1,23 @@
 <Project>
 
   <PropertyGroup>
-    <_RegiraEntitiesFilesRoot>$(MSBuildThisFileDirectory)..\contentFiles\any\any\ai\</_RegiraEntitiesFilesRoot>
+    <_RegiraEntitiesFilesRoot>$(MSBuildThisFileDirectory)..\ai\</_RegiraEntitiesFilesRoot>
+    <_RegiraBaseDir Condition="'$(SolutionDir)' != '' And '$(SolutionDir)' != '*Undefined*'">$(SolutionDir)</_RegiraBaseDir>
+    <_RegiraBaseDir Condition="'$(_RegiraBaseDir)' == ''">$(ProjectDir)</_RegiraBaseDir>
   </PropertyGroup>
 
   <!--
     Copies Entities AI instruction files into the consuming project's
-    .github/instructions/regira/ folder on first build.
+    .regira/instructions/ folder on first build.
   -->
   <Target Name="RegiraEntitiesExtractAiFiles"
           BeforeTargets="BeforeBuild"
-          Condition="!Exists('$(ProjectDir).github\instructions\regira\entities.instructions.md')">
+          Condition="!Exists('$(_RegiraBaseDir).regira\instructions\entities.instructions.md')">
 
-    <MakeDir Directories="$(ProjectDir).github\instructions\regira" />
+    <MakeDir Directories="$(_RegiraBaseDir).regira\instructions" />
 
     <Copy SourceFiles="$(_RegiraEntitiesFilesRoot)entities.instructions.md;$(_RegiraEntitiesFilesRoot)entities.setup.md;$(_RegiraEntitiesFilesRoot)entities.examples.md;$(_RegiraEntitiesFilesRoot)entities.signatures.md;$(_RegiraEntitiesFilesRoot)entities.namespaces.md;$(_RegiraEntitiesFilesRoot)entities.advanced.example.md"
-          DestinationFolder="$(ProjectDir).github\instructions\regira\"
+          DestinationFolder="$(_RegiraBaseDir).regira\instructions\"
           SkipUnchangedFiles="true" />
 
   </Target>
@@ -26,12 +28,12 @@
   -->
   <Target Name="RegiraEntitiesExtractAgentFiles"
           BeforeTargets="BeforeBuild"
-          Condition="!Exists('$(ProjectDir).claude\agents\entities-agent.md')">
+          Condition="!Exists('$(_RegiraBaseDir).claude\agents\entities-agent.md')">
 
-    <MakeDir Directories="$(ProjectDir).claude\agents" />
+    <MakeDir Directories="$(_RegiraBaseDir).claude\agents" />
 
     <Copy SourceFiles="$(_RegiraEntitiesFilesRoot)entities-agent.md"
-          DestinationFolder="$(ProjectDir).claude\agents\"
+          DestinationFolder="$(_RegiraBaseDir).claude\agents\"
           SkipUnchangedFiles="true" />
 
   </Target>

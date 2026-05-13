@@ -2,7 +2,7 @@
 
 Use this file as the authoritative downstream bootstrap for choosing the project template, selecting Regira packages, and generating code inside a consumer repository.
 
-This file is also the top-level Regira routing guide inside the source repository. In a consumer repository, use this file plus any local `.github/instructions/regira/*.md` guides as the available sources of truth.
+This file is also the top-level Regira routing guide inside the source repository. In a consumer repository, use this file plus any local `regira/instructions/*.md` guides as the available sources of truth.
 
 ## Pre-flight checklist
 
@@ -11,8 +11,8 @@ Run this checklist before any code generation:
 - [ ] `NuGet.Config` includes the Regira feed `https://packages.regira.com/v3/index.json` alongside `nuget.org`
 - [ ] `dotnet restore` succeeded when package changes or first-time setup required it
 - [ ] `dotnet build` succeeded when installed Regira packages were expected to extract local AI guides
-- [ ] `.github/instructions/regira/` was checked for extracted `*.instructions.md` files and relevant setup references in the consuming project directory (relative to the project that references the Regira packages, not assumed to be the solution root)
-- [ ] If `.github/instructions/regira/project.setup.md` exists locally, it was read before generating project shape, hosting, logging, authentication, or OpenAPI/UI setup
+- [ ] `.regira/instructions/` was checked for extracted `*.instructions.md` files and relevant setup references at the solution root (or project root when building standalone)
+- [ ] If `.regira/instructions/project.setup.md` exists locally, it was read before generating project shape, hosting, logging, authentication, or OpenAPI/UI setup
 - [ ] Every extracted primary guide relevant to the selected modules (`project.setup.md`, `shared.setup.md`, matching `*.instructions.md`) was read in full before writing application code in that area
 - [ ] Deep references such as `*.setup.md`, `*.examples.md`, `*.signatures.md`, and `*.namespaces.md` were consulted on demand by section when the current task needed them
 
@@ -22,7 +22,7 @@ Only proceed to project scaffolding, infrastructure changes, or domain code once
 
 Ask the user what they're building if it isn't already clear, then follow the **Code generation workflow** below. For an existing project, inspect current `*.csproj` files before choosing packages or scaffolding. Prefer project-local instructions over shared Regira guidance when both exist, and ask for feedback rather than guessing missing APIs or conventions.
 
-If the project contains `.github/instructions/regira/*.md`, treat the extracted shared setup guides plus the matching module guides as the primary local instructions. Regira packages that carry AI files embed them inside the NuGet package under `ai/`. During `dotnet build`, their bundled `.targets` files copy those files into `.github/instructions/regira/` under the consuming project directory (`$(ProjectDir)`), which may be a nested application folder rather than the solution root. Use `Regira.Setup` when the consumer needs local copies of `project.setup.md` and `shared.setup.md` through the same package-extraction workflow.
+If the project contains `.regira/instructions/*.md`, treat the extracted shared setup guides plus the matching module guides as the primary local instructions. Regira packages that carry AI files embed them inside the NuGet package under `ai/`. During `dotnet build`, their bundled `.props` and `.targets` files ensure those files are not included as project items and copy them into `.regira/instructions/` at the solution root (`$(SolutionDir)`), falling back to the project root when building standalone. Use `Regira.Setup` when the consumer needs local copies of `project.setup.md` and `shared.setup.md` through the same package-extraction workflow.
 
 ## Guide loading rules
 
@@ -85,9 +85,9 @@ Template consequences:
 2. Choose the smallest Regira module set that covers the user's request.
 3. Ensure the NuGet feed exists and add the matching packages.
 4. Inspect existing `PackageReference` items when the installed Regira package set is part of the decision.
-5. Run `dotnet restore` and `dotnet build` when needed so installed Regira packages can extract any embedded `ai/*.md` files from the NuGet package into `.github/instructions/regira/`.
+5. Run `dotnet restore` and `dotnet build` when needed so installed Regira packages can extract any embedded `ai/*.md` files from the NuGet package into `.regira/instructions/`.
 6. **New project checkpoint**: When creating a project from scratch, stop here after completing steps 1–5. Summarize what was set up (template chosen, packages added, restore/build outcome) and explicitly ask the user whether to continue before writing any application code. This gives the user the opportunity to review the initial setup, switch to plan mode, or adjust the package selection before any code is generated.
-7. Before writing any application code, check `.github/instructions/regira/` for extracted `*.instructions.md` guides, shared setup files, and relevant deep references.
+7. Before writing any application code, check `.regira/instructions/` for extracted `*.instructions.md` guides, shared setup files, and relevant deep references.
 8. If extracted guides exist, read the applicable primary guides in full before generating entity models, services, controllers, DI registrations, or infrastructure code. Use deep references by section when the current task needs exact examples, signatures, namespaces, or setup details. Skipping the relevant primary guides is a workflow violation.
 9. If no extracted guides exist, verify the feed is reachable and the restore/build succeeded, then continue with the setup baseline, package mapping tables, and general engineering rules in this file.
 10. Generate code that stays consistent with the selected `projectTemplate`, installed Regira packages, any extracted local guides, and local project conventions.
@@ -166,7 +166,7 @@ These package families are available from the Regira feed but do not currently h
 
 If the application repository already contains local Regira metadata files, use them as extra context:
 
-- `.github/instructions/regira/*.md` can provide richer shared setup and module-specific guidance. Installed Regira packages that ship AI files can extract them there from their packaged `ai/` content on build via their package targets.
+- `.regira/instructions/*.md` can provide richer shared setup and module-specific guidance. Installed Regira packages that ship AI files can extract them there from their packaged `ai/` content on build via their package props and targets.
 - `Regira.Setup` can be installed when the consumer needs `project.setup.md` and `shared.setup.md` extracted locally through the package-based guide flow.
 
 These files are optional. `AGENTS.md` must remain enough for the normal consumer flow.

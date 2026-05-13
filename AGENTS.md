@@ -9,7 +9,7 @@ This file is for AI agents working **on** the Regira source codebase (adding mod
 A collection of .NET NuGet packages published to `https://packages.regira.com`. Each package:
 - Contains source code under `src/{ModuleName}/`
 - Embeds AI instruction files in `src/{ModuleName}/ai/`
-- Ships an MSBuild `.targets` file in `src/{ModuleName}/build/` that extracts those AI files into consumer projects on `dotnet build`
+- Ships an MSBuild `.props` and `.targets` file in `src/{ModuleName}/build/` that extracts those AI files into consumer projects on `dotnet build`
 
 The `ai/` folder at the repo root contains the consumer-facing bootstrap guide (`ai/AGENTS.md`) and a learnings log (`ai/learnings.md`). These are not source-repo contributor guides.
 
@@ -21,13 +21,13 @@ The `ai/` folder at the repo root contains the consumer-facing bootstrap guide (
 src/
   Common.Setup/          # Shared project templates and setup guides
     ai/                  # project.setup.md, shared.setup.md, CLAUDE.md, copilot-instructions.md (consumer-facing)
-    build/               # Regira.Setup.targets
+    build/               # Regira.Setup.props, Regira.Setup.targets
   Common.Entities/       # CRUD entity framework
     ai/                  # entities.instructions.md, entities.signatures.md, entities-agent.md, ...
-    build/               # Regira.Entities.targets
+    build/               # Regira.Entities.props, Regira.Entities.targets
   Common.Office/         # Office operations (PDF, Excel, Word, Mail, ...)
     ai/                  # office.instructions.md, office-agent.md, per-submodule guides, ...
-    build/               # Regira.Office.targets
+    build/               # Regira.Office.props, Regira.Office.targets
   Common.{Module}/       # Other modules follow the same pattern
 ai/
   AGENTS.md              # Consumer bootstrap guide (do not use for source work)
@@ -53,8 +53,9 @@ Read `ai/learnings.md` before starting any substantial work. Update it when a ta
 1. Create `src/{ModuleName}/` with a `.csproj`, source files, `build/`, and `ai/`
 2. Write the AI guides in `src/{ModuleName}/ai/` — at minimum `{module}.instructions.md` and `{module}.examples.md`
 3. Create `src/{ModuleName}/build/Regira.{ModuleName}.targets` following the pattern in any existing `.targets` file
-4. Add the targets file and AI files to the `.csproj` under `buildTransitive\` and `contentFiles\any\any\ai\` respectively
-5. Add the module to the routing tables in `ai/AGENTS.md` and `src/Common.Setup/ai/copilot-instructions.md`
+4. Create `src/{ModuleName}/build/Regira.{ModuleName}.props` following the pattern in any existing `.props` file (sets `DefaultItemExcludes` to prevent `.regira\**` and `.claude\**` from appearing as project items)
+5. Add the props file, targets file, and AI files to the `.csproj` under `buildTransitive\` and `ai\` respectively
+6. Add the module to the routing tables in `ai/AGENTS.md` and `src/Common.Setup/ai/copilot-instructions.md`
 
 ### Updating AI guides
 

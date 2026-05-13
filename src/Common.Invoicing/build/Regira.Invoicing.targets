@@ -1,21 +1,23 @@
 <Project>
 
   <PropertyGroup>
-    <_RegiraInvoicingFilesRoot>$(MSBuildThisFileDirectory)..\contentFiles\any\any\ai\</_RegiraInvoicingFilesRoot>
+    <_RegiraInvoicingFilesRoot>$(MSBuildThisFileDirectory)..\ai\</_RegiraInvoicingFilesRoot>
+    <_RegiraBaseDir Condition="'$(SolutionDir)' != '' And '$(SolutionDir)' != '*Undefined*'">$(SolutionDir)</_RegiraBaseDir>
+    <_RegiraBaseDir Condition="'$(_RegiraBaseDir)' == ''">$(ProjectDir)</_RegiraBaseDir>
   </PropertyGroup>
 
   <!--
     Copies Invoicing AI instruction files into the consuming project's
-    .github/instructions/regira/ folder on first build.
+    .regira/instructions/ folder on first build.
   -->
   <Target Name="RegiraInvoicingExtractAiFiles"
           BeforeTargets="BeforeBuild"
-          Condition="!Exists('$(ProjectDir).github\instructions\regira\invoicing.instructions.md')">
+          Condition="!Exists('$(_RegiraBaseDir).regira\instructions\invoicing.instructions.md')">
 
-    <MakeDir Directories="$(ProjectDir).github\instructions\regira" />
+    <MakeDir Directories="$(_RegiraBaseDir).regira\instructions" />
 
     <Copy SourceFiles="$(_RegiraInvoicingFilesRoot)invoicing.instructions.md;$(_RegiraInvoicingFilesRoot)invoicing.examples.md"
-          DestinationFolder="$(ProjectDir).github\instructions\regira\"
+          DestinationFolder="$(_RegiraBaseDir).regira\instructions\"
           SkipUnchangedFiles="true" />
 
   </Target>

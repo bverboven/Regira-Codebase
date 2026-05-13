@@ -1,21 +1,23 @@
 <Project>
 
   <PropertyGroup>
-    <_RegiraOfficeFilesRoot>$(MSBuildThisFileDirectory)..\contentFiles\any\any\ai\</_RegiraOfficeFilesRoot>
+    <_RegiraOfficeFilesRoot>$(MSBuildThisFileDirectory)..\ai\</_RegiraOfficeFilesRoot>
+    <_RegiraBaseDir Condition="'$(SolutionDir)' != '' And '$(SolutionDir)' != '*Undefined*'">$(SolutionDir)</_RegiraBaseDir>
+    <_RegiraBaseDir Condition="'$(_RegiraBaseDir)' == ''">$(ProjectDir)</_RegiraBaseDir>
   </PropertyGroup>
 
   <!--
     Copies Office AI instruction files into the consuming project's
-    .github/instructions/regira/ folder on first build.
+    .regira/instructions/ folder on first build.
   -->
   <Target Name="RegiraOfficeExtractAiFiles"
           BeforeTargets="BeforeBuild"
-          Condition="!Exists('$(ProjectDir).github\instructions\regira\office.instructions.md')">
+          Condition="!Exists('$(_RegiraBaseDir).regira\instructions\office.instructions.md')">
 
-    <MakeDir Directories="$(ProjectDir).github\instructions\regira" />
+    <MakeDir Directories="$(_RegiraBaseDir).regira\instructions" />
 
     <Copy SourceFiles="$(_RegiraOfficeFilesRoot)office.instructions.md;$(_RegiraOfficeFilesRoot)office.pdf.instructions.md;$(_RegiraOfficeFilesRoot)office.pdf.examples.md;$(_RegiraOfficeFilesRoot)office.excel.instructions.md;$(_RegiraOfficeFilesRoot)office.excel.examples.md;$(_RegiraOfficeFilesRoot)office.word.instructions.md;$(_RegiraOfficeFilesRoot)office.word.examples.md;$(_RegiraOfficeFilesRoot)office.mail.instructions.md;$(_RegiraOfficeFilesRoot)office.mail.examples.md;$(_RegiraOfficeFilesRoot)office.csv.instructions.md;$(_RegiraOfficeFilesRoot)office.csv.examples.md;$(_RegiraOfficeFilesRoot)office.barcodes.instructions.md;$(_RegiraOfficeFilesRoot)office.barcodes.examples.md;$(_RegiraOfficeFilesRoot)office.ocr.instructions.md;$(_RegiraOfficeFilesRoot)office.ocr.examples.md;$(_RegiraOfficeFilesRoot)office.vcards.instructions.md;$(_RegiraOfficeFilesRoot)office.vcards.examples.md"
-          DestinationFolder="$(ProjectDir).github\instructions\regira\"
+          DestinationFolder="$(_RegiraBaseDir).regira\instructions\"
           SkipUnchangedFiles="true" />
 
   </Target>
@@ -26,12 +28,12 @@
   -->
   <Target Name="RegiraOfficeExtractAgentFiles"
           BeforeTargets="BeforeBuild"
-          Condition="!Exists('$(ProjectDir).claude\agents\office-agent.md')">
+          Condition="!Exists('$(_RegiraBaseDir).claude\agents\office-agent.md')">
 
-    <MakeDir Directories="$(ProjectDir).claude\agents" />
+    <MakeDir Directories="$(_RegiraBaseDir).claude\agents" />
 
     <Copy SourceFiles="$(_RegiraOfficeFilesRoot)office-agent.md"
-          DestinationFolder="$(ProjectDir).claude\agents\"
+          DestinationFolder="$(_RegiraBaseDir).claude\agents\"
           SkipUnchangedFiles="true" />
 
   </Target>
