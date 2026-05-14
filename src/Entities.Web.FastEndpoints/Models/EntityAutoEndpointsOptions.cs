@@ -12,9 +12,9 @@ public class EntityAutoEndpointsOptions
 
     /// <summary>
     /// Route prefix prepended to every auto-registered route.
-    /// Defaults to <c>"api"</c>.
+    /// Defaults to <c>""</c>.
     /// </summary>
-    public string RoutePrefix { get; set; } = "api";
+    public string RoutePrefix { get; set; } = "";
 
     /// <summary>
     /// Explicitly sets the base route for <typeparamref name="TEntity"/>.
@@ -34,7 +34,9 @@ public class EntityAutoEndpointsOptions
     public string GetRouteFor(Type entityType)
         => _entityRoutes.TryGetValue(entityType, out var route)
             ? route
-            : $"{RoutePrefix}/{Pluralize(entityType.Name.ToLowerInvariant())}";
+            : !string.IsNullOrWhiteSpace(RoutePrefix)
+                ? $"{RoutePrefix.TrimEnd('/')}/{Pluralize(entityType.Name.ToLowerInvariant())}"
+                : Pluralize(entityType.Name.ToLowerInvariant());
 
     private static string Pluralize(string name) => name.Pluralize();
 }

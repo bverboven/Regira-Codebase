@@ -19,9 +19,8 @@ namespace Regira.Entities.Web.FastEndpoints.Extensions;
 /// </summary>
 public static class WebApplicationEntityExtensions
 {
-    private static readonly MethodInfo _registerMethod =
-        typeof(WebApplicationEntityExtensions)
-            .GetMethod(nameof(MapCrudEndpointsFor), BindingFlags.Static | BindingFlags.NonPublic)!;
+    private static readonly MethodInfo RegisterMethod = typeof(WebApplicationEntityExtensions)
+        .GetMethod(nameof(MapCrudEndpointsFor), BindingFlags.Static | BindingFlags.NonPublic)!;
 
     /// <summary>
     /// Scans all <see cref="IEntityService{TEntity,TKey}"/> registrations in the DI container and
@@ -45,14 +44,10 @@ public static class WebApplicationEntityExtensions
     /// </para>
     /// </summary>
     /// <param name="app">The application builder.</param>
-    /// <param name="routePrefix">Default route prefix (default: <c>"api"</c>).</param>
     /// <param name="configure">Optional callback to customise routes or add per-entity overrides.</param>
-    public static WebApplication MapEntityEndpoints(
-        this WebApplication app,
-        string routePrefix = "",
-        Action<EntityAutoEndpointsOptions>? configure = null)
+    public static WebApplication MapEntityEndpoints(this WebApplication app, Action<EntityAutoEndpointsOptions>? configure = null)
     {
-        var options = new EntityAutoEndpointsOptions { RoutePrefix = routePrefix };
+        var options = new EntityAutoEndpointsOptions();
         configure?.Invoke(options);
 
         var serviceCollection = app.Services.GetService<IServiceCollection>();
@@ -68,7 +63,7 @@ public static class WebApplicationEntityExtensions
         foreach (var (entityType, keyType) in GetEntityServiceRegistrations(serviceCollection))
         {
             var route = options.GetRouteFor(entityType);
-            _registerMethod
+            RegisterMethod
                 .MakeGenericMethod(entityType, keyType)
                 .Invoke(null, [app, route]);
         }
@@ -78,19 +73,19 @@ public static class WebApplicationEntityExtensions
 
     // ── Internal helpers ───────────────────────────────────────────────────────
 
-    private static IEnumerable<(Type entityType, Type keyType)> GetEntityServiceRegistrations(
-        IServiceCollection services)
+    private static IEnumerable<(Type entityType, Type keyType)> GetEntityServiceRegistrations(IServiceCollection services)
     {
         var twoArgGeneric = typeof(IEntityService<,>);
 
-        return services
+        var fromDi = services
             .Where(d =>
                 d.ServiceType.IsGenericType &&
                 d.ServiceType.GetGenericTypeDefinition() == twoArgGeneric)
             .Select(d => (
                 entityType: d.ServiceType.GetGenericArguments()[0],
-                keyType: d.ServiceType.GetGenericArguments()[1]))
-            .DistinctBy(x => x.entityType);
+                keyType: d.ServiceType.GetGenericArguments()[1]));
+
+        return fromDi.DistinctBy(x => x.entityType);
     }
 
     /// <summary>
@@ -103,9 +98,7 @@ public static class WebApplicationEntityExtensions
         var group = app.MapGroup(route);
 
         // ── GET /{id} — Details ────────────────────────────────────────────────
-        group.MapGet("/{id}", async (TKey id,
-            IEntityService<TEntity, TKey> service,
-            CancellationToken ct) =>
+        group.MapGet("/{id}", async (TKey id, IEntityService<TEntity, TKey> service, CancellationToken ct) =>
         {
             var item = await service.Details(id, ct);
             return item == null
@@ -114,11 +107,7 @@ public static class WebApplicationEntityExtensions
         });
 
         // ── GET / — List ───────────────────────────────────────────────────────
-        group.MapGet("/", async (
-            IEntityService<TEntity, TKey> service,
-            CancellationToken ct,
-            int? page = null,
-            int? pageSize = null) =>
+        group.MapGet("/", async (IEntityService<TEntity, TKey> service, CancellationToken ct, int? page = null, int? pageSize = null) =>
         {
             var pagingInfo = EntityEndpointHelper.ExtractPagingInfo(page, pageSize);
             var items = await service.List((object?)null, pagingInfo, ct);
@@ -126,9 +115,7 @@ public static class WebApplicationEntityExtensions
         });
 
         // ── POST / — Create ────────────────────────────────────────────────────
-        group.MapPost("/", async (TEntity input,
-            IEntityService<TEntity, TKey> service,
-            CancellationToken ct) =>
+        group.MapPost("/", async (TEntity input, IEntityService<TEntity, TKey> service, CancellationToken ct) =>
         {
             try
             {
@@ -146,9 +133,7 @@ public static class WebApplicationEntityExtensions
         });
 
         // ── POST /save — Save (create or update) ───────────────────────────────
-        group.MapPost("/save", async (TEntity input,
-            IEntityService<TEntity, TKey> service,
-            CancellationToken ct) =>
+        group.MapPost("/save", async (TEntity input, IEntityService<TEntity, TKey> service, CancellationToken ct) =>
         {
             try
             {
@@ -175,10 +160,7 @@ public static class WebApplicationEntityExtensions
         });
 
         // ── PUT /{id} — Modify ─────────────────────────────────────────────────
-        group.MapPut("/{id}", async (TKey id,
-            TEntity input,
-            IEntityService<TEntity, TKey> service,
-            CancellationToken ct) =>
+        group.MapPut("/{id}", async (TKey id, TEntity input, IEntityService<TEntity, TKey> service, CancellationToken ct) =>
         {
             input.Id = id;
             var exists = await service.Count(new { id }, ct) == 1;
@@ -202,9 +184,7 @@ public static class WebApplicationEntityExtensions
         });
 
         // ── DELETE /{id} — Delete ──────────────────────────────────────────────
-        group.MapDelete("/{id}", async (TKey id,
-            IEntityService<TEntity, TKey> service,
-            CancellationToken ct) =>
+        group.MapDelete("/{id}", async (TKey id, IEntityService<TEntity, TKey> service, CancellationToken ct) =>
         {
             var item = await service.Details(id, ct);
             if (item == null)
