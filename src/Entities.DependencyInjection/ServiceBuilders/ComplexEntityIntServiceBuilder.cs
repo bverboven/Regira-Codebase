@@ -257,20 +257,12 @@ public class ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TS
 
     // Related
     public ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> Related<TRelated>(
-        Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression, Action<TEntity>? prepareFunc = null)
-        where TRelated : class, IEntity<int>
-    {
-        Related<TRelated, int>(navigationExpression, prepareFunc);
-
-        return this;
-    }
-    public ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> Related<TRelated>(
         Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression,
-        Action<RelatedEntityBuilder<TContext, TRelated, int>> configure,
-        Action<TEntity>? prepareFunc = null)
+        Action<TEntity>? prepareFunc = null,
+        Action<RelatedEntityBuilder<TContext, TRelated, int>>? configure = null)
         where TRelated : class, IEntity<int>
     {
-        Related<TRelated, int>(navigationExpression, configure, prepareFunc);
+        Related<TRelated, int>(navigationExpression, prepareFunc, configure);
 
         return this;
     }

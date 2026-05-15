@@ -39,15 +39,21 @@ public class RelatedCollectionPrepper<TContext, TEntity, TRelated, TEntityKey, T
                 }
             }
         }
-        else if (_nestedPreppers.Count > 0)
+        else
         {
             var modifiedItems = _selectorFunc(modified)?.ToList();
             if (modifiedItems is { Count: > 0 })
             {
-                foreach (var modifiedItem in modifiedItems)
+                // Parent is new: explicitly track all items as Added (no original to diff against)
+                dbContext.UpdateRelatedCollection<TEntity, TRelated, TEntityKey, TRelatedKey>(modified, modifiedItems, modified, []);
+
+                if (_nestedPreppers.Count > 0)
                 {
-                    foreach (var nestedPrepper in _nestedPreppers)
-                        await nestedPrepper.Prepare(modifiedItem, null, token);
+                    foreach (var modifiedItem in modifiedItems)
+                    {
+                        foreach (var nestedPrepper in _nestedPreppers)
+                            await nestedPrepper.Prepare(modifiedItem, null, token);
+                    }
                 }
             }
         }

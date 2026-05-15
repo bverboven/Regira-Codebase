@@ -47,7 +47,7 @@ public class RelatedEntityBuilder<TContext, TRelated, TRelatedKey>
         Action<RelatedEntityBuilder<TContext, TSubRelated, TSubRelatedKey>>? configure = null)
         where TSubRelated : class, IEntity<TSubRelatedKey>
     {
-        Related<TSubRelated, TSubRelatedKey>(navigationExpression, configure);
+        Related(navigationExpression, configure);
         Prepare(prepareFunc);
         return this;
     }

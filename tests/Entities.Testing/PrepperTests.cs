@@ -371,7 +371,7 @@ public class PrepperTests
                 e.Includes((q, _) => q.Include(c => c.Products!).ThenInclude(p => p.Tags));
                 e.Related<Product>(x => x.Products, products =>
                 {
-                    products.Related<ProductTag>(x => x.Tags);
+                    products.Related(x => x.Tags);
                 });
             });
 
