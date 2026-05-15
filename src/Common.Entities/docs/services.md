@@ -177,6 +177,22 @@ public abstract class EntityPrepperBase<TEntity> : IEntityPrepper<TEntity>
 }
 ```
 
+#### Related child collections
+
+`e.Related()` is the shortcut for synchronizing child collections. It registers a `RelatedCollectionPrepper` and has two overloads:
+
+```csharp
+// Simple: sync the collection + optional parent-level prepare
+e.Related<TRelated, TRelatedKey>(x => x.Collection, parentEntity => { /* optional */ });
+
+// Configure: nest sub-collections or add per-item prepare via RelatedEntityBuilder
+e.Related<TRelated, TRelatedKey>(x => x.Collection, builder =>
+{
+    builder.Related(item => item.SubCollection);        // sync a nested sub-collection
+    builder.Prepare(item => item.RecalculateTotals());  // per-item prepare on each TRelated
+}, parentEntity => { /* optional parent-level prepare */ });
+```
+
 ### Entity Primers
 
 - Executed as EF Core `SaveChangesInterceptors` by DbContext 
@@ -305,7 +321,7 @@ services
         // Primer
         e.AddPrimer<ProductPrimer>();
         
-        // Related entities
+        // Related entities — simple: just sync the collection
         e.Related(x => x.Reviews);
     })
     
@@ -347,7 +363,14 @@ services
             await Task.CompletedTask;
         });
         
-        e.Related(x => x.OrderItems, (item, _) => item.OrderItems?.Prepare());
+        // Simple related with parent-level prepare
+        e.Related(x => x.OrderItems, item => item.OrderItems?.SetSortOrder());
+        // Configure overload — nest sub-collections or add per-item prepare
+        // e.Related(x => x.OrderItems, builder =>
+        // {
+        //     builder.Related(oi => oi.Options);
+        //     builder.Prepare(oi => oi.RecalculateTotals());
+        // });
     });
 ```
 

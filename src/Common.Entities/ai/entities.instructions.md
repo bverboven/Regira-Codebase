@@ -337,6 +337,10 @@ Use processors to fill `[NotMapped]` properties or enrich entities **after** fet
 
 **Variants:** inline (simple), inline with original (create vs update), inline with DbContext, separate class, `e.Related(x => x.ChildCollection)` shortcut.
 
+`e.Related()` has two overloads:
+- Simple: `e.Related<TRelated, TRelatedKey>(x => x.Collection, prepareFunc?)` — syncs the collection, optional per-entity prepare.
+- Configure: `e.Related<TRelated, TRelatedKey>(x => x.Collection, builder => { ... }, prepareFunc?)` — use `RelatedEntityBuilder` to nest sub-collections (`builder.Related(...)`) or add item-level prepare logic (`builder.Prepare(...)`).
+
 ### Step 9: Primers (Optional)
 
 - Run during `SaveChanges()` via EF Core interceptors

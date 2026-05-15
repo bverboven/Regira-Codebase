@@ -478,6 +478,12 @@ public static class ProjectServiceCollectionExtensions
                 e.Related(item => item.Tags);
                 e.Related(item => item.ParentEntities, item => item.ParentEntities?.SetSortOrder());
                 e.Related(item => item.ChildEntities, item => item.ChildEntities?.SetSortOrder());
+                // configure overload — nest sub-collections or add per-item prepare via RelatedEntityBuilder
+                // e.Related(item => item.OrderItems, builder =>
+                // {
+                //     builder.Related(oi => oi.Options);       // sync OrderItem.Options sub-collection
+                //     builder.Prepare(oi => oi.SetDefaults()); // run per-item logic on each OrderItem
+                // });
 
                 e.AddPrepper<ProjectPrepper>();
                 e.AddNormalizer<ProjectNormalizer>();

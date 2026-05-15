@@ -863,12 +863,50 @@ public partial class EntityServiceBuilder<TContext, TEntity, TKey>
     // class-based (moved here from above)
 
     // Related child collections (managed by RelatedCollectionPrepper)
+    // Simple overload — just sync the collection
     EntityServiceBuilder<TContext, TEntity, TKey> Related<TRelated, TRelatedKey>(
         Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression,
         Action<TEntity>? prepareFunc = null)
         where TRelated : class, IEntity<TRelatedKey>;
 
+    // Configure overload — nest sub-collections or add per-item prepare logic via RelatedEntityBuilder
+    EntityServiceBuilder<TContext, TEntity, TKey> Related<TRelated, TRelatedKey>(
+        Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression,
+        Action<RelatedEntityBuilder<TContext, TRelated, TRelatedKey>> configure,
+        Action<TEntity>? prepareFunc = null)
+        where TRelated : class, IEntity<TRelatedKey>;
+
     void Build();
+}
+```
+
+---
+
+### RelatedEntityBuilder\<TContext, TRelated, TRelatedKey\>
+
+Passed into the `configure` callback of the `Related(...)` overload. Allows configuring nested sub-collections and per-item prepare logic for a related collection.
+
+```csharp
+using Regira.Entities.DependencyInjection.ServiceBuilders;
+
+public class RelatedEntityBuilder<TContext, TRelated, TRelatedKey>
+    where TContext : DbContext
+    where TRelated : class, IEntity<TRelatedKey>
+{
+    // Nest a sub-collection (generic key)
+    RelatedEntityBuilder<TContext, TRelated, TRelatedKey> Related<TSubRelated, TSubRelatedKey>(
+        Expression<Func<TRelated, ICollection<TSubRelated>?>> navigationExpression,
+        Action<RelatedEntityBuilder<TContext, TSubRelated, TSubRelatedKey>>? configure = null)
+        where TSubRelated : class, IEntity<TSubRelatedKey>;
+
+    // Int-key shortcut for sub-collections
+    RelatedEntityBuilder<TContext, TRelated, TRelatedKey> Related<TSubRelated>(
+        Expression<Func<TRelated, ICollection<TSubRelated>?>> navigationExpression,
+        Action<RelatedEntityBuilder<TContext, TSubRelated, int>>? configure = null)
+        where TSubRelated : class, IEntity<int>;
+
+    // Add a prepare action applied to each item in the collection
+    RelatedEntityBuilder<TContext, TRelated, TRelatedKey> Prepare(Action<TRelated> prepareFunc);
 }
 ```
 
@@ -927,6 +965,12 @@ public partial class EntityIntServiceBuilder<TContext, TEntity>
 
     EntityIntServiceBuilder<TContext, TEntity> Related<TRelated>(
         Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression,
+        Action<TEntity>? prepareFunc = null)
+        where TRelated : class, IEntity<int>;
+
+    EntityIntServiceBuilder<TContext, TEntity> Related<TRelated>(
+        Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression,
+        Action<RelatedEntityBuilder<TContext, TRelated, int>> configure,
         Action<TEntity>? prepareFunc = null)
         where TRelated : class, IEntity<int>;
 
@@ -1017,6 +1061,12 @@ public partial class ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchOb
     // Int-key shortcut — no TRelatedKey type parameter needed
     ComplexEntityIntServiceBuilder<...> Related<TRelated>(
         Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression,
+        Action<TEntity>? prepareFunc = null)
+        where TRelated : class, IEntity<int>;
+
+    ComplexEntityIntServiceBuilder<...> Related<TRelated>(
+        Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression,
+        Action<RelatedEntityBuilder<TContext, TRelated, int>> configure,
         Action<TEntity>? prepareFunc = null)
         where TRelated : class, IEntity<int>;
 
