@@ -14,40 +14,34 @@ public class RelatedCollectionPrepper<TContext, TEntity, TRelated, TEntityKey, T
     where TEntity : class, IEntity<TEntityKey>
     where TRelated : class, IEntity<TRelatedKey>
 {
+    private readonly Func<TEntity, ICollection<TRelated>?> _selectorFunc = navigationExpression.Compile();
+    private readonly IReadOnlyList<IEntityPrepper<TRelated>> _nestedPreppers = nestedPreppers?.ToList() ?? [];
+
     public override async Task Prepare(TEntity modified, TEntity? original, CancellationToken token = default)
     {
         if (original != null)
         {
-            var prepperList = nestedPreppers?.ToList();
-            if (prepperList?.Count > 0)
+            var originalItems = _nestedPreppers.Count > 0 ? _selectorFunc(original)?.ToList() : null;
+            var modifiedItems = _nestedPreppers.Count > 0 ? _selectorFunc(modified)?.ToList() : null;
+
+            dbContext.UpdateRelatedCollection<TEntity, TRelated, TEntityKey, TRelatedKey>(modified, original, navigationExpression);
+
+            if (_nestedPreppers.Count > 0 && originalItems != null && modifiedItems != null)
             {
-                var selectorFunc = navigationExpression.Compile();
-                var originalItems = selectorFunc(original)?.ToList();
-                var modifiedItems = selectorFunc(modified)?.ToList();
-
-                dbContext.UpdateRelatedCollection<TEntity, TRelated, TEntityKey, TRelatedKey>(modified, original, navigationExpression);
-
-                if (originalItems != null && modifiedItems != null)
+                foreach (var modifiedItem in modifiedItems)
                 {
-                    foreach (var modifiedItem in modifiedItems)
+                    if (modifiedItem.Id != null && !modifiedItem.Id.Equals(default(TRelatedKey)))
                     {
-                        if (modifiedItem.Id != null && !modifiedItem.Id.Equals(default(TRelatedKey)))
+                        var originalItem = originalItems.FirstOrDefault(o => o.Id != null && o.Id.Equals(modifiedItem.Id));
+                        if (originalItem != null)
                         {
-                            var originalItem = originalItems.FirstOrDefault(o => o.Id != null && o.Id.Equals(modifiedItem.Id));
-                            if (originalItem != null)
+                            foreach (var nestedPrepper in _nestedPreppers)
                             {
-                                foreach (var nestedPrepper in prepperList)
-                                {
-                                    await nestedPrepper.Prepare(modifiedItem, originalItem, token);
-                                }
+                                await nestedPrepper.Prepare(modifiedItem, originalItem, token);
                             }
                         }
                     }
                 }
-            }
-            else
-            {
-                dbContext.UpdateRelatedCollection<TEntity, TRelated, TEntityKey, TRelatedKey>(modified, original, navigationExpression);
             }
         }
     }
