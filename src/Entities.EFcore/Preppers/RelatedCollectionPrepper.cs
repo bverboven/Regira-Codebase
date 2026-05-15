@@ -26,21 +26,28 @@ public class RelatedCollectionPrepper<TContext, TEntity, TRelated, TEntityKey, T
 
             dbContext.UpdateRelatedCollection<TEntity, TRelated, TEntityKey, TRelatedKey>(modified, original, navigationExpression);
 
-            if (_nestedPreppers.Count > 0 && originalItems != null && modifiedItems != null)
+            if (_nestedPreppers.Count > 0 && modifiedItems != null)
             {
                 foreach (var modifiedItem in modifiedItems)
                 {
+                    TRelated? originalItem = null;
                     if (modifiedItem.Id != null && !modifiedItem.Id.Equals(default(TRelatedKey)))
-                    {
-                        var originalItem = originalItems.FirstOrDefault(o => o.Id != null && o.Id.Equals(modifiedItem.Id));
-                        if (originalItem != null)
-                        {
-                            foreach (var nestedPrepper in _nestedPreppers)
-                            {
-                                await nestedPrepper.Prepare(modifiedItem, originalItem, token);
-                            }
-                        }
-                    }
+                        originalItem = originalItems?.FirstOrDefault(o => o.Id != null && o.Id.Equals(modifiedItem.Id));
+
+                    foreach (var nestedPrepper in _nestedPreppers)
+                        await nestedPrepper.Prepare(modifiedItem, originalItem, token);
+                }
+            }
+        }
+        else if (_nestedPreppers.Count > 0)
+        {
+            var modifiedItems = _selectorFunc(modified)?.ToList();
+            if (modifiedItems is { Count: > 0 })
+            {
+                foreach (var modifiedItem in modifiedItems)
+                {
+                    foreach (var nestedPrepper in _nestedPreppers)
+                        await nestedPrepper.Prepare(modifiedItem, null, token);
                 }
             }
         }

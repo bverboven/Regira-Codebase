@@ -2,21 +2,6 @@
 
 This guide demonstrates the Regira Entities framework using a simple webshop scenario with Products and Categories.
 
-## Web Endpoints Setup
-
-With FastEndpoints, all entity CRUD routes are auto-registered in `Program.cs` — no per-entity controller class needed:
-
-```csharp
-// Program.cs
-builder.Services.AddFastEndpoints();
-// ...
-app.UseFastEndpoints();
-app.MapEntityEndpoints();
-// Auto-registers: /api/products/*, /api/categories/*, ... (Humanizer handles pluralization)
-```
-
-The examples below show which routes get registered per entity. Controller alternatives are included under "Advanced" headings.
-
 ## Example 1: Product Entity (Full Implementation)
 
 ### Entity Model
@@ -139,20 +124,7 @@ public class ProductInputDto
 }
 ```
 
-### Web Endpoints
-
-`app.MapEntityEndpoints()` (see setup above) auto-registers:
-
-```
-GET    /api/products/{id}    — Details
-GET    /api/products         — List
-POST   /api/products         — Create
-POST   /api/products/save    — Save (upsert)
-PUT    /api/products/{id}    — Modify
-DELETE /api/products/{id}    — Delete
-```
-
-### Controller (Advanced)
+### Controller
 
 ```csharp
 [ApiController]
@@ -220,20 +192,7 @@ public class CategoryInputDto
 }
 ```
 
-### Web Endpoints
-
-`app.MapEntityEndpoints()` (see setup above) auto-registers:
-
-```
-GET    /api/categories/{id}    — Details
-GET    /api/categories         — List
-POST   /api/categories         — Create
-POST   /api/categories/save    — Save (upsert)
-PUT    /api/categories/{id}    — Modify
-DELETE /api/categories/{id}    — Delete
-```
-
-### Controller (Advanced)
+### Controller
 
 ```csharp
 [ApiController]
@@ -321,11 +280,15 @@ public class ShopDbContext : DbContext
 
 ### Web Endpoints
 
-Entity endpoints (`/api/products/*`) are auto-registered via `app.MapEntityEndpoints()` (see setup above).
-
-Attachment endpoints are not auto-registered and still require a controller:
+Both entity and attachment endpoints require a controller:
 
 ```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class ProductsController : EntityControllerBase<Product, ProductSearchObject, ProductSortBy, ProductIncludes, ProductDto, ProductInputDto>
+{
+}
+
 [ApiController]
 [Route("api/products/{objectId}/attachments")]
 public class ProductAttachmentsController : EntityAttachmentControllerBase<ProductAttachment, int, int>

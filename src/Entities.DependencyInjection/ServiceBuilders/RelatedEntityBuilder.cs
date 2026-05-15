@@ -41,6 +41,24 @@ public class RelatedEntityBuilder<TContext, TRelated, TRelatedKey>
         where TSubRelated : class, IEntity<int>
         => Related<TSubRelated, int>(navigationExpression, configure);
 
+    public RelatedEntityBuilder<TContext, TRelated, TRelatedKey> Related<TSubRelated, TSubRelatedKey>(
+        Expression<Func<TRelated, ICollection<TSubRelated>?>> navigationExpression,
+        Action<TRelated> prepareFunc,
+        Action<RelatedEntityBuilder<TContext, TSubRelated, TSubRelatedKey>>? configure = null)
+        where TSubRelated : class, IEntity<TSubRelatedKey>
+    {
+        Related<TSubRelated, TSubRelatedKey>(navigationExpression, configure);
+        Prepare(prepareFunc);
+        return this;
+    }
+
+    public RelatedEntityBuilder<TContext, TRelated, TRelatedKey> Related<TSubRelated>(
+        Expression<Func<TRelated, ICollection<TSubRelated>?>> navigationExpression,
+        Action<TRelated> prepareFunc,
+        Action<RelatedEntityBuilder<TContext, TSubRelated, int>>? configure = null)
+        where TSubRelated : class, IEntity<int>
+        => Related<TSubRelated, int>(navigationExpression, prepareFunc, configure);
+
     public RelatedEntityBuilder<TContext, TRelated, TRelatedKey> Prepare(Action<TRelated> prepareFunc)
     {
         PrepperFactories.Add(_ => new EntityPrepper<TRelated>(prepareFunc));

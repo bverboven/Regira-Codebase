@@ -28,11 +28,11 @@ public class PrepperTests
 
 
     /// <summary>
-    /// Tests that the nested prepper is called for items that exist in both the original and
-    /// modified collection (i.e., items being updated), but NOT for new or deleted items.
+    /// Tests that the nested prepper is called for both existing items (update) and new items
+    /// (Id=0), but NOT for deleted items (absent from modified).
     /// </summary>
     [Test]
-    public async Task Nested_Prepper_Is_Called_For_Existing_Items_Only()
+    public async Task Nested_Prepper_Is_Called_For_Existing_And_New_Items()
     {
         IServiceCollection services = new ServiceCollection();
         services.AddDbContext<ProductContext>(db => db.UseSqlite(_connection));
@@ -41,7 +41,6 @@ public class PrepperTests
         var dbContext = sp.GetRequiredService<ProductContext>();
         await dbContext.Database.EnsureCreatedAsync();
 
-        // Insert an order with products
         using (var insertScope = sp.CreateScope())
         {
             var ctx = insertScope.ServiceProvider.GetRequiredService<ProductContext>();
@@ -58,7 +57,7 @@ public class PrepperTests
             await ctx.SaveChangesAsync();
         }
 
-        // Track which product Ids the nested prepper is called for
+        // Track which product Ids the nested prepper is called for (new item has Id=0 at call time)
         var calledForIds = new List<int>();
         IEntityPrepper<Product> trackingPrepper = new EntityPrepper<Product>(p => calledForIds.Add(p.Id));
 
@@ -76,9 +75,9 @@ public class PrepperTests
             Title = "Category (updated)",
             Products = new List<Product>
             {
-                new() { Id = 1, Title = "Product (1 - modified)" },   // existing → nested prepper should be called
-                new() { Title = "Product (3)" },                       // new (Id=0) → nested prepper should NOT be called
-                // Product (2) omitted → will be deleted → nested prepper should NOT be called
+                new() { Id = 1, Title = "Product (1 - modified)" },   // existing → nested prepper called with original
+                new() { Title = "Product (3)" },                       // new (Id=0) → nested prepper called with null original
+                // Product (2) omitted → deleted → nested prepper should NOT be called
             }
         };
 
@@ -89,8 +88,50 @@ public class PrepperTests
 
         await prepper.Prepare(modified, original);
 
-        // Only product with Id=1 (existing in both) should trigger the nested prepper
-        Assert.That(calledForIds, Is.EquivalentTo(new[] { 1 }));
+        // Both existing (Id=1) and new (Id=0) products should trigger the nested prepper;
+        // deleted Product (2) should not.
+        Assert.That(calledForIds, Is.EquivalentTo(new[] { 1, 0 }));
+    }
+
+    /// <summary>
+    /// Tests that when a parent item has no original (it is new), nested preppers are still
+    /// invoked for its child items — covering the else-branch in RelatedCollectionPrepper.
+    /// </summary>
+    [Test]
+    public async Task Nested_Prepper_Is_Called_With_Null_Original_For_New_Parent()
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddDbContext<ProductContext>(db => db.UseSqlite(_connection));
+        var sp = services.BuildServiceProvider();
+
+        await sp.GetRequiredService<ProductContext>().Database.EnsureCreatedAsync();
+
+        var calledForTitles = new List<string?>();
+        IEntityPrepper<Product> trackingPrepper = new EntityPrepper<Product>(p => calledForTitles.Add(p.Title));
+
+        using var scope = sp.CreateScope();
+        var ctx = scope.ServiceProvider.GetRequiredService<ProductContext>();
+
+        var newCategory = new Category
+        {
+            Id = 0,
+            Title = "New Category",
+            Products = new List<Product>
+            {
+                new() { Title = "Product (A)" },
+                new() { Title = "Product (B)" },
+            }
+        };
+
+        var prepper = new RelatedCollectionPrepper<ProductContext, Category, Product, int, int>(
+            ctx,
+            x => x.Products,
+            [trackingPrepper]);
+
+        // No original — parent is brand new
+        await prepper.Prepare(newCategory, null);
+
+        Assert.That(calledForTitles, Is.EquivalentTo(new[] { "Product (A)", "Product (B)" }));
     }
 
     /// <summary>

@@ -9,15 +9,14 @@ Exact signatures for interfaces, classes, and extension methods in the Regira En
 1. [Entity Interfaces](#entity-interfaces)
 2. [Service Interfaces](#service-interfaces)
 3. [Controller Base Classes](#controller-base-classes)
-4. [FastEndpoints (Minimal API)](#fastendpoints-minimal-api)
-5. [Search and Filter Objects](#search-and-filter-objects)
-6. [Extension Methods](#extension-methods)
-7. [Service Builders](#service-builders)
-8. [Mapping and Processing](#mapping-and-processing)
-9. [Response Types](#response-types)
-10. [Attachments](#attachments)
-11. [Exceptions](#exceptions)
-12. [Supporting Types](#supporting-types)
+4. [Search and Filter Objects](#search-and-filter-objects)
+5. [Extension Methods](#extension-methods)
+6. [Service Builders](#service-builders)
+7. [Mapping and Processing](#mapping-and-processing)
+8. [Response Types](#response-types)
+9. [Attachments](#attachments)
+10. [Exceptions](#exceptions)
+11. [Supporting Types](#supporting-types)
 
 ---
 
@@ -356,80 +355,6 @@ public abstract class EntityControllerBase<TEntity, TKey, TSo, TSortBy, TInclude
 | `POST` | `/` | Create |
 | `PUT` | `/{id}` | Modify |
 | `DELETE` | `/{id}` | Delete |
-
----
-
-## FastEndpoints (Minimal API)
-
-NuGet: `Regira.Entities.Web.FastEndpoints`
-
-### Auto-Registration
-
-```csharp
-using Regira.Entities.Web.FastEndpoints.Extensions;
-using Regira.Entities.Web.FastEndpoints.Models;
-
-// Scans DI for all IEntityService<,> registrations and maps CRUD routes for each entity.
-// Requires UseEntities<TContext>() to have been called during service registration.
-WebApplication MapEntityEndpoints(
-    this WebApplication app,
-    string routePrefix = "api",
-    Action<EntityAutoEndpointsOptions>? configure = null)
-```
-
-**Routes registered per entity** (base: `{routePrefix}/{entityName}s`):
-
-| Method | Route | Action |
-|--------|-------|--------|
-| `GET` | `/{id}` | Details (404 if missing) |
-| `GET` | `/` | List (`?page`, `?pageSize`) |
-| `POST` | `/` | Create |
-| `POST` | `/save` | Save (upsert; 404 if updating nonexistent) |
-| `PUT` | `/{id}` | Modify (404 if missing) |
-| `DELETE` | `/{id}` | Delete (404 if missing) |
-
-> Note: auto-registration uses raw entity classes (no DTOs/mapping). Use the endpoint base classes below for DTO-aware endpoints.
-
-### Configuration
-
-```csharp
-using Regira.Entities.Web.FastEndpoints.Models;
-
-public class EntityAutoEndpointsOptions
-{
-    // Default route prefix. Default: "api"
-    public string RoutePrefix { get; set; }
-
-    // Override the route for a specific entity (for fully custom paths; irregular plurals are handled automatically)
-    public EntityAutoEndpointsOptions For<TEntity>(string route)
-        where TEntity : class, IEntity;
-
-    // Returns the configured route, falling back to {RoutePrefix}/{entityName}s
-    public string GetRouteFor(Type entityType);
-}
-```
-
-### Endpoint Base Classes (manual, DTO-aware)
-
-```csharp
-using Regira.Entities.Web.FastEndpoints.Endpoints.Abstractions;
-
-// Simple endpoints (int-key convenience variants available — omit TKey)
-EntityDetailsEndpointBase<TEntity, TKey, TDto>
-EntityListEndpointBase<TEntity, TKey, TSearchObject, TDto>
-EntityCreateEndpointBase<TEntity, TKey, TDto, TInputDto>
-EntitySaveEndpointBase<TEntity, TKey, TDto, TInputDto>
-EntityModifyEndpointBase<TEntity, TKey, TDto, TInputDto>
-EntityDeleteEndpointBase<TEntity, TKey, TDto>
-
-// Complex endpoints (with TSortBy + TIncludes; int-key convenience variants available)
-ComplexEntityListGetEndpointBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto>
-ComplexEntityListPostEndpointBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto>
-ComplexEntitySearchGetEndpointBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto>
-ComplexEntitySearchPostEndpointBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto>
-```
-
-Override `Configure()` to add authentication, OpenAPI tags, or other FastEndpoints settings.
 
 ---
 

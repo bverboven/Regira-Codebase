@@ -30,8 +30,7 @@ When implementing a new entity in an application:
     - Prefer Data Annotations over Fluent API when possible
 - [ ] Configure Entity in DI using `.For<TEntity>()`
 - [ ] Add **Web Endpoints** *(when using API)*
-    - Preferred: `app.MapEntityEndpoints()` auto-registers CRUD routes for all entities (zero boilerplate)
-    - Alternative: Create an `EntityControllerBase` controller for full control, DTO mapping, or custom auth
+    - Create an `EntityControllerBase` controller for each entity
     - Add custom actions only when necessary, otherwise rely on built-in CRUD actions
     - Prefer extending SearchObject to extend filtering over adding extra endpoints
 - [ ] Initialize the database

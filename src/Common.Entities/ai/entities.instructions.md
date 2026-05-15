@@ -9,7 +9,6 @@
 | `Common.Entities` | `Regira.Entities` | Shared abstractions and interfaces |
 | `Entities.EFcore` | `Regira.Entities.EFcore` | EF Core `EntityRepository` |
 | `Entities.Web` | `Regira.Entities.Web` | ASP.NET Core `EntityControllerBase` |
-| `Entities.Web.FastEndpoints` | `Regira.Entities.Web.FastEndpoints` | `MapEntityEndpoints()` auto-registration (preferred) |
 | `Entities.DependencyInjection` | `Regira.Entities.DependencyInjection` | `UseEntities()` / `.For<>()` DI builder |
 | `Entities.Mapping.AutoMapper` | `Regira.Entities.Mapping.AutoMapper` | AutoMapper integration |
 | `Entities.Mapping.Mapster` | `Regira.Entities.Mapping.Mapster` | Mapster integration |
@@ -34,7 +33,7 @@ Use this as the primary checklist.
    - Call `UseEntities<YourDbContext>(...)` on `builder.Services`, preferably via an extension method.
    - Inside `UseEntities` config, call `.UseDefaults()` by default, then add mapping and any global services.
    - `UseEntities()` returns a `IEntityServiceCollection` to configure the entities using `.For()`, preferably via extension methods per main Entity.
-   - Add `builder.Services.AddFastEndpoints()` and call `app.UseFastEndpoints()` + `app.MapEntityEndpoints()` to auto-register all CRUD routes (preferred). For controller-based routing, use standard ASP.NET controller setup instead.
+   - Use standard ASP.NET controller setup for routing.
 6. Add entities using the workflow below.
 
 ### Add a New Entity to an Existing Project
@@ -43,7 +42,7 @@ Use this as the primary checklist.
 2. Add `SearchObject`, `SortBy`, `Includes`, and DTOs as needed.
 3. Add optional query builder / processor / prepper classes.
 4. Register the entity on the `EntityServiceCollection` using `.For<TEntity,...>(...)`.
-5. Prefer `app.MapEntityEndpoints()` for zero-boilerplate CRUD route registration — no per-entity step needed. Add an `EntityControllerBase` controller only when DTO mapping, custom auth, or advanced sort/includes filtering is required.
+5. Add an `EntityControllerBase` controller for the entity's HTTP endpoints.
 6. Add `DbSet<TEntity>` to `YourDbContext` and configure relationships.
 7. If the project still uses the default SQLite starter database, keep it migration-free and rely on `Database.EnsureCreated()` with a disposable local database.
 8. Only create and apply EF migrations when the user explicitly wants migration-based schema management or has moved to a more mature database provider.
@@ -109,7 +108,7 @@ Use this as the primary checklist.
 ```
 EntitySet → QueryBuilders (Filters → Sorting → Paging → Includes) → Processors → Mapping → AfterMapping*
 ```
-*AfterMapping is only executed in API controllers and FastEndpoints endpoints
+*AfterMapping is only executed in API controllers
 
 **Write Pipeline:**
 ```
@@ -141,16 +140,7 @@ Base controllers call `SaveChanges()` automatically, but when using `IEntityServ
 
 ### Web Endpoints
 
-**FastEndpoints (preferred — no per-entity controller boilerplate):**
-- Call `app.MapEntityEndpoints()` in `Program.cs` — auto-registers CRUD routes for every `IEntityService<,>` in DI
-- No per-entity code needed; routes follow `api/{entityname}s` convention
-- Use `EntityAutoEndpointsOptions` to override routes for fully custom paths (irregular plurals are handled automatically)
-- Note: auto-registration uses raw entities (no DTOs); use endpoint base classes for DTO-aware endpoints
-
-**Use `EntityControllerBase` when:**
-- The project already uses MVC controllers and consistency is preferred
-- Per-endpoint or per-controller customisation is more natural in the MVC attribute model
-- You don't want an extra dependency on FastEndpoints (though it's a very lightweight dependency)
+**Use `EntityControllerBase`** for exposing entity operations as HTTP endpoints:
 
 ```csharp
 // Minimal (no search or sorting)
@@ -373,21 +363,7 @@ Before writing the controller, verify the `.For<>()` registration and controller
 
 ### Step 12: Configure Web Endpoints
 
-**Option A: FastEndpoints auto-registration (preferred)**
-
-No per-entity step needed. `app.MapEntityEndpoints()` (called once in `Program.cs`) automatically covers every entity registered via `.For<>()`. Routes follow the `api/{entityname}s` convention.
-
-Use `EntityAutoEndpointsOptions` only for fully custom routes (e.g. versioning, renamed paths):
-```csharp
-app.MapEntityEndpoints(configure: options =>
-{
-    options.For<Product>("v2/shop/items"); // fully custom path
-});
-```
-
-**Option B: Controller (when DTO mapping or custom behaviour is required)**
-
-The generic type arguments on the controller must **exactly match** the type arguments used in `.For<>()`. 
+Use `EntityControllerBase`. The generic type arguments on the controller must **exactly match** the type arguments used in `.For<>()`. 
 The controller can add `TDto` and `TInputDto` on top.
 
 | `.For<>()` registration | Required controller base |

@@ -150,18 +150,6 @@
 
 ---
 
-## FastEndpoints (Minimal API)
-
-NuGet: `Regira.Entities.Web.FastEndpoints`
-
-| Namespace | Types |
-|-----------|-------|
-| `Regira.Entities.Web.FastEndpoints.Extensions` | `WebApplicationEntityExtensions` (`MapEntityEndpoints()` — on `WebApplication`) |
-| `Regira.Entities.Web.FastEndpoints.Models` | `EntityAutoEndpointsOptions` |
-| `Regira.Entities.Web.FastEndpoints.Endpoints.Abstractions` | `EntityDetailsEndpointBase<>`, `EntityListEndpointBase<>`, `EntityCreateEndpointBase<>`, `EntitySaveEndpointBase<>`, `EntityModifyEndpointBase<>`, `EntityDeleteEndpointBase<>`, `ComplexEntityListGetEndpointBase<>`, `ComplexEntityListPostEndpointBase<>`, `ComplexEntitySearchGetEndpointBase<>`, `ComplexEntitySearchPostEndpointBase<>` |
-
----
-
 ## Common .NET / EF Core Namespaces
 
 | Namespace | Types |
@@ -251,23 +239,6 @@ Regira.Normalizing.Models                         → NormalizingOptions
 Regira.Entities.Services.Abstractions   → EntityWrappingServiceBase<...>, IEntityService<...>
 Regira.Entities.Models                  → EntityInputException<T>
 Regira.DAL.Paging                       → PagingInfo
-```
-
-### Auto-registering endpoints (FastEndpoints — preferred)
-```
-Regira.Entities.Web.FastEndpoints.Extensions   → MapEntityEndpoints() (on WebApplication)
-Regira.Entities.Web.FastEndpoints.Models       → EntityAutoEndpointsOptions
-```
-
-### Creating a manual FastEndpoints endpoint (DTO-aware)
-```
-Regira.Entities.Web.FastEndpoints.Endpoints.Abstractions → EntityDetailsEndpointBase<>
-                                                            EntityListEndpointBase<>
-                                                            EntityCreateEndpointBase<>
-                                                            EntitySaveEndpointBase<>
-                                                            EntityModifyEndpointBase<>
-                                                            EntityDeleteEndpointBase<>
-                                                            ComplexEntity*EndpointBase<>
 ```
 
 ### Creating a controller

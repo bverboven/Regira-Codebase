@@ -12,7 +12,7 @@
     <Description>Shared Regira setup guides and AI instruction extraction support for consumer projects.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.0</Version>
+    <Version>5.4.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Include="build\Regira.Setup.props" Pack="true" PackagePath="buildTransitive\" />
