@@ -429,9 +429,8 @@ public class EntityServiceBuilder<TContext, TEntity, TKey>(EntityServiceCollecti
         {
             var relatedBuilder = new RelatedEntityBuilder<TContext, TRelated, TRelatedKey>();
             configure(relatedBuilder);
-            var nestedPreppers = relatedBuilder.PrepperFactories.Select(f => f(p));
-            return new RelatedCollectionPrepper<TContext, TEntity, TRelated, TKey, TRelatedKey>(
-                p.GetRequiredService<TContext>(), navigationExpression, nestedPreppers);
+            var nestedPreppers = relatedBuilder.PrepperFactories.Select(prepperFactory => prepperFactory(p));
+            return new RelatedCollectionPrepper<TContext, TEntity, TRelated, TKey, TRelatedKey>(p.GetRequiredService<TContext>(), navigationExpression, nestedPreppers);
         });
         if (prepareFunc != null)
         {
