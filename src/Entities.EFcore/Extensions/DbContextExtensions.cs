@@ -63,6 +63,8 @@ public static class DbContextExtensions
 
         var relatedItemsToAdd = modifiedItems.Where(m => m.Id == null || m.Id.Equals(default(TRelatedKey)) || originalItems.All(o => m.Id.Equals(o.Id) != true)).ToArray();
         var relatedItemsToDelete = originalItems.Where(o => modifiedItems.All(m => m.Id != null && m.Id.Equals(o.Id) != true)).ToArray();
+        // Materialize before the delete loop so EF Core navigation fixup cannot add deleted items back into modifiedItems
+        var relatedItemsToModify = modifiedItems.Except(relatedItemsToAdd).Where(m => m.Id != null && !m.Id.Equals(default(TRelatedKey))).ToArray();
         foreach (var entity in relatedItemsToAdd)
         {
             dbContext.Entry(entity).State = EntityState.Added;
@@ -71,14 +73,13 @@ public static class DbContextExtensions
         {
             dbContext.Entry(entity).State = EntityState.Deleted;
         }
-        var relatedItemsToModify = modifiedItems.Except(relatedItemsToAdd).Where(m => m.Id != null && !m.Id.Equals(default(TRelatedKey)));
         foreach (var entity in relatedItemsToModify)
         {
             var originalEntity = originalItems.Single(p => p.Id!.Equals(entity.Id));
             dbContext.Entry(originalEntity).State = EntityState.Detached;
             dbContext.Attach(entity);
             dbContext.Entry(entity).OriginalValues.SetValues(originalEntity);
-            dbContext.Update(entity);
+            dbContext.Entry(entity).State = EntityState.Modified;
         }
     }
     #endregion

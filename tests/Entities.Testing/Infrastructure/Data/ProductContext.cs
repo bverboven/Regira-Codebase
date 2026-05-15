@@ -9,4 +9,5 @@ public class ProductContext(DbContextOptions<ProductContext> options) : DbContex
     public DbSet<Order> Orders { get; set; } = null!;
     public DbSet<Customer> Customers { get; set; } = null!;
     public DbSet<User> Users { get; set; } = null!;
+    public DbSet<ProductTag> ProductTags { get; set; } = null!;
 }
