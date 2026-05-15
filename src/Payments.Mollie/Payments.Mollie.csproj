@@ -11,27 +11,20 @@
     <AssemblyName>Regira.Payments.Mollie</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.3.1</Version>
+    <Version>5.4.0</Version>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Abstractions\**" />
-    <Compile Remove="Models\**" />
-    <Compile Remove="Response\**" />
-    <EmbeddedResource Remove="Abstractions\**" />
-    <EmbeddedResource Remove="Models\**" />
-    <EmbeddedResource Remove="Response\**" />
-    <None Remove="Abstractions\**" />
-    <None Remove="Models\**" />
-    <None Remove="Response\**" />
-  </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
     <PackageReference Include="System.Text.Json" Version="10.0.8" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Abstractions\**" />
+    <EmbeddedResource Remove="Abstractions\**" />
+    <None Remove="Abstractions\**" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Mollie.Api" Version="4.19.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Common.Payments\Common.Payments.csproj" />
     <ProjectReference Include="..\Common.Invoicing\Common.Invoicing.csproj" />
   </ItemGroup>
 </Project>

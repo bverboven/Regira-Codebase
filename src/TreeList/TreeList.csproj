@@ -11,7 +11,7 @@
     <AssemblyName>Regira.TreeList</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.1.0</Version>
+    <Version>5.4.0</Version>
   </PropertyGroup>
   <!-- MSBuild targets — auto-imported into consuming builds via NuGet buildTransitive -->
   <ItemGroup>
@@ -22,5 +22,8 @@
   <ItemGroup>
     <None Include="ai\treelist.instructions.md" Pack="true" PackagePath="ai\" />
     <None Include="ai\treelist.examples.md" Pack="true" PackagePath="ai\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 </Project>

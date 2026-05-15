@@ -264,4 +264,14 @@ public class ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TS
 
         return this;
     }
+    public ComplexEntityIntServiceBuilder<TContext, TEntity, TSearchObject, TSortBy, TIncludes> Related<TRelated>(
+        Expression<Func<TEntity, ICollection<TRelated>?>> navigationExpression,
+        Action<RelatedEntityBuilder<TContext, TRelated, int>> configure,
+        Action<TEntity>? prepareFunc = null)
+        where TRelated : class, IEntity<int>
+    {
+        Related<TRelated, int>(navigationExpression, configure, prepareFunc);
+
+        return this;
+    }
 }

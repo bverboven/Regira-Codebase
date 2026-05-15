@@ -11,7 +11,7 @@
     <AssemblyName>Regira.Invoicing.ViaAdValvas</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.3.1</Version>
+    <Version>5.4.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Invoicing\Common.Invoicing.csproj" />

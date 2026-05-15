@@ -20,6 +20,7 @@ public class Product : IEntity<int>, IHasNormalizedTitle, IHasDescription, IHasT
     public DateTime? LastModified { get; set; }
 
     public Category? Category { get; set; }
+    public ICollection<ProductTag>? Tags { get; set; }
 }
 
 public class ProductSearchObject : SearchObject
