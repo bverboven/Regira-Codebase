@@ -4,6 +4,41 @@ Use this file as the authoritative downstream bootstrap for choosing the project
 
 This file is also the top-level Regira routing guide inside the source repository. In a consumer repository, use this file plus any local `regira/instructions/*.md` guides as the available sources of truth.
 
+## MCP server
+
+A Regira MCP server is available at `https://mcp.regira.com/mcp`. It provides full knowledge of all Regira packages — including packages that are not yet installed locally.
+
+**Use it for:**
+- Discovering which packages to install before writing any code (`recommend_packages`, `search_packages`, `list_packages`)
+- Reading full setup guides and code examples without running `dotnet build` first
+- Any AI tool that supports MCP (Claude Desktop, VS Code, Cursor, Copilot)
+
+**Configure once** in your AI tool, then use these tools naturally:
+
+| Tool | Purpose |
+|---|---|
+| `recommend_packages` | Describe a feature, get package suggestions |
+| `search_packages` | Keyword/use-case search across all packages |
+| `list_packages` | Browse all 74 packages, optionally by category |
+| `get_package` | Full docs (instructions + examples + setup) for one package |
+| `get_bootstrap_guide` | This consumer bootstrap guide |
+
+**Configuration snippets:**
+
+Claude Desktop (`~/.claude/claude_desktop_config.json`):
+```json
+{ "mcpServers": { "regira": { "url": "https://mcp.regira.com/mcp" } } }
+```
+
+VS Code / Claude Code (`.claude/settings.json` in your project):
+```json
+{ "mcpServers": { "regira": { "url": "https://mcp.regira.com/mcp" } } }
+```
+
+Cursor: Settings → MCP Servers → add `https://mcp.regira.com/mcp`.
+
+The local file-extraction system (`dotnet build` → `.regira/instructions/`) remains available as an offline fallback and for IDE-local use. Prefer MCP-based discovery for the initial "what should I install?" phase.
+
 ## Pre-flight checklist
 
 Run this checklist before any code generation:

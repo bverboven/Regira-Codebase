@@ -174,6 +174,8 @@
     <Project Path="tests/Web.Security.Testing/Web.Security.Testing.csproj" />
   </Folder>
   <Folder Name="/tools/">
+    <Project Path="tools/build-mcp-knowledge/Regira.McpKnowledgeBuilder.csproj" />
+    <Project Path="tools/mcp-server/Regira.McpServer.csproj" />
     <Project Path="tools/ProjectBackupConsole/ProjectBackupConsole.csproj" />
     <Project Path="tools/ProjectFilesProcessor/ProjectFilesProcessor.csproj" />
     <Project Path="tools/ProjectsCleanerConsole/ProjectsCleanerConsole.csproj" />

@@ -2,6 +2,16 @@
 
 Read `ai/AGENTS.md` (or `.github/instructions/regira/` if guides have been extracted) before taking any action. It is the authoritative routing guide for all code generation, package selection, and project scaffolding.
 
+## MCP server
+
+For full package discovery (including packages not yet installed), the Regira MCP server provides all guides at runtime:
+
+```json
+{ "mcpServers": { "regira": { "url": "https://mcp.regira.com/mcp" } } }
+```
+
+Add this to your AI tool's settings once. Then use `recommend_packages`, `search_packages`, or `get_package` to explore the full catalog before installing anything.
+
 ## Non-negotiable rules
 
 1. **Never guess** — do not invent namespaces, method signatures, or package names. Stop and ask.

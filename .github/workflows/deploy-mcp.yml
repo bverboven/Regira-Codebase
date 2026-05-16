@@ -1,0 +1,63 @@
+name: Deploy Regira MCP Server
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "src/*/ai/**"
+      - "src/*/*.csproj"
+      - "ai/AGENTS.md"
+      - "tools/mcp-server/**"
+      - "tools/build-mcp-knowledge/**"
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.x"
+
+      # Generate knowledge-base.json from source ai/ files
+      - name: Build knowledge base
+        working-directory: tools/build-mcp-knowledge
+        run: dotnet run -- ${{ github.workspace }}
+
+      # Publish self-contained MCP server with knowledge base embedded
+      - name: Publish MCP server
+        working-directory: tools/mcp-server
+        run: dotnet publish -c Release -o publish
+
+      - name: Copy knowledge-base.json into publish folder
+        run: cp tools/mcp-server/knowledge-base.json tools/mcp-server/publish/
+
+      # Deploy to server via SSH
+      - name: Create deploy directory
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: mkdir -p ${{ secrets.SSH_DEPLOY_PATH }}
+
+      - name: Copy files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "tools/mcp-server/publish/"
+          target: ${{ secrets.SSH_DEPLOY_PATH }}
+          strip_components: 3
+
+      - name: Reload IIS app pool
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            & "$env:windir\system32\inetsrv\appcmd" recycle apppool /apppool.name:"regira-mcp"
