@@ -7,7 +7,10 @@
 	<IsPackable>false</IsPackable>
 	<Authors>B.Verboven</Authors>
 	<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-  </PropertyGroup>
+  
+	<Description>Shared test fixtures and helpers for Regira unit and integration tests.</Description>
+	<PackageTags>regira;testing;library</PackageTags>
+</PropertyGroup>
   <ItemGroup>
 	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
   </ItemGroup>

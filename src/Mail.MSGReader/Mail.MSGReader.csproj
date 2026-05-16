@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.1</Version>
-  </PropertyGroup>
+  
+    <Description>MSG and EML file reading using MsgReader for Regira Office.</Description>
+    <PackageTags>regira;office;mail;msg;msgreader;email</PackageTags>
+</PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MsgReader" Version="6.0.11" />
   </ItemGroup>

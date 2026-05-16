@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.1</Version>
-  </PropertyGroup>
+  
+    <Description>Razor-based HTML template rendering using RazorEngineCore for Regira.</Description>
+    <PackageTags>regira;web;html;razor;templates</PackageTags>
+</PropertyGroup>
   <ItemGroup>
     <PackageReference Include="RazorEngineCore" Version="2026.1.1" />
   </ItemGroup>

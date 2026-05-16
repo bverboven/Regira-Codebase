@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,7 +8,10 @@
     <Authors>B.Verboven</Authors>
     <RootNamespace>Regira.ProjectBackupConsole</RootNamespace>
     <PackageId>Regira.ProjectBackupConsole</PackageId>
-  </PropertyGroup>
+  
+    <Description>Console tool for creating backups of Regira project files.</Description>
+    <PackageTags>regira;tools;projects;backup</PackageTags>
+</PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Common.IO.Storage\Common.IO.Storage.csproj" />
   </ItemGroup>

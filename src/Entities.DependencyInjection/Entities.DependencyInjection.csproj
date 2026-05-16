@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.2</Version>
-  </PropertyGroup>
+  
+    <Description>Dependency injection extensions for Regira's entity framework.</Description>
+    <PackageTags>regira;entities;dependency-injection;di</PackageTags>
+</PropertyGroup>
   <ItemGroup>
     <Compile Remove="ai\**" />
     <EmbeddedResource Remove="ai\**" />

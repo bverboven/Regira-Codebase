@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.1</Version>
-  </PropertyGroup>
+  
+    <Description>Word document processing using FreeSpire.Doc for Regira Office.</Description>
+    <PackageTags>regira;office;word;spire;docx</PackageTags>
+</PropertyGroup>
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
     <PackageReference Include="FreeSpire.Doc" Version="9.9.7" />
     <ProjectReference Include="..\Drawing.SkiaSharp\Drawing.SkiaSharp.csproj" />

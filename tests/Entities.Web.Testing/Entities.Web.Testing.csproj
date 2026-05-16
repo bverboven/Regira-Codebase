@@ -6,7 +6,10 @@
         <Nullable>enable</Nullable>
 
         <IsPackable>false</IsPackable>
-    </PropertyGroup>
+    
+        <Description>Unit and integration tests for Regira Entities Web controllers.</Description>
+        <PackageTags>regira;testing;entities;web</PackageTags>
+</PropertyGroup>
 
     <PropertyGroup>
         <PreserveCompilationContext>true</PreserveCompilationContext>

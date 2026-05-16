@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.1</Version>
-  </PropertyGroup>
+  
+    <Description>PDF printing support using PDFtoPrinter for Regira Office.</Description>
+    <PackageTags>regira;office;pdf;printing;pdftopinter</PackageTags>
+</PropertyGroup>
   <ItemGroup>
     <PackageReference Include="PDFtoPrinter" Version="1.5.6" />
   </ItemGroup>

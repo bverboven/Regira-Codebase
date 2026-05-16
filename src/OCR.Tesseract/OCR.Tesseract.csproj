@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.1</Version>
-  </PropertyGroup>
+  
+    <Description>Optical character recognition using Tesseract for Regira Office.</Description>
+    <PackageTags>regira;office;ocr;tesseract</PackageTags>
+</PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Tesseract" Version="5.2.0" />
   </ItemGroup>
