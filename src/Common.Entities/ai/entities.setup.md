@@ -17,6 +17,7 @@
 - **Project structure**: Per-entity folder structure
 - **Service layer**: Default `EntityRepository` (unless complex logic requires wrapping)
 - **Many-to-many relationships**: prefer option A
+- **Web endpoints**: Controllers inheriting from `EntityControllerBase`
 
 ---
 

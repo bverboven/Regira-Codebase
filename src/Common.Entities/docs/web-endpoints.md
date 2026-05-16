@@ -66,7 +66,7 @@ List([FromBody] searchObject[], pagingInfo, includes[], sortBy[]) -> ListResult
 Search([FromBody] searchObject[], pagingInfo, includes[], sortBy[]) -> SearchResult
 ```
 
-*The SearchObject items return queries that are inclusive.*
+*The SearchObject items return queries that are inclusive (using Union).*
 
 #### Save (Add/Modify)
 

@@ -10,15 +10,15 @@ while allowing **customization** through generic type parameters, interfaces and
 
 Understanding the generic type system is crucial:
 
-| Type | Required | Purpose | Example |
-|------|----------|---------|---------|
-| TEntity | ✓ | The entity class | `Product` |
-| TKey | ✓* | Primary key type (*default: int) | `Guid`, `int` |
-| TSearchObject | ○ | Advanced filtering | `ProductSearchObject` |
-| TSortBy | ○ | Sorting enum | `ProductSortBy` |
-| TInclude | ○ | Navigation properties enum | `ProductIncludes` |
-| TDto | ○ | Read/display model (details & lists) | `ProductDto` |
-| TInputDto | ○ | Create/update model | `ProductInputDto` |
+| Type | Required | Purpose | Default (when omitted) | Example |
+|------|----------|---------|---------|---------|
+| TEntity | ✓ | The entity class | - | `Product` |
+| TKey | ○ | Primary key type | `int` | `Guid`, `int` |
+| TSearchObject | ○ | Advanced filtering | `SearchObject` | `ProductSearchObject` |
+| TSortBy | ○ | Sorting enum | `EntitySortBy` | `ProductSortBy` |
+| TInclude | ○ | Navigation properties enum | `EntityIncludes` | `ProductIncludes` |
+| TDto | ○ | Read/display model (details & lists) | `TEntity` | `ProductDto` |
+| TInputDto | ○ | Create/update model | `TEntity` | `ProductInputDto` |
 
 ### Architecture
 

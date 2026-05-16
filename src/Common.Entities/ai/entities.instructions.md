@@ -8,80 +8,40 @@
 |---------|---------|----------|
 | `Common.Entities` | `Regira.Entities` | Shared abstractions and interfaces |
 | `Entities.EFcore` | `Regira.Entities.EFcore` | EF Core `EntityRepository` |
-| `Entities.Web` | `Regira.Entities.Web` | ASP.NET Core `EntityControllerBase` |
+| `Entities.Web` | `Regira.Entities.Web` | ASP.NET Core Endpoints |
 | `Entities.DependencyInjection` | `Regira.Entities.DependencyInjection` | `UseEntities()` / `.For<>()` DI builder |
-| `Entities.Mapping.AutoMapper` | `Regira.Entities.Mapping.AutoMapper` | AutoMapper integration |
 | `Entities.Mapping.Mapster` | `Regira.Entities.Mapping.Mapster` | Mapster integration |
+| *`Entities.Mapping.AutoMapper`* | *`Regira.Entities.Mapping.AutoMapper`* | *AutoMapper integration (deprecated)* |
 
-Always prefer clear, conventional patterns over clever solutions. Default to the more feature-rich options when in doubt.
+Always prefer clear, conventional patterns over clever solutions. Default to the more feature-rich options when in doubt. Use the latest .NET version (net10) unless instructed otherwise.
 
 ---
 
 ## Quick Agent Playbook
 
-Use this as the primary checklist.
+**Create project:** → [`entities.setup.md`](./entities.setup.md)
 
-### Create a New Regira API Project
+**Add entity:** → §Entity Implementation Workflow
 
-1. Create an ASP.NET Core Web API project targeting the latest .NET version (or the solution's target).
-2. Add `NuGet.Config` with the Regira feed (see below).
-3. Add the required Regira and EF Core packages to the project file.
-4. Create a `YourDbContext` deriving from `DbContext` and configure it.
-5. In `Program.cs`:
-   - Register `YourDbContext` via `AddDbContext<YourDbContext>(...)`
-   - Inside the DbContext configuration, add any interceptors (primers, normalizers, auto-truncate) as needed.
-   - Call `UseEntities<YourDbContext>(...)` on `builder.Services`, preferably via an extension method.
-   - Inside `UseEntities` config, call `.UseDefaults()` by default, then add mapping and any global services.
-   - `UseEntities()` returns a `IEntityServiceCollection` to configure the entities using `.For()`, preferably via extension methods per main Entity.
-   - Use standard ASP.NET controller setup for routing.
-6. Add entities using the workflow below.
-
-### Add a New Entity to an Existing Project
-
-1. Add the entity class and implement the appropriate interfaces.
-2. Add `SearchObject`, `SortBy`, `Includes`, and DTOs as needed.
-3. Add optional query builder / processor / prepper classes.
-4. Register the entity on the `EntityServiceCollection` using `.For<TEntity,...>(...)`.
-5. Add an `EntityControllerBase` controller for the entity's HTTP endpoints.
-6. Add `DbSet<TEntity>` to `YourDbContext` and configure relationships.
-7. If the project still uses the default SQLite starter database, keep it migration-free and rely on `Database.EnsureCreated()` with a disposable local database.
-8. Only create and apply EF migrations when the user explicitly wants migration-based schema management or has moved to a more mature database provider.
-
-### Modify an Existing Entity
-
-1. Update the entity class and related `DbSet`/relationships.
-2. Update DTOs and mapping configuration.
-3. Update `SearchObject`, enums, and query builders if filters/sorting change.
-4. Adjust processors, preppers, and normalizers if behavior changes.
-5. If the project still uses the default SQLite starter database, keep the model aligned and recreate the local test database when schema changes require `EnsureCreated()` to rebuild it.
-6. Create and apply a migration only when the user explicitly wants migration-based schema management or the project has moved beyond the disposable SQLite starter setup.
+**Modify entity:**
+1. Update entity class and related `DbSet`/relationships
+2. Update DTOs and mapping configuration
+3. Update `SearchObject`, enums, and query builders if filters/sorting change
+4. Adjust processors, preppers, and normalizers if behavior changes
 
 ---
 
-## Namespace Reference
+## References
 
-> **→ See:** [`entities.namespaces.md`](./entities.namespaces.md)
+**Namespaces:** [`entities.namespaces.md`](./entities.namespaces.md) — never guess, invent, or assume a namespace.
 
-- You are **NOT** allowed to guess, invent, or assume any namespace.
-- **Always use exact namespaces — never guess.**  
-
----
-
-## Signatures Reference
-
-> **→ See:** [`entities.signatures.md`](./entities.signatures.md)
-
-- Use this file to look up the **exact signatures** of all interfaces, classes, and extension methods in the framework.
-- **Do not guess method names, parameter types, or return types** — always verify against this reference.
-- Covers: entity interfaces, service interfaces, controller base classes, service builders, mapping types, response types, and more.
+**Signatures:** [`entities.signatures.md`](./entities.signatures.md) — never guess method names, parameter types, or return types; always verify here.
 
 ---
 
 ## Core Understanding
 
 ### Framework Architecture
-
-**Regira Entities** is a generic, extensible framework for managing data entities in .NET with standardized CRUD operations.
 
 **Key Components:**
 - **Entity Models**: POCO classes implementing `IEntity<TKey>`
@@ -92,15 +52,15 @@ Use this as the primary checklist.
 
 ### Generic Type System
 
-| Type | Required | Purpose | Example |
-|------|----------|---------|---------|
-| `TEntity` | ✓ | The entity class | `Product` |
-| `TKey` | ✓* | Primary key type (*default: `int`) | `Guid`, `int` |
-| `TSearchObject` | ○ | Advanced filtering | `ProductSearchObject` |
-| `TSortBy` | ○ | Sorting enum | `ProductSortBy` |
-| `TInclude` | ○ | Navigation properties enum | `ProductIncludes` |
-| `TDto` | ○ | Read/display model | `ProductDto` |
-| `TInputDto` | ○ | Create/update model | `ProductInputDto` |
+| Type | Required | Purpose | Default (when omitted) | Example |
+|------|----------|---------|---------|---------|
+| TEntity | ✓ | The entity class | - | `Product` |
+| TKey | ○ | Primary key type | `int` | `Guid`, `int` |
+| TSearchObject | ○ | Advanced filtering | `SearchObject` | `ProductSearchObject` |
+| TSortBy | ○ | Sorting enum | `EntitySortBy` | `ProductSortBy` |
+| TInclude | ○ | Navigation properties enum | `EntityIncludes` | `ProductIncludes` |
+| TDto | ○ | Read/display model (details & lists) | `TEntity` | `ProductDto` |
+| TInputDto | ○ | Create/update model | `TEntity` | `ProductInputDto` |
 
 ### Processing Pipelines
 
@@ -140,19 +100,7 @@ Base controllers call `SaveChanges()` automatically, but when using `IEntityServ
 
 ### Web Endpoints
 
-**Use `EntityControllerBase`** for exposing entity operations as HTTP endpoints:
-
-```csharp
-// Minimal (no search or sorting)
-EntityControllerBase<TEntity, TDto, TInputDto>
-
-// With search
-EntityControllerBase<TEntity, TSearchObject, TDto, TInputDto>
-EntityControllerBase<TEntity, TKey, TSearchObject, TDto, TInputDto>
-
-// Full-featured (recommended for complex scenarios)
-EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TInputDto>
-```
+**Use `EntityControllerBase`** for exposing entity operations as HTTP endpoints (→ see Step 12 for the full pairing table).
 
 - Don't expose entity classes directly in API responses — prefer DTOs
 - Extend `SearchObject` to add filtering rather than creating extra endpoints
@@ -174,8 +122,6 @@ EntityControllerBase<TEntity, TKey, TSearchObject, TSortBy, TIncludes, TDto, TIn
 ---
 
 ## Project Creation Workflow
-
-Don't copy the example code, use it as a reference and follow the steps to create your own implementation.
 
 ### Step 1: Project Files
 
@@ -200,15 +146,13 @@ Don't copy the example code, use it as a reference and follow the steps to creat
 
 - Enable Regira Entities by `UseEntities()` which returns an `IEntityServiceCollection` for configuring entities
 - Use extension methods per entity using `.For()` for clean, composable DI registration
-- Use inline config for simple logic; separate classes for complex logic or when DI is needed
+- → Apply the inline vs separate class rule from §Decision-Making Guidelines
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Setup
 
 ---
 
 ## Entity Implementation Workflow
-
-Use the table below to decide which extension points are actually needed before adding more classes.
 
 | Step | Default | Add it when |
 |------|---------|--------------|
@@ -245,8 +189,7 @@ Mnemonic: Preppers prepare entity state before `SaveChanges()`; Primers prepare 
 
 ### Step 2: Create SearchObject
 
-- Inherit from `SearchObject` and add filter properties as needed. 
-- When no custom search object is implemented, the default `SearchObject` is used as fallback.
+- Inherit from `SearchObject` and add filter properties as needed.
 - Prefer using `ICollection<TKey>` for FK filters to allow multiple values.
 
 ```csharp
@@ -273,18 +216,14 @@ public class SearchObject<TKey> : ISearchObject<TKey>
 
 - `SortBy` is a plain (non-`[Flags]`) enum
 - Multiple sortBy values can be passed in an array and will be applied in order
-- The framework falls back to `EntitySortBy` if no custom sorting options implemented
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Product entity
 
 ### Step 4: Create Includes Enum
 
-> `Includes` is a `[Flags]` enum — values are combined with bitwise OR.
-> The framework falls back to `EntityIncludes` if no custom includes options implemented.
-> Base `EntityIncludes` is intentionally minimal (`Default`, `All`). Use it when the entity only needs the base "no extra relations" versus "include all configured relations" behavior.
-> If the entity needs named domain-specific flags such as `Categories`, `Parents`, or `Children`, define a custom `[Flags]` enum and use that same `TIncludes` type consistently in `.For<>()`, `EntityControllerBase<>`, processors, and any direct `IEntityService<>` injections.
-> List function should not return navigation properties by default — they must be explicitly requested via the `includes` parameter to prevent over-fetching and performance issues.
-> Details function can return all navigation properties by default since it's for a single item and the consumer is likely to want the related data.
+- `[Flags]` enum — values combined with bitwise OR
+- `EntityIncludes` is minimal (`Default`, `All`) — define a domain-specific `[Flags]` enum when you need named flags (`Categories`, `Parents`, etc.) and use it consistently in `.For<>()`, controllers, processors, and `IEntityService<>` injections
+- List: no navigation properties by default (prevent over-fetching); Details: can return all by default
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity
 
@@ -306,22 +245,17 @@ public class SearchObject<TKey> : ISearchObject<TKey>
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Product entity
 
-**Option A: Inline** — use for simple logic (< 10 lines), entity-specific, no DI needed.  
-**Option B: Separate class** — use when complex logic, DI, or reuse is required.
+→ Apply the inline vs separate class rule from §Decision-Making Guidelines.
 
 **⚠️ Important:** Never reference `[NotMapped]` or processor-populated properties inside `.Filter(...)`, `.SortBy(...)`, or any query lambda that must be translated to SQL. Those values do not exist in the database query. If a filter needs derived data, move it into a separate query builder with DI and use database-backed joins or subqueries.
 
 ### Step 7: Processors (Optional)
 
-Use processors to fill `[NotMapped]` properties or enrich entities **after** fetching from the database.
-
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Category entity (CategoryProcessor) / Additional Patterns > Inline processor
 
 ### Step 8: Preppers (Optional)
 
-- Before saving
-- manage child entities (if not using `e.Related()` in entity configuration)
-- (re)calculate totals, generate codes, set FKs, etc.
+Use to: manage child collections (if not using `e.Related()`), recalculate totals/codes/FKs before `SaveChanges()`.
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Prepper
 
@@ -333,9 +267,7 @@ Use processors to fill `[NotMapped]` properties or enrich entities **after** fet
 
 ### Step 9: Primers (Optional)
 
-- Run during `SaveChanges()` via EF Core interceptors
-- Allow checking other modified entities, ready to be persisted in the same transaction
-- Require use of `AddPrimerInterceptors(sp)` in `AddDbContext()`
+Run during `SaveChanges()` via EF Core interceptors; can inspect other modified entities in the same transaction. Requires `AddPrimerInterceptors(sp)` in `AddDbContext()`.
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Primers
 
@@ -389,25 +321,15 @@ Add `DbSet<YourEntity>` and configure any relationships in `OnModelCreating`.
 - After changing `.For<>()` generic arguments, run the app once in addition to `dotnet build`.
 - `dotnet build` verifies compilation, but startup DI validation is what catches mismatches between `.For<>()`, `EntityControllerBase<>`, and direct `IEntityService<...>` injections.
 
-### Optional: Seed initial data
-
-- Seed after `Database.EnsureCreated()` or after applying migrations, preferably in a startup scope.
-- If you seed through `IEntityService`, the normal prepper and primer pipeline runs and you must still call `SaveChanges()` explicitly.
-- If you inject `IEntityService<TEntity, TSearchObject, TSortBy, TIncludes>` into a startup seeder, background job, or hosted service, its generic arguments must exactly match the `.For<>()` registration, including `TIncludes`.
-- Use `DbContext` directly only when you intentionally want raw EF Core behavior instead of the entity-service pipeline.
-
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Database initialization and seeding
-
 ---
 
 ## Custom Entity Services
 
 ### Using EntityWrappingServiceBase
 
-> Extends default logic of the Repositories. 
-> The wrapper delegates all calls to an inner `IEntityService` and you override only what you need.
-> Register via `e.UseEntityService<MyCustomEntityService>()` to replace the default repository.
-⚠️ Prevent circular dependencies when injection parent EntityService!
+- Delegates all calls to an inner `IEntityService`; override only what you need
+- Register via `e.UseEntityService<MyCustomEntityService>()` to replace the default repository
+- ⚠️ Prevent circular dependencies when injecting the parent `EntityService`
 
 Examples:
 - Caching: Wrap the default `EntityRepository` with `IMemoryCache`.
@@ -420,25 +342,8 @@ Examples:
 - `e.AddTransient<IProductService, ProductService>()` — enables typed injection by interface
 - `e.UseEntityService<ProductService>()` — replaces the default `EntityRepository` as `IEntityService` for the entity
 
+> **→ See:** [`entities.signatures.md`](./entities.signatures.md) — EntityWrappingServiceBase
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Order + OrderLine entities (OrderManager)
-
-### EntityWrappingServiceBase Available Overrides
-
-```csharp
-// Read
-Task<TEntity?> Details(TKey id, CancellationToken token = default)
-Task<IList<TEntity>> List(TSearchObject? so = null, PagingInfo? pagingInfo = null, CancellationToken token = default)
-Task<IList<TEntity>> List(IList<TSearchObject?> so, IList<TSortBy> sortBy, TIncludes? includes, PagingInfo? pagingInfo, CancellationToken token = default)
-Task<long> Count(TSearchObject? so, CancellationToken token = default)
-Task<long> Count(IList<TSearchObject?> so, CancellationToken token = default)
-
-// Write
-Task Save(TEntity item, CancellationToken token = default)
-Task Add(TEntity item, CancellationToken token = default)
-Task<TEntity?> Modify(TEntity item, CancellationToken token = default)
-Task Remove(TEntity item, CancellationToken token = default)
-Task<int> SaveChanges(CancellationToken token = default)
-```
 
 ---
 
@@ -448,29 +353,21 @@ Task<int> SaveChanges(CancellationToken token = default)
 - They are registered on the `EntityServiceCollectionOptions` (inside `UseEntities()`)
 - Global services execute before entity-specific services — order matters
 
-### Global Filter Query Builders
+### Global Services (→ see [`entities.examples.md`](./entities.examples.md))
 
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Global filter query builder
-
-### Global Preppers (Inline)
-
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Setup
-
-### Global Primers
-
-> **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Primers
+- Filter query builders → Additional Patterns > Global filter query builder
+- Preppers (inline) → Setup
+- Primers → Additional Patterns > Primers
 
 ### UseDefaults() — What It Registers
 
 `options.UseDefaults()` is a convenience method that registers default primers, global query filters, and normalizer services.
 
-> **→ See:** [Quick Reference: Built-in Services](#quick-reference-built-in-services) for the full list of registered classes.
+> **→ See:** §Quick Reference: Built-in Services (this file) for the full list of registered classes.
 
 ---
 
 ## Normalizing
-
-Normalization facilitates text search by removing diacritics, special characters, and standardizing whitespace.
 
 ### Attribute-Based (Recommended)
 
@@ -516,26 +413,13 @@ Normalizers run automatically when saving. Use the `(sp, options) =>` factory ov
 ## Attachments
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Attachments
+> **→ See:** [`entities.signatures.md`](./entities.signatures.md) — Attachments
 
-### 1. EntityAttachment Model
-
-Create a class inheriting `EntityAttachment<TKey, TObjectKey>` and override `ObjectType`.
-
-### 2. Update Owning Entity
-
-Implement `IHasAttachments` and `IHasAttachments<TAttachment>`. The `IHasAttachments.Attachments` property requires an explicit interface implementation.
-
-### 3. Create Attachment Controller
-
-Inherit from `EntityAttachmentControllerBase<TAttachment, TKey, TObjectKey>`. Route pattern: `api/{entity}/{objectId}/attachments`.
-
-### 4. Update DbContext
-
-Add `DbSet<Attachment>` and `DbSet<TAttachment>`. Configure the relationship between the attachment and its owning entity in `OnModelCreating`.
-
-### 5. Configure DI
-
-Call `.WithAttachments(_ => new BinaryFileService(...))` (or Azure/SFTP variant) on the `IEntityServiceCollection`.
+1. Create class inheriting `EntityAttachment<TKey, TObjectKey>`, override `ObjectType`
+2. Implement `IHasAttachments` and `IHasAttachments<TAttachment>` on the owning entity (`Attachments` property needs explicit interface implementation)
+3. Create controller inheriting `EntityAttachmentControllerBase<TAttachment, TKey, TObjectKey>` — route: `api/{entity}/{objectId}/attachments`
+4. Add `DbSet<Attachment>` and `DbSet<TAttachment>` to DbContext; configure relationship in `OnModelCreating`
+5. Call `.WithAttachments(_ => new BinaryFileService(...))` on `IEntityServiceCollection`
 
 ---
 
@@ -550,8 +434,6 @@ Controllers automatically catch `EntityInputException` and return `BadRequest (4
 ---
 
 ## Built-in Query Extensions
-
-These LINQ extension methods are available for use inside query builders:
 
 > **→ See:** [`entities.examples.md`](./entities.examples.md) — Additional Patterns > Query extensions reference
 
@@ -605,35 +487,9 @@ Use `AddAutoTruncateInterceptors()` when registering DbContext to prevent string
 
 ## Response Types
 
-All base controller endpoints return standardized wrappers:
+All base controller endpoints return typed wrappers (`DetailsResult`, `ListResult`, `SearchResult`, `SaveResult`, `DeleteResult`).
 
-```csharp
-// GET /api/entities/{id}
-DetailsResult<TDto>  { TDto Item; long? Duration; }
-
-// GET /api/entities
-ListResult<TDto>     { IList<TDto> Items; long? Duration; }
-
-// GET /api/entities/search  (Items + Count for pagination)
-SearchResult<TDto>   { IList<TDto> Items; long Count; long? Duration; }
-
-// POST / PUT / POST save
-SaveResult<TDto>     { TDto Item; bool IsNew; int Affected; long? Duration; }
-
-// DELETE /api/entities/{id}
-DeleteResult<TDto>   { TDto Item; long? Duration; }
-```
-
----
-
-## Best Practices
-
-- **Always call `SaveChanges()`** after write operations when using `IEntityService` directly (e.g. when seeding data) - this is standard EF Core behavior
-- `Add()`, `Modify()`, `Remove()`, and `Save()` only track changes - they do NOT persist to the database
-- Base controllers call `SaveChanges()` automatically after write endpoints (POST, PUT, DELETE)
-- Custom code (services, background jobs, console apps) must explicitly call `await service.SaveChanges()` or `await dbContext.SaveChangesAsync()`
-- Preppers run before `SaveChanges()` - they prepare entities for persistence but don't commit them
-- Primers run during `SaveChanges()` via EF Core interceptors
+> **→ See:** [`entities.signatures.md`](./entities.signatures.md) — Response Types
 
 ---
 
@@ -657,8 +513,7 @@ DeleteResult<TDto>   { TDto Item; long? Duration; }
 
 ## Quick Reference: Built-in Services
 
-These services are automatically registered when calling `options.UseDefaults()`, 
-but can also be registered manually if you want to customize the configuration.
+Registered by `options.UseDefaults()`; can also be registered manually.
 
 ### Global Filter Query Builders
 
@@ -691,8 +546,6 @@ but can also be registered manually if you want to customize the configuration.
 ---
 
 ## Troubleshooting
-
-Always use the latest .net version (net10 atm) unless rquested otherwise.
 
 | Problem | Likely Cause | Fix |
 |---------|-------------|-----|
