@@ -14,7 +14,7 @@
     <Version>5.4.1</Version>
   
     <Description>PDF printing support using PDFtoPrinter for Regira Office.</Description>
-    <PackageTags>regira;office;pdf;printing;pdftopinter</PackageTags>
+    <PackageTags>regira;office;pdf;printing;pdftoprinter</PackageTags>
 </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="PDFtoPrinter" Version="1.5.6" />
