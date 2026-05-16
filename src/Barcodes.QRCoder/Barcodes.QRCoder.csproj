@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.1</Version>
-  </PropertyGroup>
+  
+    <Description>QR code generation using QRCoder for Regira Office.</Description>
+    <PackageTags>regira;office;barcodes;qrcode;qrcoder</PackageTags>
+</PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
     <ProjectReference Include="..\Drawing.GDI\Drawing.GDI.csproj" />

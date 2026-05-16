@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.1</Version>
-  </PropertyGroup>
+  
+    <Description>Video and audio processing using FFMpegCore for Regira.</Description>
+    <PackageTags>regira;media;video;audio;ffmpeg</PackageTags>
+</PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FFMpegCore" Version="5.4.0" />
   </ItemGroup>

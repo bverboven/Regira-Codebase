@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.1</Version>
-  </PropertyGroup>
+  
+    <Description>Entity Framework Core data access layer base classes and helpers for Regira.</Description>
+    <PackageTags>regira;dal;efcore;entityframework;orm</PackageTags>
+</PropertyGroup>
   <ItemGroup>
     <Compile Remove="Normalizing\**" />
     <EmbeddedResource Remove="Normalizing\**" />

@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.2</Version>
-  </PropertyGroup>
+  
+    <Description>AutoMapper integration for Regira entity mapping.</Description>
+    <PackageTags>regira;entities;mapping;automapper</PackageTags>
+</PropertyGroup>
   <ItemGroup>
     <None Include="$(OutputPath)$(AssemblyName).xml" Pack="true" PackagePath="lib\$(TargetFramework)\" Visible="false" Condition="Exists('$(OutputPath)$(AssemblyName).xml')" />
   </ItemGroup>

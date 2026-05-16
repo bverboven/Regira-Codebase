@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -10,7 +10,10 @@
     <PackageId>Regira.ProjectFilesProcessor</PackageId>
     <Authors>B.Verboven</Authors>
     <UserSecretsId>a148955e-1052-48e7-a8da-4534748de1c4</UserSecretsId>
-  </PropertyGroup>
+  
+    <Description>Console tool for batch-processing Regira project files.</Description>
+    <PackageTags>regira;tools;projects;processor</PackageTags>
+</PropertyGroup>
   <ItemGroup>
     <None Remove="appsettings.json" />
   </ItemGroup>

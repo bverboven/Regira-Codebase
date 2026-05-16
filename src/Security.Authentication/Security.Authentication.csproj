@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.1</Version>
-  </PropertyGroup>
+  
+    <Description>JWT and OAuth2 authentication helpers using Duende IdentityModel for Regira.</Description>
+    <PackageTags>regira;security;authentication;jwt;oauth2</PackageTags>
+</PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Duende.IdentityModel" Version="8.1.0" />
   </ItemGroup>

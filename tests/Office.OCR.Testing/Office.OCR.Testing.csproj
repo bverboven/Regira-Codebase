@@ -6,7 +6,10 @@
     <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
-  </PropertyGroup>
+  
+    <Description>Unit and integration tests for Regira Office OCR packages.</Description>
+    <PackageTags>regira;testing;office;ocr</PackageTags>
+</PropertyGroup>
 
   <ItemGroup>
     <None Remove="Assets\poem-en.jpg" />

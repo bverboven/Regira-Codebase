@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.1</Version>
-  </PropertyGroup>
+  
+    <Description>Mollie payment gateway integration for Regira.</Description>
+    <PackageTags>regira;payments;mollie;gateway</PackageTags>
+</PropertyGroup>
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
     <PackageReference Include="System.Text.Json" Version="10.0.8" />
   </ItemGroup>

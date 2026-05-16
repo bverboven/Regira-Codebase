@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.1</Version>
-  </PropertyGroup>
+  
+    <Description>vCard read/write support using FolkerKinzel.VCards for Regira Office.</Description>
+    <PackageTags>regira;office;vcards;contacts;folkerkinzel</PackageTags>
+</PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
   </ItemGroup>

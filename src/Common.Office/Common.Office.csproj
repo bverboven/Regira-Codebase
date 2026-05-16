@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.1</Version>
-  </PropertyGroup>
+  
+    <Description>Abstractions for office document operations including PDF, Excel, Word, Mail, CSV, OCR, barcodes, and vCards.</Description>
+    <PackageTags>regira;office;pdf;excel;word;mail;csv;ocr;barcodes;vcards</PackageTags>
+</PropertyGroup>
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.8" />
   </ItemGroup>

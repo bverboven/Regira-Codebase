@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.1</Version>
-  </PropertyGroup>
+  
+    <Description>In-memory caching utilities using System.Runtime.Caching for Regira.</Description>
+    <PackageTags>regira;caching;runtime;memory</PackageTags>
+</PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Runtime.Caching" Version="10.0.8" />
   </ItemGroup>

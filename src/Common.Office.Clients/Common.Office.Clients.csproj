@@ -12,7 +12,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.1</Version>
-  </PropertyGroup>
+  
+    <Description>HTTP client extensions for consuming Regira Office services remotely.</Description>
+    <PackageTags>regira;office;clients;http</PackageTags>
+</PropertyGroup>
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
     <PackageReference Include="System.Net.Http.Json" Version="10.0.8" />
   </ItemGroup>

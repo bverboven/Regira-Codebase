@@ -13,7 +13,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
     <Version>5.4.1</Version>
-  </PropertyGroup>
+  
+    <PackageTags>regira;setup;ai;guides</PackageTags>
+</PropertyGroup>
   <ItemGroup>
     <None Include="build\Regira.Setup.props" Pack="true" PackagePath="buildTransitive\" />
     <None Include="build\Regira.Setup.targets" Pack="true" PackagePath="buildTransitive\" />
