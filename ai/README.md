@@ -22,9 +22,9 @@ The root `ai/AGENTS.md` is the top-level bootstrap and routing guide. Every sour
 
 Guide files exist across modules: `Entities`, `IO.Storage`, `Office.*`, `Security`, `Web`, `Invoicing`, `Payments`, `Media`, `System`, `TreeList`.
 
-### Layer 2 — Consumer projects (`regira/instructions/`)
+### Layer 2 — Consumer projects (`.regira/instructions/`)
 
-When a consumer project runs `dotnet build`, package `.targets` files **extract the embedded `ai/*.md` files** from the installed NuGet packages and copy them into `regira/instructions/` at the solution root. This means the AI agent in the consumer project sees only the guides relevant to the packages actually installed — not the entire Regira source tree.
+When a consumer project runs `dotnet build`, package `.targets` files **extract the embedded `ai/*.md` files** from the installed NuGet packages and copy them into `.regira/instructions/` at the solution root. This means the AI agent in the consumer project sees only the guides relevant to the packages actually installed — not the entire Regira source tree.
 
 ---
 
@@ -41,7 +41,7 @@ The agent loads only the most specific guide that covers the current task, not t
 
 ### Template-driven scaffolding
 
-Six project templates (`ConsoleWithLogging`, `BasicApi`, `SelfHostingApi`, `SelfHostingApiWithAuth`, etc.) ensure generated code lands in the right architectural shape before any module code is written.
+Four project templates (`ConsoleWithLogging`, `BasicApi`, `SelfHostingApi`, `SelfHostingApiWithAuth`) ensure generated code lands in the right architectural shape before any module code is written.
 
 ### Pre-flight → checkpoint → code
 

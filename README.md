@@ -81,18 +81,87 @@ Regira is a collection of .NET libraries providing unified abstractions for comm
 
 ## Using Regira in your project
 
-Use this section as the human-facing guide. The downstream `./AGENTS.md` file is the AI-facing bootstrap the agent follows inside the consumer repository.
+AI assistance for Regira works in three complementary layers, each covering a different phase of development:
 
-The normal consumer flow is one committed bootstrap file:
+1. **Discover** — the MCP server helps the agent find the right packages before anything is installed
+2. **Bootstrap** — an `AGENTS.md` file in your repo gives the agent the project setup workflow
+3. **Implement** — per-package guide files extracted locally on `dotnet build` give the agent detailed implementation instructions
 
-1. Copy [ai/AGENTS.md](ai/AGENTS.md) into the root of the application repository as `AGENTS.md`.
-2. Ask the agent what application to build, or which Regira feature to add to an existing application.
-3. The agent uses `./AGENTS.md` to choose the project template, select the required Regira NuGet packages, add them to the project, and write the code.
+You can use any layer in isolation, but together they give the agent everything it needs from first idea to working code.
 
-If an installed Regira package ships AI instruction files, those files live inside the NuGet package under its `ai/` content. During `dotnet build`, a bundled MSBuild `.targets` file extracts them into `.github/instructions/regira/` in the consumer repository. When those extracted local guides are present, the downstream agent should read the relevant local guides before generating Regira-related code.
+### Step 1 — Connect the MCP server (discovery)
 
-Install `Regira.Setup` when you also want the shared setup guides `project.setup.md` and `shared.setup.md` extracted locally into `.github/instructions/regira/`. Module packages can extract their own module-specific guides the same way.
+Regira exposes a hosted MCP server at `https://mcp.regira.com/mcp`. Connect it to your AI tool once and the agent can search the full package catalog, get recommendations, and fetch setup instructions — without you having to install anything first.
 
-This same `./AGENTS.md` flow works for both a new empty folder and an existing application that needs extra Regira features.
+#### GitHub Copilot (VS Code)
 
-In this source repository, [ai/AGENTS.md](ai/AGENTS.md) is also the top-level Regira routing guide. Consumer repositories do not need any additional root `ai/*.md` files for the normal flow.
+Add `.vscode/mcp.json` to your project:
+
+```json
+{
+  "servers": {
+    "regira": {
+      "type": "http",
+      "url": "https://mcp.regira.com/mcp"
+    }
+  }
+}
+```
+
+Then switch Copilot Chat to **Agent mode** — the Regira tools appear automatically.
+
+#### Claude Desktop
+
+Edit `~/.claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "regira": {
+      "url": "https://mcp.regira.com/mcp"
+    }
+  }
+}
+```
+
+Restart Claude Desktop. The Regira tools appear automatically.
+
+#### Claude Code (VS Code extension)
+
+Add to `.claude/settings.json` in your project:
+
+```json
+{
+  "mcpServers": {
+    "regira": {
+      "url": "https://mcp.regira.com/mcp"
+    }
+  }
+}
+```
+
+#### Cursor
+
+Settings → MCP Servers → Add server → paste `https://mcp.regira.com/mcp`.
+
+#### Available tools
+
+| Tool | What it does |
+|------|-------------|
+| `list_packages` | Browse all packages, optionally filtered by category |
+| `search_packages` | Keyword/use-case search, returns ranked results |
+| `recommend_packages` | Describe a feature, get package suggestions |
+| `get_package` | Full docs, examples, and setup instructions for one package |
+| `get_bootstrap_guide` | Consumer project setup guide (NuGet config, DI, workflow) |
+
+### Step 2 — Bootstrap your project
+
+Copy [ai/AGENTS.md](ai/AGENTS.md) into the root of your application repository as `AGENTS.md`. This gives the agent the full Regira project setup workflow: NuGet configuration, project templates, and which packages to install for common scenarios.
+
+This works for both a new empty folder and an existing application that needs extra Regira features. When the MCP server is also connected, the agent can call `get_bootstrap_guide` to retrieve this same guide without you copying the file manually.
+
+### Step 3 — Per-package guides (post-install)
+
+When a Regira package is installed and you run `dotnet build`, the package extracts its AI guide files into `.github/instructions/regira/` in your repository. These local files give the agent detailed implementation instructions, code examples, and API signatures for the specific packages you have installed.
+
+Install `Regira.Setup` to also extract the shared setup guides `project.setup.md` and `shared.setup.md`. Individual module packages extract their own guides the same way.

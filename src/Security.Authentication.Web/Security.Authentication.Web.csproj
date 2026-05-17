@@ -11,11 +11,10 @@
     <AssemblyName>Regira.Security.Authentication.Web</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.1</Version>
-  
+    <Version>5.4.2</Version>
     <Description>ASP.NET Core authentication middleware and OpenAPI integration for Regira.</Description>
     <PackageTags>regira;security;authentication;web;aspnetcore;openapi</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Office\Common.Office.csproj" />
     <ProjectReference Include="..\Common.Web\Common.Web.csproj" />

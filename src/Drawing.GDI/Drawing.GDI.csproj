@@ -11,11 +11,10 @@
     <AssemblyName>Regira.Drawing.GDI</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.1</Version>
-  
+    <Version>5.4.2</Version>
     <Description>GDI+-based image processing and drawing utilities for Regira.</Description>
     <PackageTags>regira;drawing;gdi;images</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="10.0.8" />
   </ItemGroup>

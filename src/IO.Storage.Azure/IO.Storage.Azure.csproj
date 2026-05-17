@@ -11,11 +11,10 @@
     <AssemblyName>Regira.IO.Storage.Azure</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.1</Version>
-  
+    <Version>5.4.2</Version>
     <Description>Azure Blob Storage implementation of Regira's IO storage abstractions.</Description>
     <PackageTags>regira;io;storage;azure;blobs</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.IO.Storage\Common.IO.Storage.csproj" />
   </ItemGroup>

@@ -10,12 +10,11 @@
     <AssemblyName>Regira.Office.Excel.ClosedXML</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.1</Version>
+    <Version>5.4.2</Version>
     <TargetFramework>netstandard2.0</TargetFramework>
-  
     <Description>Excel read/write support using ClosedXML for Regira Office.</Description>
     <PackageTags>regira;office;excel;closedxml</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="ClosedXML.Parser" Version="2.0.0" />

@@ -11,11 +11,10 @@
     <AssemblyName>Regira.IO.Compression.SharpZipLib</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.1</Version>
-  
+    <Version>5.4.2</Version>
     <Description>ZIP and archive compression support using SharpZipLib for Regira.</Description>
     <PackageTags>regira;io;compression;zip;sharpziplib</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>

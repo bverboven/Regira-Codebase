@@ -11,11 +11,10 @@
     <AssemblyName>Regira.Entities.DependencyInjection</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.2</Version>
-  
+    <Version>5.4.3</Version>
     <Description>Dependency injection extensions for Regira's entity framework.</Description>
     <PackageTags>regira;entities;dependency-injection;di</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="ai\**" />
     <EmbeddedResource Remove="ai\**" />

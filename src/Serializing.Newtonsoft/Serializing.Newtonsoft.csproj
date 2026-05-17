@@ -11,11 +11,10 @@
     <AssemblyName>Regira.Serializing.Newtonsoft</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.1</Version>
-  
+    <Version>5.4.2</Version>
     <Description>JSON serialization using Newtonsoft.Json (Json.NET) for Regira.</Description>
     <PackageTags>regira;serializing;json;newtonsoft;json.net</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>

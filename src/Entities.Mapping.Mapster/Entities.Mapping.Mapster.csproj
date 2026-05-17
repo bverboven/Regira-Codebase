@@ -11,11 +11,10 @@
     <AssemblyName>Regira.Entities.Mapping.Mapster</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.2</Version>
-  
+    <Version>5.4.3</Version>
     <Description>Mapster integration for Regira entity mapping.</Description>
     <PackageTags>regira;entities;mapping;mapster</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="$(OutputPath)$(AssemblyName).xml" Pack="true" PackagePath="lib\$(TargetFramework)\" Visible="false" Condition="Exists('$(OutputPath)$(AssemblyName).xml')" />
   </ItemGroup>

@@ -11,11 +11,10 @@
     <AssemblyName>Regira.Globalization.LibPhoneNumber</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.3.1</Version>
-  
+    <Version>5.3.2</Version>
     <Description>Phone number parsing and formatting using libphonenumber-csharp for Regira.</Description>
     <PackageTags>regira;globalization;phone;libphonenumber</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="libphonenumber-csharp" Version="9.0.30" />
   </ItemGroup>

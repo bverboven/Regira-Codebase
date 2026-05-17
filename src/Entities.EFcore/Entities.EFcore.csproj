@@ -11,11 +11,10 @@
     <AssemblyName>Regira.Entities.EFcore</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.2</Version>
-  
+    <Version>5.4.3</Version>
     <Description>Entity Framework Core integration for the Regira entity framework.</Description>
     <PackageTags>regira;entities;efcore;entityframework</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="$(OutputPath)$(AssemblyName).xml" Pack="true" PackagePath="lib\$(TargetFramework)\" Visible="false" Condition="Exists('$(OutputPath)$(AssemblyName).xml')" />
   </ItemGroup>

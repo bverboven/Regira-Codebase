@@ -11,11 +11,10 @@
     <AssemblyName>Regira.Invoicing.UblSharp</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.1</Version>
-  
+    <Version>5.4.2</Version>
     <Description>UBL (Universal Business Language) invoice serialization using UblSharp for Regira.</Description>
     <PackageTags>regira;invoicing;ubl;xml;ublsharp</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="UblSharp" Version="1.1.1" />
   </ItemGroup>

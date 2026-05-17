@@ -11,11 +11,10 @@
     <AssemblyName>Regira.System.Projects</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.1</Version>
-  
+    <Version>5.4.2</Version>
     <Description>Project file and solution structure utilities for Regira system tools.</Description>
     <PackageTags>regira;system;projects;solution</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.IO.Storage\Common.IO.Storage.csproj" />
     <ProjectReference Include="..\Common.System\Common.System.csproj" />

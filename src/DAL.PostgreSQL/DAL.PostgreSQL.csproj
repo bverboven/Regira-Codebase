@@ -11,11 +11,10 @@
     <AssemblyName>Regira.DAL.PostgreSQL</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.1</Version>
-  
+    <Version>5.4.2</Version>
     <Description>PostgreSQL data access layer for Regira using Dapper and Npgsql.</Description>
     <PackageTags>regira;dal;postgresql;dapper;npgsql</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.72" />
   </ItemGroup>

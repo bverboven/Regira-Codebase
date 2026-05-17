@@ -11,11 +11,10 @@
     <AssemblyName>Regira.Payments.Pom</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.1</Version>
-  
+    <Version>5.4.2</Version>
     <Description>POM payment integration for Regira.</Description>
     <PackageTags>regira;payments;pom</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Invoicing\Common.Invoicing.csproj" />
   </ItemGroup>

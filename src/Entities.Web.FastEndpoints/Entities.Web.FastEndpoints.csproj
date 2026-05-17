@@ -11,11 +11,10 @@
     <AssemblyName>Regira.Entities.Web.FastEndpoints</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.2</Version>
-  
+    <Version>5.4.3</Version>
     <Description>FastEndpoints integration for exposing Regira entities via minimal API endpoints.</Description>
     <PackageTags>regira;entities;web;fastendpoints;minimal-api</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="$(OutputPath)$(AssemblyName).xml" Pack="true" PackagePath="lib\$(TargetFramework)\" Visible="false" Condition="Exists('$(OutputPath)$(AssemblyName).xml')" />
   </ItemGroup>

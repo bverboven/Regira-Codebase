@@ -11,11 +11,10 @@
     <AssemblyName>Regira.TreeList</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.1</Version>
-  
+    <Version>5.4.2</Version>
     <Description>Hierarchical tree list data structure and LINQ extensions for Regira.</Description>
     <PackageTags>regira;treelist;tree;hierarchy;linq</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <!-- MSBuild targets — auto-imported into consuming builds via NuGet buildTransitive -->
   <ItemGroup>
     <None Include="build\Regira.TreeList.props" Pack="true" PackagePath="buildTransitive\" />

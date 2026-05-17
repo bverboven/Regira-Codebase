@@ -11,11 +11,10 @@
     <AssemblyName>Regira.Media.FFMpeg</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.1</Version>
-  
+    <Version>5.4.2</Version>
     <Description>Video and audio processing using FFMpegCore for Regira.</Description>
     <PackageTags>regira;media;video;audio;ffmpeg</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FFMpegCore" Version="5.4.0" />
   </ItemGroup>

@@ -11,11 +11,10 @@
     <AssemblyName>Regira.Entities.Web</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
-    <Version>5.4.2</Version>
-  
+    <Version>5.4.3</Version>
     <Description>ASP.NET Core Web API controllers and endpoints for Regira entities.</Description>
     <PackageTags>regira;entities;web;aspnetcore;api</PackageTags>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="$(OutputPath)$(AssemblyName).xml" Pack="true" PackagePath="lib\$(TargetFramework)\" Visible="false" Condition="Exists('$(OutputPath)$(AssemblyName).xml')" />
   </ItemGroup>
